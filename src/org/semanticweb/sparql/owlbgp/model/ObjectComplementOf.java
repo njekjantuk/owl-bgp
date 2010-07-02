@@ -42,6 +42,9 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     protected ObjectComplementOf(ClassExpression classExpression) {
         m_classExpression=classExpression;
     }
+    public ClassExpression getComplementedClassExpression() {
+        return m_classExpression;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectComplementOf(");

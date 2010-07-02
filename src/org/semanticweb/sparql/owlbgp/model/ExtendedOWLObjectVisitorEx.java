@@ -42,4 +42,23 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataIntersectionOf dataIntersectionOf);
     O visit(DataUnionOf dataUnionOf);
     O visit(DataOneOf dataOneOf);
+    
+    O visit(SubClassOf axiom);
+    O visit(EquivalentClasses axiom);
+    O visit(DisjointClasses axiom);
+    O visit(DisjointUnion axiom);
+    
+    O visit(SubObjectPropertyOf axiom);
+    O visit(EquivalentObjectProperties axiom);
+    O visit(DisjointObjectProperties axiom);
+    O visit(InverseObjectProperties axiom);
+    O visit(ObjectPropertyDomain axiom);
+    O visit(ObjectPropertyRange axiom);
+    O visit(FunctionalObjectProperty axiom);
+    O visit(InverseFunctionalObjectProperty axiom);
+    O visit(ReflexiveObjectProperty axiom);
+    O visit(IrreflexiveObjectProperty axiom);
+    O visit(SymmetricObjectProperty axiom);
+    O visit(AsymmetricObjectProperty axiom);
+    O visit(TransitiveObjectProperty axiom);
 }

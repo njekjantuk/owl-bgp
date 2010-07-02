@@ -26,14 +26,14 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class InverseObjectProperty extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
-    private static final long serialVersionUID = 8384355222796218922L;
+    private static final long serialVersionUID = 4170522309299326290L;
 
     protected static InterningManager<InverseObjectProperty> s_interningManager=new InterningManager<InverseObjectProperty>() {
         protected boolean equal(InverseObjectProperty object1,InverseObjectProperty object2) {
             return object1.m_ope==object2.m_ope;
         }
         protected int getHashCode(InverseObjectProperty object) {
-            return object.m_ope.hashCode();
+            return -object.m_ope.hashCode();
         }
     };
     
@@ -41,6 +41,9 @@ public class InverseObjectProperty extends AbstractExtendedOWLObject implements 
    
     protected InverseObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
         m_ope=objectPropertyExpression;
+    }
+    public ObjectPropertyExpression getInvertedObjectPropertyExpression() {
+        return m_ope;
     }
     public String getIRIString() {
         return null;

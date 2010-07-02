@@ -46,6 +46,15 @@ public class ObjectMinCardinality extends AbstractExtendedOWLObject implements C
         m_ope=ope;
         m_classExpression=classExpression;
     }
+    public int getCardinality() {
+        return m_cardinality;
+    }
+    public ObjectPropertyExpression getObjectPropertyExpression() {
+        return m_ope;
+    }
+    public ClassExpression getClassExpression() {
+        return m_classExpression;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectMinCardinality(");

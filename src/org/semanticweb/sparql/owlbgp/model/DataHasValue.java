@@ -44,6 +44,12 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
         m_dpe=dpe;
         m_literal=literal;
     }
+    public DataPropertyExpression getDataPropertyExpression() {
+        return m_dpe;
+    }
+    public ILiteral getDataRange() {
+        return m_literal;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataHasValue(");

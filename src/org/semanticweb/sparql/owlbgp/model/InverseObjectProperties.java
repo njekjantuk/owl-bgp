@@ -25,41 +25,45 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class ObjectHasSelf extends AbstractExtendedOWLObject implements ClassExpression {
-    private static final long serialVersionUID = -5958845591224826209L;
+public class InverseObjectProperties extends AbstractAxiom implements ObjectPropertyAxiom {
+    private static final long serialVersionUID = -4739651270386976693L;
 
-    protected static InterningManager<ObjectHasSelf> s_interningManager=new InterningManager<ObjectHasSelf>() {
-        protected boolean equal(ObjectHasSelf object1,ObjectHasSelf object2) {
-            return object1.m_ope==object2.m_ope;
+    protected static InterningManager<InverseObjectProperties> s_interningManager=new InterningManager<InverseObjectProperties>() {
+        protected boolean equal(InverseObjectProperties object1,InverseObjectProperties object2) {
+            return object1.m_ope==object2.m_ope&&object1.m_inverseOpe==object2.m_inverseOpe;
         }
-        protected int getHashCode(ObjectHasSelf object) {
-            return 17*object.m_ope.hashCode();
+        protected int getHashCode(InverseObjectProperties object) {
+            return 7*object.m_ope.hashCode()+11*object.m_inverseOpe.hashCode();
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
+    protected final ObjectPropertyExpression m_inverseOpe;
     
-    protected ObjectHasSelf(ObjectPropertyExpression ope) {
+    protected InverseObjectProperties(ObjectPropertyExpression ope,ObjectPropertyExpression inverseOpe) {
         m_ope=ope;
+        m_inverseOpe=inverseOpe;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
+    public ObjectPropertyExpression getInverseObjectPropertyExpression() {
+        return m_inverseOpe;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
-        buffer.append("ObjectHasSelf(");
+        buffer.append("InverseObjectProperties(");
         buffer.append(m_ope.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_inverseOpe.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectHasSelf create(ObjectPropertyExpression ope) {
-        return s_interningManager.intern(new ObjectHasSelf(ope));
-    }
-    public String getIdentifier() {
-        return null;
+    public static InverseObjectProperties create(ObjectPropertyExpression objectPropertyExpression, ObjectPropertyExpression inverseObjectPropertyExpression) {
+        return s_interningManager.intern(new InverseObjectProperties(objectPropertyExpression,inverseObjectPropertyExpression));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -70,17 +74,21 @@ public class ObjectHasSelf extends AbstractExtendedOWLObject implements ClassExp
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ope.getVariablesInSignature(varType));
+        variables.addAll(m_inverseOpe.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_inverseOpe.getUnboundVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
+        m_inverseOpe.applyBindings(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
         m_ope.applyVariableBindings(variablesToBindings);
+        m_inverseOpe.applyVariableBindings(variablesToBindings);
     }
 }

@@ -59,6 +59,13 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
         m_datatype=datatype;
         m_facetRestrictions=facetRestrictions;
     }
+
+    public Datatype getDatatype() {
+        return m_datatype;
+    }
+    public Set<FacetRestriction> getFacetRestrictions() {
+        return m_facetRestrictions;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DatatypeRestriction(");
