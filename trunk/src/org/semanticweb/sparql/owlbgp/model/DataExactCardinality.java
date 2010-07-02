@@ -46,6 +46,15 @@ public class DataExactCardinality extends AbstractExtendedOWLObject implements C
         m_dpe=ope;
         m_dataRange=dataRange;
     }
+    public int getCardinality() {
+        return m_cardinality;
+    }
+    public DataPropertyExpression getDataPropertyExpression() {
+        return m_dpe;
+    }
+    public DataRange getDataRange() {
+        return m_dataRange;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataExactCardinality(");

@@ -25,41 +25,34 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class ObjectHasSelf extends AbstractExtendedOWLObject implements ClassExpression {
-    private static final long serialVersionUID = -5958845591224826209L;
+public class FunctionalObjectProperty extends AbstractAxiom implements ObjectPropertyAxiom {
+    private static final long serialVersionUID = -5357221370133957174L;
 
-    protected static InterningManager<ObjectHasSelf> s_interningManager=new InterningManager<ObjectHasSelf>() {
-        protected boolean equal(ObjectHasSelf object1,ObjectHasSelf object2) {
+    protected static InterningManager<FunctionalObjectProperty> s_interningManager=new InterningManager<FunctionalObjectProperty>() {
+        protected boolean equal(FunctionalObjectProperty object1,FunctionalObjectProperty object2) {
             return object1.m_ope==object2.m_ope;
         }
-        protected int getHashCode(ObjectHasSelf object) {
-            return 17*object.m_ope.hashCode();
+        protected int getHashCode(FunctionalObjectProperty object) {
+            return 17+11*object.m_ope.hashCode();
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
-    
-    protected ObjectHasSelf(ObjectPropertyExpression ope) {
-        m_ope=ope;
+   
+    protected FunctionalObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
+        m_ope=objectPropertyExpression;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
     public String toString(Prefixes prefixes) {
-        StringBuffer buffer=new StringBuffer();
-        buffer.append("ObjectHasSelf(");
-        buffer.append(m_ope.toString(prefixes));
-        buffer.append(")");
-        return buffer.toString();
+        return "FunctionalObjectProperty("+m_ope.toString(prefixes)+")";
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectHasSelf create(ObjectPropertyExpression ope) {
-        return s_interningManager.intern(new ObjectHasSelf(ope));
-    }
-    public String getIdentifier() {
-        return null;
+    public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
+        return s_interningManager.intern(new FunctionalObjectProperty(objectPropertyExpression));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

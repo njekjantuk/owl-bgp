@@ -44,6 +44,9 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
         m_ope=ope;
         m_individual=individual;
     }
+    public ObjectPropertyExpression getObjectPropertyExpression() {
+        return m_ope;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectHasValue(");

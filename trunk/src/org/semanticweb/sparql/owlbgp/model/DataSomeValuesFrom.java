@@ -44,6 +44,12 @@ public class DataSomeValuesFrom extends AbstractExtendedOWLObject implements Cla
         m_dpe=ope;
         m_dataRange=dataRange;
     }
+    public DataPropertyExpression getDataPropertyExpression() {
+        return m_dpe;
+    }
+    public DataRange getDataRange() {
+        return m_dataRange;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataSomeValuesFrom(");

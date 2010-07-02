@@ -42,6 +42,9 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
     protected DataComplementOf(DataRange dataRange) {
         m_dataRange=dataRange;
     }
+    public DataRange getDataRange() {
+        return m_dataRange;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataComplementOf(");
