@@ -29,6 +29,7 @@ public interface ExtendedOWLObject extends Serializable {
     public String getIdentifier();
     public String toString(Prefixes prefixes);
     public void applyBindings(Map<String,String> variablesToBindings);
+    public Iterable<ExtendedOWLObject> applyBindingSets(Map<String,Set<String>> variablesToBindings);
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings);
     public Set<Variable> getVariablesInSignature();
     public Set<Variable> getVariablesInSignature(VarType varType);
