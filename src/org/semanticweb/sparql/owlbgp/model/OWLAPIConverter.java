@@ -260,4 +260,23 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLObject visit(FunctionalDataProperty axiom) {
         return m_dataFactory.getOWLFunctionalDataPropertyAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this));
     }
+    
+    public OWLObject visit(DatatypeDefinition axiom) {
+        return m_dataFactory.getOWLDatatypeDefinitionAxiom((OWLDatatype)axiom.m_datatype.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this));
+    }
+    
+    public OWLObject visit(HasKey axiom) {
+        Set<OWLObjectPropertyExpression> opes=new HashSet<OWLObjectPropertyExpression>();
+        for (ObjectPropertyExpression ope : axiom.m_objectPropertyExpressions) {
+            opes.add((OWLObjectPropertyExpression)ope.accept(this));
+        }
+        Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
+        for (DataPropertyExpression dpe : axiom.m_dataPropertyExpressions) {
+            dpes.add((OWLDataPropertyExpression)dpe.accept(this));
+        }
+        if (opes.size()>0)
+            return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),opes);
+        else 
+            return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),dpes);
+    }
 }

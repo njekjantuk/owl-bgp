@@ -17,7 +17,6 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,72 +24,46 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
-public class DatatypeRestriction extends AbstractExtendedOWLObject implements DataRange {
-    private static final long serialVersionUID = 4586938662095776040L;
+public class DatatypeDefinition extends AbstractAxiom {
+    private static final long serialVersionUID = -3515748752748732664L;
 
-    protected static InterningManager<DatatypeRestriction> s_interningManager=new InterningManager<DatatypeRestriction>() {
-        protected boolean equal(DatatypeRestriction object1,DatatypeRestriction object2) {
-            if (object1.m_datatype!=object2.m_datatype) return false;
-            if (object1.m_facetRestrictions.size()!=object2.m_facetRestrictions.size()) return false;
-            for (FacetRestriction facetRestriction : object1.m_facetRestrictions) {
-                if (!contains(facetRestriction, object2.m_facetRestrictions))
-                    return false;
-            } 
-            return true;
+    protected static InterningManager<DatatypeDefinition> s_interningManager=new InterningManager<DatatypeDefinition>() {
+        protected boolean equal(DatatypeDefinition object1,DatatypeDefinition object2) {
+            return object1.m_datatype==object2.m_datatype&&object1.m_dataRange==object2.m_dataRange;
         }
-        protected boolean contains(FacetRestriction facetRestriction, Set<FacetRestriction> facetRestrictions) {
-            for (FacetRestriction restriction : facetRestrictions)
-                if (restriction==facetRestriction)
-                    return true;
-            return false;
-        }
-        protected int getHashCode(DatatypeRestriction object) {
-            int hashCode=7*object.m_datatype.hashCode();
-            for (FacetRestriction restriction : object.m_facetRestrictions)
-                hashCode+=restriction.hashCode();
-            return hashCode;
+        protected int getHashCode(DatatypeDefinition object) {
+            return 27+11*object.m_datatype.hashCode()+37*object.m_dataRange.hashCode();
         }
     };
     
     protected final Datatype m_datatype;
-    protected final Set<FacetRestriction> m_facetRestrictions;
+    protected final DataRange m_dataRange;
     
-    protected DatatypeRestriction(Datatype datatype,Set<FacetRestriction> facetRestrictions) {
+    protected DatatypeDefinition(Datatype datatype,DataRange facetRestrictions) {
         m_datatype=datatype;
-        m_facetRestrictions=facetRestrictions;
+        m_dataRange=facetRestrictions;
     }
 
     public Datatype getDatatype() {
         return m_datatype;
     }
-    public Set<FacetRestriction> getFacetRestrictions() {
-        return m_facetRestrictions;
+    public DataRange getDataRange() {
+        return m_dataRange;
     }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
-        buffer.append("DatatypeRestriction(");
+        buffer.append("DatatypeDefinition(");
         buffer.append(m_datatype.toString(prefixes));
         buffer.append(" ");
-        boolean notFirst=false;
-        for (FacetRestriction facetRestriction : m_facetRestrictions) {
-            if (notFirst) buffer.append(" ");
-            else notFirst=true;
-            buffer.append(facetRestriction.toString(prefixes));
-        }
+        buffer.append(m_dataRange.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DatatypeRestriction create(Datatype datatype,Set<FacetRestriction> facetRestrictions) {
-        return s_interningManager.intern(new DatatypeRestriction(datatype,facetRestrictions));
-    }
-    public static DatatypeRestriction create(Datatype datatype,FacetRestriction... facetRestrictions) {
-        return s_interningManager.intern(new DatatypeRestriction(datatype,new HashSet<FacetRestriction>(Arrays.asList(facetRestrictions))));
-    }
-    public String getIdentifier() {
-        return null;
+    public static DatatypeDefinition create(Datatype datatype,DataRange dataRange) {
+        return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -101,17 +74,21 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_datatype.getVariablesInSignature(varType));
+        variables.addAll(m_dataRange.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_datatype.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
         m_datatype.applyBindings(variablesToBindings);
+        m_dataRange.applyBindings(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
         m_datatype.applyVariableBindings(variablesToBindings);
+        m_dataRange.applyVariableBindings(variablesToBindings);
     }
 }
