@@ -21,10 +21,19 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 public interface ExtendedOWLObject extends Serializable {
     public String getIdentifier();
     public String toString(Prefixes prefixes);
     public void applyBindings(Map<String,String> variablesToBindings);
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings);
     public Set<Variable> getVariablesInSignature();
+    public Set<Variable> getVariablesInSignature(VarType varType);
+    public Set<Variable> getUnboundVariablesInSignature();
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType);
     <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
+    public OWLObject asOWLAPIObject(OWLDataFactory dataFactory);
 }

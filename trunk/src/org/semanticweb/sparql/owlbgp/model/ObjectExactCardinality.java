@@ -18,11 +18,24 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class ObjectExactCardinality extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -592593606832056971L;
+
+    protected static InterningManager<ObjectExactCardinality> s_interningManager=new InterningManager<ObjectExactCardinality>() {
+        protected boolean equal(ObjectExactCardinality object1,ObjectExactCardinality object2) {
+            return object1.m_cardinality==object2.m_cardinality&&object1.m_ope==object2.m_ope&&object1.m_classExpression==object2.m_classExpression;
+        }
+        protected int getHashCode(ObjectExactCardinality object) {
+            return object.m_cardinality*7+object.m_ope.hashCode()*13+object.m_classExpression.hashCode()*23;
+        }
+    };
     
     protected final int m_cardinality;
     protected final ObjectPropertyExpression m_ope;
@@ -47,14 +60,6 @@ public class ObjectExactCardinality extends AbstractExtendedOWLObject implements
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ObjectExactCardinality> s_interningManager=new InterningManager<ObjectExactCardinality>() {
-        protected boolean equal(ObjectExactCardinality object1,ObjectExactCardinality object2) {
-            return object1.m_cardinality==object2.m_cardinality && object1.m_ope.equals(object2.m_ope) && object1.m_classExpression.equals(object2.m_classExpression);
-        }
-        protected int getHashCode(ObjectExactCardinality object) {
-            return object.m_cardinality*7+object.m_ope.hashCode()*13+object.m_classExpression.hashCode()*23;
-        }
-    };
     public static ObjectExactCardinality create(int cardinality,ObjectPropertyExpression ope,ClassExpression classExpression) {
         return s_interningManager.intern(new ObjectExactCardinality(cardinality,ope,classExpression));
     }
@@ -64,10 +69,27 @@ public class ObjectExactCardinality extends AbstractExtendedOWLObject implements
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ope.getVariablesInSignature());
-        variables.addAll(m_classExpression.getVariablesInSignature());
+        variables.addAll(m_ope.getVariablesInSignature(varType));
+        variables.addAll(m_classExpression.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_ope.applyBindings(variablesToBindings);
+        m_classExpression.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_ope.applyVariableBindings(variablesToBindings);
+        m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

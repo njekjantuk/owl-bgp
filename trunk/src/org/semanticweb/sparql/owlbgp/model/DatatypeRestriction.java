@@ -17,11 +17,40 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 public class DatatypeRestriction extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = 4586938662095776040L;
+
+    protected static InterningManager<DatatypeRestriction> s_interningManager=new InterningManager<DatatypeRestriction>() {
+        protected boolean equal(DatatypeRestriction object1,DatatypeRestriction object2) {
+            if (object1.m_datatype!=object2.m_datatype) return false;
+            if (object1.m_facetRestrictions.size()!=object2.m_facetRestrictions.size()) return false;
+            for (FacetRestriction facetRestriction : object1.m_facetRestrictions) {
+                if (!contains(facetRestriction, object2.m_facetRestrictions))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(FacetRestriction facetRestriction, Set<FacetRestriction> facetRestrictions) {
+            for (FacetRestriction restriction : facetRestrictions)
+                if (restriction==facetRestriction)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(DatatypeRestriction object) {
+            int hashCode=7*object.m_datatype.hashCode();
+            for (FacetRestriction restriction : object.m_facetRestrictions)
+                hashCode+=restriction.hashCode();
+            return hashCode;
+        }
+    };
     
     protected final Datatype m_datatype;
     protected final Set<FacetRestriction> m_facetRestrictions;
@@ -43,31 +72,11 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DatatypeRestriction> s_interningManager=new InterningManager<DatatypeRestriction>() {
-        protected boolean equal(DatatypeRestriction object1,DatatypeRestriction object2) {
-            if (!object1.m_datatype.equals(object2.m_datatype)) return false;
-            if (object1.m_facetRestrictions.size()!=object2.m_facetRestrictions.size()) return false;
-            for (FacetRestriction facetRestriction : object1.m_facetRestrictions) {
-                if (!contains(facetRestriction, object2.m_facetRestrictions))
-                    return false;
-            } 
-            return true;
-        }
-        protected boolean contains(FacetRestriction facetRestriction, Set<FacetRestriction> facetRestrictions) {
-            for (FacetRestriction restriction : facetRestrictions)
-                if (restriction.equals(facetRestriction))
-                    return true;
-            return false;
-        }
-        protected int getHashCode(DatatypeRestriction object) {
-            int hashCode=7*object.m_datatype.hashCode();
-            for (FacetRestriction restriction : object.m_facetRestrictions)
-                hashCode+=restriction.hashCode();
-            return hashCode;
-        }
-    };
     public static DatatypeRestriction create(Datatype datatype,Set<FacetRestriction> facetRestrictions) {
         return s_interningManager.intern(new DatatypeRestriction(datatype,facetRestrictions));
+    }
+    public static DatatypeRestriction create(Datatype datatype,FacetRestriction... facetRestrictions) {
+        return s_interningManager.intern(new DatatypeRestriction(datatype,new HashSet<FacetRestriction>(Arrays.asList(facetRestrictions))));
     }
     public String getIdentifier() {
         return null;
@@ -75,9 +84,23 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_datatype.getVariablesInSignature());
+        variables.addAll(m_datatype.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_datatype.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_datatype.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_datatype.applyVariableBindings(variablesToBindings);
     }
 }

@@ -20,10 +20,25 @@ package org.semanticweb.sparql.owlbgp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 
 public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
     private static final long serialVersionUID = 6601006990377858121L;
 
+    protected static InterningManager<ObjectProperty> s_interningManager=new InterningManager<ObjectProperty>() {
+        protected boolean equal(ObjectProperty object1,ObjectProperty object2) {
+            return object1.m_iri==object2.m_iri;
+        }
+        protected int getHashCode(ObjectProperty object) {
+            return object.m_iri.hashCode();
+        }
+    };
+    
+    public static final ObjectProperty TOP_OBJECT_PROPERTY=create("http://www.w3.org/2002/07/owl#topObjectProperty");
+    public static final ObjectProperty BOTTOM_OBJECT_PROPERTY=create("http://www.w3.org/2002/07/owl#bottomObjectProperty");
+        
     protected final String m_iri;
    
     protected ObjectProperty(String iri) {
@@ -38,14 +53,6 @@ public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectP
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ObjectProperty> s_interningManager=new InterningManager<ObjectProperty>() {
-        protected boolean equal(ObjectProperty object1,ObjectProperty object2) {
-            return object1.m_iri.equals(object2.m_iri);
-        }
-        protected int getHashCode(ObjectProperty object) {
-            return object.m_iri.hashCode();
-        }
-    };
     public static ObjectProperty create(String iri) {
         return s_interningManager.intern(new ObjectProperty(iri));
     }
@@ -55,7 +62,13 @@ public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectP
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
 }

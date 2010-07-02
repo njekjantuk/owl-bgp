@@ -17,12 +17,41 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = 3341650510200806191L;
 
+    protected static InterningManager<DataOneOf> s_interningManager=new InterningManager<DataOneOf>() {
+        protected boolean equal(DataOneOf dataOneOf1,DataOneOf dataOneOf2) {
+            if (dataOneOf1.m_enumeration.size()!=dataOneOf2.m_enumeration.size())
+                return false;
+            for (ILiteral literal : dataOneOf1.m_enumeration) {
+                if (!contains(literal, dataOneOf2.m_enumeration))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(ILiteral literal ,Set<ILiteral> literals) {
+            for (ILiteral oneOf : literals)
+                if (literal==oneOf)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(DataOneOf oneOf) {
+            int hashCode=0;
+            for (ILiteral literal : oneOf.m_enumeration)
+                hashCode+=literal.hashCode();
+            return hashCode;
+        }
+    };
+    
     protected final Set<ILiteral> m_enumeration;
     
     protected DataOneOf(Set<ILiteral> enumeration) {
@@ -48,31 +77,11 @@ public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DataOneOf> s_interningManager=new InterningManager<DataOneOf>() {
-        protected boolean equal(DataOneOf dataOneOf1,DataOneOf dataOneOf2) {
-            if (dataOneOf1.m_enumeration.size()!=dataOneOf2.m_enumeration.size())
-                return false;
-            for (ILiteral literal : dataOneOf1.m_enumeration) {
-                if (!contains(literal, dataOneOf2.m_enumeration))
-                    return false;
-            } 
-            return true;
-        }
-        protected boolean contains(ILiteral literal ,Set<ILiteral> literals) {
-            for (ILiteral oneOf : literals)
-                if (literal.equals(oneOf))
-                    return true;
-            return false;
-        }
-        protected int getHashCode(DataOneOf oneOf) {
-            int hashCode=0;
-            for (ILiteral literal : oneOf.m_enumeration)
-                hashCode+=literal.hashCode();
-            return hashCode;
-        }
-    };
     public static DataOneOf create(Set<ILiteral> oneOfs) {
         return s_interningManager.intern(new DataOneOf(oneOfs));
+    }
+    public static DataOneOf create(ILiteral... literals) {
+        return s_interningManager.intern(new DataOneOf(new HashSet<ILiteral>(Arrays.asList(literals))));
     }
     public String getIdentifier() {
         return null;
@@ -80,11 +89,28 @@ public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         for (ILiteral literal : m_enumeration) {
-            variables.addAll(literal.getVariablesInSignature());
+            variables.addAll(literal.getVariablesInSignature(varType));
         }
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        for (ILiteral literal : m_enumeration) 
+            unbound.addAll(literal.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        for (ILiteral literal : m_enumeration)
+            literal.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        for (ILiteral literal : m_enumeration)
+            literal.applyVariableBindings(variablesToBindings);
     }
 }

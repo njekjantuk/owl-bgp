@@ -18,11 +18,24 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -4900504105887302464L;
+
+    protected static InterningManager<ObjectHasValue> s_interningManager=new InterningManager<ObjectHasValue>() {
+        protected boolean equal(ObjectHasValue object1,ObjectHasValue object2) {
+            return object1.m_ope==object2.m_ope&&object1.m_individual==object2.m_individual;
+        }
+        protected int getHashCode(ObjectHasValue object) {
+            return 7*object.m_ope.hashCode()+23*object.m_individual.hashCode();
+        }
+    };
     
     protected final ObjectPropertyExpression m_ope;
     protected final Individual m_individual;
@@ -43,14 +56,6 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ObjectHasValue> s_interningManager=new InterningManager<ObjectHasValue>() {
-        protected boolean equal(ObjectHasValue object1,ObjectHasValue object2) {
-            return object1.m_ope.equals(object2.m_ope) && object1.m_individual.equals(object2.m_individual);
-        }
-        protected int getHashCode(ObjectHasValue object) {
-            return 7*object.m_ope.hashCode()+23*object.m_individual.hashCode();
-        }
-    };
     public static ObjectHasValue create(ObjectPropertyExpression ope,Individual individual) {
         return s_interningManager.intern(new ObjectHasValue(ope,individual));
     }
@@ -60,10 +65,26 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ope.getVariablesInSignature());
-        variables.addAll(m_individual.getVariablesInSignature());
+        variables.addAll(m_ope.getVariablesInSignature(varType));
+        variables.addAll(m_individual.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_ope.applyBindings(variablesToBindings);
+        m_individual.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_ope.applyVariableBindings(variablesToBindings);
+        m_individual.applyVariableBindings(variablesToBindings);
     }
 }

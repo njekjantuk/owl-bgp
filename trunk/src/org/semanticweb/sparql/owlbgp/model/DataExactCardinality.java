@@ -18,11 +18,24 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class DataExactCardinality extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -7848221781154806956L;
+    
+    protected static InterningManager<DataExactCardinality> s_interningManager=new InterningManager<DataExactCardinality>() {
+        protected boolean equal(DataExactCardinality object1,DataExactCardinality object2) {
+            return object1.m_cardinality==object2.m_cardinality && object1.m_dpe==object2.m_dpe && object1.m_dataRange==object2.m_dataRange;
+        }
+        protected int getHashCode(DataExactCardinality object) {
+            return 23*object.m_cardinality+17*object.m_dpe.hashCode()+7*object.m_dataRange.hashCode();
+        }
+    };
     
     protected final int m_cardinality;
     protected final DataPropertyExpression m_dpe;
@@ -47,14 +60,6 @@ public class DataExactCardinality extends AbstractExtendedOWLObject implements C
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DataExactCardinality> s_interningManager=new InterningManager<DataExactCardinality>() {
-        protected boolean equal(DataExactCardinality object1,DataExactCardinality object2) {
-            return object1.m_cardinality==object2.m_cardinality && object1.m_dpe.equals(object2.m_dpe) && object1.m_dataRange.equals(object2.m_dataRange);
-        }
-        protected int getHashCode(DataExactCardinality object) {
-            return 23*object.m_cardinality+17*object.m_dpe.hashCode()+7*object.m_dataRange.hashCode();
-        }
-    };
     public static DataExactCardinality create(int cardinality,DataPropertyExpression dpe,DataRange dataRange) {
         return s_interningManager.intern(new DataExactCardinality(cardinality,dpe,dataRange));
     }
@@ -64,10 +69,27 @@ public class DataExactCardinality extends AbstractExtendedOWLObject implements C
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_dpe.getVariablesInSignature());
-        variables.addAll(m_dataRange.getVariablesInSignature());
+        variables.addAll(m_dpe.getVariablesInSignature(varType));
+        variables.addAll(m_dataRange.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_dpe.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_dpe.applyBindings(variablesToBindings);
+        m_dataRange.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_dpe.applyVariableBindings(variablesToBindings);
+        m_dataRange.applyVariableBindings(variablesToBindings);
     }
 }

@@ -20,9 +20,21 @@ package org.semanticweb.sparql.owlbgp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 
 public class FacetRestriction extends AbstractExtendedOWLObject {
     private static final long serialVersionUID = -3713040265806923820L;
+
+    protected static InterningManager<FacetRestriction> s_interningManager=new InterningManager<FacetRestriction>() {
+        protected boolean equal(FacetRestriction object1,FacetRestriction object2) {
+            return object1.m_facet==object2.m_facet&&object1.m_literal==object2.m_literal;
+        }
+        protected int getHashCode(FacetRestriction object) {
+            return object.m_facet.hashCode()+object.m_literal.hashCode();
+        }
+    };
     
     protected final Facet m_facet;
     protected final Literal m_literal;
@@ -37,14 +49,6 @@ public class FacetRestriction extends AbstractExtendedOWLObject {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<FacetRestriction> s_interningManager=new InterningManager<FacetRestriction>() {
-        protected boolean equal(FacetRestriction object1,FacetRestriction object2) {
-            return object1.m_facet.equals(object2.m_facet)&&object1.m_literal.equals(object2.m_literal);
-        }
-        protected int getHashCode(FacetRestriction object) {
-            return object.m_facet.hashCode()+object.m_literal.hashCode();
-        }
-    };
     public static FacetRestriction create(Facet facet,Literal literal) {
         return s_interningManager.intern(new FacetRestriction(facet,literal));
     }
@@ -54,7 +58,13 @@ public class FacetRestriction extends AbstractExtendedOWLObject {
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
 }

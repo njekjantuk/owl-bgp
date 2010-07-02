@@ -20,9 +20,21 @@ package org.semanticweb.sparql.owlbgp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 
 public class Literal extends AbstractExtendedOWLObject implements ILiteral {
     private static final long serialVersionUID = -8503015611577734737L;
+
+    protected static InterningManager<Literal> s_interningManager=new InterningManager<Literal>() {
+        protected boolean equal(Literal object1,Literal object2) {
+            return object1.m_lexicalForm==object2.m_lexicalForm;
+        }
+        protected int getHashCode(Literal object) {
+            return object.m_lexicalForm.hashCode();
+        }
+    };
     
     protected final String m_lexicalForm;
     protected final String m_langTag;
@@ -59,18 +71,10 @@ public class Literal extends AbstractExtendedOWLObject implements ILiteral {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<Literal> s_interningManager=new InterningManager<Literal>() {
-        protected boolean equal(Literal object1,Literal object2) {
-            return object1.m_lexicalForm.equals(object2.m_lexicalForm);
-        }
-        protected int getHashCode(Literal object) {
-            return object.m_lexicalForm.hashCode();
-        }
-    };
-    public static ILiteral create(String lexicalForm,String langTag,Datatype datatype) {
+    public static Literal create(String lexicalForm,String langTag,Datatype datatype) {
         return s_interningManager.intern(new Literal(lexicalForm,langTag,datatype));
     }
-    public static ILiteral create(String literal) {
+    public static Literal create(String literal) {
         String lexicalForm=null;
         String langTag=null;
         Datatype datatype=null;
@@ -98,7 +102,19 @@ public class Literal extends AbstractExtendedOWLObject implements ILiteral {
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
     public Set<Variable> getVariablesInSignature() {
+        return getVariablesInSignature(null);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    public Set<Variable> getUnboundVariablesInSignature() {
+        return getUnboundVariablesInSignature(null);
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
 }

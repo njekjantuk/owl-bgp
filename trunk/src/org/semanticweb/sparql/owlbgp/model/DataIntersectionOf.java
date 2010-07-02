@@ -17,12 +17,41 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 public class DataIntersectionOf extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = -7086444949144988954L;
 
+    protected static InterningManager<DataIntersectionOf> s_interningManager=new InterningManager<DataIntersectionOf>() {
+        protected boolean equal(DataIntersectionOf intersection1,DataIntersectionOf intersection2) {
+            if (intersection1.m_dataRanges.size()!=intersection2.m_dataRanges.size())
+                return false;
+            for (DataRange conjunct : intersection1.m_dataRanges) {
+                if (!contains(conjunct, intersection2.m_dataRanges))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(DataRange dataRange,Set<DataRange> dataRanges) {
+            for (DataRange conjunct: dataRanges)
+                if (conjunct==dataRange)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(DataIntersectionOf intersection) {
+            int hashCode=0;
+            for (DataRange conjunct : intersection.m_dataRanges)
+                hashCode+=conjunct.hashCode();
+            return hashCode;
+        }
+    };
+    
     protected final Set<DataRange> m_dataRanges;
     
     protected DataIntersectionOf(Set<DataRange> dataRanges) {
@@ -48,31 +77,11 @@ public class DataIntersectionOf extends AbstractExtendedOWLObject implements Dat
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DataIntersectionOf> s_interningManager=new InterningManager<DataIntersectionOf>() {
-        protected boolean equal(DataIntersectionOf intersection1,DataIntersectionOf intersection2) {
-            if (intersection1.m_dataRanges.size()!=intersection2.m_dataRanges.size())
-                return false;
-            for (DataRange conjunct : intersection1.m_dataRanges) {
-                if (!contains(conjunct, intersection2.m_dataRanges))
-                    return false;
-            } 
-            return true;
-        }
-        protected boolean contains(DataRange dataRange,Set<DataRange> dataRanges) {
-            for (DataRange conjunct: dataRanges)
-                if (conjunct.equals(dataRange))
-                    return true;
-            return false;
-        }
-        protected int getHashCode(DataIntersectionOf intersection) {
-            int hashCode=0;
-            for (DataRange conjunct : intersection.m_dataRanges)
-                hashCode+=conjunct.hashCode();
-            return hashCode;
-        }
-    };
     public static DataIntersectionOf create(Set<DataRange> dataRanges) {
         return s_interningManager.intern(new DataIntersectionOf(dataRanges));
+    }
+    public static DataIntersectionOf create(DataRange... dataRanges) {
+        return s_interningManager.intern(new DataIntersectionOf(new HashSet<DataRange>(Arrays.asList(dataRanges))));
     }
     public String getIdentifier() {
         return null;
@@ -80,11 +89,28 @@ public class DataIntersectionOf extends AbstractExtendedOWLObject implements Dat
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         for (DataRange dataRange : m_dataRanges) {
-            variables.addAll(dataRange.getVariablesInSignature());
+            variables.addAll(dataRange.getVariablesInSignature(varType));
         }
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        for (DataRange dataRange : m_dataRanges) 
+            unbound.addAll(dataRange.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        for (DataRange dataRange : m_dataRanges)
+            dataRange.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        for (DataRange dataRange : m_dataRanges)
+            dataRange.applyVariableBindings(variablesToBindings);
     }
 }

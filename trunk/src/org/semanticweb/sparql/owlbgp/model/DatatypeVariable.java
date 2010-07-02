@@ -18,12 +18,24 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
 
 
 public class DatatypeVariable extends Variable implements DataRange {
     private static final long serialVersionUID = -3325199555146763566L;
 
+    protected static InterningManager<DatatypeVariable> s_interningManager=new InterningManager<DatatypeVariable>() {
+        protected boolean equal(DatatypeVariable object1,DatatypeVariable object2) {
+            return object1.m_variable==object2.m_variable;
+        }
+        protected int getHashCode(DatatypeVariable object) {
+            return object.m_variable.hashCode();
+        }
+    };
+    
     protected DatatypeVariable(String variable) {
         super(variable);
     }
@@ -31,29 +43,39 @@ public class DatatypeVariable extends Variable implements DataRange {
         if (m_binding==null) return null;
         return Datatype.create(m_binding);
     }
-    public void setBinding(DataRange binding) {
-        m_binding=binding.getIdentifier();
+    public void setBinding(Datatype binding) {
+        if (binding==null) m_binding=null;
+        else m_binding=binding.getIdentifier();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DatatypeVariable> s_interningManager=new InterningManager<DatatypeVariable>() {
-        protected boolean equal(DatatypeVariable object1,DatatypeVariable object2) {
-            return object1.m_variable.equals(object2.m_variable);
-        }
-        protected int getHashCode(DatatypeVariable object) {
-            return object.m_variable.hashCode();
-        }
-    };
     public static DatatypeVariable create(String iri) {
         return s_interningManager.intern(new DatatypeVariable(iri));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.add(this);
+        if (varType==null||varType==VarType.DATATYPE) variables.add(this);
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> variables=new HashSet<Variable>();
+        if (m_binding==null&&(varType==null||varType==VarType.DATATYPE)) variables.add(this);
+        return variables;
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        ExtendedOWLObject binding=variablesToBindings.get(this);
+        if (binding==null)
+            binding=null;
+        else if (!(binding instanceof Datatype))
+            throw new RuntimeException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
+        else 
+            m_binding=((Datatype)variablesToBindings.get(this)).m_iri;
     }
 }

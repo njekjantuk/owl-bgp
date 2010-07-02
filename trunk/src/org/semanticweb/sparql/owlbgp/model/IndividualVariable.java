@@ -18,11 +18,23 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
 
 
 public class IndividualVariable extends Variable implements Individual {
     private static final long serialVersionUID = 7157759527436797847L;
+
+    protected static InterningManager<IndividualVariable> s_interningManager=new InterningManager<IndividualVariable>() {
+        protected boolean equal(IndividualVariable object1,IndividualVariable object2) {
+            return object1.m_variable==object2.m_variable;
+        }
+        protected int getHashCode(IndividualVariable object) {
+            return object.m_variable.hashCode();
+        }
+    };
     
     protected IndividualVariable(String variable) {
         super(variable);
@@ -33,28 +45,38 @@ public class IndividualVariable extends Variable implements Individual {
         else return NamedIndividual.create(m_binding);
     }
     public void setBinding(Individual binding) {
-        m_binding=binding.getIdentifier();
+        if (binding==null) m_binding=null;
+        else m_binding=binding.getIdentifier();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<IndividualVariable> s_interningManager=new InterningManager<IndividualVariable>() {
-        protected boolean equal(IndividualVariable object1,IndividualVariable object2) {
-            return object1.m_variable.equals(object2.m_variable);
-        }
-        protected int getHashCode(IndividualVariable object) {
-            return object.m_variable.hashCode();
-        }
-    };
     public static IndividualVariable create(String iri) {
         return s_interningManager.intern(new IndividualVariable(iri));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.add(this);
+        if (varType==null||varType==VarType.INDIVIDUAL) variables.add(this);
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> variables=new HashSet<Variable>();
+        if (m_binding==null&&(varType==null||varType==VarType.INDIVIDUAL)) variables.add(this);
+        return variables;
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        ExtendedOWLObject binding=variablesToBindings.get(this);
+        if (binding==null)
+            m_binding=null;
+        else if (!(binding instanceof Individual))
+            throw new RuntimeException("Error: Only individuals can be assigned to individual variables, but individual variable "+m_variable+" was assigned the non-individual "+binding);
+        else 
+            m_binding=((Individual)variablesToBindings.get(this)).getIdentifier();
     }
 }
