@@ -24,35 +24,35 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
-public class ObjectPropertyRange extends AbstractAxiom implements ObjectPropertyAxiom {
-    private static final long serialVersionUID = -4174717850056831261L;
+public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxiom {
+    private static final long serialVersionUID = 7064189891149424128L;
 
-    protected static InterningManager<ObjectPropertyRange> s_interningManager=new InterningManager<ObjectPropertyRange>() {
-        protected boolean equal(ObjectPropertyRange object1,ObjectPropertyRange object2) {
-            return object1.m_ope==object2.m_ope && object1.m_classExpression==object2.m_classExpression;
+    protected static InterningManager<DataPropertyDomain> s_interningManager=new InterningManager<DataPropertyDomain>() {
+        protected boolean equal(DataPropertyDomain object1,DataPropertyDomain object2) {
+            return object1.m_dpe==object2.m_dpe && object1.m_classExpression==object2.m_classExpression;
         }
-        protected int getHashCode(ObjectPropertyRange object) {
-            return 37+13*object.m_ope.hashCode()+23*object.m_classExpression.hashCode();
+        protected int getHashCode(DataPropertyDomain object) {
+            return 11+133*object.m_dpe.hashCode()+5*object.m_classExpression.hashCode();
         }
     };
     
-    protected final ObjectPropertyExpression m_ope;
+    protected final DataPropertyExpression m_dpe;
     protected final ClassExpression m_classExpression;
    
-    protected ObjectPropertyRange(ObjectPropertyExpression ope,ClassExpression classExpression) {
-        m_ope=ope;
+    protected DataPropertyDomain(DataPropertyExpression dpe,ClassExpression classExpression) {
+        m_dpe=dpe;
         m_classExpression=classExpression;
     }
-    public ObjectPropertyExpression getObjectPropertyExpression() {
-        return m_ope;
+    public DataPropertyExpression getDataPropertyExpression() {
+        return m_dpe;
     }
-    public ClassExpression getRange() {
+    public ClassExpression getDomain() {
         return m_classExpression;
     }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
-        buffer.append("ObjectPropertyRange(");
-        buffer.append(m_ope.toString(prefixes));
+        buffer.append("DataPropertyDomain(");
+        buffer.append(m_dpe.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_classExpression.toString(prefixes));
         buffer.append(")");
@@ -61,8 +61,8 @@ public class ObjectPropertyRange extends AbstractAxiom implements ObjectProperty
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectPropertyRange create(ObjectPropertyExpression ope,ClassExpression classExpression) {
-        return s_interningManager.intern(new ObjectPropertyRange(ope,classExpression));
+    public static DataPropertyDomain create(DataPropertyExpression dpe,ClassExpression classExpression) {
+        return s_interningManager.intern(new DataPropertyDomain(dpe,classExpression));
     }
     public String getIdentifier() {
         return null;
@@ -75,22 +75,22 @@ public class ObjectPropertyRange extends AbstractAxiom implements ObjectProperty
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ope.getVariablesInSignature(varType));
+        variables.addAll(m_dpe.getVariablesInSignature(varType));
         variables.addAll(m_classExpression.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
-        unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_dpe.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
-        m_ope.applyBindings(variablesToBindings);
+        m_dpe.applyBindings(variablesToBindings);
         m_classExpression.applyBindings(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
+        m_dpe.applyVariableBindings(variablesToBindings);
         m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

@@ -46,7 +46,7 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
-    public ClassExpression getClassExpression() {
+    public ClassExpression getDomain() {
         return m_classExpression;
     }
     public String toString(Prefixes prefixes) {

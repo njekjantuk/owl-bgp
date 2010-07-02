@@ -235,4 +235,29 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLObject visit(TransitiveObjectProperty axiom) {
         return m_dataFactory.getOWLTransitiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
     }
+    
+    public OWLObject visit(SubDataPropertyOf axiom) {
+        return m_dataFactory.getOWLSubDataPropertyOfAxiom((OWLDataPropertyExpression)axiom.m_subdpe.accept(this),(OWLDataPropertyExpression)axiom.m_superdpe.accept(this));
+    }
+    public OWLObject visit(EquivalentDataProperties axiom) {
+        Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
+        for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions())
+            dpes.add((OWLDataPropertyExpression)dpe.accept(this));
+        return m_dataFactory.getOWLEquivalentDataPropertiesAxiom(dpes);
+    }
+    public OWLObject visit(DisjointDataProperties axiom) {
+        Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
+        for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions())
+            dpes.add((OWLDataPropertyExpression)dpe.accept(this));
+        return m_dataFactory.getOWLDisjointDataPropertiesAxiom(dpes);
+    }
+    public OWLObject visit(DataPropertyDomain axiom) {
+        return m_dataFactory.getOWLDataPropertyDomainAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this));
+    }
+    public OWLObject visit(DataPropertyRange axiom) {
+        return m_dataFactory.getOWLDataPropertyRangeAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this));
+    }
+    public OWLObject visit(FunctionalDataProperty axiom) {
+        return m_dataFactory.getOWLFunctionalDataPropertyAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this));
+    }
 }

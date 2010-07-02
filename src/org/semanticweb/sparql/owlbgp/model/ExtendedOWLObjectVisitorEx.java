@@ -61,4 +61,11 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(SymmetricObjectProperty axiom);
     O visit(AsymmetricObjectProperty axiom);
     O visit(TransitiveObjectProperty axiom);
+    
+    O visit(SubDataPropertyOf axiom);
+    O visit(EquivalentDataProperties axiom);
+    O visit(DisjointDataProperties axiom);
+    O visit(DataPropertyDomain axiom);
+    O visit(DataPropertyRange axiom);
+    O visit(FunctionalDataProperty axiom);
 }
