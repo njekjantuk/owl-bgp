@@ -20,9 +20,24 @@ package org.semanticweb.sparql.owlbgp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 public class Clazz extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -8150996806174432055L;
 
+    protected static InterningManager<Clazz> s_interningManager=new InterningManager<Clazz>() {
+        protected boolean equal(Clazz object1,Clazz object2) {
+            return object1.m_iri==object2.m_iri;
+        }
+        protected int getHashCode(Clazz object) {
+            return object.m_iri.hashCode();
+        }
+    };
+    
+    public static final Clazz THING=create("http://www.w3.org/2002/07/owl#Thing");
+    public static final Clazz NOTHING=create("http://www.w3.org/2002/07/owl#Nothing");
+    
     protected final String m_iri;
    
     protected Clazz(String iri) {
@@ -37,14 +52,6 @@ public class Clazz extends AbstractExtendedOWLObject implements ClassExpression 
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<Clazz> s_interningManager=new InterningManager<Clazz>() {
-        protected boolean equal(Clazz object1,Clazz object2) {
-            return object1.m_iri.equals(object2.m_iri);
-        }
-        protected int getHashCode(Clazz object) {
-            return object.m_iri.hashCode();
-        }
-    };
     public static Clazz create(String iri) {
         return s_interningManager.intern(new Clazz(iri));
     }
@@ -54,7 +61,13 @@ public class Clazz extends AbstractExtendedOWLObject implements ClassExpression 
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
 }

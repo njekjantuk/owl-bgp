@@ -20,9 +20,23 @@ package org.semanticweb.sparql.owlbgp.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+
 
 public class Datatype extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = -5589507335866233523L;
+
+    protected static InterningManager<Datatype> s_interningManager=new InterningManager<Datatype>() {
+        protected boolean equal(Datatype object1,Datatype object2) {
+            return object1.m_iri==object2.m_iri;
+        }
+        protected int getHashCode(Datatype object) {
+            return object.m_iri.hashCode();
+        }
+    };
+    
+    public static final Datatype RDFS_LITERAL=create("http://www.w3.org/2000/01/rdf-schema#Literal");
     
     protected final String m_iri;
    
@@ -38,14 +52,6 @@ public class Datatype extends AbstractExtendedOWLObject implements DataRange {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<Datatype> s_interningManager=new InterningManager<Datatype>() {
-        protected boolean equal(Datatype object1,Datatype object2) {
-            return object1.m_iri.equals(object2.m_iri);
-        }
-        protected int getHashCode(Datatype object) {
-            return object.m_iri.hashCode();
-        }
-    };
     public static Datatype create(String iri) {
         return s_interningManager.intern(new Datatype(iri));
     }
@@ -55,7 +61,13 @@ public class Datatype extends AbstractExtendedOWLObject implements DataRange {
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
 }

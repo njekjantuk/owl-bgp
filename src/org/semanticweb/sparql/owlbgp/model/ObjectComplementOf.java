@@ -18,12 +18,25 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class ObjectComplementOf extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -4754922633877659444L;
 
+    protected static InterningManager<ObjectComplementOf> s_interningManager=new InterningManager<ObjectComplementOf>() {
+        protected boolean equal(ObjectComplementOf object1,ObjectComplementOf object2) {
+            return object1.m_classExpression==object2.m_classExpression;
+        }
+        protected int getHashCode(ObjectComplementOf object) {
+            return -object.m_classExpression.hashCode();
+        }
+    };
+    
     protected final ClassExpression m_classExpression;
    
     protected ObjectComplementOf(ClassExpression classExpression) {
@@ -39,14 +52,6 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ObjectComplementOf> s_interningManager=new InterningManager<ObjectComplementOf>() {
-        protected boolean equal(ObjectComplementOf object1,ObjectComplementOf object2) {
-            return object1.m_classExpression.equals(object2.m_classExpression);
-        }
-        protected int getHashCode(ObjectComplementOf object) {
-            return -object.m_classExpression.hashCode();
-        }
-    };
     public static ObjectComplementOf create(ClassExpression classExpression) {
         return s_interningManager.intern(new ObjectComplementOf(classExpression));
     }
@@ -56,9 +61,23 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_classExpression.getVariablesInSignature());
+        variables.addAll(m_classExpression.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_classExpression.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

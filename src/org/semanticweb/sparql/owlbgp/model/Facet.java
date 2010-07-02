@@ -21,6 +21,15 @@ package org.semanticweb.sparql.owlbgp.model;
 public class Facet {
     private static final long serialVersionUID = -5165781649617062849L;
 
+    protected static InterningManager<Facet> s_interningManager=new InterningManager<Facet>() {
+        protected boolean equal(Facet object1,Facet object2) {
+            return object1.m_iri==object2.m_iri;
+        }
+        protected int getHashCode(Facet object) {
+            return object.m_iri.hashCode();
+        }
+    };
+    
     protected final String m_iri;
    
     protected Facet(String iri) {
@@ -35,14 +44,6 @@ public class Facet {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<Facet> s_interningManager=new InterningManager<Facet>() {
-        protected boolean equal(Facet object1,Facet object2) {
-            return object1.m_iri.equals(object2.m_iri);
-        }
-        protected int getHashCode(Facet object) {
-            return object.m_iri.hashCode();
-        }
-    };
     public static Facet create(String iri) {
         return s_interningManager.intern(new Facet(iri));
     }

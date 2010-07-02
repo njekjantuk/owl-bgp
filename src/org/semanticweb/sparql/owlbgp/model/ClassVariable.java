@@ -18,11 +18,23 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
 
 
 public class ClassVariable extends Variable implements ClassExpression {
     private static final long serialVersionUID = -4710499264999865534L;
+
+    protected static InterningManager<ClassVariable> s_interningManager=new InterningManager<ClassVariable>() {
+        protected boolean equal(ClassVariable object1,ClassVariable object2) {
+            return object1.m_variable==object2.m_variable;
+        }
+        protected int getHashCode(ClassVariable object) {
+            return object.m_variable.hashCode();
+        }
+    };
     
     protected ClassVariable(String variable) {
         super(variable);
@@ -31,29 +43,39 @@ public class ClassVariable extends Variable implements ClassExpression {
         if (m_binding==null) return null;
         return Clazz.create(m_binding);
     }
-    public void setBinding(ClassExpression binding) {
-        m_binding=binding.getIdentifier();
+    public void setBinding(Clazz binding) {
+        if (binding==null) m_binding=null;
+        else m_binding=binding.getIdentifier();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ClassVariable> s_interningManager=new InterningManager<ClassVariable>() {
-        protected boolean equal(ClassVariable object1,ClassVariable object2) {
-            return object1.m_variable.equals(object2.m_variable);
-        }
-        protected int getHashCode(ClassVariable object) {
-            return object.m_variable.hashCode();
-        }
-    };
     public static ClassVariable create(String iri) {
         return s_interningManager.intern(new ClassVariable(iri));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.add(this);
+        if (varType==null||varType==VarType.CLASS) variables.add(this);
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> variables=new HashSet<Variable>();
+        if (m_binding==null&&(varType==null||varType==VarType.CLASS)) variables.add(this);
+        return variables;
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        ExtendedOWLObject binding=variablesToBindings.get(this);
+        if (binding==null)
+            m_binding=null;
+        else if (!(binding instanceof Clazz))
+            throw new RuntimeException("Error: Only classes can be assigned to class variables, but class variable "+m_variable+" was assigned the non-class "+binding);
+        else 
+            m_binding=((Clazz)variablesToBindings.get(this)).m_iri;
     }
 }

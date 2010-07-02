@@ -17,11 +17,40 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 public class ObjectUnionOf extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = 6211740113622574460L;
+
+    protected static InterningManager<ObjectUnionOf> s_interningManager=new InterningManager<ObjectUnionOf>() {
+        protected boolean equal(ObjectUnionOf intersection1,ObjectUnionOf intersection2) {
+            if (intersection1.m_classExpressions.size()!=intersection2.m_classExpressions.size())
+                return false;
+            for (ClassExpression conjunct : intersection1.m_classExpressions) {
+                if (!contains(conjunct, intersection2.m_classExpressions))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(ClassExpression classExpression,Set<ClassExpression> classExpressions) {
+            for (ClassExpression conjunct: classExpressions)
+                if (conjunct==classExpression)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(ObjectUnionOf intersection) {
+            int hashCode=0;
+            for (ClassExpression conjunct : intersection.m_classExpressions)
+                hashCode+=conjunct.hashCode();
+            return hashCode;
+        }
+    };
     
     protected final Set<ClassExpression> m_classExpressions;
     
@@ -48,31 +77,11 @@ public class ObjectUnionOf extends AbstractExtendedOWLObject implements ClassExp
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<ObjectUnionOf> s_interningManager=new InterningManager<ObjectUnionOf>() {
-        protected boolean equal(ObjectUnionOf intersection1,ObjectUnionOf intersection2) {
-            if (intersection1.m_classExpressions.size()!=intersection2.m_classExpressions.size())
-                return false;
-            for (ClassExpression conjunct : intersection1.m_classExpressions) {
-                if (!contains(conjunct, intersection2.m_classExpressions))
-                    return false;
-            } 
-            return true;
-        }
-        protected boolean contains(ClassExpression classExpression,Set<ClassExpression> classExpressions) {
-            for (ClassExpression conjunct: classExpressions)
-                if (conjunct.equals(classExpression))
-                    return true;
-            return false;
-        }
-        protected int getHashCode(ObjectUnionOf intersection) {
-            int hashCode=0;
-            for (ClassExpression conjunct : intersection.m_classExpressions)
-                hashCode+=conjunct.hashCode();
-            return hashCode;
-        }
-    };
     public static ObjectUnionOf create(Set<ClassExpression> classExpressions) {
         return s_interningManager.intern(new ObjectUnionOf(classExpressions));
+    }
+    public static ObjectUnionOf create(ClassExpression... classExpressions) {
+        return s_interningManager.intern(new ObjectUnionOf(new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
     }
     public String getIdentifier() {
         return null;
@@ -80,11 +89,28 @@ public class ObjectUnionOf extends AbstractExtendedOWLObject implements ClassExp
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         for (ClassExpression classExpression : m_classExpressions) {
-            variables.addAll(classExpression.getVariablesInSignature());
+            variables.addAll(classExpression.getVariablesInSignature(varType));
         }
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        for (ClassExpression ce : m_classExpressions) 
+            unbound.addAll(ce.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        for (ClassExpression ce : m_classExpressions)
+            ce.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        for (ClassExpression ce : m_classExpressions)
+            ce.applyVariableBindings(variablesToBindings);
     }
 }

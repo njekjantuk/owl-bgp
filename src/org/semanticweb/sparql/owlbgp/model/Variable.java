@@ -5,6 +5,15 @@ import java.util.Map;
 public abstract class Variable extends AbstractExtendedOWLObject {
     private static final long serialVersionUID = -9183189034293387667L;
     
+    public static enum VarType {
+        CLASS,
+        OBJECT_PROPERTY,
+        DATA_PROPERTY,
+        DATATYPE,
+        INDIVIDUAL,
+        LITERAL
+    }
+    
     protected final String m_variable;
     protected String m_binding;
     
@@ -24,7 +33,7 @@ public abstract class Variable extends AbstractExtendedOWLObject {
         setBinding(variablesToBindings.get(m_variable));
     }
     public String toString(Prefixes prefixes) {
-        if (m_binding!=null) return m_variable+"/"+prefixes.abbreviateIRI(m_binding);
+        if (m_binding!=null) return "("+m_variable+"->"+prefixes.abbreviateIRI(m_binding)+")";
         return m_variable;
     }
     public String getIdentifier() {

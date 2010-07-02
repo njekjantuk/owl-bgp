@@ -18,11 +18,24 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
 public class DataComplementOf extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = -8211975109884861171L;
+
+    protected static InterningManager<DataComplementOf> s_interningManager=new InterningManager<DataComplementOf>() {
+        protected boolean equal(DataComplementOf object1,DataComplementOf object2) {
+            return object1.m_dataRange==object2.m_dataRange;
+        }
+        protected int getHashCode(DataComplementOf object) {
+            return -object.m_dataRange.hashCode();
+        }
+    };
     
     protected final DataRange m_dataRange;
    
@@ -39,14 +52,6 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DataComplementOf> s_interningManager=new InterningManager<DataComplementOf>() {
-        protected boolean equal(DataComplementOf object1,DataComplementOf object2) {
-            return object1.m_dataRange.equals(object2.m_dataRange);
-        }
-        protected int getHashCode(DataComplementOf object) {
-            return -object.m_dataRange.hashCode();
-        }
-    };
     public static DataComplementOf create(DataRange dataRange) {
         return s_interningManager.intern(new DataComplementOf(dataRange));
     }
@@ -56,9 +61,23 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_dataRange.getVariablesInSignature());
+        variables.addAll(m_dataRange.getVariablesInSignature(varType));
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> unbound=new HashSet<Variable>();
+        unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
+        return unbound;
+    }
+    public void applyBindings(Map<String,String> variablesToBindings) {
+        m_dataRange.applyBindings(variablesToBindings);
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        m_dataRange.applyVariableBindings(variablesToBindings);
     }
 }

@@ -19,6 +19,10 @@ package org.semanticweb.sparql.owlbgp.model;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
 
 public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Serializable {
     private static final long serialVersionUID = -4753012753870470339L;
@@ -27,6 +31,18 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
         return toString(Prefixes.STANDARD_PREFIXES);
     }
     public abstract String toString(Prefixes prefixes);
+    public Set<Variable> getVariablesInSignature() {
+        return getVariablesInSignature(null);
+    }
+    public Set<Variable> getUnboundVariablesInSignature() {
+        return getUnboundVariablesInSignature(null);
+    }
     public void applyBindings(Map<String,String> variablesToBindings) {
     }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+    }
+    public OWLObject asOWLAPIObject(OWLDataFactory dataFactory) {
+        return this.convertToOWLAPIObject(new OWLAPIConverter(dataFactory));
+    }
+    protected abstract OWLObject convertToOWLAPIObject(OWLAPIConverter converter);
 }

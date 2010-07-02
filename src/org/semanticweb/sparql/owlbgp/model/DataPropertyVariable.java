@@ -18,11 +18,23 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
 
 
 public class DataPropertyVariable extends Variable implements DataPropertyExpression {
     private static final long serialVersionUID = 3644196667162641608L;
+
+    protected static InterningManager<DataPropertyVariable> s_interningManager=new InterningManager<DataPropertyVariable>() {
+        protected boolean equal(DataPropertyVariable object1,DataPropertyVariable object2) {
+            return object1.m_variable==object2.m_variable;
+        }
+        protected int getHashCode(DataPropertyVariable object) {
+            return object.m_variable.hashCode();
+        }
+    };
     
     protected DataPropertyVariable(String variable) {
         super(variable);
@@ -32,28 +44,38 @@ public class DataPropertyVariable extends Variable implements DataPropertyExpres
         return DataProperty.create(m_binding);
     }
     public void setBinding(DataPropertyExpression binding) {
-        m_binding=binding.getIdentifier();
+        if (binding==null) m_binding=null;
+        else m_binding=binding.getIdentifier();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    protected static InterningManager<DataPropertyVariable> s_interningManager=new InterningManager<DataPropertyVariable>() {
-        protected boolean equal(DataPropertyVariable object1,DataPropertyVariable object2) {
-            return object1.m_variable.equals(object2.m_variable);
-        }
-        protected int getHashCode(DataPropertyVariable object) {
-            return object.m_variable.hashCode();
-        }
-    };
     public static DataPropertyVariable create(String iri) {
         return s_interningManager.intern(new DataPropertyVariable(iri));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
-    public Set<Variable> getVariablesInSignature() {
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.add(this);
+        if (varType==null||varType==VarType.DATA_PROPERTY) variables.add(this);
         return variables;
+    }
+    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+        Set<Variable> variables=new HashSet<Variable>();
+        if (m_binding==null&&(varType==null||varType==VarType.DATA_PROPERTY)) variables.add(this);
+        return variables;
+    }
+    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+        ExtendedOWLObject binding=variablesToBindings.get(this);
+        if (binding==null)
+            m_binding=null;
+        else if (!(binding instanceof DataProperty))
+            throw new RuntimeException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
+        else 
+            m_binding=((DataProperty)variablesToBindings.get(this)).m_iri;
     }
 }
