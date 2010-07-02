@@ -68,4 +68,8 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataPropertyDomain axiom);
     O visit(DataPropertyRange axiom);
     O visit(FunctionalDataProperty axiom);
+    
+    O visit(DatatypeDefinition axiom);
+    
+    O visit(HasKey axiom);
 }
