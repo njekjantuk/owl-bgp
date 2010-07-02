@@ -81,6 +81,37 @@ public class TestClasses extends TestCase {
         assertTrue(classVars.contains(classVar));
         assertTrue(opVars.contains(opVar));
     }
+    public void testApplyMultipleBindings() {
+        ClassExpression classVar1=ClassVariable.create("?x");
+        ClassExpression classVar2=ClassVariable.create("?y");
+        ClassExpression classVar3=ClassVariable.create("?z");
+        ClassExpression or=ObjectUnionOf.create(classVar1, classVar2, classVar3);
+        Map<String,Set<String>> varToBindingSets=new HashMap<String, Set<String>>();
+        Set<String> bindingsX=new HashSet<String>();
+        bindingsX.add("http://example.org/a");
+        bindingsX.add("http://example.org/b");
+        bindingsX.add("http://example.org/c");
+        varToBindingSets.put(classVar1.getIdentifier(), bindingsX);
+        Set<String> bindingsY=new HashSet<String>();
+        bindingsY.add("http://example.org/k");
+        bindingsY.add("http://example.org/l");
+        varToBindingSets.put(classVar2.getIdentifier(), bindingsY);
+        Set<String> bindingsZ=new HashSet<String>();
+        bindingsZ.add("http://example.org/r");
+        bindingsZ.add("http://example.org/q");
+        bindingsZ.add("http://example.org/s");
+        varToBindingSets.put(classVar3.getIdentifier(), bindingsZ);
+        int i=0;
+        for (ExtendedOWLObject eoo : or.applyBindingSets(varToBindingSets)) {
+            System.out.println(eoo);
+            assertTrue(eoo.getUnboundVariablesInSignature().size()==0);
+            i++;
+        }
+        assertTrue(i==(3*3*2));
+        for (ExtendedOWLObject eoo : or.applyBindingSets(varToBindingSets)) {
+            System.out.println(eoo.asOWLAPIObject(OWLManager.getOWLDataFactory()));
+        }
+    }
     public void testIntersectionApplyBindings() {
         String classIRI="http://www.example.org/"+new String(chars);
         String opIRI="http://www.example.org/iri2";

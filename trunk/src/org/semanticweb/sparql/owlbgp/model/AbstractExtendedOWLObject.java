@@ -18,7 +18,10 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -39,10 +42,78 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
     }
+    public Iterable<ExtendedOWLObject> applyBindingSets(Map<String,Set<String>> variablesToBindings) {
+        return new BindingIterator(this,variablesToBindings);
+    }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
     }
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory) {
         return this.convertToOWLAPIObject(new OWLAPIConverter(dataFactory));
     }
     protected abstract OWLObject convertToOWLAPIObject(OWLAPIConverter converter);
+}
+
+class BindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedOWLObject> {
+    protected final ExtendedOWLObject m_extendedOwlObject;
+    protected final String[] m_variables;
+    protected int[] m_currentBindingIndexes;
+    protected final String[][] m_variablesToBindings;
+    
+    public BindingIterator(ExtendedOWLObject extendedOwlObject,Map<String,Set<String>> variablesToBindings) {
+        m_extendedOwlObject=extendedOwlObject;
+        m_variables=variablesToBindings.keySet().toArray(new String[0]);
+        m_variablesToBindings=new String[m_variables.length][];
+        for (int index=0;index<m_variables.length;index++) {
+            m_variablesToBindings[index]=variablesToBindings.get(m_variables[index]).toArray(new String[0]);
+        }
+    }
+    
+    public boolean hasNext() {
+        if (m_currentBindingIndexes==null) return true;
+        for (int index=0;index<m_variables.length;index++) {
+            if (m_currentBindingIndexes[index]<m_variablesToBindings[index].length-1) return true;
+        }
+        return false;
+    }
+    public ExtendedOWLObject next() {
+        if (!hasNext()) throw new NoSuchElementException();
+        Map<String,String> currentBinding=new HashMap<String, String>();
+        if (m_currentBindingIndexes==null) {
+            // first entry, initialise
+            m_currentBindingIndexes=new int[m_variables.length];
+            for (int index=0;index<m_variables.length;index++) {
+                m_currentBindingIndexes[index]=0;
+            }
+        } else {
+            boolean flip=false;
+            for (int index=m_variables.length-1;index>=0;index--) {
+                if (index==m_variables.length-1) {
+                    // last bit, always flip
+                    if (m_currentBindingIndexes[index]<m_variablesToBindings[index].length-1)
+                        m_currentBindingIndexes[index]=m_currentBindingIndexes[index]+1;
+                    else {
+                        m_currentBindingIndexes[index]=0;
+                        flip=true;
+                    }
+                } else if (flip) {
+                    if (m_currentBindingIndexes[index]<m_variablesToBindings[index].length-1) {
+                        m_currentBindingIndexes[index]=m_currentBindingIndexes[index]+1;
+                        flip=false;
+                    } else 
+                        m_currentBindingIndexes[index]=0; 
+                }
+            }
+        }
+        for (int i=0;i<m_variables.length;i++) {
+            currentBinding.put(m_variables[i], m_variablesToBindings[i][m_currentBindingIndexes[i]]);
+        }
+        m_extendedOwlObject.applyBindings(currentBinding);
+        return m_extendedOwlObject;
+    }
+    public void remove() {
+        throw new UnsupportedOperationException("The binding iterator does not support removal. ");
+    }
+    public Iterator<ExtendedOWLObject> iterator() {
+        return this;
+    }    
 }
