@@ -42,8 +42,11 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
     }
-    public Iterable<ExtendedOWLObject> applyBindingSets(Map<String,Set<String>> variablesToBindings) {
-        return new BindingIterator(this,variablesToBindings);
+    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<String,Set<String>> variablesToBindings) {
+        return new AppliedBindingIterator(this,variablesToBindings);
+    }
+    public Iterable<Map<String,String>> getBindingIterator(Map<String,Set<String>> variablesToBindings) {
+        return new BindingIterator(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
     }
@@ -53,14 +56,12 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
     protected abstract OWLObject convertToOWLAPIObject(OWLAPIConverter converter);
 }
 
-class BindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedOWLObject> {
-    protected final ExtendedOWLObject m_extendedOwlObject;
+class BindingIterator implements Iterator<Map<String,String>>, Iterable<Map<String,String>> {
     protected final String[] m_variables;
     protected int[] m_currentBindingIndexes;
     protected final String[][] m_variablesToBindings;
     
-    public BindingIterator(ExtendedOWLObject extendedOwlObject,Map<String,Set<String>> variablesToBindings) {
-        m_extendedOwlObject=extendedOwlObject;
+    public BindingIterator(Map<String,Set<String>> variablesToBindings) {
         m_variables=variablesToBindings.keySet().toArray(new String[0]);
         m_variablesToBindings=new String[m_variables.length][];
         for (int index=0;index<m_variables.length;index++) {
@@ -75,7 +76,7 @@ class BindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedO
         }
         return false;
     }
-    public ExtendedOWLObject next() {
+    public Map<String,String> next() {
         if (!hasNext()) throw new NoSuchElementException();
         Map<String,String> currentBinding=new HashMap<String, String>();
         if (m_currentBindingIndexes==null) {
@@ -107,7 +108,30 @@ class BindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedO
         for (int i=0;i<m_variables.length;i++) {
             currentBinding.put(m_variables[i], m_variablesToBindings[i][m_currentBindingIndexes[i]]);
         }
-        m_extendedOwlObject.applyBindings(currentBinding);
+        return currentBinding;
+    }
+    public void remove() {
+        throw new UnsupportedOperationException("The binding iterator does not support removal. ");
+    }
+    public Iterator<Map<String,String>> iterator() {
+        return this;
+    }    
+}
+
+class AppliedBindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedOWLObject> {
+    protected final ExtendedOWLObject m_extendedOwlObject;
+    protected final BindingIterator m_bindingIterator;
+    
+    public AppliedBindingIterator(ExtendedOWLObject extendedOwlObject,Map<String,Set<String>> variablesToBindings) {
+        m_extendedOwlObject=extendedOwlObject;
+        m_bindingIterator=new BindingIterator(variablesToBindings);
+    }
+    
+    public boolean hasNext() {
+        return m_bindingIterator.hasNext();
+    }
+    public ExtendedOWLObject next() {
+        m_extendedOwlObject.applyBindings(m_bindingIterator.next());
         return m_extendedOwlObject;
     }
     public void remove() {

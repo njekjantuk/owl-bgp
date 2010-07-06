@@ -72,4 +72,12 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DatatypeDefinition axiom);
     
     O visit(HasKey axiom);
+    
+    O visit(SameIndividual axiom);
+    O visit(DifferentIndividuals axiom);
+    O visit(ClassAssertion axiom);
+    O visit(ObjectPropertyAssertion axiom);
+    O visit(NegativeObjectPropertyAssertion axiom);
+    O visit(DataPropertyAssertion axiom);
+    O visit(NegativeDataPropertyAssertion axiom);
 }

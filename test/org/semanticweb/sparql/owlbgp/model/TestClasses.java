@@ -102,13 +102,13 @@ public class TestClasses extends TestCase {
         bindingsZ.add("http://example.org/s");
         varToBindingSets.put(classVar3.getIdentifier(), bindingsZ);
         int i=0;
-        for (ExtendedOWLObject eoo : or.applyBindingSets(varToBindingSets)) {
+        for (ExtendedOWLObject eoo : or.getAppliedBindingsIterator(varToBindingSets)) {
             System.out.println(eoo);
             assertTrue(eoo.getUnboundVariablesInSignature().size()==0);
             i++;
         }
         assertTrue(i==(3*3*2));
-        for (ExtendedOWLObject eoo : or.applyBindingSets(varToBindingSets)) {
+        for (ExtendedOWLObject eoo : or.getAppliedBindingsIterator(varToBindingSets)) {
             System.out.println(eoo.asOWLAPIObject(OWLManager.getOWLDataFactory()));
         }
     }
