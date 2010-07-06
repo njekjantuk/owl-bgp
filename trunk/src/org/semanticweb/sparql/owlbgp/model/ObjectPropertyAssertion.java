@@ -25,45 +25,58 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassExpression {
-    private static final long serialVersionUID = -4900504105887302464L;
+public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion {
+    private static final long serialVersionUID = -1819707843103417338L;
 
-    protected static InterningManager<ObjectHasValue> s_interningManager=new InterningManager<ObjectHasValue>() {
-        protected boolean equal(ObjectHasValue object1,ObjectHasValue object2) {
-            return object1.m_ope==object2.m_ope&&object1.m_individual==object2.m_individual;
+    protected static InterningManager<ObjectPropertyAssertion> s_interningManager=new InterningManager<ObjectPropertyAssertion>() {
+        protected boolean equal(ObjectPropertyAssertion object1,ObjectPropertyAssertion object2) {
+            return object1.m_ope==object2.m_ope&&object1.m_individual1==object2.m_individual1&&object1.m_individual2==object2.m_individual2;
         }
-        protected int getHashCode(ObjectHasValue object) {
-            return 7*object.m_ope.hashCode()+23*object.m_individual.hashCode();
+        protected int getHashCode(ObjectPropertyAssertion object) {
+            return 7*object.m_ope.hashCode()+11*object.m_individual1.hashCode()+53*object.m_individual2.hashCode();
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
-    protected final Individual m_individual;
+    protected final Individual m_individual1;
+    protected final Individual m_individual2;
    
-    protected ObjectHasValue(ObjectPropertyExpression ope,Individual individual) {
+    protected ObjectPropertyAssertion(ObjectProperty ope,Individual individual1,Individual individual2) {
         m_ope=ope;
-        m_individual=individual;
+        m_individual1=individual1;
+        m_individual2=individual2;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
+    public Individual getIndividual1() {
+        return m_individual1;
+    }
+    public Individual getSubject() {
+        return m_individual1;
+    }
+    public Individual getIndividual2() {
+        return m_individual2;
+    }
+    public Individual getobject() {
+        return m_individual2;
+    }
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
-        buffer.append("ObjectHasValue(");
+        buffer.append("ObjectPropertyAssertion(");
         buffer.append(m_ope.toString(prefixes));
         buffer.append(" ");
-        buffer.append(m_individual.toString(prefixes));
+        buffer.append(m_individual1.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_individual2.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectHasValue create(ObjectPropertyExpression ope,Individual individual) {
-        return s_interningManager.intern(new ObjectHasValue(ope,individual));
-    }
-    public String getIdentifier() {
-        return null;
+    public static ObjectPropertyAssertion create(ObjectProperty ope,Individual individual1,Individual individual2) {
+        return s_interningManager.intern(new ObjectPropertyAssertion(ope,individual1,individual2));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -74,21 +87,25 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ope.getVariablesInSignature(varType));
-        variables.addAll(m_individual.getVariablesInSignature(varType));
+        variables.addAll(m_individual1.getVariablesInSignature(varType));
+        variables.addAll(m_individual2.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
-        unbound.addAll(m_individual.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_individual1.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_individual2.getUnboundVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
-        m_individual.applyBindings(variablesToBindings);
+        m_individual1.applyBindings(variablesToBindings);
+        m_individual2.applyBindings(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
         m_ope.applyVariableBindings(variablesToBindings);
-        m_individual.applyVariableBindings(variablesToBindings);
+        m_individual1.applyVariableBindings(variablesToBindings);
+        m_individual2.applyVariableBindings(variablesToBindings);
     }
 }

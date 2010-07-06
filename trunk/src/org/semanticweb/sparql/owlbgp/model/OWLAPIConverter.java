@@ -279,4 +279,32 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         else 
             return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),dpes);
     }
+    
+    public OWLObject visit(SameIndividual axiom) {
+        Set<OWLIndividual> individuals=new HashSet<OWLIndividual>();
+        for (Individual individual : axiom.m_individuals)
+            individuals.add((OWLIndividual)individual.accept(this));
+        return m_dataFactory.getOWLSameIndividualAxiom(individuals);
+    }
+    public OWLObject visit(DifferentIndividuals axiom) {
+        Set<OWLIndividual> individuals=new HashSet<OWLIndividual>();
+        for (Individual individual : axiom.m_individuals)
+            individuals.add((OWLIndividual)individual.accept(this));
+        return m_dataFactory.getOWLDifferentIndividualsAxiom(individuals);
+    }
+    public OWLObject visit(ClassAssertion axiom) {
+        return m_dataFactory.getOWLClassAssertionAxiom((OWLClassExpression)axiom.m_ce.accept(this),(OWLIndividual)axiom.m_individual.accept(this));
+    }
+    public OWLObject visit(ObjectPropertyAssertion axiom) {
+        return m_dataFactory.getOWLObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this));
+    }
+    public OWLObject visit(NegativeObjectPropertyAssertion axiom) {
+        return m_dataFactory.getOWLNegativeObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this));
+    }
+    public OWLObject visit(DataPropertyAssertion axiom) {
+        return m_dataFactory.getOWLDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this));
+    }
+    public OWLObject visit(NegativeDataPropertyAssertion axiom) {
+        return m_dataFactory.getOWLNegativeDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this));
+    }
 }

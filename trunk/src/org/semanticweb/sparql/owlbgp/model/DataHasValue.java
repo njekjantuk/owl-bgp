@@ -83,6 +83,7 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_dpe.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_literal.getVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
