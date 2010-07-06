@@ -41,7 +41,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     protected final Individual m_individual1;
     protected final Individual m_individual2;
    
-    protected NegativeObjectPropertyAssertion(ObjectProperty ope,Individual individual1,Individual individual2) {
+    protected NegativeObjectPropertyAssertion(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
         m_ope=ope;
         m_individual1=individual1;
         m_individual2=individual2;
@@ -75,7 +75,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static NegativeObjectPropertyAssertion create(ObjectProperty ope,Individual individual1,Individual individual2) {
+    public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
         return s_interningManager.intern(new NegativeObjectPropertyAssertion(ope,individual1,individual2));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

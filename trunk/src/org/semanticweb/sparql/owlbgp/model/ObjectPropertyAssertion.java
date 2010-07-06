@@ -41,7 +41,7 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
     protected final Individual m_individual1;
     protected final Individual m_individual2;
    
-    protected ObjectPropertyAssertion(ObjectProperty ope,Individual individual1,Individual individual2) {
+    protected ObjectPropertyAssertion(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
         m_ope=ope;
         m_individual1=individual1;
         m_individual2=individual2;
@@ -75,8 +75,13 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectPropertyAssertion create(ObjectProperty ope,Individual individual1,Individual individual2) {
-        return s_interningManager.intern(new ObjectPropertyAssertion(ope,individual1,individual2));
+    public static ObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
+        if (ope instanceof ObjectProperty)
+            return s_interningManager.intern(new ObjectPropertyAssertion((ObjectProperty)ope,individual1,individual2));
+        else if (ope instanceof ObjectInverseOf)
+            return s_interningManager.intern(new ObjectPropertyAssertion(((ObjectInverseOf)ope).getInvertedObjectProperty(),individual2,individual1));
+        else
+            return s_interningManager.intern(new ObjectPropertyAssertion((ObjectPropertyVariable)ope,individual1,individual2));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

@@ -17,6 +17,5 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
-public interface ObjectPropertyExpression extends ExtendedOWLObject {
-    
+public interface ObjectPropertyExpression extends PropertyExpression {
 }

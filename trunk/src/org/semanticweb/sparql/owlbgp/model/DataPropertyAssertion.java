@@ -68,8 +68,9 @@ public class DataPropertyAssertion extends AbstractAxiom implements Assertion {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DataPropertyAssertion create(DataProperty dpe,Individual individual,ILiteral literal) {
-        return s_interningManager.intern(new DataPropertyAssertion(dpe,individual,literal));
+    public static DataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,ILiteral literal) {
+        if (!(dpe instanceof DataProperty)) throw new IllegalArgumentException("DatapropertyAssertions cannot contain data property expressions, but only data properties. Here we got an expression: "+dpe);
+        return s_interningManager.intern(new DataPropertyAssertion((DataProperty)dpe,individual,literal));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
