@@ -40,7 +40,7 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
     protected final Individual m_individual;
     protected final ILiteral m_literal;
    
-    protected NegativeDataPropertyAssertion(DataProperty dpe,Individual individual,ILiteral literal) {
+    protected NegativeDataPropertyAssertion(DataPropertyExpression dpe,Individual individual,ILiteral literal) {
         m_dpe=dpe;
         m_individual=individual;
         m_literal=literal;
@@ -68,7 +68,7 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static NegativeDataPropertyAssertion create(DataProperty dpe,Individual individual,ILiteral literal) {
+    public static NegativeDataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,ILiteral literal) {
         return s_interningManager.intern(new NegativeDataPropertyAssertion(dpe,individual,literal));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

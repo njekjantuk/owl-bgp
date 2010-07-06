@@ -35,14 +35,18 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
         }
     };
     
-    protected final Clazz m_class;
+    protected final ClassExpression m_class;
     protected final Set<ClassExpression> m_classExpressions;
     
     protected DisjointUnion(Clazz clazz, Set<ClassExpression> classExpressions) {
         m_class=clazz;
         m_classExpressions=classExpressions;
     }
-    public Clazz getClazz() {
+    protected DisjointUnion(ClassVariable classVariable, Set<ClassExpression> classExpressions) {
+        m_class=classVariable;
+        m_classExpressions=classExpressions;
+    }
+    public ClassExpression getClazz() {
         return m_class;
     }
     public Set<ClassExpression> getClassExpressions() {
@@ -68,6 +72,12 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
         return s_interningManager.intern(this);
     }
     public static DisjointUnion create(Clazz clazz,Set<ClassExpression> classExpressions) {
+        return s_interningManager.intern(new DisjointUnion(clazz,classExpressions));
+    }
+    public static DisjointUnion create(ClassVariable clazz,ClassExpression... classExpressions) {
+        return s_interningManager.intern(new DisjointUnion(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
+    }
+    public static DisjointUnion create(ClassVariable clazz,Set<ClassExpression> classExpressions) {
         return s_interningManager.intern(new DisjointUnion(clazz,classExpressions));
     }
     public static DisjointUnion create(Clazz clazz,ClassExpression... classExpressions) {

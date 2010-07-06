@@ -25,37 +25,37 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class InverseObjectProperty extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
+public class ObjectInverseOf extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
     private static final long serialVersionUID = 4170522309299326290L;
 
-    protected static InterningManager<InverseObjectProperty> s_interningManager=new InterningManager<InverseObjectProperty>() {
-        protected boolean equal(InverseObjectProperty object1,InverseObjectProperty object2) {
-            return object1.m_ope==object2.m_ope;
+    protected static InterningManager<ObjectInverseOf> s_interningManager=new InterningManager<ObjectInverseOf>() {
+        protected boolean equal(ObjectInverseOf object1,ObjectInverseOf object2) {
+            return object1.m_op==object2.m_op;
         }
-        protected int getHashCode(InverseObjectProperty object) {
-            return -object.m_ope.hashCode();
+        protected int getHashCode(ObjectInverseOf object) {
+            return -object.m_op.hashCode();
         }
     };
     
-    protected final ObjectPropertyExpression m_ope;
+    protected final ObjectProperty m_op;
    
-    protected InverseObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
-        m_ope=objectPropertyExpression;
+    protected ObjectInverseOf(ObjectProperty objectPropertyExpression) {
+        m_op=objectPropertyExpression;
     }
-    public ObjectPropertyExpression getInvertedObjectPropertyExpression() {
-        return m_ope;
+    public ObjectProperty getInvertedObjectProperty() {
+        return m_op;
     }
     public String getIRIString() {
         return null;
     }
     public String toString(Prefixes prefixes) {
-        return "ObjectInverseOf("+m_ope.toString(prefixes)+")";
+        return "ObjectInverseOf("+m_op.toString(prefixes)+")";
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static InverseObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
-        return s_interningManager.intern(new InverseObjectProperty(objectPropertyExpression));
+    public static ObjectInverseOf create(ObjectProperty objectProperty) {
+        return s_interningManager.intern(new ObjectInverseOf(objectProperty));
     }
     public String getIdentifier() {
         return null;
@@ -68,18 +68,18 @@ public class InverseObjectProperty extends AbstractExtendedOWLObject implements 
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ope.getVariablesInSignature(varType));
+        variables.addAll(m_op.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
-        unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_op.getUnboundVariablesInSignature(varType));
         return unbound;
     }
     public void applyBindings(Map<String,String> variablesToBindings) {
-        m_ope.applyBindings(variablesToBindings);
+        m_op.applyBindings(variablesToBindings);
     }
     public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
+        m_op.applyVariableBindings(variablesToBindings);
     }
 }

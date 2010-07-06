@@ -1,6 +1,8 @@
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
@@ -94,8 +96,8 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLObject visit(ObjectProperty objectProperty) {
         return m_dataFactory.getOWLObjectProperty(IRI.create(objectProperty.m_iri));
     }
-    public OWLObject visit(InverseObjectProperty inverseObjectProperty) {
-        return m_dataFactory.getOWLObjectInverseOf((OWLObjectPropertyExpression)inverseObjectProperty.m_ope.accept(this));
+    public OWLObject visit(ObjectInverseOf inverseObjectProperty) {
+        return m_dataFactory.getOWLObjectInverseOf((OWLObjectPropertyExpression)inverseObjectProperty.m_op.accept(this));
     }
     public OWLObject visit(ObjectPropertyVariable objectPropertyVariable) {
       if (objectPropertyVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+objectPropertyVariable.m_variable+" is unbound. ");
@@ -191,7 +193,15 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     }
     
     public OWLObject visit(SubObjectPropertyOf axiom) {
-        return m_dataFactory.getOWLSubObjectPropertyOfAxiom((OWLObjectPropertyExpression)axiom.m_subope.accept(this),(OWLObjectPropertyExpression)axiom.m_superope.accept(this));
+        if (axiom.m_subope instanceof ObjectPropertyChain) {
+            List<OWLObjectPropertyExpression> opes=new ArrayList<OWLObjectPropertyExpression>();
+            for (ObjectPropertyExpression op : ((ObjectPropertyChain)axiom.m_subope).m_objectPropertyExpressions) {
+                opes.add((OWLObjectPropertyExpression)op.accept(this));
+            }
+            return m_dataFactory.getOWLSubPropertyChainOfAxiom(opes,(OWLObjectPropertyExpression)axiom.m_superope.accept(this));
+        } else {
+            return m_dataFactory.getOWLSubObjectPropertyOfAxiom((OWLObjectPropertyExpression)axiom.m_subope.accept(this),(OWLObjectPropertyExpression)axiom.m_superope.accept(this));
+        }
     }
     public OWLObject visit(EquivalentObjectProperties axiom) {
         Set<OWLObjectPropertyExpression> opes=new HashSet<OWLObjectPropertyExpression>();

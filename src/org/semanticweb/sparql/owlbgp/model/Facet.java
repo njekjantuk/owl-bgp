@@ -17,10 +17,26 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
-public class Facet {
+
+public class Facet implements Serializable {
     private static final long serialVersionUID = -5165781649617062849L;
-
+    
+    public static Set<Facet> OWL_FACETS=new HashSet<Facet>();
+    static {
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minInclusive"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxInclusive"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minExclusive"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxExclusive"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"length"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minLength"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxLength"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"pattern"));
+        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"langRange"));
+    }
     protected static InterningManager<Facet> s_interningManager=new InterningManager<Facet>() {
         protected boolean equal(Facet object1,Facet object2) {
             return object1.m_iri==object2.m_iri;

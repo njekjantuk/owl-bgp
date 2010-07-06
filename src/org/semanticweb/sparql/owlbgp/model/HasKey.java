@@ -52,6 +52,18 @@ public class HasKey extends AbstractAxiom {
     protected final Set<ObjectPropertyExpression> m_objectPropertyExpressions;
     protected final Set<DataPropertyExpression> m_dataPropertyExpressions;
     
+    protected HasKey(ClassExpression classExpression, Set<PropertyExpression> propertyExpressions) {
+        m_classExpression=classExpression;
+        Set<ObjectPropertyExpression> objectPropertyExpressions=new HashSet<ObjectPropertyExpression>();
+        Set<DataPropertyExpression> dataPropertyExpressions=new HashSet<DataPropertyExpression>();
+        for (PropertyExpression pe : propertyExpressions)
+            if (pe instanceof ObjectPropertyExpression)
+                objectPropertyExpressions.add((ObjectPropertyExpression)pe);
+            else
+                dataPropertyExpressions.add((DataPropertyExpression)pe);
+        m_objectPropertyExpressions=objectPropertyExpressions;
+        m_dataPropertyExpressions=dataPropertyExpressions;
+    }
     protected HasKey(ClassExpression classExpression, Set<ObjectPropertyExpression> objectPropertyExpressions, Set<DataPropertyExpression> dataPropertyExpressions) {
         m_classExpression=classExpression;
         m_objectPropertyExpressions=objectPropertyExpressions;
@@ -94,6 +106,12 @@ public class HasKey extends AbstractAxiom {
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
+    }
+    public static HasKey create(ClassExpression classExpression,Set<PropertyExpression> propertyExpressions) {
+        return s_interningManager.intern(new HasKey(classExpression,propertyExpressions));
+    }
+    public static HasKey create(ClassExpression classExpression,PropertyExpression... propertyExpressions) {
+        return s_interningManager.intern(new HasKey(classExpression,new HashSet<PropertyExpression>(Arrays.asList(propertyExpressions))));
     }
     public static HasKey create(ClassExpression classExpression,Set<ObjectPropertyExpression> objectPropertyExpressions,Set<DataPropertyExpression> dataPropertyExpressions) {
         return s_interningManager.intern(new HasKey(classExpression,objectPropertyExpressions,dataPropertyExpressions));

@@ -22,7 +22,7 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataMaxCardinality dataMaxCardinality);
     
     O visit(ObjectProperty objectProperty);
-    O visit(InverseObjectProperty inverseObjectProperty);
+    O visit(ObjectInverseOf inverseObjectProperty);
     O visit(ObjectPropertyVariable objectPropertyVariable);
     O visit(DataProperty dataProperty);
     O visit(DataPropertyVariable dataPropertyVariable);
