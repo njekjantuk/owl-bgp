@@ -3,10 +3,10 @@ package org.semanticweb.sparql.owlbgpparser;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
 
-public class OWLObjectPropertyExpressionListItemTranslator implements ListItemTranslator<ObjectPropertyExpression> {
+public class ObjectPropertyExpressionListItemTranslator implements ListItemTranslator<ObjectPropertyExpression> {
     protected final OWLRDFConsumer consumer;
 
-    public OWLObjectPropertyExpressionListItemTranslator(OWLRDFConsumer consumer) {
+    public ObjectPropertyExpressionListItemTranslator(OWLRDFConsumer consumer) {
         this.consumer = consumer;
     }
     public ObjectPropertyExpression translate(String iri) {

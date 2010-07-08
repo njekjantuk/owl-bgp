@@ -12,7 +12,7 @@ public class OneOfTranslator extends AbstractClassExpressionTranslator {
         super(consumer);
     }
     public ClassExpression translate(String mainNode) {
-        String oneOfObject=getResourceObject(mainNode, OWLRDFVocabulary.OWL_ONE_OF.getIRI(), true);
+        String oneOfObject=getResourceObject(mainNode, Vocabulary.OWL_ONE_OF.getIRI(), true);
         Set<Individual> individuals=translateToIndividualSet(oneOfObject);
         for (Individual ind : individuals) 
             consumer.addIndividual(ind.getIdentifier());

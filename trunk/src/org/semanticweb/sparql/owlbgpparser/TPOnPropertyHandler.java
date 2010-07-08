@@ -5,7 +5,7 @@ public class TPOnPropertyHandler extends TriplePredicateHandler {
     protected static int count=0;
 
     public TPOnPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_ON_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_ON_PROPERTY.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

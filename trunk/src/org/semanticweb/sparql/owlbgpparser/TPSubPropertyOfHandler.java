@@ -6,7 +6,7 @@ import org.semanticweb.sparql.owlbgp.model.SubObjectPropertyOf;
 public class TPSubPropertyOfHandler extends TriplePredicateHandler {
 
     public TPSubPropertyOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.RDFS_SUB_PROPERTY_OF.getIRI());
+        super(consumer, Vocabulary.RDFS_SUB_PROPERTY_OF.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {
@@ -20,7 +20,7 @@ public class TPSubPropertyOfHandler extends TriplePredicateHandler {
             translateSubDataProperty(subject, predicate, object);
         else {
             // Check for range statements
-            String subPropRange=consumer.getResourceObject(subject, OWLRDFVocabulary.RDFS_RANGE.getIRI(), false);
+            String subPropRange=consumer.getResourceObject(subject, Vocabulary.RDFS_RANGE.getIRI(), false);
             if (subPropRange!=null) {
                 if (consumer.isDataRange(subPropRange))
                     translateSubDataProperty(subject, predicate, object);
@@ -28,7 +28,7 @@ public class TPSubPropertyOfHandler extends TriplePredicateHandler {
                     translateSubObjectProperty(subject, predicate, object);
                 return;
             }
-            String supPropRange = consumer.getResourceObject(subject, OWLRDFVocabulary.RDFS_RANGE.getIRI(), false);
+            String supPropRange = consumer.getResourceObject(subject, Vocabulary.RDFS_RANGE.getIRI(), false);
             if (supPropRange!=null) {
                 if (consumer.isDataRange(supPropRange))
                     translateSubDataProperty(subject, predicate, object);

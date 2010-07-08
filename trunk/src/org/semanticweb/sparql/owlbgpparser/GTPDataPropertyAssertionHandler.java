@@ -11,7 +11,7 @@ public class GTPDataPropertyAssertionHandler extends AbstractLiteralTripleHandle
     }
     public boolean canHandle(String subject, String predicate, ILiteral object) {
         if (getConsumer().isAnnotationProperty(predicate) || getConsumer().isOntology(subject)) return false;
-        return !OWLRDFVocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate) && !Facet.OWL_FACETS.contains(predicate);
+        return !Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate) && !Facet.OWL_FACETS.contains(predicate);
     }
     public boolean canHandleStreaming(String subject, String predicate, ILiteral object) {
         return false;

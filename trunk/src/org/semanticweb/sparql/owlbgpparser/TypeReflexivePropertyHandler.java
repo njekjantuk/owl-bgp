@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.ReflexiveObjectProperty;
 public class TypeReflexivePropertyHandler extends BuiltInTypeHandler {
 
     public TypeReflexivePropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_REFLEXIVE_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_REFLEXIVE_PROPERTY.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

@@ -8,7 +8,7 @@ public class TPSubClassOfHandler extends TriplePredicateHandler {
     public static int potentiallyConsumedTiples = 0;
 
     public TPSubClassOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.RDFS_SUBCLASS_OF.getIRI());
+        super(consumer, Vocabulary.RDFS_SUBCLASS_OF.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

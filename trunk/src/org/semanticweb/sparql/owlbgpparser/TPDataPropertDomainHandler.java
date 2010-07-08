@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.DataPropertyDomain;
 public class TPDataPropertDomainHandler extends TriplePredicateHandler {
 
     public TPDataPropertDomainHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_DATA_PROPERTY_DOMAIN.getIRI());
+        super(consumer, Vocabulary.OWL_DATA_PROPERTY_DOMAIN.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

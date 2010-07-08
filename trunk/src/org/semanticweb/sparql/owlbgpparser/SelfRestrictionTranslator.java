@@ -12,7 +12,7 @@ public class SelfRestrictionTranslator extends AbstractObjectRestrictionTranslat
 
     protected ClassExpression translateRestriction(String mainNode) {
         // Consume the triple that specifies the description is a has self
-        consumer.getLiteralObject(mainNode, OWLRDFVocabulary.OWL_HAS_SELF.getIRI(), true);
+        consumer.getLiteralObject(mainNode, Vocabulary.OWL_HAS_SELF.getIRI(), true);
         ObjectPropertyExpression prop=translateOnProperty(mainNode);
         return ObjectHasSelf.create(prop);
     }

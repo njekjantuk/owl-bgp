@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.TransitiveObjectProperty;
 public class TypeTransitivePropertyHandler extends BuiltInTypeHandler {
 
     public TypeTransitivePropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_TRANSITIVE_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_TRANSITIVE_PROPERTY.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

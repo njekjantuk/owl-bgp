@@ -9,7 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.EquivalentDataProperties;
 public class TPEquivalentDataPropertyHandler extends TriplePredicateHandler {
 
     public TPEquivalentDataPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_EQUIVALENT_DATA_PROPERTIES.getIRI());
+        super(consumer, Vocabulary.OWL_EQUIVALENT_DATA_PROPERTIES.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

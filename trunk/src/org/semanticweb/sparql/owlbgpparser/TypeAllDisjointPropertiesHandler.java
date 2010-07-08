@@ -11,12 +11,12 @@ import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
 public class TypeAllDisjointPropertiesHandler extends BuiltInTypeHandler {
 
     public TypeAllDisjointPropertiesHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_ALL_DISJOINT_PROPERTIES.getIRI());
+        super(consumer, Vocabulary.OWL_ALL_DISJOINT_PROPERTIES.getIRI());
     }
 
     public void handleTriple(String subject, String predicate, String object) {
         consumeTriple(subject, predicate, object);
-        String listNode = consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_MEMBERS.getIRI(), true);
+        String listNode = consumer.getResourceObject(subject, Vocabulary.OWL_MEMBERS.getIRI(), true);
         if (getConsumer().isObjectPropertyOnly(getConsumer().getFirstResource(listNode, false))) {
             translateAndSetPendingAnnotations(subject);
             List<ObjectPropertyExpression> props=consumer.translateToObjectPropertyList(listNode);

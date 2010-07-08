@@ -9,7 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.SubObjectPropertyOf;
 public class TPPropertyChainAxiomHandler extends TriplePredicateHandler {
 
     public TPPropertyChainAxiomHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_PROPERTY_CHAIN_AXIOM.getIRI());
+        super(consumer, Vocabulary.OWL_PROPERTY_CHAIN_AXIOM.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

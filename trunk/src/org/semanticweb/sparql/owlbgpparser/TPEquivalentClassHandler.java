@@ -12,7 +12,7 @@ import org.semanticweb.sparql.owlbgp.model.EquivalentClasses;
 public class TPEquivalentClassHandler extends TriplePredicateHandler {
 
     public TPEquivalentClassHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_EQUIVALENT_CLASS.getIRI());
+        super(consumer, Vocabulary.OWL_EQUIVALENT_CLASS.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

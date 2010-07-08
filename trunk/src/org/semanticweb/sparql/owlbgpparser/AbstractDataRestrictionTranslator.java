@@ -7,7 +7,7 @@ public abstract class AbstractDataRestrictionTranslator extends AbstractRestrict
         super(consumer);
     }
     protected DataPropertyExpression translateOnProperty(String mainNode) {
-        String onPropertyObject=getResourceObject(mainNode, OWLRDFVocabulary.OWL_ON_PROPERTY.getIRI(), true);
+        String onPropertyObject=getResourceObject(mainNode, Vocabulary.OWL_ON_PROPERTY.getIRI(), true);
         return consumer.translateDataPropertyExpression(onPropertyObject);
     }
 

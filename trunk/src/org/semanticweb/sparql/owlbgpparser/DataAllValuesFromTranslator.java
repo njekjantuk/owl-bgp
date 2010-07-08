@@ -15,6 +15,6 @@ public class DataAllValuesFromTranslator extends AbstractDataQuantifiedRestricti
         return DataAllValuesFrom.create(prop, filler);
     }
     protected String getFillerTriplePredicate() {
-        return OWLRDFVocabulary.OWL_ALL_VALUES_FROM.getIRI();
+        return Vocabulary.OWL_ALL_VALUES_FROM.getIRI();
     }
 }

@@ -14,6 +14,6 @@ public class UnionOfTranslator extends AbstractNaryBooleanClassExpressionTransla
         return ObjectUnionOf.create(operands);
     }
     protected String getPredicateIRI() {
-        return OWLRDFVocabulary.OWL_UNION_OF.getIRI();
+        return Vocabulary.OWL_UNION_OF.getIRI();
     }
 }

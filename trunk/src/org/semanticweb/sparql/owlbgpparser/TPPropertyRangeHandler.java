@@ -6,7 +6,7 @@ import org.semanticweb.sparql.owlbgp.model.ObjectPropertyRange;
 public class TPPropertyRangeHandler extends TriplePredicateHandler {
 
     public TPPropertyRangeHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.RDFS_RANGE.getIRI());
+        super(consumer, Vocabulary.RDFS_RANGE.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

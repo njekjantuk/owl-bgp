@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.FunctionalDataProperty;
 public class TypeFunctionalDataPropertyHandler extends BuiltInTypeHandler {
 
     public TypeFunctionalDataPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_FUNCTIONAL_DATA_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_FUNCTIONAL_DATA_PROPERTY.getIRI());
     }
 
     public void handleTriple(String subject, String predicate, String object) {

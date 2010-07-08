@@ -9,7 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.SubObjectPropertyOf;
 public class TPSubObjectPropertyOfHandler extends TriplePredicateHandler {
 
     public TPSubObjectPropertyOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_SUB_OBJECT_PROPERTY_OF.getIRI());
+        super(consumer, Vocabulary.OWL_SUB_OBJECT_PROPERTY_OF.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {
@@ -18,9 +18,9 @@ public class TPSubObjectPropertyOfHandler extends TriplePredicateHandler {
         return !consumer.isAnonymousNode(subject);
     }
     public void handleTriple(String subject, String predicate, String object) {
-        if (consumer.isAnonymousNode(subject) && getConsumer().hasPredicateObject(subject,OWLRDFVocabulary.RDF_TYPE.getIRI(),OWLRDFVocabulary.RDF_LIST.getIRI())) {
+        if (consumer.isAnonymousNode(subject) && getConsumer().hasPredicateObject(subject,Vocabulary.RDF_TYPE.getIRI(),Vocabulary.RDF_LIST.getIRI())) {
             // Property chain!
-            OptimisedListTranslator<ObjectPropertyExpression> translator=new OptimisedListTranslator<ObjectPropertyExpression>(consumer,new OWLObjectPropertyExpressionListItemTranslator(consumer));
+            OptimisedListTranslator<ObjectPropertyExpression> translator=new OptimisedListTranslator<ObjectPropertyExpression>(consumer,new ObjectPropertyExpressionListItemTranslator(consumer));
             List<ObjectPropertyExpression> props=translator.translateList(subject);
             ObjectPropertyExpression chain=ObjectPropertyChain.create(props);
             addAxiom(SubObjectPropertyOf.create(chain,translateObjectProperty(object)));

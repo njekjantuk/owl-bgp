@@ -22,7 +22,7 @@ public abstract class AbstractDataCardinalityTranslator extends AbstractDataRest
         return Integer.parseInt(cardiObject.getLexicalForm());
     }
     protected DataRange translateFiller(String mainNode) {
-        String onDataRangeObject=getResourceObject(mainNode, OWLRDFVocabulary.OWL_ON_DATA_RANGE.getIRI(), true);
+        String onDataRangeObject=getResourceObject(mainNode, Vocabulary.OWL_ON_DATA_RANGE.getIRI(), true);
         if (onDataRangeObject == null) return Datatype.RDFS_LITERAL;
         return getConsumer().translateDataRange(onDataRangeObject);
     }

@@ -6,7 +6,7 @@ import org.semanticweb.sparql.owlbgp.model.ObjectIntersectionOf;
 public class TPIntersectionOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
 
     public TPIntersectionOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_INTERSECTION_OF.getIRI());
+        super(consumer, Vocabulary.OWL_INTERSECTION_OF.getIRI());
     }
 
     protected ClassExpression translateEquivalentClass(String mainNode) {

@@ -9,7 +9,7 @@ public class ComplementOfTranslator extends AbstractClassExpressionTranslator {
         super(consumer);
     }
     public ClassExpression translate(String mainNode) {
-        String complementOfObject = getResourceObject(mainNode, OWLRDFVocabulary.OWL_COMPLEMENT_OF.getIRI(), true);
+        String complementOfObject = getResourceObject(mainNode, Vocabulary.OWL_COMPLEMENT_OF.getIRI(), true);
         ClassExpression operand = translateToClassExpression(complementOfObject);
         return ObjectComplementOf.create(operand);
     }

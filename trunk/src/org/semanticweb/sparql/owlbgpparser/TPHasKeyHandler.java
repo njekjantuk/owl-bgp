@@ -11,7 +11,7 @@ public class TPHasKeyHandler extends TriplePredicateHandler {
     private OptimisedListTranslator<PropertyExpression> listTranslator;
 
     public TPHasKeyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_HAS_KEY.getIRI());
+        super(consumer, Vocabulary.OWL_HAS_KEY.getIRI());
         this.listTranslator=new OptimisedListTranslator<PropertyExpression>(consumer, new HasKeyListItemTranslator(consumer));
     }
 

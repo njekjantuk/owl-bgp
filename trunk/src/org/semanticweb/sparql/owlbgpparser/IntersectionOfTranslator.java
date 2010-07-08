@@ -13,6 +13,6 @@ public class IntersectionOfTranslator extends AbstractNaryBooleanClassExpression
         return ObjectIntersectionOf.create(operands);
     }
     protected String getPredicateIRI() {
-        return OWLRDFVocabulary.OWL_INTERSECTION_OF.getIRI();
+        return Vocabulary.OWL_INTERSECTION_OF.getIRI();
     }
 }

@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.InverseFunctionalObjectProperty;
 public class TypeInverseFunctionalPropertyHandler extends BuiltInTypeHandler {
 
     public TypeInverseFunctionalPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY.getIRI());
     }
     
     public boolean canHandleStreaming(String subject, String predicate, String object) {

@@ -3,7 +3,7 @@ package org.semanticweb.sparql.owlbgpparser;
 public class TPVersionIRIHandler extends TriplePredicateHandler {
 
     public TPVersionIRIHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_VERSION_IRI.getIRI());
+        super(consumer, Vocabulary.OWL_VERSION_IRI.getIRI());
     }
 
     public void handleTriple(String subject,String predicate,String object) {
