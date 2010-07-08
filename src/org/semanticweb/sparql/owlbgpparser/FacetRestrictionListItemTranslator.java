@@ -5,11 +5,11 @@ import org.semanticweb.sparql.owlbgp.model.FacetRestriction;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Literal;
 
-public class OWLFacetRestrictionListItemTranslator implements ListItemTranslator<FacetRestriction> {
+public class FacetRestrictionListItemTranslator implements ListItemTranslator<FacetRestriction> {
 
     protected final OWLRDFConsumer consumer;
 
-    public OWLFacetRestrictionListItemTranslator(OWLRDFConsumer consumer) {
+    public FacetRestrictionListItemTranslator(OWLRDFConsumer consumer) {
         this.consumer = consumer;
     }
     public FacetRestriction translate(ILiteral firstObject) {

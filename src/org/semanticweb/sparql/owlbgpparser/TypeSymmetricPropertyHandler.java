@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.SymmetricObjectProperty;
 public class TypeSymmetricPropertyHandler extends BuiltInTypeHandler {
 
     public TypeSymmetricPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_SYMMETRIC_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_SYMMETRIC_PROPERTY.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

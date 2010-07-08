@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.FunctionalObjectProperty;
 public class TypeFunctionalObjectPropertyHandler extends BuiltInTypeHandler {
 
     public TypeFunctionalObjectPropertyHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_FUNCTIONAL_PROPERTY.getIRI());
+        super(consumer, Vocabulary.OWL_FUNCTIONAL_PROPERTY.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

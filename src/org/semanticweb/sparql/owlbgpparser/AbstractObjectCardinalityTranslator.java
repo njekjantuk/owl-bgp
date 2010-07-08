@@ -19,7 +19,7 @@ public abstract class AbstractObjectCardinalityTranslator extends AbstractObject
         return Integer.parseInt(con.getLexicalForm().trim());
     }
     protected ClassExpression translateFiller(String mainNode) {
-        String onClassObject=getResourceObject(mainNode, OWLRDFVocabulary.OWL_ON_CLASS.getIRI(), true);
+        String onClassObject=getResourceObject(mainNode, Vocabulary.OWL_ON_CLASS.getIRI(), true);
         if (onClassObject==null) return Clazz.THING;
         return translateToClassExpression(onClassObject);
     }

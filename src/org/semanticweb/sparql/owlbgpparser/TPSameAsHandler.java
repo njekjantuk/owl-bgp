@@ -9,7 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.SameIndividual;
 public class TPSameAsHandler extends TriplePredicateHandler {
 
     public TPSameAsHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_SAME_AS.getIRI());
+        super(consumer, Vocabulary.OWL_SAME_AS.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

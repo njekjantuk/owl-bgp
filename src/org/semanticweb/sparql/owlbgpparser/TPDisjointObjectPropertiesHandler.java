@@ -9,7 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
 public class TPDisjointObjectPropertiesHandler extends TriplePredicateHandler {
 
     public TPDisjointObjectPropertiesHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_DISJOINT_OBJECT_PROPERTIES.getIRI());
+        super(consumer, Vocabulary.OWL_DISJOINT_OBJECT_PROPERTIES.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

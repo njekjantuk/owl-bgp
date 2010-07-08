@@ -27,41 +27,54 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 public class Datatype extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = -5589507335866233523L;
 
-    public static Set<Datatype> OWL2_DATATYPES=new HashSet<Datatype>();
-    static {
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"XMLLiteral"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("owl")+"real"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("owl")+"rational"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"string"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"integer"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"long"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"int"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"short"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"byte"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"decimal"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"float"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"boolean"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"double"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"nonPositiveInteger"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"negativeInteger"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"nonNegativeInteger"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedLong"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedInt"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"positiveInteger"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"base64Binary"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"hexBinary"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"anyURI"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"QName"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"normalizedString"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"token"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"Name"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"NCName"));
+    public enum OWL2_DATATYPES {
+        PLAIN_LITERAL(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"),
+        XML_LITERAL(Prefixes.s_semanticWebPrefixes.get("rdf")+"XMLLiteral"),
+        REAL(Prefixes.s_semanticWebPrefixes.get("owl")+"real"),
+        RATIONAL(Prefixes.s_semanticWebPrefixes.get("owl")+"rational"),
+        STRINg(Prefixes.s_semanticWebPrefixes.get("xsd")+"string"),
+        INTEGER(Prefixes.s_semanticWebPrefixes.get("xsd")+"integer"),
+        LONG(Prefixes.s_semanticWebPrefixes.get("xsd")+"long"),
+        INT(Prefixes.s_semanticWebPrefixes.get("xsd")+"int"),
+        SHORT(Prefixes.s_semanticWebPrefixes.get("xsd")+"short"),
+        BYTE(Prefixes.s_semanticWebPrefixes.get("xsd")+"byte"),
+        DECIMAL(Prefixes.s_semanticWebPrefixes.get("xsd")+"decimal"),
+        FLOAT(Prefixes.s_semanticWebPrefixes.get("xsd")+"float"),
+        BOOLEAN(Prefixes.s_semanticWebPrefixes.get("xsd")+"boolean"),
+        DOUBLE(Prefixes.s_semanticWebPrefixes.get("xsd")+"double"),
+        NON_POSITIVE_INTEGER(Prefixes.s_semanticWebPrefixes.get("xsd")+"nonPositiveInteger"),
+        NEGATIVE_INTEGER(Prefixes.s_semanticWebPrefixes.get("xsd")+"negativeInteger"),
+        NON_NEGATIVE_INTEGER(Prefixes.s_semanticWebPrefixes.get("xsd")+"nonNegativeInteger"),
+        UNSIGNED_LONG(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedLong"),
+        UNSIGNED_INT(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedInt"),
+        POSITIVE_INTEGER(Prefixes.s_semanticWebPrefixes.get("xsd")+"positiveInteger"),
+        BASE64_bINARY(Prefixes.s_semanticWebPrefixes.get("xsd")+"base64Binary"),
+        HEX_BINARY(Prefixes.s_semanticWebPrefixes.get("xsd")+"hexBinary"),
+        ANY_URI(Prefixes.s_semanticWebPrefixes.get("xsd")+"anyURI"),
+        QNAME(Prefixes.s_semanticWebPrefixes.get("xsd")+"QName"),
+        NORMALIZED_STRING(Prefixes.s_semanticWebPrefixes.get("xsd")+"normalizedString"),
+        TOKEN(Prefixes.s_semanticWebPrefixes.get("xsd")+"token"),
+        NAME(Prefixes.s_semanticWebPrefixes.get("xsd")+"Name"),
+        NCNAME(Prefixes.s_semanticWebPrefixes.get("xsd")+"NCName"),
+        NMTOKEN(Prefixes.s_semanticWebPrefixes.get("xsd")+"NMToken"),
+        DATETIME(Prefixes.s_semanticWebPrefixes.get("xsd")+"dateTime"),
+        DATETIMESTAMP(Prefixes.s_semanticWebPrefixes.get("xsd")+"dateTimeStamp"),
+        UNSIGNEDSHORT(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedShort"),
+        UNSIGNEDBYTE(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedByte");
         
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"NMToken"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"dateTime"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"dateTimeStamp"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedShort"));
-        OWL2_DATATYPES.add(Datatype.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"unsignedByte"));
+        protected final Datatype datatype; 
+        
+        OWL2_DATATYPES(String datatypeURI) {
+            this.datatype=Datatype.create(datatypeURI);
+        }
+        public Datatype getDatatype() {
+            return datatype;
+        }
+    }
+    public boolean isOWL2Datatype() {
+        for (OWL2_DATATYPES dt : OWL2_DATATYPES.values())
+            if (this.m_iri==dt.getDatatype().m_iri) return true;
+        return false;
     }
     
     protected static InterningManager<Datatype> s_interningManager=new InterningManager<Datatype>() {

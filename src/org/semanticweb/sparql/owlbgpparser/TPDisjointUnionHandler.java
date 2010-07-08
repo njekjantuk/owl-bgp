@@ -10,7 +10,7 @@ import org.semanticweb.sparql.owlbgp.model.DisjointUnion;
 public class TPDisjointUnionHandler extends TriplePredicateHandler {
 
     public TPDisjointUnionHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_DISJOINT_UNION_OF.getIRI());
+        super(consumer, Vocabulary.OWL_DISJOINT_UNION_OF.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

@@ -1,14 +1,13 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.xml.sax.SAXException;
 
 public class OWLRDFConsumerAdapter extends OWLRDFConsumer implements TripleHandler {
 
-    public OWLRDFConsumerAdapter(OWLOntology ontology) {
-        super(ontology);
+    public OWLRDFConsumerAdapter() {
+        super();
     }
     public void handlePrefixDirective(String prefixName, String prefix) {}
     public void handleBaseDirective(String base) {
@@ -22,23 +21,16 @@ public class OWLRDFConsumerAdapter extends OWLRDFConsumer implements TripleHandl
             throw new RuntimeException(e);
         }
     }
-    public void handleTriple(IRI subject, IRI predicate, String object) {
+    public void handleLiteralTriple(String subject, String predicate, String literal, String langTag, Datatype datatype) {
         try {
-        	statementWithLiteralValue(subject.toString(), predicate.toString(), object, null, null);
+            statementWithLiteralValue(subject, predicate, literal, langTag, datatype);
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }
-    public void handleTriple(IRI subject, IRI predicate, String object, String lang) {
+    public void handleLiteralTriple(String subject, String predicate, String literal, Datatype datatype) {
         try {
-            statementWithLiteralValue(subject.toString(), predicate.toString(), object, lang, null);
-        } catch (SAXException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public void handleTriple(IRI subject, IRI predicate, String object, IRI datatype) {
-        try {
-            statementWithLiteralValue(subject.toString(), predicate.toString(), object, null, datatype.toString());
+            statementWithLiteralValue(subject, predicate, literal, "", datatype);
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }

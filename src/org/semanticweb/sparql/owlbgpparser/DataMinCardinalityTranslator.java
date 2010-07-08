@@ -14,9 +14,9 @@ public class DataMinCardinalityTranslator extends AbstractDataCardinalityTransla
         return DataMinCardinality.create(cardi, prop, filler);
     }
     protected String getCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_MIN_CARDINALITY.getIRI();
+        return Vocabulary.OWL_MIN_CARDINALITY.getIRI();
     }
     protected String getQualifiedCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_MIN_QUALIFIED_CARDINALITY.getIRI();
+        return Vocabulary.OWL_MIN_QUALIFIED_CARDINALITY.getIRI();
     }
 }

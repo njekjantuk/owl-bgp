@@ -14,9 +14,9 @@ public class DataMaxCardinalityTranslator extends AbstractDataCardinalityTransla
         return DataMaxCardinality.create(cardi, prop, filler);
     }
     protected String getCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_MAX_CARDINALITY.getIRI();
+        return Vocabulary.OWL_MAX_CARDINALITY.getIRI();
     }
     protected String getQualifiedCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_MAX_QUALIFIED_CARDINALITY.getIRI();
+        return Vocabulary.OWL_MAX_QUALIFIED_CARDINALITY.getIRI();
     }
 }

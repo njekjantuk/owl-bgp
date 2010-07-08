@@ -7,7 +7,7 @@ public class GTPObjectPropertyAssertionHandler extends AbstractResourceTripleHan
         super(consumer);
     }
     public boolean canHandle(String subject, String predicate, String object) {
-        return !consumer.isAnnotationProperty(subject) && !OWLRDFVocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate) && !getConsumer().isOntology(subject);
+        return !consumer.isAnnotationProperty(subject) && !Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate) && !getConsumer().isOntology(subject);
     }
     public boolean canHandleStreaming(String subject, String predicate, String object) {
         return false;

@@ -11,7 +11,7 @@ public class DataHasValueTranslator extends AbstractDataRestrictionTranslator {
     }
     
     protected ClassExpression translateRestriction(String mainNode) {
-        ILiteral con=getLiteralObject(mainNode, OWLRDFVocabulary.OWL_HAS_VALUE.getIRI(), true);
+        ILiteral con=getLiteralObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(), true);
         return DataHasValue.create(translateOnProperty(mainNode), con);
     }
 }

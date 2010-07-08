@@ -10,36 +10,36 @@ import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
 public class TypeNegativePropertyAssertionHandler extends BuiltInTypeHandler {
 
     public TypeNegativePropertyAssertionHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION.getIRI());
+        super(consumer, Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {
         return false;
     }
     public void handleTriple(String subject, String predicate, String object) {
-        String source=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_SOURCE_INDIVIDUAL.getIRI(), true);
+        String source=consumer.getResourceObject(subject, Vocabulary.OWL_SOURCE_INDIVIDUAL.getIRI(), true);
         if (source==null) 
-            source=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_SUBJECT.getIRI(), true);
+            source=consumer.getResourceObject(subject, Vocabulary.OWL_SUBJECT.getIRI(), true);
         if (source==null)
-            source=consumer.getResourceObject(subject, OWLRDFVocabulary.RDF_SUBJECT.getIRI(), true);
+            source=consumer.getResourceObject(subject, Vocabulary.RDF_SUBJECT.getIRI(), true);
 
-        String property=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_ASSERTION_PROPERTY.getIRI(), true);
+        String property=consumer.getResourceObject(subject, Vocabulary.OWL_ASSERTION_PROPERTY.getIRI(), true);
         if (property==null)
-            property=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_PREDICATE.getIRI(), true);
+            property=consumer.getResourceObject(subject, Vocabulary.OWL_PREDICATE.getIRI(), true);
         if (property==null)
-            property=consumer.getResourceObject(subject, OWLRDFVocabulary.RDF_PREDICATE.getIRI(), true);
+            property=consumer.getResourceObject(subject, Vocabulary.RDF_PREDICATE.getIRI(), true);
 
-        Object target=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_TARGET_INDIVIDUAL.getIRI(), true);
+        Object target=consumer.getResourceObject(subject, Vocabulary.OWL_TARGET_INDIVIDUAL.getIRI(), true);
         if (target==null)
-            target=consumer.getResourceObject(subject, OWLRDFVocabulary.OWL_OBJECT.getIRI(), true);
+            target=consumer.getResourceObject(subject, Vocabulary.OWL_OBJECT.getIRI(), true);
         if (target==null)
-            target=consumer.getResourceObject(subject, OWLRDFVocabulary.RDF_OBJECT.getIRI(), true);
+            target=consumer.getResourceObject(subject, Vocabulary.RDF_OBJECT.getIRI(), true);
         if (target==null)
-            target=consumer.getLiteralObject(subject, OWLRDFVocabulary.OWL_OBJECT.getIRI(), true);
+            target=consumer.getLiteralObject(subject, Vocabulary.OWL_OBJECT.getIRI(), true);
         if (target==null)
-            target=consumer.getLiteralObject(subject, OWLRDFVocabulary.RDF_OBJECT.getIRI(), true);
+            target=consumer.getLiteralObject(subject, Vocabulary.RDF_OBJECT.getIRI(), true);
         if (target==null)
-            target=consumer.getLiteralObject(subject, OWLRDFVocabulary.OWL_TARGET_VALUE.getIRI(), true);
+            target=consumer.getLiteralObject(subject, Vocabulary.OWL_TARGET_VALUE.getIRI(), true);
 
         consumer.translateAnnotations(subject);
         if (target instanceof ILiteral) {

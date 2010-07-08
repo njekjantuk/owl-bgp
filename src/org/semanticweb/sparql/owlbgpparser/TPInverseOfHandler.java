@@ -5,7 +5,7 @@ import org.semanticweb.sparql.owlbgp.model.InverseObjectProperties;
 public class TPInverseOfHandler extends TriplePredicateHandler {
 
     public TPInverseOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_INVERSE_OF.getIRI());
+        super(consumer, Vocabulary.OWL_INVERSE_OF.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

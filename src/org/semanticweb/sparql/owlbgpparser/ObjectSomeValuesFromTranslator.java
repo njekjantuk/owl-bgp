@@ -13,6 +13,6 @@ public class ObjectSomeValuesFromTranslator extends AbstractObjectQuantifiedRest
         return ObjectSomeValuesFrom.create(property, filler);
     }
     protected String getFillerTriplePredicate() {
-        return OWLRDFVocabulary.OWL_SOME_VALUES_FROM.getIRI();
+        return Vocabulary.OWL_SOME_VALUES_FROM.getIRI();
     }
 }

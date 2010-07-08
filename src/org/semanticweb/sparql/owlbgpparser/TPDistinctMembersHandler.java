@@ -8,7 +8,7 @@ import org.semanticweb.sparql.owlbgp.model.Individual;
 public class TPDistinctMembersHandler extends TriplePredicateHandler {
 
     public TPDistinctMembersHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_DISTINCT_MEMBERS.getIRI());
+        super(consumer, Vocabulary.OWL_DISTINCT_MEMBERS.getIRI());
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {

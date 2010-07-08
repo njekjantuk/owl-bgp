@@ -6,7 +6,7 @@ import org.semanticweb.sparql.owlbgp.model.ObjectComplementOf;
 public class TPComplementOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
 
     public TPComplementOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_COMPLEMENT_OF.getIRI());
+        super(consumer, Vocabulary.OWL_COMPLEMENT_OF.getIRI());
     }
 
     protected ClassExpression translateEquivalentClass(String mainNode) {

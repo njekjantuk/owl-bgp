@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 
-public enum OWLRDFVocabulary {
+public enum Vocabulary {
     OWL_THING(Prefixes.s_semanticWebPrefixes.get("owl"), "Thing"),
     OWL_NOTHING(Prefixes.s_semanticWebPrefixes.get("owl"), "Nothing"),
     OWL_CLASS(Prefixes.s_semanticWebPrefixes.get("owl"), "Class"),
@@ -130,7 +130,7 @@ public enum OWLRDFVocabulary {
     String namespace;
     String shortName;
 
-    OWLRDFVocabulary(String namespace, String shortName) {
+    Vocabulary(String namespace, String shortName) {
         this.namespace=namespace.intern();
         this.shortName=shortName.intern();
     }
@@ -149,7 +149,7 @@ public enum OWLRDFVocabulary {
     public static final Set<String> BUILT_IN_VOCABULARY_IRIS;
     static {
         BUILT_IN_VOCABULARY_IRIS = new HashSet<String>();
-        for (OWLRDFVocabulary v : OWLRDFVocabulary.values()) {
+        for (Vocabulary v : Vocabulary.values()) {
             BUILT_IN_VOCABULARY_IRIS.add(v.getIRI());
         }
     }

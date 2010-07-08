@@ -6,7 +6,7 @@ import org.semanticweb.sparql.owlbgp.model.ObjectUnionOf;
 public class TPUnionOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
 
     public TPUnionOfHandler(OWLRDFConsumer consumer) {
-        super(consumer, OWLRDFVocabulary.OWL_UNION_OF.getIRI());
+        super(consumer, Vocabulary.OWL_UNION_OF.getIRI());
     }
     
     protected ClassExpression translateEquivalentClass(String mainNode) {

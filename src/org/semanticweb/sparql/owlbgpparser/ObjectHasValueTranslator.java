@@ -14,7 +14,7 @@ public class ObjectHasValueTranslator extends AbstractObjectRestrictionTranslato
         super(consumer);
     }
     protected ClassExpression translateRestriction(String mainNode) {
-        String hasValueObject=getResourceObject(mainNode, OWLRDFVocabulary.OWL_HAS_VALUE.getIRI(), true);
+        String hasValueObject=getResourceObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(), true);
         ObjectPropertyExpression prop=translateOnProperty(mainNode);
         Individual ind;
         if (consumer.isAnonymousNode(hasValueObject)) ind=AnonymousIndividual.create(hasValueObject);

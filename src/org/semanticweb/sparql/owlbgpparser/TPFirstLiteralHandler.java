@@ -9,10 +9,10 @@ public class TPFirstLiteralHandler extends AbstractLiteralTripleHandler {
     }
 
     public boolean canHandle(String subject, String predicate, ILiteral object) {
-        return predicate.equals(OWLRDFVocabulary.RDF_FIRST.getIRI());
+        return predicate.equals(Vocabulary.RDF_FIRST.getIRI());
     }
     public boolean canHandleStreaming(String subject, String predicate, ILiteral object) {
-        return predicate.equals(OWLRDFVocabulary.RDF_FIRST.getIRI());
+        return predicate.equals(Vocabulary.RDF_FIRST.getIRI());
     }
     public void handleTriple(String subject, String predicate, ILiteral object) {
         getConsumer().addFirst(subject, object);

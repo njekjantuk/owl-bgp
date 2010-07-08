@@ -12,6 +12,6 @@ public class ObjectAllValuesFromTranslator extends AbstractObjectQuantifiedRestr
         return ObjectAllValuesFrom.create(property, filler);
     }
     protected String getFillerTriplePredicate() {
-        return OWLRDFVocabulary.OWL_ALL_VALUES_FROM.getIRI();
+        return Vocabulary.OWL_ALL_VALUES_FROM.getIRI();
     }
 }

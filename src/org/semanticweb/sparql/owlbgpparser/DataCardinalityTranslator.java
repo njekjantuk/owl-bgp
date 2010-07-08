@@ -14,9 +14,9 @@ public class DataCardinalityTranslator extends AbstractDataCardinalityTranslator
         return DataExactCardinality.create(cardi, prop, filler);
     }
     protected String getCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_CARDINALITY.getIRI();
+        return Vocabulary.OWL_CARDINALITY.getIRI();
     }
     protected String getQualifiedCardinalityTriplePredicate() {
-        return OWLRDFVocabulary.OWL_QUALIFIED_CARDINALITY.getIRI();
+        return Vocabulary.OWL_QUALIFIED_CARDINALITY.getIRI();
     }
 }
