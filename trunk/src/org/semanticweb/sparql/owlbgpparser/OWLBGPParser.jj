@@ -20,6 +20,8 @@ import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
 
 public class OWLBGPParser {
 
+    public static final String LB = System.getProperty("line.separator") ;
+
     protected String base;
     protected int blankNodeId=0;
     protected final TripleHandler handler=new OWLRDFConsumerAdapter();
@@ -27,9 +29,63 @@ public class OWLBGPParser {
     {
         pm.declareSemanticWebPrefixes();
     }
+    
+    public OWLBGPParser(StringReader reader, Set<String> classes, Set<String> objectProperties, Set<String> dataProperties, Set<String> individuals, Set<String> customDatatypes) {
+         this(reader);
+         handler.setClassesInOntologySignature(classes);
+         handler.setObjectPropertiesInOntologySignature(objectProperties);
+         handler.setDataPropertiesInOntologySignature(dataProperties);
+         handler.setIndividualsInOntologySignature(individuals);
+         handler.setCustomDatatypesInOntologySignature(customDatatypes);
+    }
+    public void setClassesInOntologySignature(Set<String> classes) {
+        handler.setClassesInOntologySignature(classes);
+    }
+    public void setObjectPropertiesInOntologySignature(Set<String> objectProperties) {
+        handler.setObjectPropertiesInOntologySignature(objectProperties);
+    }
+    public void setDataPropertiesInOntologySignature(Set<String> dataProperties) {
+        handler.setDataPropertiesInOntologySignature(dataProperties);
+    }
+    public void setIndividualsInOntologySignature(Set<String> individuals) {
+        handler.setIndividualsInOntologySignature(individuals);
+    }
+    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypes) {
+        handler.setCustomDatatypesInOntologySignature(customDatatypes);
+    }
+    
     public static void main(String[] args) {
 //        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
-        String s="<http://example.org/Person> rdf:type owl:Class . ?x rdf:type <http://example.org/Person> .";
+        
+        String s="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
+        s+= "<http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> a owl:ObjectProperty ."+LB;
+
+        s+= "?prop a owl:ObjectProperty ."+LB
+            + "?class a owl:Class ."+LB
+            + "?conj a owl:Class ."+LB
+            + "?class rdfs:subClassOf ["+LB
+            + "   a owl:Restriction ; "+LB
+            + "   owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB
+            + "   owl:someValuesFrom ["+LB
+            + "      a owl:Class ;"+LB
+            + "      owl:intersectionOf ("+LB
+            + "         ?conj "+LB
+            + "         ["+LB
+            + "            a owl:Restriction ;"+LB
+            + "            owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB //?prop
+            + "            owl:someValuesFrom <http://www.co-ode.org/ontologies/galen#linear> "+LB
+            + "         ]"+LB
+            + "      ) ;"+LB
+            + "   ]"+LB
+            + "] . "+LB
+            + "?conj rdfs:subClassOf ["+LB
+            + "   a owl:Class ; "+LB
+            + "   owl:unionOf ( <http://www.co-ode.org/ontologies/galen#Shape> <http://www.co-ode.org/ontologies/galen#AnatomicalShape> ) . "+LB
+            + "] . "+LB
+            + "?prop a owl:FunctionalProperty . "+LB
+            + "?prop a owl:IrreflexiveProperty . "+LB
+            + "?prop rdfs:subPropertyOf <http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> . ";
+//        s+="<http://example.org/Person> rdf:type owl:Class . ?x rdf:type <http://example.org/Person> .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         try {
             parser.parse();
@@ -72,329 +128,68 @@ PARSER_END(OWLBGPParser)
 
 SKIP: {" " | "\n" | "\t" | "\r"}
 
-SKIP:
-{
-    <COMMENT: "#" (~["\n"])*>
-}
+SKIP: { <COMMENT: "#" (~["\n"])*> }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-MORE : {
-    "\"": IN_STRING
-}
-
-<IN_STRING> MORE :
-{
-    <  ("\\\"")|~["\""] >
-}
-
-<IN_STRING> TOKEN:
-{
-    <STRING: "\""> : DEFAULT
-}
-
-MORE : {
-    "\"\"\"" : IN_LONG_STRING
-}
-
-<IN_LONG_STRING> MORE :
-{
-    <  ~[] >
-}
-
-
-<IN_LONG_STRING> TOKEN :
-{
-    <LONG_STRING: "\"\"\""> : DEFAULT
-}
-
+MORE : { "\"": IN_STRING }
+<IN_STRING> MORE : { <  ("\\\"")|~["\""] > }
+<IN_STRING> TOKEN: { <STRING: "\""> : DEFAULT }
+MORE : { "\"\"\"" : IN_LONG_STRING }
+<IN_LONG_STRING> MORE : { <  ~[] > }
+<IN_LONG_STRING> TOKEN : { <LONG_STRING: "\"\"\""> : DEFAULT }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-TOKEN:
-{
-    <DIGIT: ["0"-"9"]>
-}
-
-TOKEN:
-{
-    <INTEGER: ("+" | "-")? (<DIGIT>)+>
-}
-
-TOKEN:
-{
-    <DOUBLE: ("-" | "+") ? (<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT> | "." (<DIGIT>)+ <EXPONENT> | (<DIGIT>)+ <EXPONENT>)>
-}
-
-TOKEN:
-{
-    <DECIMAL: ("-" | "+")? ( (<DIGIT>)+ "." (<DIGIT>)* | "." (<DIGIT>)+ | (<DIGIT>)+ )>
-}
-
-
-TOKEN:
-{
-    <EXPONENT: 	("e" | "E") ("-" | "+")? (<DIGIT>)+>
-}
-
-
-TOKEN:
-{
-    <OPENPAR: "(">
-}
-
-TOKEN:
-{
-    <CLOSEPAR: ")">
-}
-
-TOKEN:
-{
-    <OPEN_SQUARE_BRACKET: "[">
-}
-
-TOKEN:
-{
-    <CLOSE_SQUARE_BRACKET: "]">
-}
-
-
-
-TOKEN:
-{
-    <COMMA: ",">
-}
-
-TOKEN:
-{
-    <DOT: ".">
-}
-
-TOKEN:
-{
-    <SEMICOLON: ";">
-}
-
-TOKEN:
-{
-    <PREFIX: "@prefix">
-}
-
-TOKEN:
-{
-    <DOUBLE_CARET: "^^">
-}
-
-TOKEN:
-{
-    <BASE: "@base">
-}
-
-TOKEN:
-{
-    <AT: "@">
-}
-
-
-TOKEN:
-{
-    <A: "a">
-}
-
-
-TOKEN:
-{
-    <EMPTY_BLANK_NODE: <OPEN_SQUARE_BRACKET><CLOSE_SQUARE_BRACKET>>
-}
-
-TOKEN:
-{
-    <NODE_ID_START: "_:">
-}
-
-TOKEN:
-{
-    <TRUE: "true">
-}
-
-TOKEN:
-{
-    <FALSE: "false">
-}
-
-TOKEN:
-{
-    <SELECT: "SELECT">
-}
-
-TOKEN:
-{
-    <WHERE: "WHERE">
-}
-
-TOKEN:
-{
-    <FILTER: "FILTER">
-}
-
-TOKEN:
-{
-    <LETTER: ["a"-"z"] | ["A"-"Z"]>
-}
-
-
+TOKEN: { <DIGIT: ["0"-"9"]> }
+TOKEN: { <INTEGER: ("+" | "-")? (<DIGIT>)+> }
+TOKEN: { <DOUBLE: ("-" | "+") ? (<DIGIT>)+ "." (<DIGIT>)* (<EXPONENT> | "." (<DIGIT>)+ <EXPONENT> | (<DIGIT>)+ <EXPONENT>)> }
+TOKEN: { <DECIMAL: ("-" | "+")? ( (<DIGIT>)+ "." (<DIGIT>)* | "." (<DIGIT>)+ | (<DIGIT>)+ )> }
+TOKEN: { <EXPONENT: ("e" | "E") ("-" | "+")? (<DIGIT>)+> }
+TOKEN: { <OPENPAR: "("> }
+TOKEN: { <CLOSEPAR: ")"> }
+TOKEN: { <OPEN_SQUARE_BRACKET: "["> }
+TOKEN: { <CLOSE_SQUARE_BRACKET: "]"> }
+TOKEN: { <COMMA: ","> }
+TOKEN: { <DOT: "."> }
+TOKEN: { <SEMICOLON: ";"> }
+TOKEN: { <PREFIX: "@prefix"> }
+TOKEN: { <DOUBLE_CARET: "^^"> }
+TOKEN: { <BASE: "@base"> }
+TOKEN: { <AT: "@"> }
+TOKEN: { <A: "a"> }
+TOKEN: { <EMPTY_BLANK_NODE: <OPEN_SQUARE_BRACKET><CLOSE_SQUARE_BRACKET>> }
+TOKEN: { <NODE_ID_START: "_:"> }
+TOKEN: { <TRUE: "true"> }
+TOKEN: { <FALSE: "false"> }
+TOKEN: { <LETTER: ["a"-"z"] | ["A"-"Z"]> }
 
 ////////////////////////////////////////////////////////////////////////////////////////////
-//
 // IRIs
 
-TOKEN:
-{
-    <FULLIRI: "<"(~[">", " "])*">">
-}
-
-TOKEN:
-{
-    <PNAME_NS: (<PN_PREFIX>)? ":">
-}
-
-
-TOKEN:
-{
-    <PN_LOCAL: ( <PN_CHARS_U> | ["0"-"9"] ) ((<PN_CHARS>|".")* <PN_CHARS>)?>
-}
-
-TOKEN:
-{
-    <PNAME_LN: <PNAME_NS> <PN_LOCAL>>
-}
-
-TOKEN:
-{
-    <PN_PREFIX: <PN_CHARS_BASE>((<PN_CHARS>|".")* <PN_CHARS>)?>
-}
-
-TOKEN:
-{
-    <PN_CHARS_BASE:   ["A"-"Z"]
-                    | ["a"-"z"]
-                    | ["\u00C0"-"\u00D6"]
-                    | ["\u00D8"-"\u00F6"]
-                    | ["\u00F8"-"\u02FF"]
-                    | ["\u0370"-"\u037D"]
-                    | ["\u037F"-"\u1FFF"]
-                    | ["\u200C"-"\u200D"]
-                    | ["\u2070"-"\u218F"]
-                    | ["\u2C00"-"\u2FEF"]
-                    | ["\u3001"-"\uD7FF"]
-                    | ["\uF900"-"\uFDCF"]
-                    | ["\uFDF0"-"\uFFFD"]>
-}
-
-
-TOKEN:
-{
-    <PN_CHARS:   <PN_CHARS_U>
-               | "-"
-               | ["0"-"9"]
-               | "\u00B7"
-               | ["\u0300"-"\u036F"]
-               | ["\u203F"-"\u2040"]>
-}
-
-TOKEN:
-{
-    <PN_CHARS_U: <PN_CHARS_BASE> | "_">
-}
-
-
-TOKEN:
-{
-    <VAR: <VAR1> | <VAR2>> 
-}
-
-TOKEN:
-{
-    <VAR1: "?"<VARNAME>>
-}
-
-TOKEN:
-{
-    <VAR2: "$"<VARNAME>>
-}
-
-TOKEN:
-{
-    <VARNAME:  ( <PN_CHARS_U> | ["0"-"9"] ) (<PN_CHARS_U> | ["0"-"9"] | "\u00B7" | ["\u0300"-"\u036F"] | ["\u203F"-"\u2040"])*>
-               
-}
-
-
-TOKEN:
-{
-    <NODEID: "_:"<PN_LOCAL>>
-}
-
-
-TOKEN:
-{
-    <ERROR: ~[]>
-}
+TOKEN: { <FULLIRI: "<"(~[">", " "])*">"> }
+TOKEN: { <PNAME_NS: (<PN_PREFIX>)? ":"> }
+TOKEN: { <PN_LOCAL: ( <PN_CHARS_U> | ["0"-"9"] ) ((<PN_CHARS>|".")* <PN_CHARS>)?> }
+TOKEN: { <PNAME_LN: <PNAME_NS> <PN_LOCAL>> }
+TOKEN: { <PN_PREFIX: <PN_CHARS_BASE>((<PN_CHARS>|".")* <PN_CHARS>)?> }
+TOKEN: { <PN_CHARS_BASE: ["A"-"Z"] | ["a"-"z"] | ["\u00C0"-"\u00D6"] | ["\u00D8"-"\u00F6"] | ["\u00F8"-"\u02FF"] | ["\u0370"-"\u037D"] | ["\u037F"-"\u1FFF"] | ["\u200C"-"\u200D"] | ["\u2070"-"\u218F"] | ["\u2C00"-"\u2FEF"] | ["\u3001"-"\uD7FF"] | ["\uF900"-"\uFDCF"] | ["\uFDF0"-"\uFFFD"]> }
+TOKEN: { <PN_CHARS: <PN_CHARS_U> | "-" | ["0"-"9"] | "\u00B7" | ["\u0300"-"\u036F"] | ["\u203F"-"\u2040"]> }
+TOKEN: { <PN_CHARS_U: <PN_CHARS_BASE> | "_"> }
+TOKEN: { <VAR: <VAR1> | <VAR2>> }
+TOKEN: { <VAR1: "?"<VARNAME>> }
+TOKEN: { <VAR2: "$"<VARNAME>> }
+TOKEN: { <VARNAME:  ( <PN_CHARS_U> | ["0"-"9"] ) (<PN_CHARS_U> | ["0"-"9"] | "\u00B7" | ["\u0300"-"\u036F"] | ["\u203F"-"\u2040"])*> }
+TOKEN: { <NODEID: <NODE_ID_START><PN_LOCAL>> }
+TOKEN: { <ERROR: ~[]> }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-//TOKEN:
-//{
-//    <LONG_STRING: (<QUOTE><QUOTE><QUOTE>~["\""]<QUOTE><QUOTE><QUOTE>)>
-//}
-
-
-
-void parse() :
+void parse() : 
 {
 }
-{
-    
-    (parseDirective()<DOT> | parseStatement()<DOT>)+<EOF> {handler.handleEnd();}
+{   
+    parseTriples()(<DOT>parseTriples())* {handler.handleEnd();}
 }
-
-void parseDirective() :
-{
-}
-{
-    parsePrefixDirective() | parseBaseDirective()
-}
-
-void parsePrefixDirective() :
-{
-    Token t;
-    String prefix="";
-    String ns;
-}
-{
-    <PREFIX> t=<PNAME_NS>{prefix=t.image;} ns=parseIRI() {
-        pm.declarePrefix(prefix,ns.toString());
-        handler.handlePrefixDirective(prefix, ns.toString());
-    }
-}
-
-void parseBaseDirective() :
-{
-    Token t;
-}
-{
-    <BASE> t=<FULLIRI> {base = t.image.substring(1, t.image.length() - 1);} {
-        handler.handleBaseDirective(base);
-    }
-}
-
-void parseStatement() :
-{
-}
-{
-    parseTriples()
-}
-
 void parseTriples() :
 {
     String subject;

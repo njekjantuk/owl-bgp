@@ -1,13 +1,13 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-public class TypeRDFPropertyHandler extends BuiltInTypeHandler {
+public class TypeOnPropertyHandler extends BuiltInTypeHandler {
 
-    public TypeRDFPropertyHandler(OWLRDFConsumer consumer) {
+    public TypeOnPropertyHandler(OWLRDFConsumer consumer) {
         super(consumer, Vocabulary.OWL_ON_PROPERTY.getIRI());
     }
 
     public void handleTriple(String subject, String predicate, String object) {
+        consumer.addOnProperty(subject);
         consumeTriple(subject, predicate, object);
-        consumer.addRDFProperty(subject);
     }
 }

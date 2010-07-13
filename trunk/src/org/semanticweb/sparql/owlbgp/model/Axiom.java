@@ -1,5 +1,7 @@
 package org.semanticweb.sparql.owlbgp.model;
 
-public interface Axiom extends ExtendedOWLObject {
+import java.util.Set;
 
+public interface Axiom extends ExtendedOWLObject {
+    public Set<Annotation> getAnnotations();
 }

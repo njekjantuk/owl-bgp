@@ -9,11 +9,9 @@ public class TypeInverseFunctionalPropertyHandler extends BuiltInTypeHandler {
     }
     
     public boolean canHandleStreaming(String subject, String predicate, String object) {
-        consumer.addOWLObjectProperty(subject);
         return !consumer.isAnonymousNode(subject);
     }
     public void handleTriple(String subject, String predicate, String object) {
-        consumer.addOWLObjectProperty(subject);
         addAxiom(InverseFunctionalObjectProperty.create(translateObjectProperty(subject)));
         consumeTriple(subject, predicate, object);
     }

@@ -9,7 +9,6 @@ public class TypeFunctionalDataPropertyHandler extends BuiltInTypeHandler {
     }
 
     public void handleTriple(String subject, String predicate, String object) {
-        getConsumer().addOWLDataProperty(subject);
         addAxiom(FunctionalDataProperty.create(translateDataProperty(subject)));
         consumeTriple(subject, predicate, object);
     }

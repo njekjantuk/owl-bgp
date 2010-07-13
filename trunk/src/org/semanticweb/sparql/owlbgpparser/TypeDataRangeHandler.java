@@ -8,7 +8,7 @@ public class TypeDataRangeHandler extends BuiltInTypeHandler {
     
     public void handleTriple(String subject, String predicate, String object) {
         if (!consumer.isAnonymousNode(subject)) {
-            getConsumer().addOWLDataRange(subject);
+            consumer.addDataRange(subject);
             consumeTriple(subject, predicate, object);
         }
     }

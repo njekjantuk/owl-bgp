@@ -7,7 +7,6 @@ public class TypeClassHandler extends BuiltInTypeHandler {
     }
 
     public void handleTriple(String subject, String predicate, String object) {
-        if (consumer.isVariableNode(subject)) consumer.owlClassVars.add(subject);
-        else if (!consumer.isAnonymousNode(subject)) consumer.owlClassIRIs.add(subject);
+        consumer.addClass(subject);
     }
 }

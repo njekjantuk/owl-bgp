@@ -12,7 +12,6 @@ public class TypeAsymmetricPropertyHandler extends BuiltInTypeHandler {
         return !consumer.isAnonymousNode(subject);
     }
     public void handleTriple(String subject, String predicate, String object) {
-        consumer.addOWLObjectProperty(subject);
         addAxiom(AsymmetricObjectProperty.create(translateObjectProperty(subject)));
         consumeTriple(subject, predicate, object);
     }

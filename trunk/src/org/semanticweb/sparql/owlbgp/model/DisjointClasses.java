@@ -13,10 +13,14 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
 
     protected static InterningManager<DisjointClasses> s_interningManager=new InterningManager<DisjointClasses>() {
         protected boolean equal(DisjointClasses classes1,DisjointClasses classes2) {
-            if (classes1.m_classExpressions.size()!=classes2.m_classExpressions.size())
+            if (classes1.m_annotations.size()!=classes2.m_annotations.size() || classes1.m_classExpressions.size()!=classes2.m_classExpressions.size())
                 return false;
             for (ClassExpression equiv : classes1.m_classExpressions) {
                 if (!contains(equiv, classes2.m_classExpressions))
+                    return false;
+            }
+            for (Annotation anno : classes1.m_annotations) {
+                if (!contains(anno, classes2.m_annotations))
                     return false;
             } 
             return true;
@@ -27,18 +31,27 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
                     return true;
             return false;
         }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
+        }
         protected int getHashCode(DisjointClasses classes) {
             int hashCode=0;
             for (ClassExpression equiv : classes.m_classExpressions)
                 hashCode+=equiv.hashCode();
+            for (Annotation anno : classes.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
     
     protected final Set<ClassExpression> m_classExpressions;
     
-    protected DisjointClasses(Set<ClassExpression> classExpressions) {
+    protected DisjointClasses(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         m_classExpressions=classExpressions;
+        m_annotations=annotations;
     }
     public Set<ClassExpression> getClassExpressions() {
         return m_classExpressions;
@@ -46,6 +59,7 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointClasses(");
+        writeAnnoations(buffer, prefixes);
         boolean notFirst=false;
         for (ClassExpression conjunct : m_classExpressions) {
             if (notFirst)
@@ -61,10 +75,13 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
         return s_interningManager.intern(this);
     }
     public static DisjointClasses create(Set<ClassExpression> classExpressions) {
-        return s_interningManager.intern(new DisjointClasses(classExpressions));
+        return s_interningManager.intern(new DisjointClasses(classExpressions,new HashSet<Annotation>()));
     }
     public static DisjointClasses create(ClassExpression... classExpressions) {
-        return s_interningManager.intern(new DisjointClasses(new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
+        return s_interningManager.intern(new DisjointClasses(new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>()));
+    }
+    public static DisjointClasses create(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DisjointClasses(classExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

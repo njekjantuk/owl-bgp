@@ -21,8 +21,8 @@ public class TPSubClassOfHandler extends TriplePredicateHandler {
                 }
             }
         }
-        consumer.addOWLClass(subject);
-        consumer.addOWLClass(object);
+        consumer.addClass(subject);
+        consumer.addClass(object);
         return !isSubjectOrObjectAnonymous(subject, object);
     }
     public void handleTriple(String subject, String predicate, String object) {

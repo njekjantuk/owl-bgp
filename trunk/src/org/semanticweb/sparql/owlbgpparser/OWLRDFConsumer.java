@@ -1,5 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.RDF_TYPE;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.sparql.owlbgp.model.Annotation;
+import org.semanticweb.sparql.owlbgp.model.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.AnnotationValue;
 import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.Axiom;
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
@@ -39,37 +44,45 @@ import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
 import org.xml.sax.SAXException;
 
 public class OWLRDFConsumer {
+    protected Set<String> classIRIs=new HashSet<String>();
+    protected Set<String> classVariables=new HashSet<String>();
+    protected Set<String> objectPropertyIRIs=new HashSet<String>();
+    protected Set<String> objectPropertyVariables=new HashSet<String>();
+    protected Set<String> dataPropertyIRIs=new HashSet<String>();
+    protected Set<String> dataPropertyVariables=new HashSet<String>();
+    protected Set<String> customDatatypes=new HashSet<String>();
+    protected Set<String> dataRangeIRIs=new HashSet<String>();
+    protected Set<String> datatypeVariables=new HashSet<String>();
+    protected Set<String> individualIRIs=new HashSet<String>();
+    protected Set<String> individualVariables=new HashSet<String>();
+    protected Set<String> literalVariables=new HashSet<String>();
+    protected Set<String> propertyIRIs=new HashSet<String>(); // things neither typed as a data or object property - bad!
+    
     protected String ontologyIRI;
     protected String xmlBase;
-    protected Set<String> owlClassIRIs;
-    protected Set<String> owlClassVars;
-    protected Set<String> objectPropertyIRIs;
-    protected Set<String> objectPropertyVars;
-    protected Set<String> dataPropertyIRIs;
-    protected Set<String> dataPropertyVars;
-    protected Set<String> propertyIRIs;
-    protected Set<String> individualIRIs;
-    protected Set<String> individualVars;
-    protected Set<String> literalVars;
-    protected Set<String> datatypeVars;
-    protected Set<String> annotationPropertyIRIs;
-    protected Set<String> annotationIRIs;
-    protected Set<String> ontologyPropertyIRIs;
-    // IRIs that had a type triple to rdfs:DataRange
-    protected Set<String> dataRangeIRIs;
+    
+    protected Set<String> axiomIRIs=new HashSet<String>();
+    protected Set<String> annotationPropertyIRIs=new HashSet<String>();
+    protected Set<String> annotationPropertyVariables=new HashSet<String>();
+    protected Set<String> annotationIRIs=new HashSet<String>();
+    protected Map<String, Object> annotationIRI2Annotation=new HashMap<String, Object>();
+    protected Map<String, Set<Object>> annotationsBySubject=new HashMap<String, Set<Object>>();
+    protected Set<Object> pendingAnnotations=new HashSet<Object>();
+    protected Map<String, Set<String>> annotatedAnonSource2AnnotationMap=new HashMap<String, Set<String>>();
+    
+    protected Set<String> ontologyPropertyIRIs=new HashSet<String>();
     // The IRI of the first resource that is typed as an ontology
     protected String firstOntologyIRI;
     // IRIs that had a type triple to owl:Ontology
-    protected Set<String> ontologyIRIs;
+    protected Set<String> ontologyIRIs=new HashSet<String>();
     // IRIs that had a type triple to owl:Restriction
-    protected Set<String> restrictionIRIs;
+    protected Set<String> restrictionIRIs=new HashSet<String>();
     // IRIs that had a type triple to rdf:List
-    protected Set<String> listIRIs;
+    protected Set<String> listIRIs=new HashSet<String>();
     // Maps rdf:next triple subjects to objects
-    protected Map<String,String> listRestTripleMap;
-    protected Map<String,String> listFirstResourceTripleMap;
-    protected Map<String,ILiteral> listFirstLiteralTripleMap;
-    protected Map<String,Axiom> reifiedAxiomsMap;
+    protected Map<String,String> listRestTripleMap=new HashMap<String, String>();
+    protected Map<String,String> listFirstResourceTripleMap=new HashMap<String, String>();
+    protected Map<String,ILiteral> listFirstLiteralTripleMap=new HashMap<String, ILiteral>();
     // A translator for lists of class expressions (such lists are used
     // in intersections, unions etc.)
     protected OptimisedListTranslator<ClassExpression> classExpressionListTranslator;
@@ -82,27 +95,36 @@ public class OWLRDFConsumer {
     protected OptimisedListTranslator<DataRange> dataRangeListTranslator;
     protected OptimisedListTranslator<FacetRestriction> faceRestrictionListTranslator;
     // Handlers for built in types
-    protected Map<String,BuiltInTypeHandler> builtInTypeTripleHandlers;
+    protected Map<String,BuiltInTypeHandler> builtInTypeTripleHandlers=new HashMap<String, BuiltInTypeHandler>();
+    // Handler for triples that denote nodes which represent axioms.
+    // i.e.
+    // owl:AllDisjointClasses
+    // owl:AllDisjointProperties
+    // owl:AllDifferent
+    // owl:NegativePropertyAssertion
+    // owl:Axiom
+    // These need to be handled separately from other types, because the base triples for annotated
+    // axioms should be in the ontology before annotations on the annotated versions of these axioms are parsed.
+    protected Map<String,BuiltInTypeHandler> axiomTypeTripleHandlers=new HashMap<String,BuiltInTypeHandler>();
     // Handlers for build in predicates
-    protected Map<String, TriplePredicateHandler> predicateHandlers;
-    protected Map<String, AbstractLiteralTripleHandler> skosTripleHandlers;
+    protected Map<String, TriplePredicateHandler> predicateHandlers=new HashMap<String, TriplePredicateHandler>();
     // Handlers for general literal triples (i.e. triples which
     // have predicates that are not part of the built in OWL/RDFS/RDF
     // vocabulary.  Such triples either constitute annotationIRIs of
     // relationships between an individual and a data literal (typed or
     // untyped)
-    protected List<AbstractLiteralTripleHandler> literalTripleHandlers;
+    protected List<AbstractLiteralTripleHandler> literalTripleHandlers=new ArrayList<AbstractLiteralTripleHandler>();
     // Handlers for general resource triples (i.e. triples which
     // have predicates that are not part of the built in OWL/RDFS/RDF
     // vocabulary.  Such triples either constitute annotationIRIs or
     // relationships between an individual and another individual.
-    protected List<AbstractResourceTripleHandler> resourceTripleHandlers;
-    protected Map<String, Set<String>> annotatedAnonSource2AnnotationMap=new HashMap<String, Set<String>>();
+    protected List<AbstractResourceTripleHandler> resourceTripleHandlers=new ArrayList<AbstractResourceTripleHandler>();
     protected ClassExpressionTranslatorSelector classExpressionTranslatorSelector;
     protected Axiom lastAddedAxiom;
     protected Set<Axiom> axioms=new HashSet<Axiom>();
-    protected Map<String, String> synonymMap;
-    protected Set<String> rdfType; 
+    protected Set<String> rdfType=new HashSet<String>(); 
+    protected Map<String,ObjectPropertyExpression> translatedObjectPropertyExpressions=new HashMap<String,ObjectPropertyExpression>();
+    protected Map<String,ClassExpression> translatedClassExpression=new HashMap<String,ClassExpression>();
     
     protected boolean hasAnnotations=false;
 
@@ -110,35 +132,14 @@ public class OWLRDFConsumer {
 
     public OWLRDFConsumer() {
         classExpressionTranslatorSelector=new ClassExpressionTranslatorSelector(this);
-        owlClassIRIs=new HashSet<String>();
-        owlClassVars=new HashSet<String>();
-        objectPropertyIRIs=new HashSet<String>();
-        objectPropertyVars=new HashSet<String>();
-        dataPropertyIRIs=new HashSet<String>();
-        dataPropertyVars=new HashSet<String>();
-        individualIRIs=new HashSet<String>();
-        individualVars=new HashSet<String>();
-        literalVars=new HashSet<String>();
-        datatypeVars=new HashSet<String>();
-        annotationPropertyIRIs=new HashSet<String>();
         for (String iri : Vocabulary.BUILT_IN_ANNOTATION_PROPERTY_IRIS) {
             annotationPropertyIRIs.add(iri);
         }
-        annotationIRIs=new HashSet<String>();
-        ontologyPropertyIRIs=new HashSet<String>();
+        addDublinCoreAnnotationIRIs();
         ontologyPropertyIRIs.add(Vocabulary.OWL_PRIOR_VERSION.getIRI());
         ontologyPropertyIRIs.add(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH.getIRI());
         ontologyPropertyIRIs.add(Vocabulary.OWL_INCOMPATIBLE_WITH.getIRI());
-
-        dataRangeIRIs=new HashSet<String>();
-        propertyIRIs=new HashSet<String>();
-        restrictionIRIs=new HashSet<String>();
-        ontologyIRIs=new HashSet<String>();
-        listIRIs=new HashSet<String>();
-        listFirstLiteralTripleMap=new HashMap<String, ILiteral>();
-        listFirstResourceTripleMap=new HashMap<String, String>();
-        listRestTripleMap=new HashMap<String, String>();
-        reifiedAxiomsMap=new HashMap<String, Axiom>();
+        
         classExpressionListTranslator=new OptimisedListTranslator<ClassExpression>(this, new ClassExpressionListItemTranslator(this));
         individualListTranslator=new OptimisedListTranslator<Individual>(this, new IndividualListItemTranslator(this));
         constantListTranslator=new OptimisedListTranslator<ILiteral>(this, new TypedConstantListItemTranslator(this));
@@ -146,34 +147,42 @@ public class OWLRDFConsumer {
         dataPropertyListTranslator=new OptimisedListTranslator<DataPropertyExpression>(this, new DataPropertyListItemTranslator(this));
         dataRangeListTranslator=new OptimisedListTranslator<DataRange>(this, new DataRangeListItemTranslator(this));
         faceRestrictionListTranslator=new OptimisedListTranslator<FacetRestriction>(this, new FacetRestrictionListItemTranslator(this));
-        builtInTypeTripleHandlers=new HashMap<String, BuiltInTypeHandler>();
         setupTypeTripleHandlers();
         setupPredicateHandlers();
-
-        literalTripleHandlers=new ArrayList<AbstractLiteralTripleHandler>();
         literalTripleHandlers.add(new GTPDataPropertyAssertionHandler(this));
         literalTripleHandlers.add(new TPFirstLiteralHandler(this));
-
-        // General resource/object triples - i.e. triples which have a predicate
-        // that is not a built in IRI. Object properties get precedence
-        // over object properties
-        resourceTripleHandlers=new ArrayList<AbstractResourceTripleHandler>();
+//        literalTripleHandlers.add(new GTPAnnotationLiteralHandler(this));
         resourceTripleHandlers.add(new GTPObjectPropertyAssertionHandler(this));
         resourceTripleHandlers.add(new GTPAnnotationResourceTripleHandler(this));
-        
         for (OWL2_DATATYPES dt : OWL2_DATATYPES.values()) {
             dataRangeIRIs.add(dt.getDatatype().getIRIString());
         }
         dataRangeIRIs.add(Vocabulary.RDFS_LITERAL.getIRI());        
-        rdfType=new HashSet<String>();
-        owlClassIRIs.add(Vocabulary.OWL_THING.getIRI());
-        owlClassIRIs.add(Vocabulary.OWL_NOTHING.getIRI());
+        classIRIs.add(Vocabulary.OWL_THING.getIRI());
+        classIRIs.add(Vocabulary.OWL_NOTHING.getIRI());
         objectPropertyIRIs.add(Vocabulary.OWL_TOP_OBJECT_PROPERTY.getIRI());
         objectPropertyIRIs.add(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY.getIRI());
         dataPropertyIRIs.add(Vocabulary.OWL_TOP_DATA_PROPERTY.getIRI());
         dataPropertyIRIs.add(Vocabulary.OWL_BOTTOM_DATA_PROPERTY.getIRI());
         setupSinglePredicateMaps();
     }
+    
+    public void setClassesInOntologySignature(Set<String> classIRIs) {
+        this.classIRIs=classIRIs;
+    }
+    public void setObjectPropertiesInOntologySignature(Set<String> objectPropertieIRIs) {
+        this.objectPropertyIRIs=objectPropertieIRIs;
+    }
+    public void setDataPropertiesInOntologySignature(Set<String> dataPropertieIRIs) {
+        this.dataPropertyIRIs=dataPropertieIRIs;
+    }
+    public void setIndividualsInOntologySignature(Set<String> individualIRIs) {
+        this.individualIRIs=individualIRIs;
+    }
+    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypeIRIs) {
+        this.dataRangeIRIs.addAll(customDatatypeIRIs);
+    }
+    
     protected void addSingleValuedResPredicate(Vocabulary v) {
         Map<String, String> map=new HashMap<String, String>();
         singleValuedResTriplesByPredicate.put(v.getIRI(), map);
@@ -191,11 +200,14 @@ public class OWLRDFConsumer {
     protected void addBuiltInTypeTripleHandler(BuiltInTypeHandler handler) {
         builtInTypeTripleHandlers.put(handler.getTypeIRI(), handler);
     }
+    protected void addAxiomTypeTripleHandler(BuiltInTypeHandler handler) {
+        axiomTypeTripleHandlers.put(handler.getTypeIRI(), handler);
+    }
     protected void setupTypeTripleHandlers() {
-        addBuiltInTypeTripleHandler(new TypeAsymmetricPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeClassHandler(this));
         addBuiltInTypeTripleHandler(new TypeDataPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeDatatypeHandler(this));
+        addBuiltInTypeTripleHandler(new TypeAsymmetricPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeFunctionalDataPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeFunctionalObjectPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeFunctionalPropertyHandler(this));
@@ -206,29 +218,25 @@ public class OWLRDFConsumer {
         addBuiltInTypeTripleHandler(new TypeSymmetricPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeTransitivePropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeRestrictionHandler(this));
-        addBuiltInTypeTripleHandler(new TypeObjectRestrictionHandler(this));
-        addBuiltInTypeTripleHandler(new TypeDataRestrictionHandler(this));
         addBuiltInTypeTripleHandler(new TypeListHandler(this));
         addBuiltInTypeTripleHandler(new TypeAnnotationPropertyHandler(this));
+//        addBuiltInTypeTripleHandler(new TypeDeprecatedClassHandler(this));
+//        addBuiltInTypeTripleHandler(new TypeDeprecatedPropertyHandler(this));
         addBuiltInTypeTripleHandler(new TypeDataRangeHandler(this));
-        addBuiltInTypeTripleHandler(new TypeAllDifferentHandler(this));
-        addBuiltInTypeTripleHandler(new TypeNegativePropertyAssertionHandler(this));
-        addBuiltInTypeTripleHandler(new TypeAxiomHandler(this));
-        addBuiltInTypeTripleHandler(new TypeRDFPropertyHandler(this));
-        addBuiltInTypeTripleHandler(new TypeRDFSClassHandler(this));
-        addBuiltInTypeTripleHandler(new TypePropertyHandler(this));
-        addBuiltInTypeTripleHandler(new TypeAllDisjointClassesHandler(this));
-        addBuiltInTypeTripleHandler(new TypeAllDisjointPropertiesHandler(this));
+//        addBuiltInTypeTripleHandler(new TypeOntologyHandler(this));
         addBuiltInTypeTripleHandler(new TypeNamedIndividualHandler(this));
-        addBuiltInTypeTripleHandler(new TypeIndividualVariableHandler(this));
-        addBuiltInTypeTripleHandler(new TypeLiteralVariableHandler(this));
         addBuiltInTypeTripleHandler(new TypeAnnotationHandler(this));
+        
+        addAxiomTypeTripleHandler(new TypeAxiomHandler(this));
+        addAxiomTypeTripleHandler(new TypeAllDisjointClassesHandler(this));
+        addAxiomTypeTripleHandler(new TypeAllDisjointPropertiesHandler(this));
+        addAxiomTypeTripleHandler(new TypeAllDifferentHandler(this));
+        addAxiomTypeTripleHandler(new TypeNegativePropertyAssertionHandler(this));
     }
     protected void addPredicateHandler(TriplePredicateHandler predicateHandler) {
         predicateHandlers.put(predicateHandler.getPredicateIRI(), predicateHandler);
     }
     protected void setupPredicateHandlers() {
-        predicateHandlers=new HashMap<String, TriplePredicateHandler>();
         addPredicateHandler(new TPDataPropertDomainHandler(this));
         addPredicateHandler(new TPDataPropertyRangeHandler(this));
         addPredicateHandler(new TPDisjointDataPropertiesHandler(this));
@@ -266,6 +274,12 @@ public class OWLRDFConsumer {
         addPredicateHandler(new TPPropertyChainAxiomHandler(this));
         addPredicateHandler(new TPPropertyDisjointWithHandler(this));
     }
+    protected void addDublinCoreAnnotationIRIs() {
+        String[] iris=new String[] {"contributor", "coverage", "creator", "date", "description", "format", "identifier", "language", "publisher", "relation", "rights", "source", "subject", "title", "type"};
+        for (String iri : iris)
+            annotationIRIs.add("http://purl.org/dc/elements/1.1/"+iri);
+    }
+    
     // We cache IRIs to save memory!!
     protected Map<String, String> IRIMap=new HashMap<String, String>();
     int currentBaseCount=0;
@@ -274,7 +288,7 @@ public class OWLRDFConsumer {
         return iri.startsWith("_:");
     }
     protected boolean isVariableNode(String iri) {
-        return iri.startsWith("?");
+        return iri.startsWith("?")||iri.startsWith("$");
     }
     protected void addAxiom(Axiom axiom) {
         axioms.add(axiom);
@@ -285,66 +299,77 @@ public class OWLRDFConsumer {
     public Axiom getLastAddedAxiom() {
         return lastAddedAxiom;
     }
-    protected void addOWLClass(String iri) {
-        owlClassIRIs.add(iri);
+    protected void addClass(String iri) {
+        if (isVariableNode(iri)) classVariables.add(iri);
+        else if (!isAnonymousNode(iri)) classIRIs.add(iri);
     }
-    protected void addOWLObjectProperty(String iri) {
-        objectPropertyIRIs.add(iri);
+    protected void addObjectProperty(String iri) {
+        if (isVariableNode(iri)) objectPropertyVariables.add(iri);
+        else objectPropertyIRIs.add(iri);
+    }
+    protected void addDataProperty(String iri) {
+        if (isVariableNode(iri)) dataPropertyVariables.add(iri);
+        else dataPropertyIRIs.add(iri);
     }
     protected void addIndividual(String iri) {
-        individualIRIs.add(iri);
+        if (isVariableNode(iri)) individualVariables.add(iri);
+        else individualIRIs.add(iri);
     }
-    protected boolean isIndividual(String iri) {
-        return individualIRIs.contains(iri);
+    protected void addDataRange(String iri) {
+        if (isVariableNode(iri)) {
+            datatypeVariables.add(iri);
+        } else {
+            dataRangeIRIs.add(iri);
+            Datatype dt=Datatype.create(iri);
+            if (!isAnonymousNode(iri) && !dt.isOWL2Datatype()) customDatatypes.add(iri);
+        }
     }
-    protected void addRDFProperty(String iri) {
-        propertyIRIs.add(iri);
+    protected void addAnnotationProperty(String iri) {
+        if (isVariableNode(iri)) annotationPropertyVariables.add(iri); 
+        else annotationPropertyIRIs.add(iri);
     }
-    protected boolean isRDFProperty(String iri) {
-        return propertyIRIs.contains(iri);
-    }
-    protected void addOWLDataProperty(String iri) {
-        dataPropertyIRIs.add(iri);
-    }
-    protected void addOWLDatatype(String iri) {
-        dataRangeIRIs.add(iri);
-    }
-    public void addOWLDataRange(String iri) {
-        dataRangeIRIs.add(iri);
+    protected void addAnnotationIRI(String iri) {
+        annotationIRIs.add(iri);
     }
     protected void addRestriction(String iri) {
         restrictionIRIs.add(iri);
     }
-    protected void addAnnotationProperty(String iri) {
-        annotationPropertyIRIs.add(iri);
+    protected void addOnProperty(String iri) {
+        propertyIRIs.add(iri); // owl:onProperty
     }
-    protected void addAnnotationIRI(String iri) {
-        annotationIRIs.add(iri);
+    public void addAxiomIRI(String axiomIRI) {
+        axiomIRIs.add(axiomIRI);
+    }
+    protected boolean isRDFProperty(String iri) {
+        return propertyIRIs.contains(iri);
     }
     public boolean isRestriction(String iri) {
         return restrictionIRIs.contains(iri);
     }
     protected boolean isClass(String iri) {
-        if (owlClassIRIs.contains(iri)) return true;
+        if (classIRIs.contains(iri) || classVariables.contains(iri)) return true;
         return false;
     }
     protected boolean isObjectPropertyOnly(String iri) {
         if (iri==null) return false;
-        if (dataPropertyIRIs.contains(iri)) return false;
-        if (objectPropertyIRIs.contains(iri)) return true;
+        if (dataPropertyIRIs.contains(iri) || dataPropertyVariables.contains(iri)) return false;
+        if (objectPropertyIRIs.contains(iri) || objectPropertyVariables.contains(iri)) return true;
         else return false;
     }
     protected boolean isDataPropertyOnly(String iri) {
-        if (objectPropertyIRIs.contains(iri)) return false;
-        if (dataPropertyIRIs.contains(iri)) return true;
+        if (objectPropertyIRIs.contains(iri) || objectPropertyVariables.contains(iri)) return false;
+        if (dataPropertyIRIs.contains(iri) || dataPropertyVariables.contains(iri)) return true;
         else return false;
     }
     protected boolean isOntologyProperty(String iri) {
         return ontologyPropertyIRIs.contains(iri);
     }
     protected boolean isAnnotationProperty(String iri) {
-        if (annotationPropertyIRIs.contains(iri)) return true;
+        if (annotationPropertyIRIs.contains(iri)||annotationPropertyVariables.contains(iri)) return true;
         else return false;
+    }
+    protected boolean isIndividual(String iri) {
+        return individualIRIs.contains(iri) || individualVariables.contains(iri);
     }
     protected boolean isOntology(String iri) {
         return ontologyIRIs.contains(iri);
@@ -516,20 +541,40 @@ public class OWLRDFConsumer {
         cleanup();
     }
     protected void cleanup() {
-        owlClassIRIs.clear();
+        classIRIs.clear();
+        classVariables.clear();
         objectPropertyIRIs.clear();
+        objectPropertyVariables.clear();
         dataPropertyIRIs.clear();
+        dataPropertyVariables.clear();
+        customDatatypes.clear();
         dataRangeIRIs.clear();
+        datatypeVariables.clear();
+        individualIRIs.clear();
+        individualVariables.clear();
+        literalVariables.clear();
+        propertyIRIs.clear();
+        annotationPropertyIRIs.clear();
+        annotationPropertyVariables.clear();
+        annotationIRIs.clear();
+        ontologyIRIs.clear();
+        ontologyPropertyIRIs.clear();
+        firstOntologyIRI=null;
         restrictionIRIs.clear();
+        listIRIs.clear();
         listFirstLiteralTripleMap.clear();
         listFirstResourceTripleMap.clear();
         listRestTripleMap.clear();
-        translatedClassExpression.clear();
-        listIRIs.clear();
         resTriplesBySubject.clear();
         litTriplesBySubject.clear();
         singleValuedLitTriplesByPredicate.clear();
         singleValuedResTriplesByPredicate.clear();
+        annotatedAnonSource2AnnotationMap.clear();
+        lastAddedAxiom=null;
+        axioms.clear();
+        rdfType.clear(); 
+        translatedClassExpression.clear();
+        translatedObjectPropertyExpressions.clear();
     }
     public void statementWithLiteralValue(String subject, String predicate, String object, String lang, Datatype datatype) throws SAXException {
         handleStreaming(subject, predicate, object, lang, datatype);
@@ -538,7 +583,36 @@ public class OWLRDFConsumer {
         handleStreaming(subject, predicate, object);
     }
     protected void handleStreaming(String subject, String predicate, String object) {
+        boolean consumed = false;
+        if (predicate.equals(RDF_TYPE.getIRI())) {
+            BuiltInTypeHandler handler=builtInTypeTripleHandlers.get(object);
+            if (handler != null) {
+                if (handler.canHandleStreaming(subject, predicate, object)) {
+                    handler.handleTriple(subject, predicate, object);
+                    consumed = true;
+                }
+            } else if (axiomTypeTripleHandlers.get(object)==null) {
+                // Not a built in type
+                addIndividual(subject);
+            } else addAxiomIRI(subject);
+        }
+        else {
+            AbstractResourceTripleHandler handler = predicateHandlers.get(predicate);
+            if (handler != null) {
+                if (handler.canHandleStreaming(subject, predicate, object)) {
+                    handler.handleTriple(subject, predicate, object);
+                    consumed = true;
+                }
+            }
+        }
+        if (!consumed) {
+            // Not consumed, so add the triple
+            addTriple(subject, predicate, object);
+        }
+        
+        
         if (predicate.equals(Vocabulary.RDF_TYPE.getIRI())) {
+            // TODO: set types of variables 
         	if (isVariableNode(subject)) rdfType.add(object);
         	BuiltInTypeHandler handler=null;
         	if (!isVariableNode(subject) 
@@ -576,7 +650,7 @@ public class OWLRDFConsumer {
         addTriple(subject, predicate, object);
     }
     protected void handleStreaming(String subject, String predicate, String literal, String lang, Datatype datatype) {
-    	ILiteral con=getOWLConstant(literal, lang, datatype);
+    	ILiteral con=getConstant(literal, lang, datatype);
         for (AbstractLiteralTripleHandler handler : literalTripleHandlers) {
             if (handler.canHandleStreaming(subject, predicate, con)) {
             	handler.handleTriple(subject, predicate, con);
@@ -585,8 +659,117 @@ public class OWLRDFConsumer {
         }
         addTriple(subject, predicate, con);
     }
-    protected ILiteral getOWLConstant(String literal, String lang, Datatype datatype) {
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////
+    //// Basic node translation - translation of entities
+    ////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public ObjectPropertyExpression translateObjectPropertyExpression(String mainNode) {
+        ObjectPropertyExpression prop=translatedObjectPropertyExpressions.get(mainNode);
+        if (prop!=null) return prop;
+        if (isAnonymousNode(mainNode)) {
+            // Inverse of a property expression
+            String inverseOfObject=getResourceObject(mainNode, Vocabulary.OWL_INVERSE_OF.getIRI(), true);
+            if (inverseOfObject!=null) {
+                if (isAnonymousNode(inverseOfObject)) {
+                    // double inverse, cancel out
+                    String inverseOfInverseObject=getResourceObject(mainNode, Vocabulary.OWL_INVERSE_OF.getIRI(), true);
+                    return translateObjectPropertyExpression(inverseOfInverseObject);
+                } else {
+                    ObjectProperty otherProperty=(ObjectProperty)translateObjectPropertyExpression(inverseOfObject);
+                    prop=ObjectInverseOf.create(otherProperty);
+                }
+            } else prop=ObjectInverseOf.create(ObjectProperty.create(mainNode));
+        } else if (isVariableNode(mainNode)) {
+            prop=ObjectPropertyVariable.create(mainNode);
+            addObjectProperty(mainNode);
+        } else {
+            prop=ObjectProperty.create(mainNode);
+            addObjectProperty(mainNode);
+        }
+        translatedObjectPropertyExpressions.put(mainNode, prop);
+        return prop;
+    }
+    public DataPropertyExpression translateDataPropertyExpression(String iri) {
+        DataPropertyExpression dpe;
+        if (isVariableNode(iri)) {
+            dpe=DataPropertyVariable.create(iri);
+        } else {
+            dpe=DataProperty.create(iri);
+        }
+        addDataProperty(iri);
+        return dpe;
+    }
+    public Individual translateIndividual(String node) {
+        if (isVariableNode(node))
+            return IndividualVariable.create(node);
+        else 
+            if (isAnonymousNode(node)) return AnonymousIndividual.create(node);
+            else return NamedIndividual.create(node);
+    }
+    protected ILiteral getConstant(String literal, String lang, Datatype datatype) {
         return Literal.create(literal, lang, datatype);
+    }
+    public Set<Annotation> translateAnnotations(String mainNode) {
+        // Are we the subject of an annotation?  If so, we need to ensure that the annotations annotate us.  This
+        // will only happen if we are an annotation!
+        Set<Annotation> annosOnMainNodeAnnotations=new HashSet<Annotation>();
+        Set<String> annotationMainNodes=getAnnotatedSourceAnnotationMainNodes(mainNode);
+        if (!annotationMainNodes.isEmpty()) {
+            for (String annotationMainNode : annotationMainNodes) {
+                annosOnMainNodeAnnotations.addAll(translateAnnotations(annotationMainNode));
+            }
+        }
+        Set<Annotation> mainNodeAnnotations=new HashSet<Annotation>();
+        Set<String> predicates=getPredicatesBySubject(mainNode);
+        for (String predicate : predicates) {
+            if (isAnnotationProperty(predicate)) {
+                String resVal = getResourceObject(mainNode, predicate, true);
+                while (resVal != null) {
+                    AnnotationProperty prop=AnnotationProperty.create(predicate);
+                    Object val;
+                    if (isAnonymousNode(resVal)) val=AnonymousIndividual.create(resVal.toString());
+                    else val=resVal; // IRI
+                    AnnotationValue av=AnnotationValue.create(val);
+                    mainNodeAnnotations.add(Annotation.create(prop, av, annosOnMainNodeAnnotations));
+                    resVal = getResourceObject(mainNode, predicate, true);
+                }
+                ILiteral litVal=getLiteralObject(mainNode, predicate, true);
+                while (litVal != null) {
+                    AnnotationProperty prop=AnnotationProperty.create(predicate);
+                    mainNodeAnnotations.add(Annotation.create(prop, AnnotationValue.create(litVal), annosOnMainNodeAnnotations));
+                    litVal=getLiteralObject(mainNode, predicate, true);
+                }
+            }
+        }
+        return mainNodeAnnotations;
+    }
+
+    public ClassExpression translateClassExpression(String mainNode) {
+    	if (!isAnonymousNode(mainNode)) {
+        	if (!isVariableNode(mainNode))
+              return Clazz.create(mainNode);
+        	else 
+        	  return ClassVariable.create(mainNode);	
+        }
+        ClassExpression desc=translatedClassExpression.get(mainNode);
+        if (desc==null) {
+            ClassExpressionTranslator translator=classExpressionTranslatorSelector.getClassExpressionTranslator(mainNode);
+            if (translator!=null) {
+            	desc=translator.translate(mainNode);
+                translatedClassExpression.put(mainNode, desc);
+                restrictionIRIs.remove(mainNode);
+            }
+            else {
+            	if (isVariableNode(mainNode)) return ClassVariable.create(mainNode);
+            	else return Clazz.create(mainNode);
+            }
+        }
+        return desc;
     }
     public DataRange translateDataRange(String iri) {
         String oneOfObject=getResourceObject(iri, Vocabulary.OWL_ONE_OF.getIRI(), true);
@@ -595,7 +778,7 @@ public class OWLRDFConsumer {
             Set<ILiteral> typedConstants=new HashSet<ILiteral>(literals.size());
             for (ILiteral con : literals) {
                 if (con instanceof LiteralVariable) {
-                	typedConstants.add((LiteralVariable) con);
+                    typedConstants.add((LiteralVariable) con);
                 } else {
                     typedConstants.add((Literal)con);
                 }
@@ -625,83 +808,6 @@ public class OWLRDFConsumer {
             return DatatypeRestriction.create(restrictedDataRange, restrictions);
         }
         return Datatype.create(iri);
-    }
-    public DataPropertyExpression translateDataPropertyExpression(String iri) {
-        if (isVariableNode(iri)) return DataPropertyVariable.create(iri);
-        else return DataProperty.create(iri);
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////
-    //// Basic node translation - translation of entities
-    ////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected Map<String,ObjectPropertyExpression> translatedProperties=new HashMap<String,ObjectPropertyExpression>();
-
-    public ObjectPropertyExpression translateObjectPropertyExpression(String mainNode) {
-        ObjectPropertyExpression prop=translatedProperties.get(mainNode);
-        if (prop!=null) return prop;
-        if (isAnonymousNode(mainNode)) {
-            // Inverse of a property expression
-            String inverseOfObject=getResourceObject(mainNode, Vocabulary.OWL_INVERSE_OF.getIRI(), true);
-            if (inverseOfObject!=null) {
-                if (isAnonymousNode(inverseOfObject)) {
-                    // double inverse, cancel out
-                    String inverseOfInverseObject=getResourceObject(mainNode, Vocabulary.OWL_INVERSE_OF.getIRI(), true);
-                    return translateObjectPropertyExpression(inverseOfInverseObject);
-                } else {
-                    ObjectProperty otherProperty=(ObjectProperty)translateObjectPropertyExpression(inverseOfObject);
-                    prop=ObjectInverseOf.create(otherProperty);
-                }
-            } else prop=ObjectInverseOf.create(ObjectProperty.create(mainNode));
-        } else if (isVariableNode(mainNode)) 
-            prop=ObjectPropertyVariable.create(mainNode);
-        else prop=ObjectProperty.create(mainNode);
-        translatedProperties.put(mainNode, prop);
-        return prop;
-    }
-    public Individual translateIndividual(String node) {
-        if (isVariableNode(node))
-            return IndividualVariable.create(node);
-        else 
-            if (node.startsWith("_:")) return AnonymousIndividual.create(node);
-            else return NamedIndividual.create(node);
-    }
-    public void translateAnnotations(String mainNode) {
-        Set<String> predicates=getPredicatesBySubject(mainNode);
-        for (String predicate : predicates)
-            if (isAnnotationProperty(predicate)) {
-                hasAnnotations=true;
-                break;
-            }
-    }
-
-    protected Map<String,ClassExpression> translatedClassExpression=new HashMap<String,ClassExpression>();
-
-    public ClassExpression translateClassExpression(String mainNode) {
-    	if (!isAnonymousNode(mainNode)) {
-        	if (!isVariableNode(mainNode))
-              return Clazz.create(mainNode);
-        	else 
-        	  return ClassVariable.create(mainNode);	
-        }
-        ClassExpression desc=translatedClassExpression.get(mainNode);
-        if (desc==null) {
-            ClassExpressionTranslator translator=classExpressionTranslatorSelector.getClassExpressionTranslator(mainNode);
-            if (translator!=null) {
-            	desc=translator.translate(mainNode);
-                translatedClassExpression.put(mainNode, desc);
-                restrictionIRIs.remove(mainNode);
-            }
-            else {
-            	if (isVariableNode(mainNode)) return ClassVariable.create(mainNode);
-            	else return Clazz.create(mainNode);
-            }
-        }
-        return desc;
     }
     public ClassExpression getClassExpressionIfTranslated(String mainNode) {
         return translatedClassExpression.get(mainNode);
@@ -911,15 +1017,6 @@ public class OWLRDFConsumer {
     }
     public void addFirst(String subject, ILiteral object) {
         listFirstLiteralTripleMap.put(subject, object);
-    }
-    public void addReifiedAxiom(String axiomIRI, Axiom axiom) {
-        reifiedAxiomsMap.put(axiomIRI, axiom);
-    }
-    public boolean isAxiom(String iri) {
-        return reifiedAxiomsMap.containsKey(iri);
-    }
-    public Axiom getAxiom(String iri) {
-        return reifiedAxiomsMap.get(iri);
     }
     public boolean isDataRange(String iri) {
         return dataRangeIRIs.contains(iri);

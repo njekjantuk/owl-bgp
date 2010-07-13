@@ -27,8 +27,7 @@ public class OptimisedListTranslator<O extends ExtendedOWLObject> {
             list.add(translator.translate(firstResource));
         } else {
             ILiteral literal=getConsumer().getFirstLiteral(mainNode);
-            if (literal != null) 
-                list.add(translator.translate(literal));
+            if (literal != null) list.add(translator.translate(literal));
         }
         String rest=getConsumer().getRest(mainNode, true);
         if (rest != null)  translateList(rest, list);

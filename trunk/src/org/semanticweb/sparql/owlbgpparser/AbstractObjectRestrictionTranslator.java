@@ -12,6 +12,6 @@ public abstract class AbstractObjectRestrictionTranslator extends AbstractRestri
     protected ObjectPropertyExpression translateOnProperty(String mainNode) {
         String onPropertyIRI=getConsumer().getResourceObject(mainNode, Vocabulary.OWL_ON_PROPERTY.getIRI(), true);
         if (onPropertyIRI == null) return null;
-        return getConsumer().translateObjectPropertyExpression(onPropertyIRI);
+        return consumer.translateObjectPropertyExpression(onPropertyIRI);
     }
 }

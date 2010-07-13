@@ -11,7 +11,7 @@ public class TPAllValuesFromHandler extends TriplePredicateHandler {
         if (propIRI!=null && (!consumer.isAnonymousNode(object) || consumer.getClassExpressionIfTranslated(object) != null)) {
             // The filler is either a datatype or named class
             if (consumer.isObjectPropertyOnly(propIRI)) {
-                consumer.addOWLClass(object);
+                consumer.addClass(object);
                 consumer.addTriple(subject, predicate, object);
                 consumer.translateClassExpression(subject);
                 return true;
