@@ -12,12 +12,8 @@ public abstract class AbstractNaryBooleanClassExpressionTranslator extends Abstr
         String object=getResourceObject(mainNode, getPredicateIRI(), true);
         Set<ClassExpression> operands=translateToClassExpressionSet(object);
         if (operands.size() < 2) {
-            if(operands.size() == 1) {
-                return operands.iterator().next();
-            }
-            else {
-                throw new IllegalArgumentException("An intersection didn't have any conjuncts. Main node: "+mainNode);
-            }
+            if (operands.size() == 1) return operands.iterator().next();
+            else throw new IllegalArgumentException("An intersection didn't have any conjuncts. Main node: "+mainNode);
         }
         return createClassExpression(operands);
     }

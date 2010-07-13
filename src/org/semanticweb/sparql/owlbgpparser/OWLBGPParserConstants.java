@@ -59,41 +59,35 @@ public interface OWLBGPParserConstants {
   /** RegularExpression Id. */
   int FALSE = 32;
   /** RegularExpression Id. */
-  int SELECT = 33;
+  int LETTER = 33;
   /** RegularExpression Id. */
-  int WHERE = 34;
+  int FULLIRI = 34;
   /** RegularExpression Id. */
-  int FILTER = 35;
+  int PNAME_NS = 35;
   /** RegularExpression Id. */
-  int LETTER = 36;
+  int PN_LOCAL = 36;
   /** RegularExpression Id. */
-  int FULLIRI = 37;
+  int PNAME_LN = 37;
   /** RegularExpression Id. */
-  int PNAME_NS = 38;
+  int PN_PREFIX = 38;
   /** RegularExpression Id. */
-  int PN_LOCAL = 39;
+  int PN_CHARS_BASE = 39;
   /** RegularExpression Id. */
-  int PNAME_LN = 40;
+  int PN_CHARS = 40;
   /** RegularExpression Id. */
-  int PN_PREFIX = 41;
+  int PN_CHARS_U = 41;
   /** RegularExpression Id. */
-  int PN_CHARS_BASE = 42;
+  int VAR = 42;
   /** RegularExpression Id. */
-  int PN_CHARS = 43;
+  int VAR1 = 43;
   /** RegularExpression Id. */
-  int PN_CHARS_U = 44;
+  int VAR2 = 44;
   /** RegularExpression Id. */
-  int VAR = 45;
+  int VARNAME = 45;
   /** RegularExpression Id. */
-  int VAR1 = 46;
+  int NODEID = 46;
   /** RegularExpression Id. */
-  int VAR2 = 47;
-  /** RegularExpression Id. */
-  int VARNAME = 48;
-  /** RegularExpression Id. */
-  int NODEID = 49;
-  /** RegularExpression Id. */
-  int ERROR = 50;
+  int ERROR = 47;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -137,9 +131,6 @@ public interface OWLBGPParserConstants {
     "\"_:\"",
     "\"true\"",
     "\"false\"",
-    "\"SELECT\"",
-    "\"WHERE\"",
-    "\"FILTER\"",
     "<LETTER>",
     "<FULLIRI>",
     "<PNAME_NS>",

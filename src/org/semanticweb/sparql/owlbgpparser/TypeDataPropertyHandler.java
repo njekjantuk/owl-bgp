@@ -7,7 +7,6 @@ public class TypeDataPropertyHandler extends BuiltInTypeHandler {
     }
 
     public void handleTriple(String subject, String predicate, String object) {
-        if (consumer.isVariableNode(subject)) consumer.dataPropertyVars.add(subject);
-        else if (!consumer.isAnonymousNode(subject)) consumer.dataPropertyIRIs.add(subject);
+        consumer.addDataProperty(subject);
     }
 }

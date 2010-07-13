@@ -7,7 +7,7 @@ public class TypeIndividualVariableHandler extends BuiltInTypeHandler {
     }
     
     public void handleTriple(String subject, String predicate, String object) {
-        if (consumer.isVariableNode(subject)) consumer.individualVars.add(subject);
+        if (consumer.isVariableNode(subject)) consumer.individualVariables.add(subject);
         else consumer.individualIRIs.add(subject);
     }
 }

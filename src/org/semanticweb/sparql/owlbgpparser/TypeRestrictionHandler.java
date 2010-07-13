@@ -9,6 +9,6 @@ public class TypeRestrictionHandler extends BuiltInTypeHandler {
     public void handleTriple(String subject, String predicate, String object) {
         consumeTriple(subject, predicate, object);
         consumer.addRestriction(subject);
-        consumer.addOWLClass(subject);
+        consumer.addClass(subject);
     }
 }

@@ -21,8 +21,6 @@ public enum Vocabulary {
     OWL_ASYMMETRIC_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "AsymmetricProperty"),
     OWL_SYMMETRIC_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "SymmetricProperty"),
     OWL_RESTRICTION(Prefixes.s_semanticWebPrefixes.get("owl"), "Restriction"),
-    OWL_DATA_RESTRICTION(Prefixes.s_semanticWebPrefixes.get("owl"), "DataRestriction"),
-    OWL_OBJECT_RESTRICTION(Prefixes.s_semanticWebPrefixes.get("owl"), "ObjectRestriction"),
     OWL_ON_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "onProperty"),
     OWL_INTERSECTION_OF(Prefixes.s_semanticWebPrefixes.get("owl"), "intersectionOf"),
     OWL_UNION_OF(Prefixes.s_semanticWebPrefixes.get("owl"), "unionOf"),

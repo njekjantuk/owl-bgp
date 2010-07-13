@@ -7,6 +7,6 @@ public class TypeLiteralVariableHandler extends BuiltInTypeHandler {
     }
     
     public void handleTriple(String subject, String predicate, String object) {
-        if (consumer.isVariableNode(subject)) consumer.literalVars.add(subject);
+        if (consumer.isVariableNode(subject)) consumer.literalVariables.add(subject);
     }
 }

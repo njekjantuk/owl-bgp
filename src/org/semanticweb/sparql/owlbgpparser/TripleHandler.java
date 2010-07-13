@@ -14,4 +14,9 @@ public interface TripleHandler {
     void handleLiteralTriple(String subject, String predicate, String literal,Datatype datatype);
     void handleEnd();
     public Set<Axiom> getParsedAxioms();
+    public void setClassesInOntologySignature(Set<String> classes);
+    public void setObjectPropertiesInOntologySignature(Set<String> objectProperties);
+    public void setDataPropertiesInOntologySignature(Set<String> dataProperties);
+    public void setIndividualsInOntologySignature(Set<String> individuals);
+    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypes);
 }

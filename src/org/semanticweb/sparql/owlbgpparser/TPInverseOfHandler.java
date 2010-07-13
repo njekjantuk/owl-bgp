@@ -9,8 +9,8 @@ public class TPInverseOfHandler extends TriplePredicateHandler {
     }
 
     public boolean canHandleStreaming(String subject, String predicate, String object) {
-        consumer.addOWLObjectProperty(subject);
-        consumer.addOWLObjectProperty(object);
+        consumer.addObjectProperty(subject);
+        consumer.addObjectProperty(object);
         return !isSubjectOrObjectAnonymous(subject, object);
     }
     public boolean canHandle(String subject, String predicate, String object) {

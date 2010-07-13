@@ -26,6 +26,7 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(ObjectPropertyVariable objectPropertyVariable);
     O visit(DataProperty dataProperty);
     O visit(DataPropertyVariable dataPropertyVariable);
+    O visit(AnnotationProperty annotationProperty);
     
     O visit(Literal literal);
     O visit(LiteralVariable literalVariable);
@@ -42,6 +43,9 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataIntersectionOf dataIntersectionOf);
     O visit(DataUnionOf dataUnionOf);
     O visit(DataOneOf dataOneOf);
+    
+    O visit(Annotation annotation);
+    O visit(AnnotationValue annotationValue);
     
     O visit(SubClassOf axiom);
     O visit(EquivalentClasses axiom);

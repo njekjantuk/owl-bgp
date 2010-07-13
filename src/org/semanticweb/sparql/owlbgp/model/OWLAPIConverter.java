@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -110,6 +112,9 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         if (dataPropertyVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+dataPropertyVariable.m_variable+" is unbound. ");
         return m_dataFactory.getOWLObjectProperty(IRI.create(dataPropertyVariable.m_binding));
     }
+    public OWLObject visit(AnnotationProperty annotationProperty) {
+        return m_dataFactory.getOWLAnnotationProperty(IRI.create(annotationProperty.m_iri));
+    }
     public OWLObject visit(Literal literal) {
         if (literal.m_langTag!=null) return m_dataFactory.getOWLStringLiteral(literal.m_lexicalForm,literal.m_langTag);
         else return m_dataFactory.getOWLTypedLiteral(literal.m_lexicalForm,(OWLDatatype)literal.m_dataDatatype.accept(this));
@@ -170,6 +175,16 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
             literals.add((OWLLiteral)literal.accept(this));
         return m_dataFactory.getOWLDataOneOf(literals);
     }
+    
+    public OWLObject visit(Annotation annotation) {
+        return m_dataFactory.getOWLAnnotation((OWLAnnotationProperty)annotation.m_ap.accept(this),(OWLAnnotationValue)annotation.m_value.accept(this));
+    }
+    public OWLObject visit(AnnotationValue annotationValue) {
+        if (annotationValue.m_value instanceof Individual || annotationValue.m_value instanceof ILiteral) 
+            return ((AnonymousIndividual)annotationValue.m_value).accept(this);
+        return IRI.create(annotationValue.m_value.toString());
+    }
+    
     public OWLObject visit(SubClassOf axiom) {
         return m_dataFactory.getOWLSubClassOfAxiom((OWLClassExpression)axiom.m_subClass.accept(this),(OWLClassExpression)axiom.m_superClass.accept(this));
     }
