@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.ObjectIntersectionOf;
 
 public class TPIntersectionOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
@@ -9,7 +10,7 @@ public class TPIntersectionOfHandler extends AbstractNamedEquivalentClassAxiomHa
         super(consumer, Vocabulary.OWL_INTERSECTION_OF.getIRI());
     }
 
-    protected ClassExpression translateEquivalentClass(String mainNode) {
+    protected ClassExpression translateEquivalentClass(Identifier mainNode) {
         return ObjectIntersectionOf.create(consumer.translateToClassExpressionSet(mainNode));
     }
 }

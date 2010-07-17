@@ -2,6 +2,7 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class DataPropertyListItemTranslator implements ListItemTranslator<DataPropertyExpression> {
 
@@ -10,7 +11,7 @@ public class DataPropertyListItemTranslator implements ListItemTranslator<DataPr
     public DataPropertyListItemTranslator(OWLRDFConsumer consumer) {
         this.consumer = consumer;
     }
-    public DataPropertyExpression translate(String firstObject) {
+    public DataPropertyExpression translate(Identifier firstObject) {
         return consumer.translateDataPropertyExpression(firstObject);
     }
     public DataPropertyExpression translate(ILiteral firstObject) {

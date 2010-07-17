@@ -62,9 +62,6 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
     public static ObjectHasValue create(ObjectPropertyExpression ope,Individual individual) {
         return s_interningManager.intern(new ObjectHasValue(ope,individual));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -83,12 +80,8 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
         unbound.addAll(m_individual.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
         m_individual.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
-        m_individual.applyVariableBindings(variablesToBindings);
     }
 }

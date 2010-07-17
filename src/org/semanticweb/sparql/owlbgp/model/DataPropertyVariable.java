@@ -18,7 +18,6 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
@@ -29,29 +28,36 @@ public class DataPropertyVariable extends Variable implements DataPropertyExpres
 
     protected static InterningManager<DataPropertyVariable> s_interningManager=new InterningManager<DataPropertyVariable>() {
         protected boolean equal(DataPropertyVariable object1,DataPropertyVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(DataPropertyVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=43;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected DataPropertyVariable(String variable) {
-        super(variable);
+    protected DataPropertyVariable(String variable,Atomic binding) {
+        super(variable,binding);
     }
     public DataPropertyExpression getBindingAsExtendedOWLObject() {
         if (m_binding==null) return null;
-        return DataProperty.create(m_binding);
+        return (DataPropertyExpression)m_binding;
     }
-    public void setBinding(DataPropertyExpression binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_binding=binding.getIdentifier();
+        else if (binding instanceof DataProperty) m_binding=binding;  
+        else throw new RuntimeException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DataPropertyVariable create(String iri) {
-        return s_interningManager.intern(new DataPropertyVariable(iri));
+    public static DataPropertyVariable create(String variable) {
+        return DataPropertyVariable.create(variable,null);
+    }
+    public static DataPropertyVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new DataPropertyVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -69,13 +75,13 @@ public class DataPropertyVariable extends Variable implements DataPropertyExpres
         if (m_binding==null&&(varType==null||varType==VarType.DATA_PROPERTY)) variables.add(this);
         return variables;
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            m_binding=null;
-        else if (!(binding instanceof DataProperty))
-            throw new RuntimeException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
-        else 
-            m_binding=((DataProperty)variablesToBindings.get(this)).m_iri;
-    }
+//    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+//        ExtendedOWLObject binding=variablesToBindings.get(this);
+//        if (binding==null)
+//            m_binding=null;
+//        else if (!(binding instanceof DataProperty))
+//            throw new RuntimeException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
+//        else 
+//            m_binding=((DataProperty)variablesToBindings.get(this)).m_iri;
+//    }
 }

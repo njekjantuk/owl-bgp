@@ -30,29 +30,54 @@ public class SymmetricObjectProperty extends AbstractAxiom implements ObjectProp
 
     protected static InterningManager<SymmetricObjectProperty> s_interningManager=new InterningManager<SymmetricObjectProperty>() {
         protected boolean equal(SymmetricObjectProperty object1,SymmetricObjectProperty object2) {
-            return object1.m_ope==object2.m_ope;
+            if (object1.m_ope!=object2.m_ope
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(SymmetricObjectProperty object) {
-            return 43*object.m_ope.hashCode();
+            int hashCode=43*object.m_ope.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
    
-    protected SymmetricObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
+    protected SymmetricObjectProperty(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
         m_ope=objectPropertyExpression;
+        m_annotations=annotations;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
     public String toString(Prefixes prefixes) {
-        return "SymmetricObjectProperty("+m_ope.toString(prefixes)+")";
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("SymmetricObjectProperty(");
+        writeAnnoations(buffer, prefixes);
+        buffer.append(m_ope.toString(prefixes));
+        buffer.append(")");
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static SymmetricObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
-        return s_interningManager.intern(new SymmetricObjectProperty(objectPropertyExpression));
+        return SymmetricObjectProperty.create(objectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static SymmetricObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
+        return s_interningManager.intern(new SymmetricObjectProperty(objectPropertyExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -63,17 +88,19 @@ public class SymmetricObjectProperty extends AbstractAxiom implements ObjectProp
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ope.getVariablesInSignature(varType));
+        getAnnotationVariables(null, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return SymmetricObjectProperty.create(m_ope);
     }
 }

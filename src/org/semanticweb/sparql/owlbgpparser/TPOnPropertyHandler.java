@@ -1,18 +1,17 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-public class TPOnPropertyHandler extends TriplePredicateHandler {
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
-    protected static int count=0;
+public class TPOnPropertyHandler extends TriplePredicateHandler {
 
     public TPOnPropertyHandler(OWLRDFConsumer consumer) {
         super(consumer, Vocabulary.OWL_ON_PROPERTY.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         consumer.addRestriction(subject);
-        count++;
         return false;   
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
     }
 }

@@ -13,16 +13,21 @@ import java.io.StringReader;
 import java.util.Set;
 
 import org.coode.string.EscapeUtils;
+import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.Axiom;
 import org.semanticweb.sparql.owlbgp.model.Datatype;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
+import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
 
 public class OWLBGPParser {
 
     public static final String LB = System.getProperty("line.separator") ;
 
-    protected String base;
+    protected Identifier base;
     protected int blankNodeId=0;
     protected final TripleHandler handler=new OWLRDFConsumerAdapter();
     protected final Prefixes pm=new Prefixes();
@@ -30,7 +35,7 @@ public class OWLBGPParser {
         pm.declareSemanticWebPrefixes();
     }
     
-    public OWLBGPParser(StringReader reader, Set<String> classes, Set<String> objectProperties, Set<String> dataProperties, Set<String> individuals, Set<String> customDatatypes) {
+    public OWLBGPParser(StringReader reader, Set<Identifier> classes, Set<Identifier> objectProperties, Set<Identifier> dataProperties, Set<Identifier> individuals, Set<Identifier> customDatatypes) {
          this(reader);
          handler.setClassesInOntologySignature(classes);
          handler.setObjectPropertiesInOntologySignature(objectProperties);
@@ -38,19 +43,19 @@ public class OWLBGPParser {
          handler.setIndividualsInOntologySignature(individuals);
          handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-    public void setClassesInOntologySignature(Set<String> classes) {
+    public void setClassesInOntologySignature(Set<Identifier> classes) {
         handler.setClassesInOntologySignature(classes);
     }
-    public void setObjectPropertiesInOntologySignature(Set<String> objectProperties) {
+    public void setObjectPropertiesInOntologySignature(Set<Identifier> objectProperties) {
         handler.setObjectPropertiesInOntologySignature(objectProperties);
     }
-    public void setDataPropertiesInOntologySignature(Set<String> dataProperties) {
+    public void setDataPropertiesInOntologySignature(Set<Identifier> dataProperties) {
         handler.setDataPropertiesInOntologySignature(dataProperties);
     }
-    public void setIndividualsInOntologySignature(Set<String> individuals) {
+    public void setIndividualsInOntologySignature(Set<Identifier> individuals) {
         handler.setIndividualsInOntologySignature(individuals);
     }
-    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypes) {
+    public void setCustomDatatypesInOntologySignature(Set<Identifier> customDatatypes) {
         handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
     
@@ -96,28 +101,28 @@ public class OWLBGPParser {
         }
     }
     
-    public boolean isAnonymousNode(String iri) {
-        return iri.startsWith("_:");
+    public boolean isAnonymousNode(Identifier id) {
+        return id.toString().startsWith("_:");
     }
-    public boolean isVariableNode(String iri) {
-        return iri.startsWith("?");
+    public boolean isVariIdentifierde(String iri) {
+        return iri.toString().startsWith("?");
     }
-    protected String getNextBlankNode() {
+    protected String getNextBlankNodeLabel() {
         String identifier="_:bn"+blankNodeId;
         blankNodeId++;
         return identifier;
     }
-    protected String getIRIFromQName(String qname) throws ParseException {
+    protected Identifier getIRIFromQName(String qname) throws ParseException {
         int colonIndex=qname.indexOf(':');
         if (colonIndex==-1) throw new ParseException("Not a valid qname (missing ':') " + qname);
         String prefix=qname.substring(0,colonIndex);
-        if (prefix.equals("_")) return getNextBlankNode()+"_"+qname.substring(colonIndex + 1);
+        if (prefix.equals("_")) return AnonymousIndividual.create(getNextBlankNodeLabel()+"_"+qname.substring(colonIndex + 1));
         if (pm.getPrefixIRI(prefix)==null) throw new ParseException("Prefix not declared: " + prefix);
-        return pm.expandAbbreviatedIRI(qname);
+        return IRI.create(pm.expandAbbreviatedIRI(qname));
     }
-    public String getIRI(String s) {
+    public IRI getIRI(String s) {
         if (s.charAt(0)=='<') s=s.substring(1,s.length()-1);
-        return s.intern();
+        return IRI.create(s);
     }
     public Set<Axiom> getParsedAxioms() {
         return handler.getParsedAxioms();
@@ -192,25 +197,24 @@ void parse() :
 }
 void parseTriples() :
 {
-    String subject;
+    Identifier subject;
 }
 {
     subject = parseSubject() (parsePredicateObjectList(subject))?
 }
 
-String parseSubject() :
+Identifier parseSubject() :
 {
-    String iri;
+    Identifier identifier;
 }
 {
-    (iri=parseResource() | iri=parseBlankNode() | iri=parseVariable()) {
-        return iri;
+    (identifier=parseResource() | identifier=parseBlankNode() | identifier=parseVariable()) {
+        return identifier;
     }
 }
 
-String parseAbbreviatedIRI() :
+Identifier parseAbbreviatedIRI() :
 {
-    String iri;
     Token t;
 }
 {
@@ -219,63 +223,62 @@ String parseAbbreviatedIRI() :
     }
 }
 
-String parseIRI() :
+IRI parseIRI() :
 {
     Token t;
-    String iri;
 }
 {
     t=<FULLIRI> {return getIRI(t.image);}
 }
 
-String parseBlankNode() :
+AnonymousIndividual parseBlankNode() :
 {
-    String iri = null;
+    AnonymousIndividual ind=null;
 }
 {
-    (iri=parseNodeID()
+    (ind=parseNodeID()
     |
-    <NODEID>{iri = getNextBlankNode();}
+    <NODEID>{ind=AnonymousIndividual.create(getNextBlankNodeLabel());}
     |
-    <OPEN_SQUARE_BRACKET> ({iri = getNextBlankNode();} parsePredicateObjectList(iri) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> {if (iri == null) {iri = getNextBlankNode(); }}
+    <OPEN_SQUARE_BRACKET> ({ind=AnonymousIndividual.create(getNextBlankNodeLabel());} parsePredicateObjectList(ind) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> {if (ind==null) {ind=AnonymousIndividual.create(getNextBlankNodeLabel()); }}
     |
-    iri = parseCollection()) {
-        return iri;
+    ind=parseCollection()) {
+        return ind;
     }
 }
 
-String parseNodeID() :
+AnonymousIndividual parseNodeID() :
 {
     Token t;
 }
 {
     t=<NODEID> {
-        return getIRIFromQName(t.image);
+        return (AnonymousIndividual)getIRIFromQName(t.image);
     }
 }
 
-String parseVariable() :
+Variable parseVariable() :
 {
-    String iri;
+    Variable var;
     Token t;
 }
 {
     t=<VAR> {
-        return t.image;
+        return UntypedVariable.create(t.image);
     }
 }
 
-void parsePredicateObjectList(String subject) :
+void parsePredicateObjectList(Identifier subject) :
 {
-    String predicate;
+    Identifier predicate;
 }
 {
     (predicate=parseVerb() parseObjectList(subject, predicate) (<SEMICOLON> predicate=parseVerb() parseObjectList(subject, predicate) )*) (<SEMICOLON>)?
 }
 
-String parseVerb() :
+Identifier parseVerb() :
 {
-    String iri;
+    Identifier iri;
 }
 {
     (<A>{iri = Vocabulary.RDF_TYPE.getIRI();} | iri=parsePredicate()) {
@@ -283,9 +286,9 @@ String parseVerb() :
     }
 }
 
-String parsePredicate() :
+Identifier parsePredicate() :
 {
-    String iri;
+    Identifier iri;
 }
 {
     (iri=parseResource() | iri=parseVariable()) {
@@ -293,9 +296,9 @@ String parsePredicate() :
     }
 }
 
-String parseResource() :
+Identifier parseResource() :
 {
-    String iri;
+    Identifier iri;
 }
 {
     (iri=parseIRI() | iri=parseAbbreviatedIRI()) {
@@ -304,7 +307,7 @@ String parseResource() :
 }
 
 
-void parseObjectList(String subject, String predicate) :
+void parseObjectList(Identifier subject, Identifier predicate) :
 {
     
 }
@@ -312,9 +315,9 @@ void parseObjectList(String subject, String predicate) :
     parseObject(subject, predicate) ( <COMMA> parseObject(subject, predicate) )*
 }
 
-void parseObject(String subject, String predicate) :
+void parseObject(Identifier subject, Identifier predicate) :
 {
-    String resObject;
+    Identifier resObject;
 }
 {
     (parseLiteral(subject, predicate) 
@@ -328,40 +331,36 @@ void parseObject(String subject, String predicate) :
     })
 }
 
-String parseCollection() :
+AnonymousIndividual parseCollection() :
 {
-    String iri;
+    AnonymousIndividual identifier;
 }
 {
-    <OPENPAR> iri=parseItemList() <CLOSEPAR> {
-        return iri;
+    <OPENPAR> identifier=parseItemList() <CLOSEPAR> {
+        return identifier;
     }
 }
 
-String parseItemList() :
+AnonymousIndividual parseItemList() :
 {
     //  _x  rdf:type rdf:List
     //  _x  rdf:first
     //  _x  rdf:next
-    String firstSubject = null;
-    String subject = null;
-    String type = Vocabulary.RDF_TYPE.getIRI();
-    String first = Vocabulary.RDF_FIRST.getIRI();
-    String rest = Vocabulary.RDF_REST.getIRI();
-    String list = Vocabulary.RDF_LIST.getIRI();
-    String nil = Vocabulary.RDF_NIL.getIRI();
+    AnonymousIndividual firstSubject=null;
+    AnonymousIndividual subject=null;
+    Identifier type=Vocabulary.RDF_TYPE.getIRI();
+    Identifier first=Vocabulary.RDF_FIRST.getIRI();
+    Identifier rest=Vocabulary.RDF_REST.getIRI();
+    Identifier list=Vocabulary.RDF_LIST.getIRI();
+    Identifier nil=Vocabulary.RDF_NIL.getIRI();
 }
 {
     (
     {
-        String prevSubject = subject;
-        subject=getNextBlankNode();
-        if (prevSubject != null) {
-            handler.handleTriple(prevSubject, rest, subject);
-        }
-        else {
-            firstSubject = subject;
-        }
+        AnonymousIndividual prevSubject = subject;
+        subject=AnonymousIndividual.create(getNextBlankNodeLabel());
+        if (prevSubject!=null) handler.handleTriple(prevSubject, rest, subject);
+        else firstSubject=subject;
         handler.handleTriple(subject, type, list);
     }
         parseObject(subject, first))* {
@@ -372,29 +371,31 @@ String parseItemList() :
 }
 
 
-void parseLiteral(String subject, String predicate) :
+void parseLiteral(Identifier subject, Identifier predicate) :
 {
-    String literal;
+    String lexicalForm;
     String lang=null;
-    String datatype=null;
+    Identifier datatypeIdentifier=null;
+    Datatype dt=null;
     Token t;
 }
 {
-    (literal=parseQuotedString() ((<DOUBLE_CARET> datatype=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}))?
+    (lexicalForm=parseQuotedString() ((<DOUBLE_CARET> datatypeIdentifier=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}))?
         {
-      if (datatype==null) datatype=Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral";
+      if (datatypeIdentifier==null) dt=Datatype.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"));
+      else dt=Datatype.create((IRI)datatypeIdentifier);
       if (lang==null) lang="";
-      handler.handleLiteralTriple(subject, predicate, literal, lang, Datatype.create(datatype));
+      handler.handleLiteralTriple(subject, predicate, lexicalForm, lang, dt);
         }
     )
     |
-    (literal=parseInteger(){handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.INTEGER.getDatatype());})
+    (lexicalForm=parseInteger(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.INTEGER.getDatatype());})
     |
-    (literal=parseDouble(){handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.DOUBLE.getDatatype());})
+    (lexicalForm=parseDouble(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DOUBLE.getDatatype());})
     |
-    (literal=parseDecimal(){handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.DECIMAL.getDatatype());})
+    (lexicalForm=parseDecimal(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DECIMAL.getDatatype());})
     |
-    (literal=parseBoolean(){handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.BOOLEAN.getDatatype());})
+    (lexicalForm=parseBoolean(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.BOOLEAN.getDatatype());})
 }
 
 

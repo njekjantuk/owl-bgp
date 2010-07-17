@@ -30,29 +30,54 @@ public class InverseFunctionalObjectProperty extends AbstractAxiom implements Ob
 
     protected static InterningManager<InverseFunctionalObjectProperty> s_interningManager=new InterningManager<InverseFunctionalObjectProperty>() {
         protected boolean equal(InverseFunctionalObjectProperty object1,InverseFunctionalObjectProperty object2) {
-            return object1.m_ope==object2.m_ope;
+            if (object1.m_ope!=object2.m_ope
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(InverseFunctionalObjectProperty object) {
-            return -1*(17+11*object.m_ope.hashCode());
+            int hashCode=-1*(17+11*object.m_ope.hashCode());
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
    
-    protected InverseFunctionalObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
+    protected InverseFunctionalObjectProperty(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
         m_ope=objectPropertyExpression;
+        m_annotations=annotations;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
     public String toString(Prefixes prefixes) {
-        return "InverseFunctionalObjectProperty("+m_ope.toString(prefixes)+")";
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("InverseFunctionalObjectProperty(");
+        writeAnnoations(buffer, prefixes);
+        buffer.append(m_ope.toString(prefixes));
+        buffer.append(")");
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static InverseFunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
-        return s_interningManager.intern(new InverseFunctionalObjectProperty(objectPropertyExpression));
+        return InverseFunctionalObjectProperty.create(objectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static InverseFunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
+        return s_interningManager.intern(new InverseFunctionalObjectProperty(objectPropertyExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -70,10 +95,10 @@ public class InverseFunctionalObjectProperty extends AbstractAxiom implements Ob
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return InverseFunctionalObjectProperty.create(m_ope);
     }
 }

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class OptimisedListTranslator<O extends ExtendedOWLObject> {
 
@@ -20,24 +21,24 @@ public class OptimisedListTranslator<O extends ExtendedOWLObject> {
     protected OWLRDFConsumer getConsumer() {
         return consumer;
     }
-    protected void translateList(String mainNode,List<O> list) {
+    protected void translateList(Identifier mainNode,List<O> list) {
         if (!consumer.isList(mainNode, true)) throw new RuntimeException("List with main node "+mainNode+" is missing a type triple.");
-        String firstResource=getConsumer().getFirstResource(mainNode, true);
+        Identifier firstResource=consumer.getFirstResource(mainNode, true);
         if (firstResource != null) {
             list.add(translator.translate(firstResource));
         } else {
             ILiteral literal=getConsumer().getFirstLiteral(mainNode);
             if (literal != null) list.add(translator.translate(literal));
         }
-        String rest=getConsumer().getRest(mainNode, true);
+        Identifier rest=consumer.getRest(mainNode, true);
         if (rest != null)  translateList(rest, list);
     }
-    public List<O> translateList(String mainNode) {
+    public List<O> translateList(Identifier mainNode) {
         List<O> list=new ArrayList<O>();
         translateList(mainNode, list);
         return list;
     }
-    public Set<O> translateToSet(String mainNode) {
+    public Set<O> translateToSet(Identifier mainNode) {
         return new HashSet<O>(translateList(mainNode));
     }
 }

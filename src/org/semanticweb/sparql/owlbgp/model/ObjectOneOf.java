@@ -83,9 +83,6 @@ public class ObjectOneOf extends AbstractExtendedOWLObject implements ClassExpre
     public static ObjectOneOf create(Individual... individuals) {
         return s_interningManager.intern(new ObjectOneOf(new HashSet<Individual>(Arrays.asList(individuals))));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -105,12 +102,8 @@ public class ObjectOneOf extends AbstractExtendedOWLObject implements ClassExpre
             unbound.addAll(individual.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (Individual individual : m_enumeration)
             individual.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (Individual individual : m_enumeration)
-            individual.applyVariableBindings(variablesToBindings);
     }
 }

@@ -29,10 +29,28 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
 
     protected static InterningManager<NegativeDataPropertyAssertion> s_interningManager=new InterningManager<NegativeDataPropertyAssertion>() {
         protected boolean equal(NegativeDataPropertyAssertion object1,NegativeDataPropertyAssertion object2) {
-            return object1.m_dpe==object2.m_dpe&&object1.m_individual==object2.m_individual&&object1.m_literal==object2.m_literal;
+            if (object1.m_dpe!=object2.m_dpe
+                    ||object1.m_individual!=object2.m_individual
+                    ||object1.m_literal!=object2.m_literal
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(NegativeDataPropertyAssertion object) {
-            return -13*object.m_dpe.hashCode()+17*object.m_individual.hashCode()+23*object.m_literal.hashCode();
+            int hashCode=-13*object.m_dpe.hashCode()+17*object.m_individual.hashCode()+23*object.m_literal.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
@@ -40,10 +58,11 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
     protected final Individual m_individual;
     protected final ILiteral m_literal;
    
-    protected NegativeDataPropertyAssertion(DataPropertyExpression dpe,Individual individual,ILiteral literal) {
+    protected NegativeDataPropertyAssertion(DataPropertyExpression dpe,Individual individual,ILiteral literal,Set<Annotation> annotations) {
         m_dpe=dpe;
         m_individual=individual;
         m_literal=literal;
+        m_annotations=annotations;
     }
     public DataPropertyExpression getDataPropertyExpression() {
         return m_dpe;
@@ -57,6 +76,7 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("NegativeDataPropertyAssertion(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_dpe.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_individual.toString(prefixes));
@@ -69,7 +89,10 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
         return s_interningManager.intern(this);
     }
     public static NegativeDataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,ILiteral literal) {
-        return s_interningManager.intern(new NegativeDataPropertyAssertion(dpe,individual,literal));
+        return NegativeDataPropertyAssertion.create(dpe,individual,literal,new HashSet<Annotation>());
+    }
+    public static NegativeDataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,ILiteral literal,Set<Annotation> annotations) {
+        return s_interningManager.intern(new NegativeDataPropertyAssertion(dpe,individual,literal,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -82,6 +105,7 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
         variables.addAll(m_dpe.getVariablesInSignature(varType));
         variables.addAll(m_individual.getVariablesInSignature(varType));
         variables.addAll(m_literal.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
@@ -89,16 +113,15 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
         unbound.addAll(m_dpe.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_individual.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_literal.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_dpe.applyBindings(variablesToBindings);
         m_individual.applyBindings(variablesToBindings);
         m_literal.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_dpe.applyVariableBindings(variablesToBindings);
-        m_individual.applyVariableBindings(variablesToBindings);
-        m_literal.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return NegativeDataPropertyAssertion.create(m_dpe, m_individual, m_literal);
     }
 }

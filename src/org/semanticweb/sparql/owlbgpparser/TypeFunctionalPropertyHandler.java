@@ -2,6 +2,7 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.FunctionalDataProperty;
 import org.semanticweb.sparql.owlbgp.model.FunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TypeFunctionalPropertyHandler extends BuiltInTypeHandler {
 
@@ -9,10 +10,10 @@ public class TypeFunctionalPropertyHandler extends BuiltInTypeHandler {
         super(consumer, Vocabulary.OWL_FUNCTIONAL_PROPERTY.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return consumer.isObjectPropertyOnly(subject) || consumer.isDataPropertyOnly(subject);
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         if (consumer.isObjectPropertyOnly(subject)) {
             addAxiom(FunctionalObjectProperty.create(translateObjectProperty(subject)));
             consumeTriple(subject, predicate, object);

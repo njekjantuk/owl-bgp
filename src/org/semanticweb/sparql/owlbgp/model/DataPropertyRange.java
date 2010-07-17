@@ -29,19 +29,37 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
 
     protected static InterningManager<DataPropertyRange> s_interningManager=new InterningManager<DataPropertyRange>() {
         protected boolean equal(DataPropertyRange object1,DataPropertyRange object2) {
-            return object1.m_dpe==object2.m_dpe && object1.m_dataRange==object2.m_dataRange;
+            if (object1.m_dpe!=object2.m_dpe
+                    ||object1.m_dataRange!=object2.m_dataRange
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(DataPropertyRange object) {
-            return 11+133*object.m_dpe.hashCode()+5*object.m_dataRange.hashCode();
+            int hashCode=11+133*object.m_dpe.hashCode()+5*object.m_dataRange.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final DataPropertyExpression m_dpe;
     protected final DataRange m_dataRange;
    
-    protected DataPropertyRange(DataPropertyExpression dpe,DataRange dataRange) {
+    protected DataPropertyRange(DataPropertyExpression dpe,DataRange dataRange,Set<Annotation> annotations) {
         m_dpe=dpe;
         m_dataRange=dataRange;
+        m_annotations=annotations;
     }
     public DataPropertyExpression getDataPropertyExpression() {
         return m_dpe;
@@ -52,6 +70,7 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataPropertyRange(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_dpe.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_dataRange.toString(prefixes));
@@ -62,10 +81,10 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
         return s_interningManager.intern(this);
     }
     public static DataPropertyRange create(DataPropertyExpression dpe,DataRange dataRange) {
-        return s_interningManager.intern(new DataPropertyRange(dpe,dataRange));
+        return DataPropertyRange .create(dpe, dataRange, new HashSet<Annotation>());
     }
-    public String getIdentifier() {
-        return null;
+    public static DataPropertyRange create(DataPropertyExpression dpe,DataRange dataRange, Set<Annotation> annotations) {
+        return s_interningManager.intern(new DataPropertyRange(dpe,dataRange,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -77,20 +96,21 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_dpe.getVariablesInSignature(varType));
         variables.addAll(m_dataRange.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_dpe.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_dpe.applyBindings(variablesToBindings);
         m_dataRange.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_dpe.applyVariableBindings(variablesToBindings);
-        m_dataRange.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DataPropertyRange.create(m_dpe, m_dataRange);
     }
 }

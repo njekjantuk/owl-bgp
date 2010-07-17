@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class AnnotationProperty extends AbstractExtendedOWLObject implements PropertyExpression {
+public class AnnotationProperty extends AbstractExtendedOWLObject implements AnnotationPropertyExpression, Atomic {
     private static final long serialVersionUID = 7323707883386926517L;
 
     protected static InterningManager<AnnotationProperty> s_interningManager=new InterningManager<AnnotationProperty>() {
@@ -36,24 +36,30 @@ public class AnnotationProperty extends AbstractExtendedOWLObject implements Pro
         }
     };
     
-    protected final String m_iri;
+    protected final IRI m_iri;
    
-    protected AnnotationProperty(String iri) {
-        m_iri=iri.intern();
+    protected AnnotationProperty(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
+        return m_iri.m_iri;
+    }
+    public IRI getIRI() {
         return m_iri;
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static AnnotationProperty create(String iri) {
+    public static AnnotationProperty create(String iriString) {
+        return create(IRI.create(iriString));
+    }
+    public static AnnotationProperty create(IRI iri) {
         return s_interningManager.intern(new AnnotationProperty(iri));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return m_iri;
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

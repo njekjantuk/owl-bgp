@@ -2,6 +2,7 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Clazz;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.ObjectMinCardinality;
 import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
 
@@ -16,10 +17,10 @@ public class ObjectMinCardinalityTranslator extends AbstractObjectCardinalityTra
     protected ClassExpression createRestriction(ObjectPropertyExpression prop,int cardi,ClassExpression filler) {
         return ObjectMinCardinality.create(cardi, prop, filler);
     }
-    protected String getCardinalityTriplePredicate() {
+    protected Identifier getCardinalityTriplePredicate() {
         return Vocabulary.OWL_MIN_CARDINALITY.getIRI();
     }
-    protected String getQualifiedCardinalityTriplePredicate() {
+    protected Identifier getQualifiedCardinalityTriplePredicate() {
         return Vocabulary.OWL_MIN_QUALIFIED_CARDINALITY.getIRI();
     }
 }

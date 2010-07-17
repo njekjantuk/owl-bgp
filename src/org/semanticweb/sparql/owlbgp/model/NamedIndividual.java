@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class NamedIndividual extends AbstractExtendedOWLObject implements Individual {
+public class NamedIndividual extends AbstractExtendedOWLObject implements Individual, Atomic {
     private static final long serialVersionUID = -8797258383209941720L;
 
     protected static InterningManager<NamedIndividual> s_interningManager=new InterningManager<NamedIndividual>() {
@@ -36,24 +36,27 @@ public class NamedIndividual extends AbstractExtendedOWLObject implements Indivi
         }
     };
     
-    protected final String m_iri;
+    protected final IRI m_iri;
    
-    protected NamedIndividual(String iri) {
-        m_iri=iri.intern();
+    protected NamedIndividual(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
-        return m_iri;
+        return m_iri.toString();
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static NamedIndividual create(String iri) {
+    public static NamedIndividual create(String iriString) {
+        return create(IRI.create(iriString));
+    }
+    public static NamedIndividual create(IRI iri) {
         return s_interningManager.intern(new NamedIndividual(iri));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return m_iri;
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

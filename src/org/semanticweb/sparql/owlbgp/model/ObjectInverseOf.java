@@ -57,9 +57,6 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
     public static ObjectInverseOf create(ObjectProperty objectProperty) {
         return s_interningManager.intern(new ObjectInverseOf(objectProperty));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -76,10 +73,7 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
         unbound.addAll(m_op.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_op.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_op.applyVariableBindings(variablesToBindings);
     }
 }

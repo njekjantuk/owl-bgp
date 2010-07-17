@@ -3,6 +3,7 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.ObjectIntersectionOf;
 
 public class IntersectionOfTranslator extends AbstractNaryBooleanClassExpressionTranslator {
@@ -12,7 +13,7 @@ public class IntersectionOfTranslator extends AbstractNaryBooleanClassExpression
     protected ClassExpression createClassExpression(Set<ClassExpression> operands) {
         return ObjectIntersectionOf.create(operands);
     }
-    protected String getPredicateIRI() {
+    protected Identifier getPredicateIRI() {
         return Vocabulary.OWL_INTERSECTION_OF.getIRI();
     }
 }

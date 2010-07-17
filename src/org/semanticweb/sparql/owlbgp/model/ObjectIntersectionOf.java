@@ -83,9 +83,6 @@ public class ObjectIntersectionOf extends AbstractExtendedOWLObject implements C
     public static ObjectIntersectionOf create(ClassExpression... classExpressions) {
         return s_interningManager.intern(new ObjectIntersectionOf(new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -105,12 +102,8 @@ public class ObjectIntersectionOf extends AbstractExtendedOWLObject implements C
             unbound.addAll(ce.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (ClassExpression ce : m_classExpressions)
             ce.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (ClassExpression ce : m_classExpressions)
-            ce.applyVariableBindings(variablesToBindings);
     }
 }

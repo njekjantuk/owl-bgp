@@ -4,6 +4,7 @@ import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.DataRange;
 import org.semanticweb.sparql.owlbgp.model.DataSomeValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class DataSomeValuesFromTranslator extends AbstractDataQuantifiedRestrictionTranslator {
 
@@ -13,7 +14,7 @@ public class DataSomeValuesFromTranslator extends AbstractDataQuantifiedRestrict
     protected ClassExpression createRestriction(DataPropertyExpression prop, DataRange filler) {
         return DataSomeValuesFrom.create(prop, filler);
     }
-    protected String getFillerTriplePredicate() {
+    protected Identifier getFillerTriplePredicate() {
         return Vocabulary.OWL_SOME_VALUES_FROM.getIRI();
     }
 }

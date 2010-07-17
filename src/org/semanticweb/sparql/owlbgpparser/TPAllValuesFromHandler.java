@@ -1,24 +1,17 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import org.semanticweb.sparql.owlbgp.model.Identifier;
+
 public class TPAllValuesFromHandler extends TriplePredicateHandler {
 
     public TPAllValuesFromHandler(OWLRDFConsumer consumer) {
         super(consumer, Vocabulary.OWL_ALL_VALUES_FROM.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
-        String propIRI = consumer.getResourceObject(subject, Vocabulary.OWL_ON_PROPERTY.getIRI(), false);
-        if (propIRI!=null && (!consumer.isAnonymousNode(object) || consumer.getClassExpressionIfTranslated(object) != null)) {
-            // The filler is either a datatype or named class
-            if (consumer.isObjectPropertyOnly(propIRI)) {
-                consumer.addClass(object);
-                consumer.addTriple(subject, predicate, object);
-                consumer.translateClassExpression(subject);
-                return true;
-            }
-        }
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
+        consumer.addRestriction(subject);
         return false;
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
     }
 }

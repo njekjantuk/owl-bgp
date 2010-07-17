@@ -24,10 +24,20 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class Datatype extends AbstractExtendedOWLObject implements DataRange {
+public class Datatype extends AbstractExtendedOWLObject implements DataRange,Atomic {
     private static final long serialVersionUID = -5589507335866233523L;
 
+    protected static InterningManager<Datatype> s_interningManager=new InterningManager<Datatype>() {
+        protected boolean equal(Datatype object1,Datatype object2) {
+            return object1.m_iri==object2.m_iri;
+        }
+        protected int getHashCode(Datatype object) {
+            return object.m_iri.hashCode();
+        }
+    };
+    
     public enum OWL2_DATATYPES {
+        LITERAL(Prefixes.s_semanticWebPrefixes.get("rdfs")+"Literal"),
         PLAIN_LITERAL(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"),
         XML_LITERAL(Prefixes.s_semanticWebPrefixes.get("rdf")+"XMLLiteral"),
         REAL(Prefixes.s_semanticWebPrefixes.get("owl")+"real"),
@@ -65,7 +75,7 @@ public class Datatype extends AbstractExtendedOWLObject implements DataRange {
         protected final Datatype datatype; 
         
         OWL2_DATATYPES(String datatypeURI) {
-            this.datatype=Datatype.create(datatypeURI);
+            this.datatype=Datatype.create(IRI.create(datatypeURI));
         }
         public Datatype getDatatype() {
             return datatype;
@@ -76,36 +86,28 @@ public class Datatype extends AbstractExtendedOWLObject implements DataRange {
             if (this.m_iri==dt.getDatatype().m_iri) return true;
         return false;
     }
-    
-    protected static InterningManager<Datatype> s_interningManager=new InterningManager<Datatype>() {
-        protected boolean equal(Datatype object1,Datatype object2) {
-            return object1.m_iri==object2.m_iri;
-        }
-        protected int getHashCode(Datatype object) {
-            return object.m_iri.hashCode();
-        }
-    };
-    
-    public static final Datatype RDFS_LITERAL=create("http://www.w3.org/2000/01/rdf-schema#Literal");
-    
-    protected final String m_iri;
+
+    protected final IRI m_iri;
    
-    protected Datatype(String iri) {
-        m_iri=iri.intern();
+    protected Datatype(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
-        return m_iri;
+        return m_iri.m_iri;
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static Datatype create(String iri) {
+    public static Datatype create(String iriString) {
+        return create(IRI.create(iriString));
+    }
+    public static Datatype create(IRI iri) {
         return s_interningManager.intern(new Datatype(iri));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return m_iri;
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

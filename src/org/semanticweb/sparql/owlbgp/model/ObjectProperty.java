@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
+public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectPropertyExpression, Atomic {
     private static final long serialVersionUID = 6601006990377858121L;
 
     protected static InterningManager<ObjectProperty> s_interningManager=new InterningManager<ObjectProperty>() {
@@ -36,28 +36,28 @@ public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectP
         }
     };
     
-    public static final ObjectProperty TOP_OBJECT_PROPERTY=create("http://www.w3.org/2002/07/owl#topObjectProperty");
-    public static final ObjectProperty BOTTOM_OBJECT_PROPERTY=create("http://www.w3.org/2002/07/owl#bottomObjectProperty");
+    public static final ObjectProperty TOP_OBJECT_PROPERTY=create(IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty"));
+    public static final ObjectProperty BOTTOM_OBJECT_PROPERTY=create(IRI.create("http://www.w3.org/2002/07/owl#bottomObjectProperty"));
         
-    protected final String m_iri;
+    protected final IRI m_iri;
    
-    protected ObjectProperty(String iri) {
-        m_iri=iri.intern();
+    protected ObjectProperty(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
-        return m_iri;
+        return m_iri.m_iri;
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectProperty create(String iri) {
-        return s_interningManager.intern(new ObjectProperty(iri));
+    public static ObjectProperty create(String iriString) {
+        return create(IRI.create(iriString));
     }
-    public String getIdentifier() {
-        return m_iri;
+    public static ObjectProperty create(IRI iri) {
+        return s_interningManager.intern(new ObjectProperty(iri));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

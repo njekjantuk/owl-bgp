@@ -12,11 +12,16 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = 7822375000293094470L;
 
     protected static InterningManager<DisjointUnion> s_interningManager=new InterningManager<DisjointUnion>() {
-        protected boolean equal(DisjointUnion classes1,DisjointUnion classes2) {
-            if (classes1.m_classExpressions.size()!=classes2.m_classExpressions.size())
+        protected boolean equal(DisjointUnion object1,DisjointUnion object2) {
+            if (object1.m_classExpressions.size()!=object2.m_classExpressions.size()
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (ClassExpression equiv : classes1.m_classExpressions) {
-                if (!contains(equiv, classes2.m_classExpressions))
+            for (ClassExpression equiv : object1.m_classExpressions) {
+                if (!contains(equiv, object2.m_classExpressions))
+                    return false;
+            } 
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
@@ -27,10 +32,18 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
                     return true;
             return false;
         }
-        protected int getHashCode(DisjointUnion classes) {
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(DisjointUnion object) {
             int hashCode=0;
-            for (ClassExpression equiv : classes.m_classExpressions)
+            for (ClassExpression equiv : object.m_classExpressions)
                 hashCode+=equiv.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
@@ -38,13 +51,10 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     protected final ClassExpression m_class;
     protected final Set<ClassExpression> m_classExpressions;
     
-    protected DisjointUnion(Clazz clazz, Set<ClassExpression> classExpressions) {
+    protected DisjointUnion(ClassExpression clazz, Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         m_class=clazz;
         m_classExpressions=classExpressions;
-    }
-    protected DisjointUnion(ClassVariable classVariable, Set<ClassExpression> classExpressions) {
-        m_class=classVariable;
-        m_classExpressions=classExpressions;
+        m_annotations=annotations;
     }
     public ClassExpression getClazz() {
         return m_class;
@@ -55,6 +65,7 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointUnion(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_class.toString(prefixes));
         buffer.append(' ');
         boolean notFirst=false;
@@ -71,17 +82,14 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointUnion create(Clazz clazz,Set<ClassExpression> classExpressions) {
-        return s_interningManager.intern(new DisjointUnion(clazz,classExpressions));
+    public static DisjointUnion create(ClassExpression clazz,Set<ClassExpression> classExpressions) {
+        return DisjointUnion.create(clazz,classExpressions,new HashSet<Annotation>());
     }
-    public static DisjointUnion create(ClassVariable clazz,ClassExpression... classExpressions) {
-        return s_interningManager.intern(new DisjointUnion(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
+    public static DisjointUnion create(ClassExpression clazz,ClassExpression... classExpressions) {
+        return DisjointUnion.create(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
     }
-    public static DisjointUnion create(ClassVariable clazz,Set<ClassExpression> classExpressions) {
-        return s_interningManager.intern(new DisjointUnion(clazz,classExpressions));
-    }
-    public static DisjointUnion create(Clazz clazz,ClassExpression... classExpressions) {
-        return s_interningManager.intern(new DisjointUnion(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
+    public static DisjointUnion create(ClassExpression clazz,Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DisjointUnion(clazz,classExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -92,27 +100,25 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_class.getVariablesInSignature(varType));
-        for (ClassExpression classExpression : m_classExpressions) {
+        for (ClassExpression classExpression : m_classExpressions) 
             variables.addAll(classExpression.getVariablesInSignature(varType));
-        }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_class.getUnboundVariablesInSignature(varType));
-        for (ClassExpression classExpression : m_classExpressions) {
+        for (ClassExpression classExpression : m_classExpressions) 
             variables.addAll(classExpression.getUnboundVariablesInSignature(varType));
-        }
+        getUnboundAnnotationVariables(varType, variables);
         return variables;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_class.applyBindings(variablesToBindings);
         for (ClassExpression ce : m_classExpressions)
             ce.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_class.applyVariableBindings(variablesToBindings);
-        for (ClassExpression ce : m_classExpressions)
-            ce.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DisjointUnion.create(m_class, m_classExpressions);
     }
 }

@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.ObjectComplementOf;
 
 public class TPComplementOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
@@ -9,7 +10,7 @@ public class TPComplementOfHandler extends AbstractNamedEquivalentClassAxiomHand
         super(consumer, Vocabulary.OWL_COMPLEMENT_OF.getIRI());
     }
 
-    protected ClassExpression translateEquivalentClass(String mainNode) {
+    protected ClassExpression translateEquivalentClass(Identifier mainNode) {
         return ObjectComplementOf.create(consumer.translateClassExpression(mainNode));
     }
 }

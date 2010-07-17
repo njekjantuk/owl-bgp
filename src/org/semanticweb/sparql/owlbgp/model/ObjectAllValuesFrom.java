@@ -64,9 +64,6 @@ public class ObjectAllValuesFrom extends AbstractExtendedOWLObject implements Cl
     public static ObjectAllValuesFrom create(ObjectPropertyExpression ope,ClassExpression classExpression) {
         return s_interningManager.intern(new ObjectAllValuesFrom(ope,classExpression));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -85,12 +82,8 @@ public class ObjectAllValuesFrom extends AbstractExtendedOWLObject implements Cl
         unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
         m_classExpression.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
-        m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

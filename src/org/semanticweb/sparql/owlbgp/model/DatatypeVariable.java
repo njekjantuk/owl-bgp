@@ -18,40 +18,44 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
-
 
 public class DatatypeVariable extends Variable implements DataRange {
     private static final long serialVersionUID = -3325199555146763566L;
 
     protected static InterningManager<DatatypeVariable> s_interningManager=new InterningManager<DatatypeVariable>() {
         protected boolean equal(DatatypeVariable object1,DatatypeVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(DatatypeVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=37;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected DatatypeVariable(String variable) {
-        super(variable);
+    protected DatatypeVariable(String variable,Atomic binding) {
+        super(variable,binding);
     }
     public DataRange getBindingAsExtendedOWLObject() {
-        if (m_binding==null) return null;
-        return Datatype.create(m_binding);
+        return (Datatype)m_binding;
     }
-    public void setBinding(Datatype binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_binding=binding.getIdentifier();
+        else if (binding instanceof Datatype) m_binding=binding;
+        else throw new RuntimeException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DatatypeVariable create(String iri) {
-        return s_interningManager.intern(new DatatypeVariable(iri));
+    public static DatatypeVariable create(String variable) {
+        return DatatypeVariable.create(variable,null);
+    }
+    public static DatatypeVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new DatatypeVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -69,13 +73,13 @@ public class DatatypeVariable extends Variable implements DataRange {
         if (m_binding==null&&(varType==null||varType==VarType.DATATYPE)) variables.add(this);
         return variables;
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            binding=null;
-        else if (!(binding instanceof Datatype))
-            throw new RuntimeException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
-        else 
-            m_binding=((Datatype)variablesToBindings.get(this)).m_iri;
-    }
+//    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+//        ExtendedOWLObject binding=variablesToBindings.get(this);
+//        if (binding==null)
+//            binding=null;
+//        else if (!(binding instanceof Datatype))
+//            throw new RuntimeException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
+//        else 
+//            m_binding=((Datatype)variablesToBindings.get(this)).m_iri;
+//    }
 }

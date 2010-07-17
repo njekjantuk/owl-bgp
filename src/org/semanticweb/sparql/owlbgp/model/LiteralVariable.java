@@ -18,7 +18,6 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
@@ -29,51 +28,47 @@ public class LiteralVariable extends Variable implements ILiteral {
 
     protected static InterningManager<LiteralVariable> s_interningManager=new InterningManager<LiteralVariable>() {
         protected boolean equal(LiteralVariable object1,LiteralVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(LiteralVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=23;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected Literal m_literalBinding;
-    
-    protected LiteralVariable(String variable) {
-        super(variable);
+    protected LiteralVariable(String variable, Atomic binding) {
+        super(variable,binding);
     }
     public String getLexicalForm() {
-        if (m_literalBinding==null) return null;
-        return m_literalBinding.getLexicalForm();
+        if (m_binding==null) return null;
+        return ((ILiteral)m_binding).getLexicalForm();
     }
     public String getLangTag() {
-        if (m_literalBinding==null) return null;
-        return m_literalBinding.getLangTag();
+        if (m_binding==null) return null;
+        return ((ILiteral)m_binding).getLangTag();
     }
     public Datatype getDatatype() {
-        if (m_literalBinding==null) return null;
-        return m_literalBinding.getDatatype();
+        if (m_binding==null) return null;
+        return ((ILiteral)m_binding).getDatatype();
     }
     public ILiteral getBindingAsExtendedOWLObject() {
-        if (m_literalBinding==null) return null;
-        return m_literalBinding;
+        return (ILiteral)m_binding;
     }
-    public void setBinding(Literal binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_literalBinding=binding;
-    }
-    public void setBinding(String binding) {
-        if (binding==null) m_literalBinding=null;
-        else m_literalBinding=Literal.create(binding);
-    }
-    public String toString(Prefixes prefixes) {
-        if (m_literalBinding!=null) return m_variable+"/"+m_literalBinding.toString(prefixes);
-        return m_variable;
+        if (binding instanceof ILiteral) m_binding=binding;
+        throw new RuntimeException("Error: Only literals can be assigned to literal variables, but literal variable "+m_variable+" was assigned the non-literal "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static LiteralVariable create(String variable) {
-        return s_interningManager.intern(new LiteralVariable(variable));
+        return LiteralVariable.create(variable,null);
+    }
+    public static LiteralVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new LiteralVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -91,13 +86,13 @@ public class LiteralVariable extends Variable implements ILiteral {
         if (m_binding==null&&(varType==null||varType==VarType.LITERAL)) variables.add(this);
         return variables;
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            m_literalBinding=null;
-        else if (!(binding instanceof Literal))
-            throw new RuntimeException("Error: Only literals can be assigned to literal variables, but literal variable "+m_variable+" was assigned the non-literal "+binding);
-        else 
-            m_literalBinding=(Literal)variablesToBindings;
-    }
+//    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+//        ExtendedOWLObject binding=variablesToBindings.get(this);
+//        if (binding==null)
+//            m_literalBinding=null;
+//        else if (!(binding instanceof Literal))
+//            throw new RuntimeException("Error: Only literals can be assigned to literal variables, but literal variable "+m_variable+" was assigned the non-literal "+binding);
+//        else 
+//            m_literalBinding=(Literal)variablesToBindings;
+//    }
 }

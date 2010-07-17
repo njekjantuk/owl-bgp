@@ -29,19 +29,37 @@ public class DatatypeDefinition extends AbstractAxiom {
 
     protected static InterningManager<DatatypeDefinition> s_interningManager=new InterningManager<DatatypeDefinition>() {
         protected boolean equal(DatatypeDefinition object1,DatatypeDefinition object2) {
-            return object1.m_datatype==object2.m_datatype&&object1.m_dataRange==object2.m_dataRange;
+            if (object1.m_datatype!=object2.m_datatype
+                    ||object1.m_dataRange!=object2.m_dataRange
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(DatatypeDefinition object) {
-            return 27+11*object.m_datatype.hashCode()+37*object.m_dataRange.hashCode();
+            int hashCode=27+11*object.m_datatype.hashCode()+37*object.m_dataRange.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final Datatype m_datatype;
     protected final DataRange m_dataRange;
     
-    protected DatatypeDefinition(Datatype datatype,DataRange facetRestrictions) {
+    protected DatatypeDefinition(Datatype datatype,DataRange dataRange,Set<Annotation> annotations) {
         m_datatype=datatype;
-        m_dataRange=facetRestrictions;
+        m_dataRange=dataRange;
+        m_annotations=annotations;
     }
 
     public Datatype getDatatype() {
@@ -53,6 +71,7 @@ public class DatatypeDefinition extends AbstractAxiom {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DatatypeDefinition(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_datatype.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_dataRange.toString(prefixes));
@@ -63,7 +82,10 @@ public class DatatypeDefinition extends AbstractAxiom {
         return s_interningManager.intern(this);
     }
     public static DatatypeDefinition create(Datatype datatype,DataRange dataRange) {
-        return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange));
+        return DatatypeDefinition .create(datatype,dataRange,new HashSet<Annotation>());
+    }
+    public static DatatypeDefinition create(Datatype datatype,DataRange dataRange,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -75,20 +97,21 @@ public class DatatypeDefinition extends AbstractAxiom {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_datatype.getVariablesInSignature(varType));
         variables.addAll(m_dataRange.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_datatype.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_datatype.applyBindings(variablesToBindings);
         m_dataRange.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_datatype.applyVariableBindings(variablesToBindings);
-        m_dataRange.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DatatypeDefinition.create(m_datatype, m_dataRange);
     }
 }

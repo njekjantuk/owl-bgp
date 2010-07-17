@@ -1,5 +1,6 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.SubDataPropertyOf;
 
 public class TPSubDataPropertyOfHandler extends TriplePredicateHandler {
@@ -8,10 +9,10 @@ public class TPSubDataPropertyOfHandler extends TriplePredicateHandler {
         super(consumer, Vocabulary.OWL_SUB_DATA_PROPERTY_OF.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return true;
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         addAxiom(SubDataPropertyOf.create(translateDataProperty(subject),translateDataProperty(object)));
         consumeTriple(subject, predicate, object);
     }

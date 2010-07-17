@@ -3,6 +3,7 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 
 public enum Vocabulary {
@@ -77,12 +78,6 @@ public enum Vocabulary {
     RDFS_RANGE(Prefixes.s_semanticWebPrefixes.get("rdfs"), "range"),
     RDFS_CLASS(Prefixes.s_semanticWebPrefixes.get("rdfs"), "Class"),
     RDF_PROPERTY(Prefixes.s_semanticWebPrefixes.get("rdf"), "Property"),
-    RDF_SUBJECT(Prefixes.s_semanticWebPrefixes.get("rdf"), "subject"),
-    RDF_PREDICATE(Prefixes.s_semanticWebPrefixes.get("rdf"), "predicate"),
-    RDF_OBJECT(Prefixes.s_semanticWebPrefixes.get("rdf"), "object"),
-    OWL_SUBJECT(Prefixes.s_semanticWebPrefixes.get("owl"), "subject"),
-    OWL_PREDICATE(Prefixes.s_semanticWebPrefixes.get("owl"), "predicate"),
-    OWL_OBJECT(Prefixes.s_semanticWebPrefixes.get("owl"), "object"),
     RDF_DESCRIPTION(Prefixes.s_semanticWebPrefixes.get("rdf"), "Description"),
     RDF_XML_LITERAL(Prefixes.s_semanticWebPrefixes.get("rdf"), "XMLLiteral"),
     OWL_PRIOR_VERSION(Prefixes.s_semanticWebPrefixes.get("owl"), "priorVersion"),
@@ -132,8 +127,8 @@ public enum Vocabulary {
         this.namespace=namespace.intern();
         this.shortName=shortName.intern();
     }
-    public String getIRI() {
-        return (namespace.toString()+shortName).intern();
+    public IRI getIRI() {
+        return IRI.create(namespace.toString()+shortName);
     }
     public String getNamespace() {
         return namespace;
@@ -144,16 +139,16 @@ public enum Vocabulary {
     public String toString() {
         return getIRI().toString();
     }
-    public static final Set<String> BUILT_IN_VOCABULARY_IRIS;
+    public static final Set<IRI> BUILT_IN_VOCABULARY_IRIS;
     static {
-        BUILT_IN_VOCABULARY_IRIS = new HashSet<String>();
+        BUILT_IN_VOCABULARY_IRIS = new HashSet<IRI>();
         for (Vocabulary v : Vocabulary.values()) {
             BUILT_IN_VOCABULARY_IRIS.add(v.getIRI());
         }
     }
-    public static final Set<String> BUILT_IN_ANNOTATION_PROPERTY_IRIS;
+    public static final Set<IRI> BUILT_IN_ANNOTATION_PROPERTY_IRIS;
     static {
-        BUILT_IN_ANNOTATION_PROPERTY_IRIS=new HashSet<String>();
+        BUILT_IN_ANNOTATION_PROPERTY_IRIS=new HashSet<IRI>();
         BUILT_IN_ANNOTATION_PROPERTY_IRIS.add(RDFS_LABEL.getIRI());
         BUILT_IN_ANNOTATION_PROPERTY_IRIS.add(RDFS_COMMENT.getIRI());
         BUILT_IN_ANNOTATION_PROPERTY_IRIS.add(OWL_VERSION_INFO.getIRI());

@@ -52,9 +52,6 @@ public class FacetRestriction extends AbstractExtendedOWLObject {
     public static FacetRestriction create(Facet facet,Literal literal) {
         return s_interningManager.intern(new FacetRestriction(facet,literal));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }

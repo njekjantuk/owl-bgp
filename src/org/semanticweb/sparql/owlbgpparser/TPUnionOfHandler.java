@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.ObjectUnionOf;
 
 public class TPUnionOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
@@ -9,7 +10,7 @@ public class TPUnionOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
         super(consumer, Vocabulary.OWL_UNION_OF.getIRI());
     }
     
-    protected ClassExpression translateEquivalentClass(String mainNode) {
+    protected ClassExpression translateEquivalentClass(Identifier mainNode) {
         return ObjectUnionOf.create(consumer.translateToClassExpressionSet(mainNode));
     }
 }

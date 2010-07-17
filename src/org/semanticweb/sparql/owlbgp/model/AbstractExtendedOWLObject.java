@@ -34,21 +34,22 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
         return toString(Prefixes.STANDARD_PREFIXES);
     }
     public abstract String toString(Prefixes prefixes);
+    public Identifier getIdentifier() {
+        return null;
+    }
     public Set<Variable> getVariablesInSignature() {
         return getVariablesInSignature(null);
     }
     public Set<Variable> getUnboundVariablesInSignature() {
         return getUnboundVariablesInSignature(null);
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
     }
-    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<String,Set<String>> variablesToBindings) {
+    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<Atomic>> variablesToBindings) {
         return new AppliedBindingIterator(this,variablesToBindings);
     }
-    public Iterable<Map<String,String>> getBindingIterator(Map<String,Set<String>> variablesToBindings) {
+    public Iterable<Map<Variable,Atomic>> getBindingIterator(Map<Variable,Set<Atomic>> variablesToBindings) {
         return new BindingIterator(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
     }
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory) {
         return this.convertToOWLAPIObject(new OWLAPIConverter(dataFactory));
@@ -56,16 +57,16 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject, Se
     protected abstract OWLObject convertToOWLAPIObject(OWLAPIConverter converter);
 }
 
-class BindingIterator implements Iterator<Map<String,String>>, Iterable<Map<String,String>> {
-    protected final String[] m_variables;
+class BindingIterator implements Iterator<Map<Variable,Atomic>>, Iterable<Map<Variable,Atomic>> {
+    protected final Variable[] m_variables;
     protected int[] m_currentBindingIndexes;
-    protected final String[][] m_variablesToBindings;
+    protected final Atomic[][] m_variablesToBindings;
     
-    public BindingIterator(Map<String,Set<String>> variablesToBindings) {
-        m_variables=variablesToBindings.keySet().toArray(new String[0]);
-        m_variablesToBindings=new String[m_variables.length][];
+    public BindingIterator(Map<Variable,Set<Atomic>> variablesToBindings) {
+        m_variables=variablesToBindings.keySet().toArray(new Variable[0]);
+        m_variablesToBindings=new Atomic[m_variables.length][];
         for (int index=0;index<m_variables.length;index++) {
-            m_variablesToBindings[index]=variablesToBindings.get(m_variables[index]).toArray(new String[0]);
+            m_variablesToBindings[index]=variablesToBindings.get(m_variables[index]).toArray(new Atomic[0]);
         }
     }
     
@@ -76,9 +77,9 @@ class BindingIterator implements Iterator<Map<String,String>>, Iterable<Map<Stri
         }
         return false;
     }
-    public Map<String,String> next() {
+    public Map<Variable,Atomic> next() {
         if (!hasNext()) throw new NoSuchElementException();
-        Map<String,String> currentBinding=new HashMap<String, String>();
+        Map<Variable,Atomic> currentBinding=new HashMap<Variable, Atomic>();
         if (m_currentBindingIndexes==null) {
             // first entry, initialise
             m_currentBindingIndexes=new int[m_variables.length];
@@ -113,20 +114,18 @@ class BindingIterator implements Iterator<Map<String,String>>, Iterable<Map<Stri
     public void remove() {
         throw new UnsupportedOperationException("The binding iterator does not support removal. ");
     }
-    public Iterator<Map<String,String>> iterator() {
+    public Iterator<Map<Variable,Atomic>> iterator() {
         return this;
     }    
 }
-
 class AppliedBindingIterator implements Iterator<ExtendedOWLObject>, Iterable<ExtendedOWLObject> {
     protected final ExtendedOWLObject m_extendedOwlObject;
     protected final BindingIterator m_bindingIterator;
     
-    public AppliedBindingIterator(ExtendedOWLObject extendedOwlObject,Map<String,Set<String>> variablesToBindings) {
-        m_extendedOwlObject=extendedOwlObject;
+    public AppliedBindingIterator(ExtendedOWLObject extendedOWLObject,Map<Variable,Set<Atomic>> variablesToBindings) {
+        m_extendedOwlObject=extendedOWLObject;
         m_bindingIterator=new BindingIterator(variablesToBindings);
     }
-    
     public boolean hasNext() {
         return m_bindingIterator.hasNext();
     }

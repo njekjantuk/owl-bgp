@@ -1,8 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
-import org.semanticweb.sparql.owlbgp.model.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.PropertyExpression;
 
 public class HasKeyListItemTranslator implements ListItemTranslator<PropertyExpression> {
@@ -16,11 +15,11 @@ public class HasKeyListItemTranslator implements ListItemTranslator<PropertyExpr
     public PropertyExpression translate(ILiteral firstObject) {
         return null;
     }
-    public PropertyExpression translate(String firstObject) {
+    public PropertyExpression translate(Identifier firstObject) {
         if (consumer.isObjectPropertyOnly(firstObject)) 
-            return ObjectProperty.create(firstObject);
+            return consumer.translateObjectPropertyExpression(firstObject);
         else if (consumer.isDataPropertyOnly(firstObject))
-            return DataProperty.create(firstObject);
+            return consumer.translateDataPropertyExpression(firstObject);
         else throw new RuntimeException("Could not disambiguate property "+firstObject+". ");
     }
 }

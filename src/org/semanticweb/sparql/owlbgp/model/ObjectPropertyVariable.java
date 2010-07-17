@@ -18,7 +18,6 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
@@ -29,29 +28,35 @@ public class ObjectPropertyVariable extends Variable implements ObjectPropertyEx
 
     protected static InterningManager<ObjectPropertyVariable> s_interningManager=new InterningManager<ObjectPropertyVariable>() {
         protected boolean equal(ObjectPropertyVariable object1,ObjectPropertyVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(ObjectPropertyVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=17;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected ObjectPropertyVariable(String variable) {
-        super(variable);
+    protected ObjectPropertyVariable(String variable,Atomic binding) {
+        super(variable,binding);
     }
-    public ObjectPropertyExpression getBindingAsExtendedOWLObject() {
-        if (m_binding==null) return null;
-        return ObjectProperty.create(m_binding);
+    public ObjectProperty getBindingAsExtendedOWLObject() {
+        return (ObjectProperty)m_binding;
     }
-    public void setBinding(ObjectProperty binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_binding=binding.getIdentifier();
+        else if (binding instanceof ObjectProperty) m_binding=binding;
+        else throw new RuntimeException("Error: Only object properties can be assigned to object property variables, but object proiperty variable "+m_variable+" was assigned the non-object property "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectPropertyVariable create(String iri) {
-        return s_interningManager.intern(new ObjectPropertyVariable(iri));
+    public static ObjectPropertyVariable create(String variable) {
+        return ObjectPropertyVariable.create(variable,null);
+    }
+    public static ObjectPropertyVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new ObjectPropertyVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -68,14 +73,5 @@ public class ObjectPropertyVariable extends Variable implements ObjectPropertyEx
         Set<Variable> variables=new HashSet<Variable>();
         if (m_binding==null&&(varType==null||varType==VarType.OBJECT_PROPERTY)) variables.add(this);
         return variables;
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            m_binding=null;
-        else if (!(binding instanceof ObjectProperty))
-            throw new RuntimeException("Error: Only object properties can be assigned to object property variables, but object proiperty variable "+m_variable+" was assigned the non-object property "+binding);
-        else 
-            m_binding=((ObjectProperty)variablesToBindings.get(this)).m_iri;
     }
 }

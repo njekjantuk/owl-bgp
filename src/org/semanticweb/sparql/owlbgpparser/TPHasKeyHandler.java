@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.HasKey;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.PropertyExpression;
 
 public class TPHasKeyHandler extends TriplePredicateHandler {
@@ -15,11 +16,11 @@ public class TPHasKeyHandler extends TriplePredicateHandler {
         this.listTranslator=new OptimisedListTranslator<PropertyExpression>(consumer, new HasKeyListItemTranslator(consumer));
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return false;
     }
 
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumeTriple(subject, predicate, object);
         ClassExpression ce = translateClassExpression(subject);
         Set<PropertyExpression> props = listTranslator.translateToSet(object);

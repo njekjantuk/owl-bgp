@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-
 import org.semanticweb.sparql.owlbgp.model.Datatype;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.xml.sax.SAXException;
 
 public class OWLRDFConsumerAdapter extends OWLRDFConsumer implements TripleHandler {
@@ -9,28 +9,28 @@ public class OWLRDFConsumerAdapter extends OWLRDFConsumer implements TripleHandl
     public OWLRDFConsumerAdapter() {
         super();
     }
-    public void handlePrefixDirective(String prefixName, String prefix) {}
-    public void handleBaseDirective(String base) {
+    public void handlePrefixDirective(String prefixName, Identifier prefix) {}
+    public void handleBaseDirective(Identifier base) {
         xmlBase=base;
     }
     public void handleComment(String comment) {}
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         try {
             statementWithResourceValue(subject, predicate, object);
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }
-    public void handleLiteralTriple(String subject, String predicate, String literal, String langTag, Datatype datatype) {
+    public void handleLiteralTriple(Identifier subject, Identifier predicate, String lexicalForm, String langTag, Datatype datatype) {
         try {
-            statementWithLiteralValue(subject, predicate, literal, langTag, datatype);
+            statementWithLiteralValue(subject, predicate, lexicalForm, langTag, datatype);
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }
     }
-    public void handleLiteralTriple(String subject, String predicate, String literal, Datatype datatype) {
+    public void handleLiteralTriple(Identifier subject, Identifier predicate, String lexicalForm, Datatype datatype) {
         try {
-            statementWithLiteralValue(subject, predicate, literal, "", datatype);
+            statementWithLiteralValue(subject, predicate, lexicalForm, "", datatype);
         } catch (SAXException e) {
             throw new RuntimeException(e);
         }

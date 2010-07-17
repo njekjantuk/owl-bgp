@@ -32,13 +32,24 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
 
     protected static InterningManager<SameIndividual> s_interningManager=new InterningManager<SameIndividual>() {
         protected boolean equal(SameIndividual object1,SameIndividual object2) {
-            if (object1.m_individuals.size()!=object2.m_individuals.size())
+            if (object1.m_individuals.size()!=object2.m_individuals.size()
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Individual individual : object1.m_individuals) {
                 if (!contains(individual, object2.m_individuals))
                     return false;
+            }
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
             } 
             return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected boolean contains(Individual individual ,Set<Individual> individuals) {
             for (Individual ind : individuals)
@@ -50,6 +61,8 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
             int hashCode=13;
             for (Individual individual : object.m_individuals)
                 hashCode+=individual.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
@@ -57,10 +70,11 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
     protected final Set<Individual> m_individuals;
    
     protected SameIndividual(Individual... individuals) {
-        m_individuals=new HashSet<Individual>(Arrays.asList(individuals));
+        this(new HashSet<Individual>(Arrays.asList(individuals)),new HashSet<Annotation>());
     }
-    protected SameIndividual(Collection<Individual> individuals) {
+    protected SameIndividual(Collection<Individual> individuals,Set<Annotation> annotations) {
         m_individuals=new HashSet<Individual>(individuals);
+        m_annotations=annotations;
     }
     public Set<Individual> getIndividuals() {
         return m_individuals;
@@ -68,6 +82,7 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("SameIndividual(");
+        writeAnnoations(buffer, prefixes);
         boolean notFirst=false;
         for (Individual individual : m_individuals) {
             if (notFirst)
@@ -82,11 +97,14 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static SameIndividual create(Set<Individual> individuals) {
-        return s_interningManager.intern(new SameIndividual(individuals));
-    }
     public static SameIndividual create(Individual... individuals) {
-        return s_interningManager.intern(new SameIndividual(individuals));
+        return SameIndividual.create(new HashSet<Individual>(Arrays.asList(individuals)));
+    }
+    public static SameIndividual create(Set<Individual> individuals) {
+        return SameIndividual.create(individuals,new HashSet<Annotation>());
+    }
+    public static SameIndividual create(Set<Individual> individuals,Set<Annotation> annotations) {
+        return s_interningManager.intern(new SameIndividual(individuals,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -96,23 +114,23 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        for (Individual individual : m_individuals) {
+        for (Individual individual : m_individuals) 
             variables.addAll(individual.getVariablesInSignature(varType));
-        }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         for (Individual individual : m_individuals) 
             unbound.addAll(individual.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (Individual individual : m_individuals)
             individual.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (Individual individual : m_individuals)
-            individual.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return SameIndividual.create(m_individuals);
     }
 }
