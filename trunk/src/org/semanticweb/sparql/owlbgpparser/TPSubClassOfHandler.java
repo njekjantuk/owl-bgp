@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.SubClassOf;
 
 public class TPSubClassOfHandler extends TriplePredicateHandler {
@@ -11,7 +12,7 @@ public class TPSubClassOfHandler extends TriplePredicateHandler {
         super(consumer, Vocabulary.RDFS_SUBCLASS_OF.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         if (!consumer.isAnonymousNode(subject)) {
             if (consumer.isAnonymousNode(object)) {
                 ClassExpression superClass=consumer.getClassExpressionIfTranslated(object);
@@ -25,10 +26,10 @@ public class TPSubClassOfHandler extends TriplePredicateHandler {
         consumer.addClass(object);
         return !isSubjectOrObjectAnonymous(subject, object);
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         ClassExpression subClass=translateClassExpression(subject);
         ClassExpression supClass=translateClassExpression(object);
-        addAxiom(SubClassOf.create(subClass,supClass));
+        addAxiom(SubClassOf.create(subClass,supClass,consumer.getPendingAnnotations()));
         consumeTriple(subject, predicate, object);
     }
 }

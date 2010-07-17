@@ -18,7 +18,6 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,10 +31,15 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
 
     protected static InterningManager<DifferentIndividuals> s_interningManager=new InterningManager<DifferentIndividuals>() {
         protected boolean equal(DifferentIndividuals object1,DifferentIndividuals object2) {
-            if (object1.m_individuals.size()!=object2.m_individuals.size())
+            if (object1.m_individuals.size()!=object2.m_individuals.size()
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Individual individual : object1.m_individuals) {
                 if (!contains(individual, object2.m_individuals))
+                    return false;
+            } 
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
@@ -46,21 +50,27 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
                     return true;
             return false;
         }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
+        }
         protected int getHashCode(DifferentIndividuals object) {
             int hashCode=127;
             for (Individual individual : object.m_individuals)
                 hashCode+=individual.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
     
     protected final Set<Individual> m_individuals;
-   
-    protected DifferentIndividuals(Individual... individuals) {
-        m_individuals=new HashSet<Individual>(Arrays.asList(individuals));
-    }
-    protected DifferentIndividuals(Collection<Individual> individuals) {
+
+    protected DifferentIndividuals(Set<Individual> individuals,Set<Annotation> annotations) {
         m_individuals=new HashSet<Individual>(individuals);
+        m_annotations=annotations;
     }
     public Set<Individual> getIndividuals() {
         return m_individuals;
@@ -68,6 +78,7 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DifferentIndividuals(");
+        writeAnnoations(buffer, prefixes);
         boolean notFirst=false;
         for (Individual individual : m_individuals) {
             if (notFirst)
@@ -83,10 +94,13 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
         return s_interningManager.intern(this);
     }
     public static DifferentIndividuals create(Set<Individual> individuals) {
-        return s_interningManager.intern(new DifferentIndividuals(individuals));
+        return DifferentIndividuals.create(individuals,new HashSet<Annotation>());
     }
     public static DifferentIndividuals create(Individual... individuals) {
-        return s_interningManager.intern(new DifferentIndividuals(individuals));
+        return DifferentIndividuals.create(new HashSet<Individual>(Arrays.asList(individuals)),new HashSet<Annotation>());
+    }
+    public static DifferentIndividuals create(Set<Individual> individuals,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DifferentIndividuals(individuals, annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -99,20 +113,21 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
         for (Individual individual : m_individuals) {
             variables.addAll(individual.getVariablesInSignature(varType));
         }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         for (Individual individual : m_individuals) 
             unbound.addAll(individual.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (Individual individual : m_individuals)
             individual.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (Individual individual : m_individuals)
-            individual.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DifferentIndividuals.create(m_individuals);
     }
 }

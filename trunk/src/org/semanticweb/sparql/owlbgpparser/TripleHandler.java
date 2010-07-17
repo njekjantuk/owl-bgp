@@ -4,19 +4,20 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Axiom;
 import org.semanticweb.sparql.owlbgp.model.Datatype;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public interface TripleHandler {
-    void handlePrefixDirective(String prefixName, String prefix);
-    void handleBaseDirective(String base);
+    void handlePrefixDirective(String prefixName, Identifier prefix);
+    void handleBaseDirective(Identifier base);
     void handleComment(String comment);
-    void handleTriple(String subject, String predicate, String object);
-    void handleLiteralTriple(String subject, String predicate, String literal,String langTag, Datatype datatype);
-    void handleLiteralTriple(String subject, String predicate, String literal,Datatype datatype);
+    void handleTriple(Identifier subject, Identifier predicate, Identifier object);
+    void handleLiteralTriple(Identifier subject, Identifier predicate, String lexicalForm,String langTag, Datatype datatype);
+    void handleLiteralTriple(Identifier subject, Identifier predicate, String lexicalForm,Datatype datatype);
     void handleEnd();
     public Set<Axiom> getParsedAxioms();
-    public void setClassesInOntologySignature(Set<String> classes);
-    public void setObjectPropertiesInOntologySignature(Set<String> objectProperties);
-    public void setDataPropertiesInOntologySignature(Set<String> dataProperties);
-    public void setIndividualsInOntologySignature(Set<String> individuals);
-    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypes);
+    public void setClassesInOntologySignature(Set<Identifier> classes);
+    public void setObjectPropertiesInOntologySignature(Set<Identifier> objectProperties);
+    public void setDataPropertiesInOntologySignature(Set<Identifier> dataProperties);
+    public void setIndividualsInOntologySignature(Set<Identifier> individuals);
+    public void setCustomDatatypesInOntologySignature(Set<Identifier> customDatatypes);
 }

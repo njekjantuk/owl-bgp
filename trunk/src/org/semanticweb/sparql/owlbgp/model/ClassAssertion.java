@@ -30,19 +30,37 @@ public class ClassAssertion extends AbstractAxiom implements Assertion {
 
     protected static InterningManager<ClassAssertion> s_interningManager=new InterningManager<ClassAssertion>() {
         protected boolean equal(ClassAssertion object1,ClassAssertion object2) {
-            return object1.m_ce==object2.m_ce&&object1.m_individual==object2.m_individual;
+            if (object1.m_ce!=object2.m_ce
+                    ||object1.m_individual!=object2.m_individual
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(ClassAssertion object) {
-            return 43*object.m_ce.hashCode()+7*object.m_individual.hashCode();
+            int hashCode=43*object.m_ce.hashCode()+7*object.m_individual.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final ClassExpression m_ce;
     protected final Individual m_individual;
    
-    protected ClassAssertion(ClassExpression ope,Individual individual) {
+    protected ClassAssertion(ClassExpression ope,Individual individual,Set<Annotation> annotations) {
         m_ce=ope;
         m_individual=individual;
+        m_annotations=annotations;
     }
     public ClassExpression getClassExpression() {
         return m_ce;
@@ -53,6 +71,7 @@ public class ClassAssertion extends AbstractAxiom implements Assertion {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ClassAssertion(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_ce.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_individual.toString(prefixes));
@@ -63,7 +82,10 @@ public class ClassAssertion extends AbstractAxiom implements Assertion {
         return s_interningManager.intern(this);
     }
     public static ClassAssertion create(ClassExpression ce,Individual individual) {
-        return s_interningManager.intern(new ClassAssertion(ce,individual));
+        return ClassAssertion.create(ce,individual,new HashSet<Annotation>());
+    }
+    public static ClassAssertion create(ClassExpression ce,Individual individual,Set<Annotation> annotations) {
+        return s_interningManager.intern(new ClassAssertion(ce,individual,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -75,20 +97,21 @@ public class ClassAssertion extends AbstractAxiom implements Assertion {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ce.getVariablesInSignature(varType));
         variables.addAll(m_individual.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ce.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_individual.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ce.applyBindings(variablesToBindings);
         m_individual.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ce.applyVariableBindings(variablesToBindings);
-        m_individual.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return ClassAssertion.create(m_ce, m_individual);
     }
 }

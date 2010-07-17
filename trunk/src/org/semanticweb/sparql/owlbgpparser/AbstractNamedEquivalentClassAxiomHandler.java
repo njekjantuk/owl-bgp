@@ -5,20 +5,21 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public abstract class AbstractNamedEquivalentClassAxiomHandler extends TriplePredicateHandler {
 
-    public AbstractNamedEquivalentClassAxiomHandler(OWLRDFConsumer consumer, String predicateIRI) {
+    public AbstractNamedEquivalentClassAxiomHandler(OWLRDFConsumer consumer, Identifier predicateIRI) {
         super(consumer, predicateIRI);
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return false;
     }
-    public boolean canHandle(String subject, String predicate, String object) {
+    public boolean canHandle(Identifier subject, Identifier predicate, Identifier object) {
         return super.canHandle(subject, predicate, object) && !consumer.isAnonymousNode(subject);
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumeTriple(subject, predicate, object);
         Set<ClassExpression> operands = new HashSet<ClassExpression>();
         operands.add(translateClassExpression(subject));
@@ -26,6 +27,6 @@ public abstract class AbstractNamedEquivalentClassAxiomHandler extends TriplePre
         addAxiom(EquivalentClasses.create(operands));
     }
 
-    protected abstract ClassExpression translateEquivalentClass(String mainNode);
+    protected abstract ClassExpression translateEquivalentClass(Identifier mainNode);
 
 }

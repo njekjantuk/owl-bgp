@@ -27,15 +27,15 @@ public class Facet implements Serializable {
     
     public static Set<Facet> OWL_FACETS=new HashSet<Facet>();
     static {
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minInclusive"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxInclusive"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minExclusive"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxExclusive"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"length"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minLength"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxLength"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"pattern"));
-        OWL_FACETS.add(Facet.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"langRange"));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minInclusive")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxInclusive")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minExclusive")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxExclusive")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"length")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minLength")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxLength")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"pattern")));
+        OWL_FACETS.add(Facet.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"langRange")));
     }
     protected static InterningManager<Facet> s_interningManager=new InterningManager<Facet>() {
         protected boolean equal(Facet object1,Facet object2) {
@@ -46,24 +46,27 @@ public class Facet implements Serializable {
         }
     };
     
-    protected final String m_iri;
+    protected final IRI m_iri;
    
-    protected Facet(String iri) {
-        m_iri=iri.intern();
+    protected Facet(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
-        return m_iri;
+        return m_iri.toString();
+    }
+    public String getIRI() {
+        return m_iri.toString();
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static Facet create(String iri) {
+    public static Facet create(IRI iri) {
         return s_interningManager.intern(new Facet(iri));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return m_iri;
     }
 }

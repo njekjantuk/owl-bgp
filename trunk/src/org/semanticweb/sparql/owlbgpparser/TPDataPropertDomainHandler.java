@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.DataPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TPDataPropertDomainHandler extends TriplePredicateHandler {
 
@@ -8,10 +9,10 @@ public class TPDataPropertDomainHandler extends TriplePredicateHandler {
         super(consumer, Vocabulary.OWL_DATA_PROPERTY_DOMAIN.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return !consumer.isAnonymousNode(object);
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         addAxiom(DataPropertyDomain.create(translateDataProperty(subject),translateClassExpression(object)));
         consumeTriple(subject, predicate, object);
     }

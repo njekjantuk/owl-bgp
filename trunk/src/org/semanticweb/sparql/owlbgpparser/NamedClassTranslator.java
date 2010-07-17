@@ -1,8 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.ClassVariable;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class NamedClassTranslator implements ClassExpressionTranslator {
 
@@ -11,8 +10,7 @@ public class NamedClassTranslator implements ClassExpressionTranslator {
     public NamedClassTranslator(OWLRDFConsumer consumer) {
         this.consumer=consumer;
     }
-    public ClassExpression translate(String mainNode) {
-        if (consumer.isVariableNode(mainNode)) return ClassVariable.create(mainNode);
-    	return Clazz.create(mainNode); 
+    public ClassExpression translate(Identifier mainNode) {
+        return consumer.translateClassExpression(mainNode);
     }
 }

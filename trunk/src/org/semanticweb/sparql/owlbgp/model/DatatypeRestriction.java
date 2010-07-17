@@ -89,9 +89,6 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
     public static DatatypeRestriction create(Datatype datatype,FacetRestriction... facetRestrictions) {
         return s_interningManager.intern(new DatatypeRestriction(datatype,new HashSet<FacetRestriction>(Arrays.asList(facetRestrictions))));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -108,10 +105,7 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
         unbound.addAll(m_datatype.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_datatype.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_datatype.applyVariableBindings(variablesToBindings);
     }
 }

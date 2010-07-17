@@ -72,9 +72,6 @@ public class ObjectExactCardinality extends AbstractExtendedOWLObject implements
     public static ObjectExactCardinality create(int cardinality,ObjectPropertyExpression ope,ClassExpression classExpression) {
         return s_interningManager.intern(new ObjectExactCardinality(cardinality,ope,classExpression));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -93,12 +90,8 @@ public class ObjectExactCardinality extends AbstractExtendedOWLObject implements
         unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
         m_classExpression.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
-        m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

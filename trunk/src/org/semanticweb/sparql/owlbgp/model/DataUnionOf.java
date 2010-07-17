@@ -83,9 +83,6 @@ public class DataUnionOf extends AbstractExtendedOWLObject implements DataRange 
     public static DataUnionOf create(DataRange... dataRanges) {
         return s_interningManager.intern(new DataUnionOf(new HashSet<DataRange>(Arrays.asList(dataRanges))));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -105,12 +102,8 @@ public class DataUnionOf extends AbstractExtendedOWLObject implements DataRange 
             unbound.addAll(dataRange.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (DataRange dataRange : m_dataRanges)
             dataRange.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (DataRange dataRange : m_dataRanges)
-            dataRange.applyVariableBindings(variablesToBindings);
     }
 }

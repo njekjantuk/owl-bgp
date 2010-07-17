@@ -1,68 +1,74 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import java.util.Set;
+
+import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Axiom;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TypeAxiomHandler extends BuiltInTypeHandler {
 
     public TypeAxiomHandler(OWLRDFConsumer consumer) {
         super(consumer, Vocabulary.OWL_AXIOM.getIRI());
     }
-    public TypeAxiomHandler(OWLRDFConsumer consumer, String typeIRI) {
+    public TypeAxiomHandler(OWLRDFConsumer consumer, IRI typeIRI) {
         super(consumer, typeIRI);
     }
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         // We can't handle this is a streaming fashion, because we can't
         // be sure that the subject, predicate, object triples have been parsed.
         return false;
     }
-    protected String getTargetTriplePredicate() {
+    protected Identifier getTargetTriplePredicate() {
         return Vocabulary.OWL_ANNOTATED_TARGET.getIRI();
     }
-    protected String getPropertyTriplePredicate() {
+    protected Identifier getPropertyTriplePredicate() {
         return Vocabulary.OWL_ANNOTATED_PROPERTY.getIRI();
     }
-    protected String getSourceTriplePredicate() {
+    protected Identifier getSourceTriplePredicate() {
         return Vocabulary.OWL_ANNOTATED_SOURCE.getIRI();
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumeTriple(subject, predicate, object);
-        String annotatedSource=getObjectOfSourceTriple(subject);
-        String annotatedProperty=getObjectOfPropertyTriple(subject);
-        String annotatedTarget=getObjectOfTargetTriple(subject);
+        Identifier annotatedSource=getObjectOfSourceTriple(subject);
+        Identifier annotatedProperty=getObjectOfPropertyTriple(subject);
+        Identifier annotatedTarget=getObjectOfTargetTriple(subject);
         ILiteral annotatedTargetLiteral=null;
         if (annotatedTarget==null) annotatedTargetLiteral=getTargetLiteral(subject);
-        consumer.translateAnnotations(subject);
-        if (annotatedTarget != null)
+        Set<Annotation> annotations=consumer.translateAnnotations(subject);
+        consumer.setPendingAnnotations(annotations);
+        if (annotatedTarget!=null)
             consumer.handle(annotatedSource, annotatedProperty, annotatedTarget);
         else
             consumer.handle(annotatedSource, annotatedProperty, annotatedTargetLiteral);
+        if (!annotations.isEmpty()) {
+            Axiom ax=consumer.getLastAddedAxiom();
+            consumer.removeAxiom(ax.getAxiomWithoutAnnotations());
+        }
     }
-    protected Axiom handleAxiomTriples(String subjectTriple, String predicateTriple, String objectTriple) {
+    protected Axiom handleAxiomTriples(Identifier subjectTriple, Identifier predicateTriple, Identifier objectTriple) {
         return consumer.getLastAddedAxiom();
     }
-    protected Axiom handleAxiomTriples(String subjectTripleObject, String predicateTripleObject, ILiteral con) {
+    protected Axiom handleAxiomTriples(Identifier subjectTripleObject, Identifier predicateTripleObject, ILiteral con) {
         consumer.handle(subjectTripleObject, predicateTripleObject, con);
         return consumer.getLastAddedAxiom();
     }
-    protected ILiteral getTargetLiteral(String subject) {
+    protected ILiteral getTargetLiteral(Identifier subject) {
         ILiteral con=consumer.getLiteralObject(subject, getTargetTriplePredicate(), true);
-        if (con==null) con=consumer.getLiteralObject(subject, Vocabulary.RDF_OBJECT.getIRI(), true);
         return con;
     }
-    protected String  getObjectOfTargetTriple(String  mainNode) {
-        String objectTripleObject=consumer.getResourceObject(mainNode, getTargetTriplePredicate(), true);
-        if (objectTripleObject==null) objectTripleObject = consumer.getResourceObject(mainNode, Vocabulary.RDF_OBJECT.getIRI(), true);
+    protected Identifier  getObjectOfTargetTriple(Identifier  mainNode) {
+        Identifier objectTripleObject=consumer.getResourceObject(mainNode, getTargetTriplePredicate(), true);
         return objectTripleObject;
     }
-    protected String getObjectOfPropertyTriple(String subject) {
-        String predicateTripleObject=consumer.getResourceObject(subject, getPropertyTriplePredicate(), true);
-        if (predicateTripleObject==null) predicateTripleObject = consumer.getResourceObject(subject, Vocabulary.RDF_PREDICATE.getIRI(), true);
+    protected Identifier getObjectOfPropertyTriple(Identifier subject) {
+        Identifier predicateTripleObject=consumer.getResourceObject(subject, getPropertyTriplePredicate(), true);
         return predicateTripleObject;
     }
-    protected String getObjectOfSourceTriple(String mainNode) {
-        String subjectTripleObject=consumer.getResourceObject(mainNode, getSourceTriplePredicate(), true);
-        if (subjectTripleObject==null) subjectTripleObject = consumer.getResourceObject(mainNode, Vocabulary.RDF_SUBJECT.getIRI(), true);
+    protected Identifier getObjectOfSourceTriple(Identifier mainNode) {
+        Identifier subjectTripleObject=consumer.getResourceObject(mainNode, getSourceTriplePredicate(), true);
         return subjectTripleObject;
     }
 }

@@ -18,41 +18,44 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
-
 
 public class IndividualVariable extends Variable implements Individual {
     private static final long serialVersionUID = 7157759527436797847L;
 
     protected static InterningManager<IndividualVariable> s_interningManager=new InterningManager<IndividualVariable>() {
         protected boolean equal(IndividualVariable object1,IndividualVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(IndividualVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=31;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected IndividualVariable(String variable) {
-        super(variable);
+    protected IndividualVariable(String variable,Atomic binding) {
+        super(variable,binding);
     }
     public Individual getBindingAsExtendedOWLObject() {
-        if (m_binding==null) return null;
-        if (m_binding.startsWith("_:")) return AnonymousIndividual.create(m_binding);
-        else return NamedIndividual.create(m_binding);
+        return (Individual)m_binding;
     }
-    public void setBinding(Individual binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_binding=binding.getIdentifier();
+        if (binding instanceof Individual) m_binding=binding;
+        else throw new RuntimeException("Error: Only individuals can be assigned to individual variables, but individual variable "+m_variable+" was assigned the non-individual "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static IndividualVariable create(String iri) {
-        return s_interningManager.intern(new IndividualVariable(iri));
+    public static IndividualVariable create(String variable) {
+        return IndividualVariable.create(variable,null);
+    }
+    public static IndividualVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new IndividualVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -70,13 +73,13 @@ public class IndividualVariable extends Variable implements Individual {
         if (m_binding==null&&(varType==null||varType==VarType.INDIVIDUAL)) variables.add(this);
         return variables;
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            m_binding=null;
-        else if (!(binding instanceof Individual))
-            throw new RuntimeException("Error: Only individuals can be assigned to individual variables, but individual variable "+m_variable+" was assigned the non-individual "+binding);
-        else 
-            m_binding=((Individual)variablesToBindings.get(this)).getIdentifier();
-    }
+//    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
+//        ExtendedOWLObject binding=variablesToBindings.get(this);
+//        if (binding==null)
+//            m_binding=null;
+//        else if (!(binding instanceof Individual))
+//            throw new RuntimeException("Error: Only individuals can be assigned to individual variables, but individual variable "+m_variable+" was assigned the non-individual "+binding);
+//        else 
+//            m_binding=((Individual)variablesToBindings.get(this)).getIdentifier();
+//    }
 }

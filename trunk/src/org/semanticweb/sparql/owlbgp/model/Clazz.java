@@ -23,7 +23,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
-public class Clazz extends AbstractExtendedOWLObject implements ClassExpression {
+public class Clazz extends AbstractExtendedOWLObject implements ClassExpression, Atomic {
     private static final long serialVersionUID = -8150996806174432055L;
 
     protected static InterningManager<Clazz> s_interningManager=new InterningManager<Clazz>() {
@@ -35,27 +35,33 @@ public class Clazz extends AbstractExtendedOWLObject implements ClassExpression 
         }
     };
     
-    public static final Clazz THING=create("http://www.w3.org/2002/07/owl#Thing");
-    public static final Clazz NOTHING=create("http://www.w3.org/2002/07/owl#Nothing");
+    public static final Clazz THING=create(IRI.create("http://www.w3.org/2002/07/owl#Thing"));
+    public static final Clazz NOTHING=create(IRI.create("http://www.w3.org/2002/07/owl#Nothing"));
     
-    protected final String m_iri;
+    protected final IRI m_iri;
    
-    protected Clazz(String iri) {
-        m_iri=iri.intern();
+    protected Clazz(IRI iri) {
+        m_iri=iri;
     }
     public String getIRIString() {
+        return m_iri.m_iri;
+    }
+    public IRI getIRI() {
         return m_iri;
     }
     public String toString(Prefixes prefixes) {
-        return prefixes.abbreviateIRI(m_iri);
+        return m_iri.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static Clazz create(String iri) {
+    public static Clazz create(String iriString) {
+        return create(IRI.create(iriString));
+    }
+    public static Clazz create(IRI iri) {
         return s_interningManager.intern(new Clazz(iri));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return m_iri;
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

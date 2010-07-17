@@ -65,9 +65,6 @@ public class DataSomeValuesFrom extends AbstractExtendedOWLObject implements Cla
     public static DataSomeValuesFrom create(DataPropertyExpression dpe,DataRange dataRange) {
         return s_interningManager.intern(new DataSomeValuesFrom(dpe,dataRange));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -86,12 +83,8 @@ public class DataSomeValuesFrom extends AbstractExtendedOWLObject implements Cla
         unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_dpe.applyBindings(variablesToBindings);
         m_dataRange.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_dpe.applyVariableBindings(variablesToBindings);
-        m_dataRange.applyVariableBindings(variablesToBindings);
     }
 }

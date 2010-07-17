@@ -5,24 +5,29 @@ import java.io.StringReader;
 import java.util.Set;
 
 import org.coode.string.EscapeUtils;
+import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.Axiom;
 import org.semanticweb.sparql.owlbgp.model.Datatype;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
+import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
 
 public class OWLBGPParser implements OWLBGPParserConstants {
 
     public static final String LB = System.getProperty("line.separator") ;
 
-    protected String base;
+    protected Identifier base;
     protected int blankNodeId=0;
     protected final TripleHandler handler=new OWLRDFConsumerAdapter();
     protected final Prefixes pm=new Prefixes();
     {
         pm.declareSemanticWebPrefixes();
     }
-    
-    public OWLBGPParser(StringReader reader, Set<String> classes, Set<String> objectProperties, Set<String> dataProperties, Set<String> individuals, Set<String> customDatatypes) {
+
+    public OWLBGPParser(StringReader reader, Set<Identifier> classes, Set<Identifier> objectProperties, Set<Identifier> dataProperties, Set<Identifier> individuals, Set<Identifier> customDatatypes) {
          this(reader);
          handler.setClassesInOntologySignature(classes);
          handler.setObjectPropertiesInOntologySignature(objectProperties);
@@ -30,52 +35,54 @@ public class OWLBGPParser implements OWLBGPParserConstants {
          handler.setIndividualsInOntologySignature(individuals);
          handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-    public void setClassesInOntologySignature(Set<String> classes) {
+    public void setClassesInOntologySignature(Set<Identifier> classes) {
         handler.setClassesInOntologySignature(classes);
     }
-    public void setObjectPropertiesInOntologySignature(Set<String> objectProperties) {
+    public void setObjectPropertiesInOntologySignature(Set<Identifier> objectProperties) {
         handler.setObjectPropertiesInOntologySignature(objectProperties);
     }
-    public void setDataPropertiesInOntologySignature(Set<String> dataProperties) {
+    public void setDataPropertiesInOntologySignature(Set<Identifier> dataProperties) {
         handler.setDataPropertiesInOntologySignature(dataProperties);
     }
-    public void setIndividualsInOntologySignature(Set<String> individuals) {
+    public void setIndividualsInOntologySignature(Set<Identifier> individuals) {
         handler.setIndividualsInOntologySignature(individuals);
     }
-    public void setCustomDatatypesInOntologySignature(Set<String> customDatatypes) {
+    public void setCustomDatatypesInOntologySignature(Set<Identifier> customDatatypes) {
         handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
+
     public static void main(String[] args) {
-//        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
+        //<http://example.org/Birte>
+        String s="<http://example.org/Person> rdf:type owl:Class . ?x rdf:type <http://example.org/Person> .";
 
-        String s="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
-        s+= "<http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> a owl:ObjectProperty ."+LB;
-
-        s+= "?prop a owl:ObjectProperty ."+LB
-            + "?class a owl:Class ."+LB
-            + "?conj a owl:Class ."+LB
-            + "?class rdfs:subClassOf ["+LB
-            + "   a owl:Restriction ; "+LB
-            + "   owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB
-            + "   owl:someValuesFrom ["+LB
-            + "      a owl:Class ;"+LB
-            + "      owl:intersectionOf ("+LB
-            + "         ?conj "+LB
-            + "         ["+LB
-            + "            a owl:Restriction ;"+LB
-            + "            owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB //?prop
-            + "            owl:someValuesFrom <http://www.co-ode.org/ontologies/galen#linear> "+LB
-            + "         ]"+LB
-            + "      ) ;"+LB
-            + "   ]"+LB
-            + "] . "+LB
-            + "?conj rdfs:subClassOf ["+LB
-            + "   a owl:Class ; "+LB
-            + "   owl:unionOf ( <http://www.co-ode.org/ontologies/galen#Shape> <http://www.co-ode.org/ontologies/galen#AnatomicalShape> ) . "+LB
-            + "] . "+LB
-            + "?prop a owl:FunctionalProperty . "+LB
-            + "?prop a owl:IrreflexiveProperty . "+LB
-            + "?prop rdfs:subPropertyOf <http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> . ";
+//        String s="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
+//        s+= "<http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> a owl:ObjectProperty ."+LB;
+//
+//        s+= "?prop a owl:ObjectProperty ."+LB
+//            + "?class a owl:Class ."+LB
+//            + "?conj a owl:Class ."+LB
+//            + "?class rdfs:subClassOf ["+LB
+//            + "   a owl:Restriction ; "+LB
+//            + "   owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB
+//            + "   owl:someValuesFrom ["+LB
+//            + "      a owl:Class ;"+LB
+//            + "      owl:intersectionOf ("+LB
+//            + "         ?conj "+LB
+//            + "         ["+LB
+//            + "            a owl:Restriction ;"+LB
+//            + "            owl:onProperty <http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> ; "+LB //?prop
+//            + "            owl:someValuesFrom <http://www.co-ode.org/ontologies/galen#linear> "+LB
+//            + "         ]"+LB
+//            + "      ) ;"+LB
+//            + "   ]"+LB
+//            + "] . "+LB
+//            + "?conj rdfs:subClassOf ["+LB
+//            + "   a owl:Class ; "+LB
+//            + "   owl:unionOf ( <http://www.co-ode.org/ontologies/galen#Shape> <http://www.co-ode.org/ontologies/galen#AnatomicalShape> ) . "+LB
+//            + "] . "+LB
+//            + "?prop a owl:FunctionalProperty . "+LB
+//            + "?prop a owl:IrreflexiveProperty . "+LB
+//            + "?prop rdfs:subPropertyOf <http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> . ";
 //        s+="<http://example.org/Person> rdf:type owl:Class . ?x rdf:type <http://example.org/Person> .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         try {
@@ -87,28 +94,28 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         }
     }
 
-    public boolean isAnonymousNode(String iri) {
-        return iri.startsWith("_:");
+    public boolean isAnonymousNode(Identifier id) {
+        return id.toString().startsWith("_:");
     }
-    public boolean isVariableNode(String iri) {
-        return iri.startsWith("?");
+    public boolean isVariIdentifierde(String iri) {
+        return iri.toString().startsWith("?");
     }
-    protected String getNextBlankNode() {
+    protected String getNextBlankNodeLabel() {
         String identifier="_:bn"+blankNodeId;
         blankNodeId++;
         return identifier;
     }
-    protected String getIRIFromQName(String qname) throws ParseException {
+    protected Identifier getIRIFromQName(String qname) throws ParseException {
         int colonIndex=qname.indexOf(':');
         if (colonIndex==-1) throw new ParseException("Not a valid qname (missing ':') " + qname);
         String prefix=qname.substring(0,colonIndex);
-        if (prefix.equals("_")) return getNextBlankNode()+"_"+qname.substring(colonIndex + 1);
+        if (prefix.equals("_")) return AnonymousIndividual.create(getNextBlankNodeLabel()+"_"+qname.substring(colonIndex + 1));
         if (pm.getPrefixIRI(prefix)==null) throw new ParseException("Prefix not declared: " + prefix);
-        return pm.expandAbbreviatedIRI(qname);
+        return IRI.create(pm.expandAbbreviatedIRI(qname));
     }
-    public String getIRI(String s) {
+    public IRI getIRI(String s) {
         if (s.charAt(0)=='<') s=s.substring(1,s.length()-1);
-        return s.intern();
+        return IRI.create(s);
     }
     public Set<Axiom> getParsedAxioms() {
         return handler.getParsedAxioms();
@@ -131,7 +138,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
   }
 
   final public void parseTriples() throws ParseException {
-    String subject;
+    Identifier subject;
     subject = parseSubject();
     if (jj_2_2(2)) {
       parsePredicateObjectList(subject);
@@ -140,50 +147,48 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
   }
 
-  final public String parseSubject() throws ParseException {
-    String iri;
+  final public Identifier parseSubject() throws ParseException {
+    Identifier identifier;
     if (jj_2_3(2)) {
-      iri = parseResource();
+      identifier = parseResource();
     } else if (jj_2_4(2)) {
-      iri = parseBlankNode();
+      identifier = parseBlankNode();
     } else if (jj_2_5(2)) {
-      iri = parseVariable();
+      identifier = parseVariable();
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
-        {if (true) return iri;}
+        {if (true) return identifier;}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseAbbreviatedIRI() throws ParseException {
-    String iri;
+  final public Identifier parseAbbreviatedIRI() throws ParseException {
     Token t;
     t = jj_consume_token(PNAME_LN);
         {if (true) return getIRIFromQName(t.image);}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseIRI() throws ParseException {
+  final public IRI parseIRI() throws ParseException {
     Token t;
-    String iri;
     t = jj_consume_token(FULLIRI);
                  {if (true) return getIRI(t.image);}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseBlankNode() throws ParseException {
-    String iri = null;
+  final public AnonymousIndividual parseBlankNode() throws ParseException {
+    AnonymousIndividual ind=null;
     if (jj_2_8(2)) {
-      iri = parseNodeID();
+      ind = parseNodeID();
     } else if (jj_2_9(2)) {
       jj_consume_token(NODEID);
-             iri = getNextBlankNode();
+             ind=AnonymousIndividual.create(getNextBlankNodeLabel());
     } else if (jj_2_10(2)) {
       jj_consume_token(OPEN_SQUARE_BRACKET);
       if (jj_2_7(2)) {
-                            iri = getNextBlankNode();
-        parsePredicateObjectList(iri);
+                            ind=AnonymousIndividual.create(getNextBlankNodeLabel());
+        parsePredicateObjectList(ind);
         if (jj_2_6(2)) {
           jj_consume_token(DOT);
         } else {
@@ -193,34 +198,34 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         ;
       }
       jj_consume_token(CLOSE_SQUARE_BRACKET);
-                                                                                                                        if (iri == null) {iri = getNextBlankNode(); }
+                                                                                                                                                       if (ind==null) {ind=AnonymousIndividual.create(getNextBlankNodeLabel()); }
     } else if (jj_2_11(2)) {
-      iri = parseCollection();
+      ind = parseCollection();
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
-        {if (true) return iri;}
+        {if (true) return ind;}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseNodeID() throws ParseException {
+  final public AnonymousIndividual parseNodeID() throws ParseException {
     Token t;
     t = jj_consume_token(NODEID);
-        {if (true) return getIRIFromQName(t.image);}
+        {if (true) return (AnonymousIndividual)getIRIFromQName(t.image);}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseVariable() throws ParseException {
-    String iri;
+  final public Variable parseVariable() throws ParseException {
+    Variable var;
     Token t;
     t = jj_consume_token(VAR);
-        {if (true) return t.image;}
+        {if (true) return UntypedVariable.create(t.image);}
     throw new Error("Missing return statement in function");
   }
 
-  final public void parsePredicateObjectList(String subject) throws ParseException {
-    String predicate;
+  final public void parsePredicateObjectList(Identifier subject) throws ParseException {
+    Identifier predicate;
     predicate = parseVerb();
     parseObjectList(subject, predicate);
     label_2:
@@ -241,8 +246,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
   }
 
-  final public String parseVerb() throws ParseException {
-    String iri;
+  final public Identifier parseVerb() throws ParseException {
+    Identifier iri;
     if (jj_2_14(2)) {
       jj_consume_token(A);
          iri = Vocabulary.RDF_TYPE.getIRI();
@@ -256,8 +261,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public String parsePredicate() throws ParseException {
-    String iri;
+  final public Identifier parsePredicate() throws ParseException {
+    Identifier iri;
     if (jj_2_16(2)) {
       iri = parseResource();
     } else if (jj_2_17(2)) {
@@ -270,8 +275,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseResource() throws ParseException {
-    String iri;
+  final public Identifier parseResource() throws ParseException {
+    Identifier iri;
     if (jj_2_18(2)) {
       iri = parseIRI();
     } else if (jj_2_19(2)) {
@@ -284,7 +289,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void parseObjectList(String subject, String predicate) throws ParseException {
+  final public void parseObjectList(Identifier subject, Identifier predicate) throws ParseException {
     parseObject(subject, predicate);
     label_3:
     while (true) {
@@ -298,8 +303,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
   }
 
-  final public void parseObject(String subject, String predicate) throws ParseException {
-    String resObject;
+  final public void parseObject(Identifier subject, Identifier predicate) throws ParseException {
+    Identifier resObject;
     if (jj_2_25(2)) {
       parseLiteral(subject, predicate);
     } else if (jj_2_26(2)) {
@@ -325,26 +330,26 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
   }
 
-  final public String parseCollection() throws ParseException {
-    String iri;
+  final public AnonymousIndividual parseCollection() throws ParseException {
+    AnonymousIndividual identifier;
     jj_consume_token(OPENPAR);
-    iri = parseItemList();
+    identifier = parseItemList();
     jj_consume_token(CLOSEPAR);
-        {if (true) return iri;}
+        {if (true) return identifier;}
     throw new Error("Missing return statement in function");
   }
 
-  final public String parseItemList() throws ParseException {
+  final public AnonymousIndividual parseItemList() throws ParseException {
     //  _x  rdf:type rdf:List
     //  _x  rdf:first
     //  _x  rdf:next
-    String firstSubject = null;
-    String subject = null;
-    String type = Vocabulary.RDF_TYPE.getIRI();
-    String first = Vocabulary.RDF_FIRST.getIRI();
-    String rest = Vocabulary.RDF_REST.getIRI();
-    String list = Vocabulary.RDF_LIST.getIRI();
-    String nil = Vocabulary.RDF_NIL.getIRI();
+    AnonymousIndividual firstSubject=null;
+    AnonymousIndividual subject=null;
+    Identifier type=Vocabulary.RDF_TYPE.getIRI();
+    Identifier first=Vocabulary.RDF_FIRST.getIRI();
+    Identifier rest=Vocabulary.RDF_REST.getIRI();
+    Identifier list=Vocabulary.RDF_LIST.getIRI();
+    Identifier nil=Vocabulary.RDF_NIL.getIRI();
     label_4:
     while (true) {
       if (jj_2_27(2)) {
@@ -352,14 +357,10 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       } else {
         break label_4;
       }
-        String prevSubject = subject;
-        subject=getNextBlankNode();
-        if (prevSubject != null) {
-            handler.handleTriple(prevSubject, rest, subject);
-        }
-        else {
-            firstSubject = subject;
-        }
+        AnonymousIndividual prevSubject = subject;
+        subject=AnonymousIndividual.create(getNextBlankNodeLabel());
+        if (prevSubject!=null) handler.handleTriple(prevSubject, rest, subject);
+        else firstSubject=subject;
         handler.handleTriple(subject, type, list);
       parseObject(subject, first);
     }
@@ -369,21 +370,22 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  final public void parseLiteral(String subject, String predicate) throws ParseException {
-    String literal;
+  final public void parseLiteral(Identifier subject, Identifier predicate) throws ParseException {
+    String lexicalForm;
     String lang=null;
-    String datatype=null;
+    Identifier datatypeIdentifier=null;
+    Datatype dt=null;
     Token t;
     if (jj_2_31(2)) {
-      literal = parseQuotedString();
+      lexicalForm = parseQuotedString();
       if (jj_2_30(2)) {
         if (jj_2_28(2)) {
           jj_consume_token(DOUBLE_CARET);
-          datatype = parseResource();
+          datatypeIdentifier = parseResource();
         } else if (jj_2_29(2)) {
           jj_consume_token(AT);
           t = jj_consume_token(PN_LOCAL);
-                                                                                                    lang=t.image;
+                                                                                                                  lang=t.image;
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -391,21 +393,22 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       } else {
         ;
       }
-      if (datatype==null) datatype=Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral";
+      if (datatypeIdentifier==null) dt=Datatype.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"));
+      else dt=Datatype.create((IRI)datatypeIdentifier);
       if (lang==null) lang="";
-      handler.handleLiteralTriple(subject, predicate, literal, lang, Datatype.create(datatype));
+      handler.handleLiteralTriple(subject, predicate, lexicalForm, lang, dt);
     } else if (jj_2_32(2)) {
-      literal = parseInteger();
-                            handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.INTEGER.getDatatype());
+      lexicalForm = parseInteger();
+                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.INTEGER.getDatatype());
     } else if (jj_2_33(2)) {
-      literal = parseDouble();
-                           handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.DOUBLE.getDatatype());
+      lexicalForm = parseDouble();
+                               handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DOUBLE.getDatatype());
     } else if (jj_2_34(2)) {
-      literal = parseDecimal();
-                            handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.DECIMAL.getDatatype());
+      lexicalForm = parseDecimal();
+                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DECIMAL.getDatatype());
     } else if (jj_2_35(2)) {
-      literal = parseBoolean();
-                            handler.handleLiteralTriple(subject, predicate, literal, "", OWL2_DATATYPES.BOOLEAN.getDatatype());
+      lexicalForm = parseBoolean();
+                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.BOOLEAN.getDatatype());
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -766,13 +769,293 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     finally { jj_save(40, xla); }
   }
 
-  private boolean jj_3_18() {
-    if (jj_3R_14()) return true;
+  private boolean jj_3_41() {
+    if (jj_scan_token(LONG_STRING)) return true;
     return false;
   }
 
-  private boolean jj_3_35() {
-    if (jj_3R_22()) return true;
+  private boolean jj_3R_6() {
+    if (jj_3R_12()) return true;
+    if (jj_3R_24()) return true;
+    return false;
+  }
+
+  private boolean jj_3_40() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_40()) {
+    jj_scanpos = xsp;
+    if (jj_3_41()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_5() {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_9() {
+    if (jj_scan_token(VAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_7() {
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3_27() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_25() {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3_27()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_39() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_18() {
+    if (jj_3R_26()) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
+    if (jj_scan_token(DOT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_10() {
+    if (jj_scan_token(NODEID)) return true;
+    return false;
+  }
+
+  private boolean jj_3_20() {
+    if (jj_scan_token(COMMA)) return true;
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3_38() {
+    if (jj_scan_token(TRUE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_38()) {
+    jj_scanpos = xsp;
+    if (jj_3_39()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_11() {
+    if (jj_3R_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_11() {
+    if (jj_scan_token(OPENPAR)) return true;
+    if (jj_3R_25()) return true;
+    if (jj_scan_token(CLOSEPAR)) return true;
+    return false;
+  }
+
+  private boolean jj_3_10() {
+    if (jj_scan_token(OPEN_SQUARE_BRACKET)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_7()) jj_scanpos = xsp;
+    if (jj_scan_token(CLOSE_SQUARE_BRACKET)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_21() {
+    if (jj_scan_token(DECIMAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_9() {
+    if (jj_scan_token(NODEID)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4() {
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3_12() {
+    if (jj_scan_token(SEMICOLON)) return true;
+    if (jj_3R_12()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8() {
+    if (jj_3R_10()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_8() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_8()) {
+    jj_scanpos = xsp;
+    if (jj_3_9()) {
+    jj_scanpos = xsp;
+    if (jj_3_10()) {
+    jj_scanpos = xsp;
+    if (jj_3_11()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3_24() {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3_15() {
+    if (jj_3R_13()) return true;
+    return false;
+  }
+
+  private boolean jj_3_21() {
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3_22() {
+    if (jj_3R_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_20() {
+    if (jj_scan_token(DOUBLE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_14() {
+    if (jj_scan_token(FULLIRI)) return true;
+    return false;
+  }
+
+  private boolean jj_3_23() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_21()) {
+    jj_scanpos = xsp;
+    if (jj_3_22()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_23()) {
+    jj_scanpos = xsp;
+    if (jj_3_24()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_25() {
+    if (jj_3R_17()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_16() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_25()) {
+    jj_scanpos = xsp;
+    if (jj_3_26()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_19() {
+    if (jj_3R_15()) return true;
+    return false;
+  }
+
+  private boolean jj_3_28() {
+    if (jj_scan_token(DOUBLE_CARET)) return true;
+    if (jj_3R_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3_30() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_28()) {
+    jj_scanpos = xsp;
+    if (jj_3_29()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_17() {
+    if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_15() {
+    if (jj_scan_token(PNAME_LN)) return true;
+    return false;
+  }
+
+  private boolean jj_3_37() {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
+  private boolean jj_3_13() {
+    if (jj_scan_token(SEMICOLON)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_24() {
+    if (jj_3R_16()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_36()) {
+    jj_scanpos = xsp;
+    if (jj_3_37()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_36() {
+    if (jj_scan_token(INTEGER)) return true;
     return false;
   }
 
@@ -794,6 +1077,17 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_1() {
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3_18() {
+    if (jj_3R_14()) return true;
+    return false;
+  }
+
   private boolean jj_3R_7() {
     Token xsp;
     xsp = jj_scanpos;
@@ -804,9 +1098,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_1() {
-    if (jj_scan_token(DOT)) return true;
-    if (jj_3R_5()) return true;
+  private boolean jj_3_35() {
+    if (jj_3R_22()) return true;
     return false;
   }
 
@@ -820,13 +1113,13 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_32() {
-    if (jj_3R_19()) return true;
+  private boolean jj_3R_5() {
+    if (jj_3R_23()) return true;
     return false;
   }
 
-  private boolean jj_3R_5() {
-    if (jj_3R_23()) return true;
+  private boolean jj_3_32() {
+    if (jj_3R_19()) return true;
     return false;
   }
 
@@ -887,299 +1180,9 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_41() {
-    if (jj_scan_token(LONG_STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_6() {
-    if (jj_3R_12()) return true;
-    if (jj_3R_24()) return true;
-    return false;
-  }
-
-  private boolean jj_3_40() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_40()) {
-    jj_scanpos = xsp;
-    if (jj_3_41()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3_29() {
     if (jj_scan_token(AT)) return true;
     if (jj_scan_token(PN_LOCAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
-    if (jj_scan_token(VAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3_7() {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
-  private boolean jj_3_39() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_27() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_25() {
-    Token xsp;
-    while (true) {
-      xsp = jj_scanpos;
-      if (jj_3_27()) { jj_scanpos = xsp; break; }
-    }
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    if (jj_3R_26()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_10() {
-    if (jj_scan_token(NODEID)) return true;
-    return false;
-  }
-
-  private boolean jj_3_5() {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3_38() {
-    if (jj_scan_token(TRUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_20() {
-    if (jj_scan_token(COMMA)) return true;
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_38()) {
-    jj_scanpos = xsp;
-    if (jj_3_39()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_11() {
-    if (jj_3R_11()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_11() {
-    if (jj_scan_token(OPENPAR)) return true;
-    if (jj_3R_25()) return true;
-    if (jj_scan_token(CLOSEPAR)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_scan_token(DECIMAL)) return true;
-    return false;
-  }
-
-  private boolean jj_3_10() {
-    if (jj_scan_token(OPEN_SQUARE_BRACKET)) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_7()) jj_scanpos = xsp;
-    if (jj_scan_token(CLOSE_SQUARE_BRACKET)) return true;
-    return false;
-  }
-
-  private boolean jj_3_9() {
-    if (jj_scan_token(NODEID)) return true;
-    return false;
-  }
-
-  private boolean jj_3_12() {
-    if (jj_scan_token(SEMICOLON)) return true;
-    if (jj_3R_12()) return true;
-    return false;
-  }
-
-  private boolean jj_3_8() {
-    if (jj_3R_10()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_8() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_8()) {
-    jj_scanpos = xsp;
-    if (jj_3_9()) {
-    jj_scanpos = xsp;
-    if (jj_3_10()) {
-    jj_scanpos = xsp;
-    if (jj_3_11()) return true;
-    }
-    }
-    }
-    return false;
-  }
-
-  private boolean jj_3_24() {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
-    if (jj_scan_token(DOUBLE)) return true;
-    return false;
-  }
-
-  private boolean jj_3_15() {
-    if (jj_3R_13()) return true;
-    return false;
-  }
-
-  private boolean jj_3_4() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3_21() {
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3_22() {
-    if (jj_3R_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_14() {
-    if (jj_scan_token(FULLIRI)) return true;
-    return false;
-  }
-
-  private boolean jj_3_23() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_21()) {
-    jj_scanpos = xsp;
-    if (jj_3_22()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_6() {
-    if (jj_scan_token(DOT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_26() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_23()) {
-    jj_scanpos = xsp;
-    if (jj_3_24()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_25() {
-    if (jj_3R_17()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_16() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_25()) {
-    jj_scanpos = xsp;
-    if (jj_3_26()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_2() {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
-  private boolean jj_3_19() {
-    if (jj_3R_15()) return true;
-    return false;
-  }
-
-  private boolean jj_3_28() {
-    if (jj_scan_token(DOUBLE_CARET)) return true;
-    if (jj_3R_7()) return true;
-    return false;
-  }
-
-  private boolean jj_3_30() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_28()) {
-    jj_scanpos = xsp;
-    if (jj_3_29()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_37() {
-    if (jj_scan_token(DIGIT)) return true;
-    return false;
-  }
-
-  private boolean jj_3_17() {
-    if (jj_3R_9()) return true;
-    return false;
-  }
-
-  private boolean jj_3_13() {
-    if (jj_scan_token(SEMICOLON)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_24() {
-    if (jj_3R_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_15() {
-    if (jj_scan_token(PNAME_LN)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_36() {
-    if (jj_scan_token(INTEGER)) return true;
     return false;
   }
 

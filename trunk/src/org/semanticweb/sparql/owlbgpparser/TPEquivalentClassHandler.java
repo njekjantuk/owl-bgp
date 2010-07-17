@@ -8,6 +8,8 @@ import org.semanticweb.sparql.owlbgp.model.DataRange;
 import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.DatatypeDefinition;
 import org.semanticweb.sparql.owlbgp.model.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TPEquivalentClassHandler extends TriplePredicateHandler {
 
@@ -15,15 +17,15 @@ public class TPEquivalentClassHandler extends TriplePredicateHandler {
         super(consumer, Vocabulary.OWL_EQUIVALENT_CLASS.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         // Can handle when streaming if the subject or object are named
         boolean named = (consumer.isClass(subject)) && !isSubjectOrObjectAnonymous(subject, object);
         return named || consumer.getClassExpressionIfTranslated(subject)!=null && consumer.getClassExpressionIfTranslated(object)!=null;
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         // Can handle because the IRIs can easily be translated to classes
         if (consumer.isDataRange(object) || consumer.isDataRange(subject)) {
-            Datatype datatype=Datatype.create(subject);
+            Datatype datatype=Datatype.create((IRI)subject);
             DataRange dataRange=consumer.translateDataRange(object);
             addAxiom(DatatypeDefinition.create(datatype, dataRange));
         } else {

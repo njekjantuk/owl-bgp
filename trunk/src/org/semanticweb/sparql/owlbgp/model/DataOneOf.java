@@ -83,9 +83,6 @@ public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
     public static DataOneOf create(ILiteral... literals) {
         return s_interningManager.intern(new DataOneOf(new HashSet<ILiteral>(Arrays.asList(literals))));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -105,12 +102,8 @@ public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
             unbound.addAll(literal.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (ILiteral literal : m_enumeration)
             literal.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (ILiteral literal : m_enumeration)
-            literal.applyVariableBindings(variablesToBindings);
     }
 }

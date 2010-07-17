@@ -18,7 +18,7 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 
-public interface ILiteral extends ExtendedOWLObject {
+public interface ILiteral extends AnnotationValue, Atomic {
     public String getLexicalForm();
     public String getLangTag();
     public Datatype getDatatype();

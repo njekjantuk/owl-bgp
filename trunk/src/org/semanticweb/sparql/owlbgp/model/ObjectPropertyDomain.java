@@ -29,19 +29,37 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
 
     protected static InterningManager<ObjectPropertyDomain> s_interningManager=new InterningManager<ObjectPropertyDomain>() {
         protected boolean equal(ObjectPropertyDomain object1,ObjectPropertyDomain object2) {
-            return object1.m_ope==object2.m_ope && object1.m_classExpression==object2.m_classExpression;
+            if (object1.m_ope!=object2.m_ope
+                || object1.m_classExpression!=object2.m_classExpression
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(ObjectPropertyDomain object) {
-            return 43+11*object.m_ope.hashCode()+17*object.m_classExpression.hashCode();
+            int hashCode=43+11*object.m_ope.hashCode()+17*object.m_classExpression.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
     protected final ClassExpression m_classExpression;
    
-    protected ObjectPropertyDomain(ObjectPropertyExpression ope,ClassExpression classExpression) {
+    protected ObjectPropertyDomain(ObjectPropertyExpression ope,ClassExpression classExpression,Set<Annotation> annotations) {
         m_ope=ope;
         m_classExpression=classExpression;
+        m_annotations=annotations;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
@@ -52,6 +70,7 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectPropertyDomain(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_ope.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_classExpression.toString(prefixes));
@@ -62,10 +81,10 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
         return s_interningManager.intern(this);
     }
     public static ObjectPropertyDomain create(ObjectPropertyExpression ope,ClassExpression classExpression) {
-        return s_interningManager.intern(new ObjectPropertyDomain(ope,classExpression));
+        return ObjectPropertyDomain.create(ope,classExpression,new HashSet<Annotation>());
     }
-    public String getIdentifier() {
-        return null;
+    public static ObjectPropertyDomain create(ObjectPropertyExpression ope,ClassExpression classExpression,Set<Annotation> annotations) {
+        return s_interningManager.intern(new ObjectPropertyDomain(ope,classExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -77,20 +96,21 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ope.getVariablesInSignature(varType));
         variables.addAll(m_classExpression.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
         m_classExpression.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
-        m_classExpression.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return ObjectPropertyDomain.create(m_ope, m_classExpression);
     }
 }

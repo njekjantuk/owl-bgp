@@ -29,27 +29,27 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
 
     protected static InterningManager<Annotation> s_interningManager=new InterningManager<Annotation>() {
         protected boolean equal(Annotation object1,Annotation object2) {
-            return object1.m_ap==object2.m_ap && object1.m_value==object2.m_value;
+            return object1.m_annotationProperty==object2.m_annotationProperty && object1.m_annotationValue==object2.m_annotationValue;
         }
         protected int getHashCode(Annotation object) {
-            return 7*object.m_ap.hashCode()+13*object.m_value.hashCode();
+            return 7*object.m_annotationProperty.hashCode()+13*object.m_annotationValue.hashCode();
         }
     };
     
-    protected final AnnotationProperty m_ap;
-    protected final AnnotationValue m_value;
+    protected final AnnotationPropertyExpression m_annotationProperty;
+    protected final AnnotationValue m_annotationValue;
     protected final Set<Annotation> m_annotations;
     
-    protected Annotation(AnnotationProperty annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
-        m_ap=annotationProperty;
-        m_value=annotationValue;
+    protected Annotation(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
+        m_annotationProperty=annotationProperty;
+        m_annotationValue=annotationValue;
         m_annotations=annotations;
     }
-    public AnnotationProperty getAnnotationProperty() {
-        return m_ap;
+    public AnnotationPropertyExpression getAnnotationProperty() {
+        return m_annotationProperty;
     }
     public AnnotationValue getAnnotationValue() {
-        return m_value;
+        return m_annotationValue;
     }
     public Set<Annotation> getAnnotations() {
         return m_annotations;
@@ -63,22 +63,22 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
             else notFirst=true;
             sb.append(anno.toString(prefixes));
         }
-        sb.append(m_ap.toString(prefixes));
+        sb.append(m_annotationProperty.toString(prefixes));
         sb.append(" ");
-        sb.append(m_value.toString(prefixes));
+        sb.append(m_annotationValue.toString(prefixes));
         sb.append(")");
         return sb.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static Annotation create(AnnotationProperty annotationProperty,AnnotationValue annotationValue) {
-        return s_interningManager.intern(new Annotation(annotationProperty,annotationValue,new HashSet<Annotation>()));
+    public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue) {
+        return Annotation.create(annotationProperty,annotationValue,new HashSet<Annotation>());
     }
-    public static Annotation create(AnnotationProperty annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
+    public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
         return s_interningManager.intern(new Annotation(annotationProperty,annotationValue,annotations));
     }
-    public String getIdentifier() {
+    public Identifier getIdentifier() {
         return null;
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
@@ -89,22 +89,18 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ap.getVariablesInSignature(varType));
-        variables.addAll(m_value.getVariablesInSignature(varType));
+        variables.addAll(m_annotationProperty.getVariablesInSignature(varType));
+        variables.addAll(m_annotationValue.getVariablesInSignature(varType));
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
-        unbound.addAll(m_ap.getUnboundVariablesInSignature(varType));
-        unbound.addAll(m_value.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_annotationProperty.getUnboundVariablesInSignature(varType));
+        unbound.addAll(m_annotationValue.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
-        m_ap.applyBindings(variablesToBindings);
-        m_value.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ap.applyVariableBindings(variablesToBindings);
-        m_value.applyVariableBindings(variablesToBindings);
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
+        m_annotationProperty.applyBindings(variablesToBindings);
+        m_annotationValue.applyBindings(variablesToBindings);
     }
 }

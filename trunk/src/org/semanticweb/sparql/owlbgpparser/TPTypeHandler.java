@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassAssertion;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TPTypeHandler extends TriplePredicateHandler {
 
@@ -8,14 +9,14 @@ public class TPTypeHandler extends TriplePredicateHandler {
         super(consumer, Vocabulary.RDF_TYPE.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         // Can handle if object isn't anonymous and either the object
-        // String is owl:Thing, or it is not part of the build in vocabulary
+        // is owl:Thing, or it is not part of the build in vocabulary
         return !consumer.isAnonymousNode(object) &&
                 (object.equals(Vocabulary.OWL_THING.getIRI()) ||
                         !Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object));
     }
-    public void handleTriple(String subject, String predicate, String object) {
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object)) {
             if (!object.equals(Vocabulary.OWL_THING.getIRI())) {
                 // Can't have instance of built in vocabulary!

@@ -12,33 +12,47 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     private static final long serialVersionUID = -9059227935467720333L;
 
     protected static InterningManager<DisjointDataProperties> s_interningManager=new InterningManager<DisjointDataProperties>() {
-        protected boolean equal(DisjointDataProperties opes1,DisjointDataProperties opes2) {
-            if (opes1.m_dataPropertyExpressions.size()!=opes2.m_dataPropertyExpressions.size())
+        protected boolean equal(DisjointDataProperties object1,DisjointDataProperties object2) {
+            if (object1.m_dataPropertyExpressions.size()!=object2.m_dataPropertyExpressions.size()
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (DataPropertyExpression ope : opes1.m_dataPropertyExpressions) {
-                if (!contains(ope, opes2.m_dataPropertyExpressions))
+            for (DataPropertyExpression ope : object1.m_dataPropertyExpressions) {
+                if (!contains(ope, object2.m_dataPropertyExpressions))
+                    return false;
+            } 
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
         }
-        protected boolean contains(DataPropertyExpression ope,Set<DataPropertyExpression> opes) {
-            for (DataPropertyExpression equiv: opes)
-                if (equiv==ope)
+        protected boolean contains(DataPropertyExpression dpe,Set<DataPropertyExpression> dpes) {
+            for (DataPropertyExpression equiv: dpes)
+                if (equiv==dpe)
                     return true;
             return false;
         }
-        protected int getHashCode(DisjointDataProperties opes) {
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(DisjointDataProperties object) {
             int hashCode=53;
-            for (DataPropertyExpression equiv : opes.m_dataPropertyExpressions)
+            for (DataPropertyExpression equiv : object.m_dataPropertyExpressions)
                 hashCode+=equiv.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
     
     protected final Set<DataPropertyExpression> m_dataPropertyExpressions;
     
-    protected DisjointDataProperties(Set<DataPropertyExpression> dataPropertyExpressions) {
+    protected DisjointDataProperties(Set<DataPropertyExpression> dataPropertyExpressions,Set<Annotation> annotations) {
         m_dataPropertyExpressions=dataPropertyExpressions;
+        m_annotations=annotations;
     }
     public Set<DataPropertyExpression> getDataPropertyExpressions() {
         return m_dataPropertyExpressions;
@@ -46,6 +60,7 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointDataProperties(");
+        writeAnnoations(buffer, prefixes);
         boolean notFirst=false;
         for (DataPropertyExpression equiv : m_dataPropertyExpressions) {
             if (notFirst)
@@ -61,10 +76,13 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
         return s_interningManager.intern(this);
     }
     public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions) {
-        return s_interningManager.intern(new DisjointDataProperties(dataPropertyExpressions));
+        return DisjointDataProperties.create(dataPropertyExpressions,new HashSet<Annotation>());
     }
     public static DisjointDataProperties create(DataPropertyExpression... dataPropertyExpressions) {
-        return s_interningManager.intern(new DisjointDataProperties(new HashSet<DataPropertyExpression>(Arrays.asList(dataPropertyExpressions))));
+        return DisjointDataProperties.create(new HashSet<DataPropertyExpression>(Arrays.asList(dataPropertyExpressions)),new HashSet<Annotation>());
+    }
+    public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DisjointDataProperties(dataPropertyExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -74,24 +92,23 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        for (DataPropertyExpression ope : m_dataPropertyExpressions) {
+        for (DataPropertyExpression ope : m_dataPropertyExpressions)
             variables.addAll(ope.getVariablesInSignature(varType));
-        }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        for (DataPropertyExpression ope : m_dataPropertyExpressions) {
+        for (DataPropertyExpression ope : m_dataPropertyExpressions)
             variables.addAll(ope.getUnboundVariablesInSignature(varType));
-        }
+        getUnboundAnnotationVariables(varType, variables);
         return variables;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (DataPropertyExpression ope : m_dataPropertyExpressions)
             ope.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (DataPropertyExpression ope : m_dataPropertyExpressions)
-            ope.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DisjointDataProperties.create(m_dataPropertyExpressions);
     }
 }

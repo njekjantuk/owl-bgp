@@ -94,6 +94,7 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
         for (ClassExpression classExpression : m_classExpressions) {
             variables.addAll(classExpression.getVariablesInSignature(varType));
         }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
@@ -101,14 +102,14 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
         for (ClassExpression classExpression : m_classExpressions) {
             variables.addAll(classExpression.getUnboundVariablesInSignature(varType));
         }
+        getUnboundAnnotationVariables(varType, variables);
         return variables;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (ClassExpression ce : m_classExpressions)
             ce.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (ClassExpression ce : m_classExpressions)
-            ce.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return DisjointClasses.create(m_classExpressions);
     }
 }

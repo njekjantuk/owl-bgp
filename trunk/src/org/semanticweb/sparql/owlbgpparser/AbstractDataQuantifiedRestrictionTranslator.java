@@ -5,22 +5,25 @@ import org.semanticweb.sparql.owlbgp.model.Clazz;
 import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.DataRange;
 import org.semanticweb.sparql.owlbgp.model.Datatype;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public abstract class AbstractDataQuantifiedRestrictionTranslator extends AbstractDataRestrictionTranslator {
     public AbstractDataQuantifiedRestrictionTranslator(OWLRDFConsumer consumer) {
         super(consumer);
     }
-    protected ClassExpression translateRestriction(String mainNode) {
+    protected ClassExpression translateRestriction(Identifier mainNode) {
         DataPropertyExpression prop=translateOnProperty(mainNode);
-        if (prop == null) return Clazz.create(mainNode);
-        String fillerObject=getResourceObject(mainNode, getFillerTriplePredicate(), true);
+        // TODO: check why we just return a class here
+        if (prop == null) return Clazz.create((IRI)mainNode);
+        Identifier fillerObject=getResourceObject(mainNode, getFillerTriplePredicate(), true);
         DataRange dataRange;
         if (fillerObject != null) 
             dataRange=consumer.translateDataRange(fillerObject);
         else
-            dataRange=Datatype.RDFS_LITERAL;
+            dataRange=Datatype.OWL2_DATATYPES.LITERAL.getDatatype();
         return createRestriction(prop, dataRange);
     }
-    protected abstract String getFillerTriplePredicate();
+    protected abstract Identifier getFillerTriplePredicate();
     protected abstract ClassExpression createRestriction(DataPropertyExpression prop, DataRange filler);
 }

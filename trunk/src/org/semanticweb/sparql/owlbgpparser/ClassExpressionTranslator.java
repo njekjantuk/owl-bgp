@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 /**
  * Give a node in an RDF graph, which represents the main node
@@ -10,5 +11,5 @@ import org.semanticweb.sparql.owlbgp.model.ClassExpression;
  * object.
  */
 public interface ClassExpressionTranslator {
-    ClassExpression translate(String mainNode);
+    ClassExpression translate(Identifier mainNode);
 }

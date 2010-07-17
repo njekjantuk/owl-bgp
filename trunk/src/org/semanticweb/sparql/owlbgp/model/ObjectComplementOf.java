@@ -58,9 +58,6 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     public static ObjectComplementOf create(ClassExpression classExpression) {
         return s_interningManager.intern(new ObjectComplementOf(classExpression));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -77,10 +74,7 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
         unbound.addAll(m_classExpression.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_classExpression.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_classExpression.applyVariableBindings(variablesToBindings);
     }
 }

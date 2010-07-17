@@ -6,20 +6,25 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLAnonymousIndividual;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLEntity;
 import org.semanticweb.owlapi.model.OWLFacetRestriction;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLPropertyExpression;
 import org.semanticweb.owlapi.vocab.OWLFacet;
 
 public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
@@ -28,12 +33,15 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLAPIConverter(OWLDataFactory dataFactory) {
         m_dataFactory=dataFactory;
     }
+    public OWLObject visit(org.semanticweb.sparql.owlbgp.model.IRI iri) {
+        return IRI.create(iri.m_iri);
+    }
     public OWLObject visit(Clazz aClass) {
-        return m_dataFactory.getOWLClass(IRI.create(aClass.m_iri));
+        return m_dataFactory.getOWLClass((IRI)aClass.m_iri.accept(this));
     }
     public OWLObject visit(ClassVariable classVariable) {
         if (classVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+classVariable.m_variable+" is unbound. ");
-        return m_dataFactory.getOWLClass(IRI.create(classVariable.m_binding));
+        return ((Clazz)classVariable.m_binding).accept(this);
     }
     public OWLObject visit(ObjectIntersectionOf objectIntersectionOf) {
         Set<OWLClassExpression> classExpressions=new HashSet<OWLClassExpression>();
@@ -96,53 +104,56 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLDataMaxCardinality(dataMaxCardinality.m_cardinality,(OWLDataPropertyExpression)dataMaxCardinality.m_dpe.accept(this),(OWLDataRange)dataMaxCardinality.m_dataRange.accept(this));
     }
     public OWLObject visit(ObjectProperty objectProperty) {
-        return m_dataFactory.getOWLObjectProperty(IRI.create(objectProperty.m_iri));
+        return m_dataFactory.getOWLObjectProperty((IRI)objectProperty.m_iri.accept(this));
     }
     public OWLObject visit(ObjectInverseOf inverseObjectProperty) {
         return m_dataFactory.getOWLObjectInverseOf((OWLObjectPropertyExpression)inverseObjectProperty.m_op.accept(this));
     }
     public OWLObject visit(ObjectPropertyVariable objectPropertyVariable) {
       if (objectPropertyVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+objectPropertyVariable.m_variable+" is unbound. ");
-      return m_dataFactory.getOWLObjectProperty(IRI.create(objectPropertyVariable.m_binding));
+      return ((ObjectProperty)objectPropertyVariable.m_binding).accept(this);
     }
     public OWLObject visit(DataProperty dataProperty) {
-        return m_dataFactory.getOWLDataProperty(IRI.create(dataProperty.m_iri));
+        return m_dataFactory.getOWLDataProperty((IRI)dataProperty.m_iri.accept(this));
     }
     public OWLObject visit(DataPropertyVariable dataPropertyVariable) {
         if (dataPropertyVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+dataPropertyVariable.m_variable+" is unbound. ");
-        return m_dataFactory.getOWLObjectProperty(IRI.create(dataPropertyVariable.m_binding));
+        return ((DataProperty)dataPropertyVariable.m_binding).accept(this);
     }
     public OWLObject visit(AnnotationProperty annotationProperty) {
-        return m_dataFactory.getOWLAnnotationProperty(IRI.create(annotationProperty.m_iri));
+        return m_dataFactory.getOWLAnnotationProperty((IRI)annotationProperty.m_iri.accept(this));
+    }
+    public OWLObject visit(AnnotationPropertyVariable annotationPropertyVariable) {
+        if (annotationPropertyVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+annotationPropertyVariable.m_variable+" is unbound. ");
+        return ((AnnotationProperty)annotationPropertyVariable.m_binding).accept(this);
     }
     public OWLObject visit(Literal literal) {
         if (literal.m_langTag!=null) return m_dataFactory.getOWLStringLiteral(literal.m_lexicalForm,literal.m_langTag);
         else return m_dataFactory.getOWLTypedLiteral(literal.m_lexicalForm,(OWLDatatype)literal.m_dataDatatype.accept(this));
     }
     public OWLObject visit(LiteralVariable literalVariable) {
-        if (literalVariable.m_literalBinding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+literalVariable.m_variable+" is unbound. ");
-        if (literalVariable.m_literalBinding.getLangTag()!=null) return m_dataFactory.getOWLStringLiteral(literalVariable.m_literalBinding.getLexicalForm(),literalVariable.m_literalBinding.getLangTag());
-        else return m_dataFactory.getOWLTypedLiteral(literalVariable.m_literalBinding.getLexicalForm(),(OWLDatatype)literalVariable.m_literalBinding.getDatatype().accept(this));
+        if (literalVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+literalVariable.m_variable+" is unbound. ");
+        return ((Literal)literalVariable.m_binding).accept(this);
     }
     public OWLObject visit(NamedIndividual namedIndividual) {
-        return m_dataFactory.getOWLNamedIndividual(IRI.create(namedIndividual.m_iri));
+        return m_dataFactory.getOWLNamedIndividual((IRI)namedIndividual.m_iri.accept(this));
     }
     public OWLObject visit(AnonymousIndividual anonymousIndividual) {
         return m_dataFactory.getOWLAnonymousIndividual(anonymousIndividual.m_nodeID);
     }
     public OWLObject visit(IndividualVariable individualVariable) {
         if (individualVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+individualVariable.m_variable+" is unbound. ");
-        if (individualVariable.m_binding.startsWith("_:"))
-            return m_dataFactory.getOWLAnonymousIndividual(individualVariable.m_binding);
+        if (individualVariable.m_binding instanceof AnonymousIndividual) 
+            return (OWLAnonymousIndividual)individualVariable.m_binding.accept(this);
         else 
-            return m_dataFactory.getOWLNamedIndividual(IRI.create(individualVariable.m_binding));
+            return (OWLNamedIndividual)individualVariable.m_binding.accept(this);
     }
     public OWLObject visit(Datatype datatype) {
-        return m_dataFactory.getOWLDatatype(IRI.create(datatype.m_iri));
+        return m_dataFactory.getOWLDatatype((IRI)datatype.m_iri.accept(this));
     }
     public OWLObject visit(DatatypeVariable datatypeVariable) {
         if (datatypeVariable.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+datatypeVariable.m_variable+" is unbound. ");
-        return m_dataFactory.getOWLDatatype(IRI.create(datatypeVariable.m_binding));
+        return (OWLDatatype)datatypeVariable.m_binding.accept(this);
     }
     public OWLObject visit(DatatypeRestriction datatypeRestriction) {
         Set<OWLFacetRestriction> facetRestrictions=new HashSet<OWLFacetRestriction>();
@@ -152,7 +163,7 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLDatatypeRestriction((OWLDatatype)datatypeRestriction.m_datatype.accept(this),facetRestrictions);
     }
     public OWLObject visit(FacetRestriction facetRestriction) {
-        return m_dataFactory.getOWLFacetRestriction(OWLFacet.getFacet(IRI.create(facetRestriction.m_facet.m_iri)), (OWLLiteral)facetRestriction.m_literal.accept(this));
+        return m_dataFactory.getOWLFacetRestriction(OWLFacet.getFacet((IRI)facetRestriction.m_facet.m_iri.accept(this)), (OWLLiteral)facetRestriction.m_literal.accept(this));
     }
     public OWLObject visit(DataComplementOf dataComplementOf) {
         return m_dataFactory.getOWLDataComplementOf((OWLDataRange)dataComplementOf.m_dataRange.accept(this));
@@ -177,34 +188,66 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     }
     
     public OWLObject visit(Annotation annotation) {
-        return m_dataFactory.getOWLAnnotation((OWLAnnotationProperty)annotation.m_ap.accept(this),(OWLAnnotationValue)annotation.m_value.accept(this));
+        return m_dataFactory.getOWLAnnotation((OWLAnnotationProperty)annotation.m_annotationProperty.accept(this),(OWLAnnotationValue)annotation.m_annotationValue.accept(this));
     }
     public OWLObject visit(AnnotationValue annotationValue) {
-        if (annotationValue.m_value instanceof Individual || annotationValue.m_value instanceof ILiteral) 
-            return ((AnonymousIndividual)annotationValue.m_value).accept(this);
-        return IRI.create(annotationValue.m_value.toString());
+        if (annotationValue instanceof Variable) {
+            Variable var=(Variable)annotationValue;
+            if (var.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+var+" is unbound. ");
+            return var.m_binding.accept(this);
+        }
+        return annotationValue.accept(this);
+    }
+    public OWLObject visit(AnnotationSubject annotationSubject) {
+        if (annotationSubject instanceof Variable) {
+            Variable var=(Variable)annotationSubject;
+            if (var.m_binding==null) throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+var+" is unbound. ");
+            return var.m_binding.accept(this);
+        }
+        return annotationSubject.accept(this);
+    }
+    public OWLObject visit(AnnotationAssertion assertion) {
+        return m_dataFactory.getOWLAnnotationAssertionAxiom((OWLAnnotationProperty)assertion.m_annotationProperty.accept(this),(OWLAnnotationSubject)assertion.m_annotationSubject.accept(this), (OWLAnnotationValue)assertion.m_annotationValue.accept(this),getAnnotations(assertion));
+    }
+    public OWLObject visit(SubAnnotationPropertyOf axiom) {
+        return m_dataFactory.getOWLSubAnnotationPropertyOfAxiom((OWLAnnotationProperty)axiom.m_subap.accept(this),(OWLAnnotationProperty)axiom.m_superap.accept(this),getAnnotations(axiom));
+    }
+    public OWLObject visit(AnnotationPropertyDomain axiom) {
+        return m_dataFactory.getOWLAnnotationPropertyDomainAxiom((OWLAnnotationProperty)axiom.m_annotationPropertyExpression.accept(this),(IRI)axiom.m_domain.accept(this),getAnnotations(axiom));
+    }
+    public OWLObject visit(AnnotationPropertyRange axiom) {
+        return m_dataFactory.getOWLAnnotationPropertyRangeAxiom((OWLAnnotationProperty)axiom.m_annotationPropertyExpression.accept(this),(IRI)axiom.m_range.accept(this),getAnnotations(axiom));
     }
     
+    protected Set<OWLAnnotation> getAnnotations(Axiom axiom) {
+        Set<OWLAnnotation> annotations=new HashSet<OWLAnnotation>();
+        for (Annotation annotation : axiom.getAnnotations()) 
+            annotations.add((OWLAnnotation)annotation.accept(this));
+        return annotations;
+    }
+    public OWLObject visit(Declaration axiom) {
+        return m_dataFactory.getOWLDeclarationAxiom((OWLEntity)axiom.accept(this),getAnnotations(axiom));
+    }
     public OWLObject visit(SubClassOf axiom) {
-        return m_dataFactory.getOWLSubClassOfAxiom((OWLClassExpression)axiom.m_subClass.accept(this),(OWLClassExpression)axiom.m_superClass.accept(this));
+        return m_dataFactory.getOWLSubClassOfAxiom((OWLClassExpression)axiom.m_subClass.accept(this),(OWLClassExpression)axiom.m_superClass.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(EquivalentClasses axiom) {
         Set<OWLClassExpression> classExpressions=new HashSet<OWLClassExpression>();
         for (ClassExpression classExpression : axiom.getClassExpressions())
             classExpressions.add((OWLClassExpression)classExpression.accept(this));
-        return m_dataFactory.getOWLEquivalentClassesAxiom(classExpressions);
+        return m_dataFactory.getOWLEquivalentClassesAxiom(classExpressions,getAnnotations(axiom));
     }
     public OWLObject visit(DisjointClasses axiom) {
         Set<OWLClassExpression> classExpressions=new HashSet<OWLClassExpression>();
         for (ClassExpression classExpression : axiom.getClassExpressions())
             classExpressions.add((OWLClassExpression)classExpression.accept(this));
-        return m_dataFactory.getOWLDisjointClassesAxiom(classExpressions);
+        return m_dataFactory.getOWLDisjointClassesAxiom(classExpressions,getAnnotations(axiom));
     }
     public OWLObject visit(DisjointUnion axiom) {
         Set<OWLClassExpression> classExpressions=new HashSet<OWLClassExpression>();
         for (ClassExpression classExpression : axiom.getClassExpressions())
             classExpressions.add((OWLClassExpression)classExpression.accept(this));
-        return m_dataFactory.getOWLDisjointUnionAxiom((OWLClass)axiom.m_class.accept(this), classExpressions);
+        return m_dataFactory.getOWLDisjointUnionAxiom((OWLClass)axiom.m_class.accept(this), classExpressions,getAnnotations(axiom));
     }
     
     public OWLObject visit(SubObjectPropertyOf axiom) {
@@ -213,123 +256,120 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
             for (ObjectPropertyExpression op : ((ObjectPropertyChain)axiom.m_subope).m_objectPropertyExpressions) {
                 opes.add((OWLObjectPropertyExpression)op.accept(this));
             }
-            return m_dataFactory.getOWLSubPropertyChainOfAxiom(opes,(OWLObjectPropertyExpression)axiom.m_superope.accept(this));
+            return m_dataFactory.getOWLSubPropertyChainOfAxiom(opes,(OWLObjectPropertyExpression)axiom.m_superope.accept(this),getAnnotations(axiom));
         } else {
-            return m_dataFactory.getOWLSubObjectPropertyOfAxiom((OWLObjectPropertyExpression)axiom.m_subope.accept(this),(OWLObjectPropertyExpression)axiom.m_superope.accept(this));
+            return m_dataFactory.getOWLSubObjectPropertyOfAxiom((OWLObjectPropertyExpression)axiom.m_subope.accept(this),(OWLObjectPropertyExpression)axiom.m_superope.accept(this),getAnnotations(axiom));
         }
     }
     public OWLObject visit(EquivalentObjectProperties axiom) {
         Set<OWLObjectPropertyExpression> opes=new HashSet<OWLObjectPropertyExpression>();
         for (ObjectPropertyExpression ope : axiom.getObjectPropertyExpressions())
             opes.add((OWLObjectPropertyExpression)ope.accept(this));
-        return m_dataFactory.getOWLEquivalentObjectPropertiesAxiom(opes);
+        return m_dataFactory.getOWLEquivalentObjectPropertiesAxiom(opes,getAnnotations(axiom));
     }
     public OWLObject visit(DisjointObjectProperties axiom) {
         Set<OWLObjectPropertyExpression> opes=new HashSet<OWLObjectPropertyExpression>();
         for (ObjectPropertyExpression ope : axiom.getObjectPropertyExpressions())
             opes.add((OWLObjectPropertyExpression)ope.accept(this));
-        return m_dataFactory.getOWLDisjointObjectPropertiesAxiom(opes);
+        return m_dataFactory.getOWLDisjointObjectPropertiesAxiom(opes,getAnnotations(axiom));
     }
     public OWLObject visit(InverseObjectProperties axiom) {
-        return m_dataFactory.getOWLInverseObjectPropertiesAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLObjectPropertyExpression)axiom.m_inverseOpe.accept(this));
+        return m_dataFactory.getOWLInverseObjectPropertiesAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLObjectPropertyExpression)axiom.m_inverseOpe.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(ObjectPropertyDomain axiom) {
-        return m_dataFactory.getOWLObjectPropertyDomainAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this));
+        return m_dataFactory.getOWLObjectPropertyDomainAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(ObjectPropertyRange axiom) {
-        return m_dataFactory.getOWLObjectPropertyDomainAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this));
+        return m_dataFactory.getOWLObjectPropertyDomainAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(FunctionalObjectProperty axiom) {
-        return m_dataFactory.getOWLFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(InverseFunctionalObjectProperty axiom) {
-        return m_dataFactory.getOWLInverseFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLInverseFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(ReflexiveObjectProperty axiom) {
-        return m_dataFactory.getOWLReflexiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLReflexiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(IrreflexiveObjectProperty axiom) {
-        return m_dataFactory.getOWLIrreflexiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLIrreflexiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(SymmetricObjectProperty axiom) {
-        return m_dataFactory.getOWLSymmetricObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLSymmetricObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(AsymmetricObjectProperty axiom) {
-        return m_dataFactory.getOWLAsymmetricObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLAsymmetricObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(TransitiveObjectProperty axiom) {
-        return m_dataFactory.getOWLTransitiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this));
+        return m_dataFactory.getOWLTransitiveObjectPropertyAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),getAnnotations(axiom));
     }
     
     public OWLObject visit(SubDataPropertyOf axiom) {
-        return m_dataFactory.getOWLSubDataPropertyOfAxiom((OWLDataPropertyExpression)axiom.m_subdpe.accept(this),(OWLDataPropertyExpression)axiom.m_superdpe.accept(this));
+        return m_dataFactory.getOWLSubDataPropertyOfAxiom((OWLDataPropertyExpression)axiom.m_subdpe.accept(this),(OWLDataPropertyExpression)axiom.m_superdpe.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(EquivalentDataProperties axiom) {
         Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
         for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions())
             dpes.add((OWLDataPropertyExpression)dpe.accept(this));
-        return m_dataFactory.getOWLEquivalentDataPropertiesAxiom(dpes);
+        return m_dataFactory.getOWLEquivalentDataPropertiesAxiom(dpes,getAnnotations(axiom));
     }
     public OWLObject visit(DisjointDataProperties axiom) {
         Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
         for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions())
             dpes.add((OWLDataPropertyExpression)dpe.accept(this));
-        return m_dataFactory.getOWLDisjointDataPropertiesAxiom(dpes);
+        return m_dataFactory.getOWLDisjointDataPropertiesAxiom(dpes,getAnnotations(axiom));
     }
     public OWLObject visit(DataPropertyDomain axiom) {
-        return m_dataFactory.getOWLDataPropertyDomainAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this));
+        return m_dataFactory.getOWLDataPropertyDomainAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLClassExpression)axiom.m_classExpression.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(DataPropertyRange axiom) {
-        return m_dataFactory.getOWLDataPropertyRangeAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this));
+        return m_dataFactory.getOWLDataPropertyRangeAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(FunctionalDataProperty axiom) {
-        return m_dataFactory.getOWLFunctionalDataPropertyAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this));
+        return m_dataFactory.getOWLFunctionalDataPropertyAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),getAnnotations(axiom));
     }
     
     public OWLObject visit(DatatypeDefinition axiom) {
-        return m_dataFactory.getOWLDatatypeDefinitionAxiom((OWLDatatype)axiom.m_datatype.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this));
+        return m_dataFactory.getOWLDatatypeDefinitionAxiom((OWLDatatype)axiom.m_datatype.accept(this),(OWLDataRange)axiom.m_dataRange.accept(this),getAnnotations(axiom));
     }
     
+    @SuppressWarnings("unchecked")
     public OWLObject visit(HasKey axiom) {
-        Set<OWLObjectPropertyExpression> opes=new HashSet<OWLObjectPropertyExpression>();
+        Set<OWLPropertyExpression> pes=new HashSet<OWLPropertyExpression>();
         for (ObjectPropertyExpression ope : axiom.m_objectPropertyExpressions) {
-            opes.add((OWLObjectPropertyExpression)ope.accept(this));
+            pes.add((OWLObjectPropertyExpression)ope.accept(this));
         }
-        Set<OWLDataPropertyExpression> dpes=new HashSet<OWLDataPropertyExpression>();
         for (DataPropertyExpression dpe : axiom.m_dataPropertyExpressions) {
-            dpes.add((OWLDataPropertyExpression)dpe.accept(this));
+            pes.add((OWLDataPropertyExpression)dpe.accept(this));
         }
-        if (opes.size()>0)
-            return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),opes);
-        else 
-            return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),dpes);
+        return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.m_classExpression.accept(this),pes,getAnnotations(axiom));
     }
     
     public OWLObject visit(SameIndividual axiom) {
         Set<OWLIndividual> individuals=new HashSet<OWLIndividual>();
         for (Individual individual : axiom.m_individuals)
             individuals.add((OWLIndividual)individual.accept(this));
-        return m_dataFactory.getOWLSameIndividualAxiom(individuals);
+        return m_dataFactory.getOWLSameIndividualAxiom(individuals,getAnnotations(axiom));
     }
     public OWLObject visit(DifferentIndividuals axiom) {
         Set<OWLIndividual> individuals=new HashSet<OWLIndividual>();
         for (Individual individual : axiom.m_individuals)
             individuals.add((OWLIndividual)individual.accept(this));
-        return m_dataFactory.getOWLDifferentIndividualsAxiom(individuals);
+        return m_dataFactory.getOWLDifferentIndividualsAxiom(individuals,getAnnotations(axiom));
     }
     public OWLObject visit(ClassAssertion axiom) {
-        return m_dataFactory.getOWLClassAssertionAxiom((OWLClassExpression)axiom.m_ce.accept(this),(OWLIndividual)axiom.m_individual.accept(this));
+        return m_dataFactory.getOWLClassAssertionAxiom((OWLClassExpression)axiom.m_ce.accept(this),(OWLIndividual)axiom.m_individual.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(ObjectPropertyAssertion axiom) {
-        return m_dataFactory.getOWLObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this));
+        return m_dataFactory.getOWLObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(NegativeObjectPropertyAssertion axiom) {
-        return m_dataFactory.getOWLNegativeObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this));
+        return m_dataFactory.getOWLNegativeObjectPropertyAssertionAxiom((OWLObjectPropertyExpression)axiom.m_ope.accept(this),(OWLIndividual)axiom.m_individual1.accept(this),(OWLIndividual)axiom.m_individual2.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(DataPropertyAssertion axiom) {
-        return m_dataFactory.getOWLDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this));
+        return m_dataFactory.getOWLDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(NegativeDataPropertyAssertion axiom) {
-        return m_dataFactory.getOWLNegativeDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this));
+        return m_dataFactory.getOWLNegativeDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.m_dpe.accept(this),(OWLIndividual)axiom.m_individual.accept(this),(OWLLiteral)axiom.m_literal.accept(this),getAnnotations(axiom));
     }
 }

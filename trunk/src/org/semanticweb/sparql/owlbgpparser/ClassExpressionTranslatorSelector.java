@@ -1,5 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import org.semanticweb.sparql.owlbgp.model.Identifier;
+
 public class ClassExpressionTranslatorSelector {
 
     protected final OWLRDFConsumer consumer;
@@ -44,7 +46,7 @@ public class ClassExpressionTranslatorSelector {
         namedClassTranslator=new NamedClassTranslator(con);
     }
 
-    public boolean isObjectRestriction(String mainNode, String property) {
+    public boolean isObjectRestriction(Identifier mainNode, Identifier property) {
         if (consumer.isObjectPropertyOnly(property)
             || isClassExpressionObject(mainNode, Vocabulary.OWL_SOME_VALUES_FROM.getIRI()) 
             || isClassExpressionObject(mainNode, Vocabulary.OWL_ALL_VALUES_FROM.getIRI())
@@ -54,11 +56,11 @@ public class ClassExpressionTranslatorSelector {
             || consumer.getResourceObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(),false)!=null) return true;
         return false;
     }
-    protected boolean isClassExpressionObject(String mainNode, String predicate) {
-        String object=consumer.getResourceObject(mainNode, predicate, false);
+    protected boolean isClassExpressionObject(Identifier mainNode, Identifier predicate) {
+        Identifier object=consumer.getResourceObject(mainNode, predicate, false);
         return object!=null && consumer.isClass(object);
     }
-    public boolean isDataRestriction(String mainNode,String property) {
+    public boolean isDataRestriction(Identifier mainNode,Identifier property) {
         if (consumer.isDataPropertyOnly(property)
             || isDataRangeObject(mainNode, Vocabulary.OWL_SOME_VALUES_FROM.getIRI())
             || isDataRangeObject(mainNode, Vocabulary.OWL_ALL_VALUES_FROM.getIRI())
@@ -68,8 +70,8 @@ public class ClassExpressionTranslatorSelector {
             || consumer.getLiteralObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(), false)!=null) return true;
         return false;
     }
-    protected boolean isDataRangeObject(String mainNode, String predicate) {
-        String object=consumer.getResourceObject(mainNode, predicate, false);
+    protected boolean isDataRangeObject(Identifier mainNode, Identifier predicate) {
+        Identifier object=consumer.getResourceObject(mainNode, predicate, false);
         return object!=null && consumer.isDataRange(object);
     }
     /**
@@ -77,10 +79,10 @@ public class ClassExpressionTranslatorSelector {
      * @param mainNode The main node of the class expression
      * @return The translator that should be used to translate the class expression
      */
-    public ClassExpressionTranslator getClassExpressionTranslator(String mainNode) {
+    public ClassExpressionTranslator getClassExpressionTranslator(Identifier mainNode) {
         if (consumer.isRestriction(mainNode)) {
             // Check that the necessary triples are there
-            String onPropertyIRI=consumer.getResourceObject(mainNode, Vocabulary.OWL_ON_PROPERTY.getIRI(), false);
+            Identifier onPropertyIRI=consumer.getResourceObject(mainNode, Vocabulary.OWL_ON_PROPERTY.getIRI(), false);
             if (isObjectRestriction(mainNode, onPropertyIRI)) return getObjectRestrictionTranslator(mainNode);
             if (isDataRestriction(mainNode, onPropertyIRI)) return getDataRestrictionTranslator(mainNode);
             throw new IllegalArgumentException("A restriction did not have an object or a data property. Main node: "+mainNode);
@@ -92,7 +94,7 @@ public class ClassExpressionTranslatorSelector {
         return namedClassTranslator;
     }
 
-    protected ClassExpressionTranslator getObjectRestrictionTranslator(String mainNode) {
+    protected ClassExpressionTranslator getObjectRestrictionTranslator(Identifier mainNode) {
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_SOME_VALUES_FROM.getIRI())) return objectSomeValuesFromTranslator;
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_ALL_VALUES_FROM.getIRI())) return objectAllValuesFromTranslator;
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI())) return objectHasValueTranslator;
@@ -103,7 +105,7 @@ public class ClassExpressionTranslatorSelector {
         return namedClassTranslator;
     }
 
-    protected ClassExpressionTranslator getDataRestrictionTranslator(String mainNode) {
+    protected ClassExpressionTranslator getDataRestrictionTranslator(Identifier mainNode) {
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_SOME_VALUES_FROM.getIRI())) return dataSomeValuesFromTranslator;
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_ALL_VALUES_FROM.getIRI())) return dataAllValuesFromTranslator;
         if (consumer.hasPredicate(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI())) return dataHasValueTranslator;

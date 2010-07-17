@@ -58,9 +58,6 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
     public static DataComplementOf create(DataRange dataRange) {
         return s_interningManager.intern(new DataComplementOf(dataRange));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -77,10 +74,7 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
         unbound.addAll(m_dataRange.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_dataRange.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_dataRange.applyVariableBindings(variablesToBindings);
     }
 }

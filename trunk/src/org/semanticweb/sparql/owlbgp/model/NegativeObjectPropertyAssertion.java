@@ -30,10 +30,28 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
 
     protected static InterningManager<NegativeObjectPropertyAssertion> s_interningManager=new InterningManager<NegativeObjectPropertyAssertion>() {
         protected boolean equal(NegativeObjectPropertyAssertion object1,NegativeObjectPropertyAssertion object2) {
-            return object1.m_ope==object2.m_ope&&object1.m_individual1==object2.m_individual1&&object1.m_individual2==object2.m_individual2;
+            if (object1.m_ope!=object2.m_ope
+                    ||object1.m_individual1!=object2.m_individual1
+                    ||object1.m_individual2!=object2.m_individual2
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(NegativeObjectPropertyAssertion object) {
-            return -7*object.m_ope.hashCode()+11*object.m_individual1.hashCode()+53*object.m_individual2.hashCode();
+            int hashCode=-7*object.m_ope.hashCode()+11*object.m_individual1.hashCode()+53*object.m_individual2.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
@@ -41,10 +59,11 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     protected final Individual m_individual1;
     protected final Individual m_individual2;
    
-    protected NegativeObjectPropertyAssertion(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
+    protected NegativeObjectPropertyAssertion(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Set<Annotation> annotations) {
         m_ope=ope;
         m_individual1=individual1;
         m_individual2=individual2;
+        m_annotations=annotations;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
@@ -64,6 +83,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("NegativeObjectPropertyAssertion(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_ope.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_individual1.toString(prefixes));
@@ -76,7 +96,10 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
         return s_interningManager.intern(this);
     }
     public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
-        return s_interningManager.intern(new NegativeObjectPropertyAssertion(ope,individual1,individual2));
+        return NegativeObjectPropertyAssertion.create(ope,individual1,individual2,new HashSet<Annotation>());
+    }
+    public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Set<Annotation> anotations) {
+        return s_interningManager.intern(new NegativeObjectPropertyAssertion(ope,individual1,individual2,anotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -89,6 +112,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
         variables.addAll(m_ope.getVariablesInSignature(varType));
         variables.addAll(m_individual1.getVariablesInSignature(varType));
         variables.addAll(m_individual2.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
@@ -96,16 +120,15 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_individual1.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_individual2.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
         m_individual1.applyBindings(variablesToBindings);
         m_individual2.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
-        m_individual1.applyVariableBindings(variablesToBindings);
-        m_individual2.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return NegativeObjectPropertyAssertion.create(m_ope, m_individual1, m_individual2);
     }
 }

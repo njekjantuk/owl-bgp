@@ -18,7 +18,6 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
@@ -29,29 +28,35 @@ public class ClassVariable extends Variable implements ClassExpression {
 
     protected static InterningManager<ClassVariable> s_interningManager=new InterningManager<ClassVariable>() {
         protected boolean equal(ClassVariable object1,ClassVariable object2) {
-            return object1.m_variable==object2.m_variable;
+            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
         }
         protected int getHashCode(ClassVariable object) {
-            return object.m_variable.hashCode();
+            int hashCode=47;
+            hashCode+=object.m_variable.hashCode();
+            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
+            return hashCode;
         }
     };
     
-    protected ClassVariable(String variable) {
-        super(variable);
+    protected ClassVariable(String variable,Atomic binding) {
+        super(variable,binding);
     }
-    public ClassExpression getBindingAsExtendedOWLObject() {
-        if (m_binding==null) return null;
-        return Clazz.create(m_binding);
+    public Clazz getBindingAsExtendedOWLObject() {
+        return (Clazz)m_binding;
     }
-    public void setBinding(Clazz binding) {
+    public void setBinding(Atomic binding) {
         if (binding==null) m_binding=null;
-        else m_binding=binding.getIdentifier();
+        if (binding instanceof Clazz) m_binding=binding;
+        else throw new RuntimeException("Error: Only classes can be assigned to class variables, but class variable "+m_variable+" was assigned the non-class "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ClassVariable create(String iri) {
-        return s_interningManager.intern(new ClassVariable(iri));
+    public static ClassVariable create(String variable) {
+        return create(variable,null);
+    }
+    public static ClassVariable create(String variable,Atomic binding) {
+        return s_interningManager.intern(new ClassVariable(variable,binding));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -68,14 +73,5 @@ public class ClassVariable extends Variable implements ClassExpression {
         Set<Variable> variables=new HashSet<Variable>();
         if (m_binding==null&&(varType==null||varType==VarType.CLASS)) variables.add(this);
         return variables;
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        ExtendedOWLObject binding=variablesToBindings.get(this);
-        if (binding==null)
-            m_binding=null;
-        else if (!(binding instanceof Clazz))
-            throw new RuntimeException("Error: Only classes can be assigned to class variables, but class variable "+m_variable+" was assigned the non-class "+binding);
-        else 
-            m_binding=((Clazz)variablesToBindings.get(this)).m_iri;
     }
 }

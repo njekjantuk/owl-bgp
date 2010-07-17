@@ -29,19 +29,37 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
 
     protected static InterningManager<SubDataPropertyOf> s_interningManager=new InterningManager<SubDataPropertyOf>() {
         protected boolean equal(SubDataPropertyOf object1,SubDataPropertyOf object2) {
-            return object1.m_subdpe==object2.m_subdpe&&object1.m_superdpe==object2.m_superdpe;
+            if (object1.m_subdpe!=object2.m_subdpe
+                ||object1.m_superdpe!=object2.m_superdpe
+                ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(SubDataPropertyOf object) {
-            return 19*object.m_subdpe.hashCode()+7*object.m_superdpe.hashCode();
+            int hashCode=19*object.m_subdpe.hashCode()+7*object.m_superdpe.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final DataPropertyExpression m_subdpe;
     protected final DataPropertyExpression m_superdpe;
     
-    protected SubDataPropertyOf(DataPropertyExpression subDataPropertyExpression,DataPropertyExpression superDataPropertyExpression) {
+    protected SubDataPropertyOf(DataPropertyExpression subDataPropertyExpression,DataPropertyExpression superDataPropertyExpression,Set<Annotation> annotations) {
         m_subdpe=subDataPropertyExpression;
         m_superdpe=superDataPropertyExpression;
+        m_annotations=annotations;
     }
     public DataPropertyExpression getSubDataPropertyExpression() {
         return m_subdpe;
@@ -52,6 +70,7 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("SubDataPropertyOf(");
+        writeAnnoations(buffer, prefixes);
         buffer.append(m_subdpe.toString(prefixes));
         buffer.append(" ");
         buffer.append(m_superdpe.toString(prefixes));
@@ -62,7 +81,10 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
         return s_interningManager.intern(this);
     }
     public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression) {
-        return s_interningManager.intern(new SubDataPropertyOf(subDataPropertyExpression,superDataPropertyExpression));
+        return SubDataPropertyOf.create(subDataPropertyExpression,superDataPropertyExpression,new HashSet<Annotation>());
+    }
+    public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression,Set<Annotation> annotation) {
+        return s_interningManager.intern(new SubDataPropertyOf(subDataPropertyExpression,superDataPropertyExpression,annotation));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -74,20 +96,21 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_subdpe.getVariablesInSignature(varType));
         variables.addAll(m_superdpe.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_subdpe.getUnboundVariablesInSignature(varType));
         unbound.addAll(m_superdpe.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_subdpe.applyBindings(variablesToBindings);
         m_superdpe.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_subdpe.applyVariableBindings(variablesToBindings);
-        m_superdpe.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return SubDataPropertyOf.create(m_subdpe, m_superdpe);
     }
 }

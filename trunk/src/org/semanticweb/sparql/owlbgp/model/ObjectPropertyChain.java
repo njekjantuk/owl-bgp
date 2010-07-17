@@ -58,9 +58,6 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
         buffer.append(")");
         return buffer.toString();
     }
-    public String getIdentifier() {
-        return null;
-    }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
@@ -90,12 +87,8 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
         }
         return variables;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (ObjectPropertyExpression ope : m_objectPropertyExpressions)
             ope.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (ObjectPropertyExpression ope : m_objectPropertyExpressions)
-            ope.applyVariableBindings(variablesToBindings);
     }
 }

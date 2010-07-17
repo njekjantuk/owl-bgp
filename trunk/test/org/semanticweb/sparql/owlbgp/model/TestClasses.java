@@ -15,6 +15,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 public class TestClasses extends TestCase {
     
     protected static char[] chars={'i', 'r', 'i', '1'};
+    protected static char[] charsVar={'v', 'a', 'r'};
     
     public TestClasses() {
         super();
@@ -23,16 +24,30 @@ public class TestClasses extends TestCase {
         super(name);
     }
     public void testClassEquality() {
-        String iri1="http://www.example.org/iri1";
-        String iri2="http://www.example.org/"+new String(chars);
-        assertFalse(iri1==iri2);
+        String iriString1="http://www.example.org/iri1";
+        String iriString2="http://www.example.org/"+new String(chars);
+        IRI iri1=IRI.create(iriString1);
+        IRI iri2=IRI.create(iriString2);
+        assertFalse(iriString1==iriString2);
+        assertTrue(iri1==iri2);
         Clazz class1=Clazz.create(iri1);
         Clazz class2=Clazz.create(iri2);
         assertTrue(class1==class2);
     }
+    public void testClassVarEquality() {
+        String iriString1="?var1";
+        Integer one=Integer.parseInt("1");
+        String iriString2="?"+new String(charsVar)+one.toString();
+        assertFalse(iriString1==iriString2);
+        ClassVariable classVar1=ClassVariable.create(iriString1);
+        ClassVariable classVar2=ClassVariable.create(iriString2);
+        assertTrue(classVar1==classVar2);
+    }
     public void testIntersection() {
-        String iri1="http://www.example.org/"+new String(chars);
-        String iri2="http://www.example.org/iri2";
+        String iriString1="http://www.example.org/"+new String(chars);
+        String iriString2="http://www.example.org/iri2";
+        IRI iri1=IRI.create(iriString1);
+        IRI iri2=IRI.create(iriString2);
         Clazz class1a=Clazz.create(iri1);
         Clazz class1b=Clazz.create(iri2);
         Clazz class2a=Clazz.create(iri1);
@@ -48,8 +63,10 @@ public class TestClasses extends TestCase {
         assertTrue(intersection1==intersection2);
     }
     public void testDataIntersection() {
-        String iri1="http://www.example.org/"+new String(chars);
-        String iri2="http://www.example.org/iri2";
+        String iriString1="http://www.example.org/"+new String(chars);
+        String iriString2="http://www.example.org/iri2";
+        IRI iri1=IRI.create(iriString1);
+        IRI iri2=IRI.create(iriString2);
         DataRange class1a=Datatype.create(iri1);
         DataRange class1b=Datatype.create(iri2);
         DataRange class2a=Datatype.create(iri2);
@@ -59,8 +76,10 @@ public class TestClasses extends TestCase {
         assertTrue(intersection1==intersection2);
     }
     public void testIntersectionMultipleVars() {
-        String classIRI="http://www.example.org/"+new String(chars);
-        String opIRI="http://www.example.org/iri2";
+        String classIRIString="http://www.example.org/"+new String(chars);
+        String opIRIString="http://www.example.org/iri2";
+        IRI classIRI=IRI.create(classIRIString);
+        IRI opIRI=IRI.create(opIRIString);
         ClassExpression classVar=ClassVariable.create("?x");
         ObjectPropertyExpression opVar=ObjectPropertyVariable.create("?y");
         ClassExpression clazz=Clazz.create(classIRI);
@@ -82,29 +101,30 @@ public class TestClasses extends TestCase {
         assertTrue(opVars.contains(opVar));
     }
     public void testApplyMultipleBindings() {
-        ClassExpression classVar1=ClassVariable.create("?x");
-        ClassExpression classVar2=ClassVariable.create("?y");
-        ClassExpression classVar3=ClassVariable.create("?z");
+        ClassVariable classVar1=ClassVariable.create("?x");
+        ClassVariable classVar2=ClassVariable.create("?y");
+        ClassVariable classVar3=ClassVariable.create("?z");
         ClassExpression or=ObjectUnionOf.create(classVar1, classVar2, classVar3);
-        Map<String,Set<String>> varToBindingSets=new HashMap<String, Set<String>>();
-        Set<String> bindingsX=new HashSet<String>();
-        bindingsX.add("http://example.org/a");
-        bindingsX.add("http://example.org/b");
-        bindingsX.add("http://example.org/c");
-        varToBindingSets.put(classVar1.getIdentifier(), bindingsX);
-        Set<String> bindingsY=new HashSet<String>();
-        bindingsY.add("http://example.org/k");
-        bindingsY.add("http://example.org/l");
-        varToBindingSets.put(classVar2.getIdentifier(), bindingsY);
-        Set<String> bindingsZ=new HashSet<String>();
-        bindingsZ.add("http://example.org/r");
-        bindingsZ.add("http://example.org/q");
-        bindingsZ.add("http://example.org/s");
-        varToBindingSets.put(classVar3.getIdentifier(), bindingsZ);
-        int i=0;
-        for (ExtendedOWLObject eoo : or.getAppliedBindingsIterator(varToBindingSets)) {
-            System.out.println(eoo);
-            assertTrue(eoo.getUnboundVariablesInSignature().size()==0);
+        Map<Variable,Set<Atomic>> varToBindingSets=new HashMap<Variable, Set<Atomic>>();
+        Set<Atomic> bindingsX=new HashSet<Atomic>();
+        bindingsX.add(Clazz.create("http://example.org/a"));
+        bindingsX.add(Clazz.create("http://example.org/b"));
+        bindingsX.add(Clazz.create("http://example.org/c"));
+        varToBindingSets.put(classVar1, bindingsX);
+        Set<Atomic> bindingsY=new HashSet<Atomic>();
+        bindingsY.add(Clazz.create("http://example.org/k"));
+        bindingsY.add(Clazz.create("http://example.org/l"));
+        varToBindingSets.put(classVar2, bindingsY);
+        Set<Atomic> bindingsZ=new HashSet<Atomic>();
+        bindingsZ.add(Clazz.create("http://example.org/r"));
+        bindingsZ.add(Clazz.create("http://example.org/q"));
+        bindingsZ.add(Clazz.create("http://example.org/s"));
+        varToBindingSets.put(classVar3, bindingsZ);
+        int i=0;   
+        for (Map<Variable,Atomic> binding : or.getBindingIterator(varToBindingSets)) {
+            or.applyBindings(binding);
+            System.out.println(or);
+            assertTrue(or.getUnboundVariablesInSignature().size()==0);
             i++;
         }
         assertTrue(i==(3*3*2));
@@ -115,8 +135,8 @@ public class TestClasses extends TestCase {
     public void testIntersectionApplyBindings() {
         String classIRI="http://www.example.org/"+new String(chars);
         String opIRI="http://www.example.org/iri2";
-        ClassExpression classVar=ClassVariable.create("?x");
-        ObjectPropertyExpression opVar=ObjectPropertyVariable.create("?y");
+        ClassVariable classVar=ClassVariable.create("?x");
+        ObjectPropertyVariable opVar=ObjectPropertyVariable.create("?y");
         ClassExpression clazz=Clazz.create(classIRI);
         ClassExpression or=ObjectUnionOf.create(clazz, classVar);
         ClassExpression some=ObjectSomeValuesFrom.create(opVar, or);
@@ -124,9 +144,9 @@ public class TestClasses extends TestCase {
         ObjectPropertyExpression op=ObjectProperty.create(opIRI);
         ClassExpression all=ObjectAllValuesFrom.create(op, and);
         ClassExpression ce=ObjectIntersectionOf.create(all, some);
-        Map<String,String> varsToBindings=new HashMap<String, String>();
-        varsToBindings.put(classVar.getIdentifier(), "http://www.example.org/CBind");
-        varsToBindings.put(opVar.getIdentifier(), "http://www.example.org/OPBind");
+        Map<Variable,Atomic> varsToBindings=new HashMap<Variable, Atomic>();
+        varsToBindings.put(classVar, Clazz.create("http://www.example.org/CBind"));
+        varsToBindings.put(opVar, ObjectProperty.create("http://www.example.org/OPBind"));
         ce.applyBindings(varsToBindings);
         assertTrue(ce.getUnboundVariablesInSignature(VarType.CLASS).size()==0);
         assertTrue(ce.getUnboundVariablesInSignature(VarType.OBJECT_PROPERTY).size()==0);

@@ -65,9 +65,6 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
     public static DataHasValue create(DataPropertyExpression dpe,ILiteral literal) {
         return s_interningManager.intern(new DataHasValue(dpe,literal));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -86,12 +83,8 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
         unbound.addAll(m_literal.getVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_dpe.applyBindings(variablesToBindings);
         m_literal.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_dpe.applyVariableBindings(variablesToBindings);
-        m_literal.applyVariableBindings(variablesToBindings);
     }
 }

@@ -4,4 +4,5 @@ import java.util.Set;
 
 public interface Axiom extends ExtendedOWLObject {
     public Set<Annotation> getAnnotations();
+    public Axiom getAxiomWithoutAnnotations();
 }

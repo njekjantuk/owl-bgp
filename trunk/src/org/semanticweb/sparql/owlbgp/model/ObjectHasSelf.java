@@ -58,9 +58,6 @@ public class ObjectHasSelf extends AbstractExtendedOWLObject implements ClassExp
     public static ObjectHasSelf create(ObjectPropertyExpression ope) {
         return s_interningManager.intern(new ObjectHasSelf(ope));
     }
-    public String getIdentifier() {
-        return null;
-    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
@@ -77,10 +74,7 @@ public class ObjectHasSelf extends AbstractExtendedOWLObject implements ClassExp
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
-    }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
     }
 }

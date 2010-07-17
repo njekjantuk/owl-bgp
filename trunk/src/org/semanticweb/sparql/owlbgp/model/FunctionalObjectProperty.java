@@ -30,29 +30,54 @@ public class FunctionalObjectProperty extends AbstractAxiom implements ObjectPro
 
     protected static InterningManager<FunctionalObjectProperty> s_interningManager=new InterningManager<FunctionalObjectProperty>() {
         protected boolean equal(FunctionalObjectProperty object1,FunctionalObjectProperty object2) {
-            return object1.m_ope==object2.m_ope;
+            if (object1.m_ope!=object2.m_ope
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(FunctionalObjectProperty object) {
-            return 17+11*object.m_ope.hashCode();
+            int hashCode=17+11*object.m_ope.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
+            return hashCode;
         }
     };
     
     protected final ObjectPropertyExpression m_ope;
    
-    protected FunctionalObjectProperty(ObjectPropertyExpression objectPropertyExpression) {
+    protected FunctionalObjectProperty(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
         m_ope=objectPropertyExpression;
+        m_annotations=annotations;
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
     }
     public String toString(Prefixes prefixes) {
-        return "FunctionalObjectProperty("+m_ope.toString(prefixes)+")";
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("FunctionalObjectProperty(");
+        writeAnnoations(buffer, prefixes);
+        buffer.append(m_ope.toString(prefixes));
+        buffer.append(")");
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
-        return s_interningManager.intern(new FunctionalObjectProperty(objectPropertyExpression));
+        return FunctionalObjectProperty.create(objectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
+        return s_interningManager.intern(new FunctionalObjectProperty(objectPropertyExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -63,17 +88,19 @@ public class FunctionalObjectProperty extends AbstractAxiom implements ObjectPro
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_ope.getVariablesInSignature(varType));
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> unbound=new HashSet<Variable>();
         unbound.addAll(m_ope.getUnboundVariablesInSignature(varType));
+        getUnboundAnnotationVariables(varType, unbound);
         return unbound;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         m_ope.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        m_ope.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return FunctionalObjectProperty.create(m_ope);
     }
 }

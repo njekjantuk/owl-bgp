@@ -2,6 +2,7 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.ILiteral;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.Individual;
 import org.semanticweb.sparql.owlbgp.model.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.NegativeObjectPropertyAssertion;
@@ -13,47 +14,24 @@ public class TypeNegativePropertyAssertionHandler extends BuiltInTypeHandler {
         super(consumer, Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION.getIRI());
     }
 
-    public boolean canHandleStreaming(String subject, String predicate, String object) {
+    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         return false;
     }
-    public void handleTriple(String subject, String predicate, String object) {
-        String source=consumer.getResourceObject(subject, Vocabulary.OWL_SOURCE_INDIVIDUAL.getIRI(), true);
-        if (source==null) 
-            source=consumer.getResourceObject(subject, Vocabulary.OWL_SUBJECT.getIRI(), true);
-        if (source==null)
-            source=consumer.getResourceObject(subject, Vocabulary.RDF_SUBJECT.getIRI(), true);
-
-        String property=consumer.getResourceObject(subject, Vocabulary.OWL_ASSERTION_PROPERTY.getIRI(), true);
-        if (property==null)
-            property=consumer.getResourceObject(subject, Vocabulary.OWL_PREDICATE.getIRI(), true);
-        if (property==null)
-            property=consumer.getResourceObject(subject, Vocabulary.RDF_PREDICATE.getIRI(), true);
-
-        Object target=consumer.getResourceObject(subject, Vocabulary.OWL_TARGET_INDIVIDUAL.getIRI(), true);
-        if (target==null)
-            target=consumer.getResourceObject(subject, Vocabulary.OWL_OBJECT.getIRI(), true);
-        if (target==null)
-            target=consumer.getResourceObject(subject, Vocabulary.RDF_OBJECT.getIRI(), true);
-        if (target==null)
-            target=consumer.getLiteralObject(subject, Vocabulary.OWL_OBJECT.getIRI(), true);
-        if (target==null)
-            target=consumer.getLiteralObject(subject, Vocabulary.RDF_OBJECT.getIRI(), true);
-        if (target==null)
-            target=consumer.getLiteralObject(subject, Vocabulary.OWL_TARGET_VALUE.getIRI(), true);
-
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
+        Identifier source=consumer.getResourceObject(subject, Vocabulary.OWL_SOURCE_INDIVIDUAL.getIRI(), true);
+        Individual sourceInd=consumer.translateIndividual(source);
+        Identifier property=consumer.getResourceObject(subject, Vocabulary.OWL_ASSERTION_PROPERTY.getIRI(), true);
+        Identifier target=consumer.getResourceObject(subject, Vocabulary.OWL_TARGET_INDIVIDUAL.getIRI(), true);
         consumer.translateAnnotations(subject);
-        if (target instanceof ILiteral) {
-            Individual sourceInd=consumer.translateIndividual(source);
-            DataPropertyExpression prop=consumer.translateDataPropertyExpression(property);
-            consumeTriple(subject, predicate, object);
-            addAxiom(NegativeDataPropertyAssertion.create(prop,sourceInd,(ILiteral)target));
-        } else {
-            Individual sourceInd=consumer.translateIndividual(source);
+        if (target!=null) { 
             ObjectPropertyExpression prop=consumer.translateObjectPropertyExpression(property);
-            Individual targetInd=consumer.translateIndividual(target.toString());
-            consumeTriple(subject, predicate, object);
-            addAxiom(NegativeObjectPropertyAssertion.create(prop,sourceInd,targetInd));
+            Individual targetInd=consumer.translateIndividual(target);
+            addAxiom(NegativeObjectPropertyAssertion.create(prop,sourceInd,targetInd,consumer.getPendingAnnotations()));
+        } else {
+            DataPropertyExpression prop=consumer.translateDataPropertyExpression(property);
+            ILiteral targetLit=consumer.getLiteralObject(subject, Vocabulary.OWL_TARGET_VALUE.getIRI(), true);
+            addAxiom(NegativeDataPropertyAssertion.create(prop,sourceInd,targetLit,consumer.getPendingAnnotations()));
         }
-
+        consumeTriple(subject, predicate, object);
     }
 }

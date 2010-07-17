@@ -12,11 +12,16 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = -5653341898298818446L;
 
     protected static InterningManager<EquivalentClasses> s_interningManager=new InterningManager<EquivalentClasses>() {
-        protected boolean equal(EquivalentClasses classes1,EquivalentClasses classes2) {
-            if (classes1.m_classExpressions.size()!=classes2.m_classExpressions.size())
+        protected boolean equal(EquivalentClasses object1,EquivalentClasses object2) {
+            if (object1.m_classExpressions.size()!=object2.m_classExpressions.size()
+                    ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (ClassExpression equiv : classes1.m_classExpressions) {
-                if (!contains(equiv, classes2.m_classExpressions))
+            for (ClassExpression equiv : object1.m_classExpressions) {
+                if (!contains(equiv, object2.m_classExpressions))
+                    return false;
+            } 
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
@@ -27,18 +32,27 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
                     return true;
             return false;
         }
-        protected int getHashCode(EquivalentClasses classes) {
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
+        }
+        protected int getHashCode(EquivalentClasses object) {
             int hashCode=0;
-            for (ClassExpression equiv : classes.m_classExpressions)
+            for (ClassExpression equiv : object.m_classExpressions)
                 hashCode+=equiv.hashCode();
+            for (Annotation anno : object.m_annotations)
+                hashCode+=anno.hashCode();
             return hashCode;
         }
     };
     
     protected final Set<ClassExpression> m_classExpressions;
     
-    protected EquivalentClasses(Set<ClassExpression> classExpressions) {
+    protected EquivalentClasses(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         m_classExpressions=classExpressions;
+        m_annotations=annotations;
     }
     public Set<ClassExpression> getClassExpressions() {
         return m_classExpressions;
@@ -46,6 +60,7 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("EquivalentClasses(");
+        writeAnnoations(buffer, prefixes);
         boolean notFirst=false;
         for (ClassExpression conjunct : m_classExpressions) {
             if (notFirst)
@@ -61,10 +76,13 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
         return s_interningManager.intern(this);
     }
     public static EquivalentClasses create(Set<ClassExpression> classExpressions) {
-        return s_interningManager.intern(new EquivalentClasses(classExpressions));
+        return EquivalentClasses.create(classExpressions,new HashSet<Annotation>());
     }
     public static EquivalentClasses create(ClassExpression... classExpressions) {
-        return s_interningManager.intern(new EquivalentClasses(new HashSet<ClassExpression>(Arrays.asList(classExpressions))));
+        return EquivalentClasses.create(new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
+    }
+    public static EquivalentClasses create(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+        return s_interningManager.intern(new EquivalentClasses(classExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -74,24 +92,23 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        for (ClassExpression classExpression : m_classExpressions) {
+        for (ClassExpression classExpression : m_classExpressions) 
             variables.addAll(classExpression.getVariablesInSignature(varType));
-        }
+        getAnnotationVariables(varType, variables);
         return variables;
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        for (ClassExpression classExpression : m_classExpressions) {
+        for (ClassExpression classExpression : m_classExpressions) 
             variables.addAll(classExpression.getUnboundVariablesInSignature(varType));
-        }
+        getUnboundAnnotationVariables(varType, variables);
         return variables;
     }
-    public void applyBindings(Map<String,String> variablesToBindings) {
+    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
         for (ClassExpression ce : m_classExpressions)
             ce.applyBindings(variablesToBindings);
     }
-    public void applyVariableBindings(Map<Variable,ExtendedOWLObject> variablesToBindings) {
-        for (ClassExpression ce : m_classExpressions)
-            ce.applyVariableBindings(variablesToBindings);
+    public Axiom getAxiomWithoutAnnotations() {
+        return EquivalentClasses.create(m_classExpressions);
     }
 }

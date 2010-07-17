@@ -24,7 +24,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
 
-public class AnonymousIndividual extends AbstractExtendedOWLObject implements Individual {
+public class AnonymousIndividual extends AbstractExtendedOWLObject implements Identifier,Individual,Atomic,AnnotationSubject {
     private static final long serialVersionUID = -8797258383209941720L;
     
     protected static InterningManager<AnonymousIndividual> s_interningManager=new InterningManager<AnonymousIndividual>() {
@@ -47,8 +47,8 @@ public class AnonymousIndividual extends AbstractExtendedOWLObject implements In
     public String toString(Prefixes prefixes) {
         return m_nodeID;
     }
-    public String getIdentifier() {
-        return m_nodeID;
+    public Identifier getIdentifier() {
+        return this;
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

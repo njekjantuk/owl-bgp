@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 public interface ExtendedOWLObjectVisitorEx<O> {
+    O visit(IRI iri);
     O visit(Clazz clazz);
     O visit(ClassVariable classVariable);
     O visit(ObjectIntersectionOf objectIntersectionOf);
@@ -27,6 +28,7 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataProperty dataProperty);
     O visit(DataPropertyVariable dataPropertyVariable);
     O visit(AnnotationProperty annotationProperty);
+    O visit(AnnotationPropertyVariable annotationProperty);
     
     O visit(Literal literal);
     O visit(LiteralVariable literalVariable);
@@ -46,7 +48,13 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     
     O visit(Annotation annotation);
     O visit(AnnotationValue annotationValue);
+    O visit(AnnotationSubject annotationSubject);
+    O visit(AnnotationAssertion assertion);
+    O visit(SubAnnotationPropertyOf axiom);
+    O visit(AnnotationPropertyDomain axiom);
+    O visit(AnnotationPropertyRange axiom);
     
+    O visit(Declaration axiom);
     O visit(SubClassOf axiom);
     O visit(EquivalentClasses axiom);
     O visit(DisjointClasses axiom);

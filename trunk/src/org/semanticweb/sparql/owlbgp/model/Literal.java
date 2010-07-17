@@ -81,10 +81,10 @@ public class Literal extends AbstractExtendedOWLObject implements ILiteral {
         String noDatatype=null;
         int lastCircCircIndex=literal.lastIndexOf("^^");
         if (lastCircCircIndex>=0) {
-            datatype=Datatype.create(literal.substring(lastCircCircIndex));
+            datatype=Datatype.create(IRI.create(literal.substring(lastCircCircIndex)));
             noDatatype=literal.substring(1,lastCircCircIndex-3);
         } else {
-            datatype=Datatype.create("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
+            datatype=Datatype.OWL2_DATATYPES.PLAIN_LITERAL.datatype;
             noDatatype=literal.substring(1,literal.length()-1);
         }
         int lastAtIndex=noDatatype.lastIndexOf("@");
@@ -95,9 +95,6 @@ public class Literal extends AbstractExtendedOWLObject implements ILiteral {
             lexicalForm=noDatatype;
         }
         return s_interningManager.intern(new Literal(lexicalForm,langTag,datatype));
-    }
-    public String getIdentifier() {
-        return this.toString();
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

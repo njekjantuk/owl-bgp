@@ -4,6 +4,7 @@ import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.DataMinCardinality;
 import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.DataRange;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class DataMinCardinalityTranslator extends AbstractDataCardinalityTranslator {
 
@@ -13,10 +14,10 @@ public class DataMinCardinalityTranslator extends AbstractDataCardinalityTransla
     protected ClassExpression createRestriction(DataPropertyExpression prop, int cardi, DataRange filler) {
         return DataMinCardinality.create(cardi, prop, filler);
     }
-    protected String getCardinalityTriplePredicate() {
+    protected Identifier getCardinalityTriplePredicate() {
         return Vocabulary.OWL_MIN_CARDINALITY.getIRI();
     }
-    protected String getQualifiedCardinalityTriplePredicate() {
+    protected Identifier getQualifiedCardinalityTriplePredicate() {
         return Vocabulary.OWL_MIN_QUALIFIED_CARDINALITY.getIRI();
     }
 }
