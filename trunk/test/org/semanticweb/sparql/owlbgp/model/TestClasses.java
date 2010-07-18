@@ -11,6 +11,19 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectIntersectionOf;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectAllValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectSomeValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectUnionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public class TestClasses extends TestCase {
     
@@ -121,16 +134,12 @@ public class TestClasses extends TestCase {
         bindingsZ.add(Clazz.create("http://example.org/s"));
         varToBindingSets.put(classVar3, bindingsZ);
         int i=0;   
-        for (Map<Variable,Atomic> binding : or.getBindingIterator(varToBindingSets)) {
-            or.applyBindings(binding);
-            System.out.println(or);
-            assertTrue(or.getUnboundVariablesInSignature().size()==0);
+        for (Map<Variable,Atomic> binding : new BindingIterator(varToBindingSets)) {
+            ExtendedOWLObject boundOr=or.getBoundVersion(binding);
+            assertTrue(boundOr.getVariablesInSignature().size()==0);
             i++;
         }
         assertTrue(i==(3*3*2));
-        for (ExtendedOWLObject eoo : or.getAppliedBindingsIterator(varToBindingSets)) {
-            System.out.println(eoo.asOWLAPIObject(OWLManager.getOWLDataFactory()));
-        }
     }
     public void testIntersectionApplyBindings() {
         String classIRI="http://www.example.org/"+new String(chars);
@@ -147,11 +156,11 @@ public class TestClasses extends TestCase {
         Map<Variable,Atomic> varsToBindings=new HashMap<Variable, Atomic>();
         varsToBindings.put(classVar, Clazz.create("http://www.example.org/CBind"));
         varsToBindings.put(opVar, ObjectProperty.create("http://www.example.org/OPBind"));
-        ce.applyBindings(varsToBindings);
-        assertTrue(ce.getUnboundVariablesInSignature(VarType.CLASS).size()==0);
-        assertTrue(ce.getUnboundVariablesInSignature(VarType.OBJECT_PROPERTY).size()==0);
-        assertTrue(ce.getUnboundVariablesInSignature().size()==0);
-        OWLObject owlCe=ce.asOWLAPIObject(OWLManager.getOWLDataFactory());
+        ExtendedOWLObject ceBound=ce.getBoundVersion(varsToBindings);
+        assertTrue(ceBound.getVariablesInSignature(VarType.CLASS).size()==0);
+        assertTrue(ceBound.getVariablesInSignature(VarType.OBJECT_PROPERTY).size()==0);
+        assertTrue(ceBound.getVariablesInSignature().size()==0);
+        OWLObject owlCe=ceBound.asOWLAPIObject(OWLManager.getOWLDataFactory());
         assertTrue(owlCe instanceof OWLObjectIntersectionOf);
         assertTrue(((OWLObjectIntersectionOf)owlCe).getOperands().size()==2);
     }
