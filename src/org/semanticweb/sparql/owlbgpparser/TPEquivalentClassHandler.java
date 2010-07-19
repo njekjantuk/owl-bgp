@@ -3,13 +3,13 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.DataRange;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
-import org.semanticweb.sparql.owlbgp.model.DatatypeDefinition;
-import org.semanticweb.sparql.owlbgp.model.EquivalentClasses;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.DatatypeDefinition;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 
 public class TPEquivalentClassHandler extends TriplePredicateHandler {
 

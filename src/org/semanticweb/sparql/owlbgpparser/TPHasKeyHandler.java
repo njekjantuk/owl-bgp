@@ -2,10 +2,10 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.HasKey;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.PropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.axioms.HasKey;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 
 public class TPHasKeyHandler extends TriplePredicateHandler {
 

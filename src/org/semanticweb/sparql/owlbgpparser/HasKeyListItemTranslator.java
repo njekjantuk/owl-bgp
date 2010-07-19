@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.PropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 
 public class HasKeyListItemTranslator implements ListItemTranslator<PropertyExpression> {
 
@@ -12,7 +12,7 @@ public class HasKeyListItemTranslator implements ListItemTranslator<PropertyExpr
         this.consumer = consumer;
     }
 
-    public PropertyExpression translate(ILiteral firstObject) {
+    public PropertyExpression translate(Literal firstObject) {
         return null;
     }
     public PropertyExpression translate(Identifier firstObject) {

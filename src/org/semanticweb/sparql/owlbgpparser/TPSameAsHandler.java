@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.SameIndividual;
+import org.semanticweb.sparql.owlbgp.model.axioms.SameIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 
 public class TPSameAsHandler extends TriplePredicateHandler {
 

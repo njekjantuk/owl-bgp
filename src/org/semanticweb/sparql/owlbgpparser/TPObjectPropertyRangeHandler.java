@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
 
 public class TPObjectPropertyRangeHandler extends TriplePredicateHandler {
 

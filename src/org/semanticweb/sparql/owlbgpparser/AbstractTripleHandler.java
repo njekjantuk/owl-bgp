@@ -1,13 +1,13 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DataRange;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class AbstractTripleHandler {
 
@@ -22,7 +22,7 @@ public class AbstractTripleHandler {
     protected void consumeTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumer.consumeTriple(subject, predicate, object);
     }
-    protected void consumeTriple(Identifier subject, Identifier predicate, ILiteral object) {
+    protected void consumeTriple(Identifier subject, Identifier predicate, Literal object) {
         consumer.consumeTriple(subject, predicate, object);
     }
     protected void addAxiom(Axiom axiom) {

@@ -3,9 +3,9 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.List;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyChain;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class TPPropertyChainAxiomHandler extends TriplePredicateHandler {
 

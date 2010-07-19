@@ -2,10 +2,10 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.ObjectOneOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectOneOf;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 
 public class OneOfTranslator extends AbstractClassExpressionTranslator {
 

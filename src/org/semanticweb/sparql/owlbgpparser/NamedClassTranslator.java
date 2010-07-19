@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 
 public class NamedClassTranslator implements ClassExpressionTranslator {
 

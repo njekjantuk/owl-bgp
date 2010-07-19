@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.DisjointDataProperties;
-import org.semanticweb.sparql.owlbgp.model.DisjointObjectProperties;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointObjectProperties;
 
 public class TPPropertyDisjointWithHandler extends TriplePredicateHandler {
 

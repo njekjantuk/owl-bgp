@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.SubDataPropertyOf;
-import org.semanticweb.sparql.owlbgp.model.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubDataPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
 
 public class TPSubPropertyOfHandler extends TriplePredicateHandler {
 

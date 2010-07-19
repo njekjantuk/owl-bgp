@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public abstract class AbstractObjectRestrictionTranslator extends AbstractRestrictionTranslator {
 

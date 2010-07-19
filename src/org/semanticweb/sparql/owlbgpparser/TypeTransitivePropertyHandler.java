@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.TransitiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.TransitiveObjectProperty;
 
 public class TypeTransitivePropertyHandler extends BuiltInTypeHandler {
 

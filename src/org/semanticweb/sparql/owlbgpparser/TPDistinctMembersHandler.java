@@ -2,9 +2,9 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
+import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 
 public class TPDistinctMembersHandler extends TriplePredicateHandler {
 

@@ -1,11 +1,11 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public abstract class AbstractObjectCardinalityTranslator extends AbstractObjectRestrictionTranslator {
 
@@ -15,8 +15,8 @@ public abstract class AbstractObjectCardinalityTranslator extends AbstractObject
     protected abstract Identifier getCardinalityTriplePredicate();
     protected abstract Identifier getQualifiedCardinalityTriplePredicate();
     protected int translateCardinality(Identifier mainNode) {
-        ILiteral con=(ILiteral)getLiteralObject(mainNode, getCardinalityTriplePredicate(), true);
-        if (con==null) con=(ILiteral)getLiteralObject(mainNode, getQualifiedCardinalityTriplePredicate(), true);
+        Literal con=(Literal)getLiteralObject(mainNode, getCardinalityTriplePredicate(), true);
+        if (con==null) con=(Literal)getLiteralObject(mainNode, getQualifiedCardinalityTriplePredicate(), true);
         if (con == null) return -1;
         return Integer.parseInt(con.getLexicalForm().trim());
     }

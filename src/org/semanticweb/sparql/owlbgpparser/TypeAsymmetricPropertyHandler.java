@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.AsymmetricObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.AsymmetricObjectProperty;
 
 public class TypeAsymmetricPropertyHandler extends BuiltInTypeHandler {
 

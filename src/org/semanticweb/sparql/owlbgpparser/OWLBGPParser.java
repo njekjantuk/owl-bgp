@@ -5,15 +5,15 @@ import java.io.StringReader;
 import java.util.Set;
 
 import org.coode.string.EscapeUtils;
-import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
-import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 
 public class OWLBGPParser implements OWLBGPParserConstants {
 

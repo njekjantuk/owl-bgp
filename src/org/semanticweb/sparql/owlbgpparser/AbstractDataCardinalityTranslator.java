@@ -1,13 +1,13 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DataRange;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 
 public abstract class AbstractDataCardinalityTranslator extends AbstractDataRestrictionTranslator {
 
@@ -18,8 +18,8 @@ public abstract class AbstractDataCardinalityTranslator extends AbstractDataRest
     protected abstract Identifier getCardinalityTriplePredicate();
     protected abstract Identifier getQualifiedCardinalityTriplePredicate();
     protected int translateCardinality(Identifier mainNode) {
-        ILiteral cardiObject=(ILiteral)getLiteralObject(mainNode, getCardinalityTriplePredicate(), true);
-        if (cardiObject == null) cardiObject=(ILiteral)getLiteralObject(mainNode, getQualifiedCardinalityTriplePredicate(), true);
+        Literal cardiObject=(Literal)getLiteralObject(mainNode, getCardinalityTriplePredicate(), true);
+        if (cardiObject == null) cardiObject=(Literal)getLiteralObject(mainNode, getQualifiedCardinalityTriplePredicate(), true);
         if (cardiObject == null) return -1;
         return Integer.parseInt(cardiObject.getLexicalForm());
     }

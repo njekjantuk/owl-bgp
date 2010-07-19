@@ -1,9 +1,9 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.DataHasValue;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataHasValue;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public class DataHasValueTranslator extends AbstractDataRestrictionTranslator {
 
@@ -12,7 +12,7 @@ public class DataHasValueTranslator extends AbstractDataRestrictionTranslator {
     }
     
     protected ClassExpression translateRestriction(Identifier mainNode) {
-        ILiteral con=getLiteralObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(), true);
+        Literal con=getLiteralObject(mainNode, Vocabulary.OWL_HAS_VALUE.getIRI(), true);
         return DataHasValue.create(translateOnProperty(mainNode), con);
     }
 }

@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.xml.sax.SAXException;
 
 public class OWLRDFConsumerAdapter extends OWLRDFConsumer implements TripleHandler {

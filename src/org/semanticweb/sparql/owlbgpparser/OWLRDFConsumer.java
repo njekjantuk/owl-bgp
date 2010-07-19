@@ -1,7 +1,5 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import static org.semanticweb.owlapi.vocab.OWLRDFVocabulary.RDF_TYPE;
-
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,40 +11,40 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
-import org.semanticweb.sparql.owlbgp.model.AnnotationProperty;
-import org.semanticweb.sparql.owlbgp.model.AnnotationPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.AnnotationPropertyVariable;
-import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.ClassAssertion;
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.ClassVariable;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
-import org.semanticweb.sparql.owlbgp.model.DataIntersectionOf;
-import org.semanticweb.sparql.owlbgp.model.DataOneOf;
-import org.semanticweb.sparql.owlbgp.model.DataProperty;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyVariable;
-import org.semanticweb.sparql.owlbgp.model.DataRange;
-import org.semanticweb.sparql.owlbgp.model.DataUnionOf;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
-import org.semanticweb.sparql.owlbgp.model.DatatypeRestriction;
-import org.semanticweb.sparql.owlbgp.model.DatatypeVariable;
-import org.semanticweb.sparql.owlbgp.model.FacetRestriction;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.IndividualVariable;
-import org.semanticweb.sparql.owlbgp.model.Literal;
-import org.semanticweb.sparql.owlbgp.model.LiteralVariable;
-import org.semanticweb.sparql.owlbgp.model.NamedIndividual;
-import org.semanticweb.sparql.owlbgp.model.ObjectInverseOf;
-import org.semanticweb.sparql.owlbgp.model.ObjectProperty;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
-import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataOneOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataUnionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
+import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.xml.sax.SAXException;
 
 public class OWLRDFConsumer {
@@ -61,21 +59,23 @@ public class OWLRDFConsumer {
     protected Set<Identifier> datatypeVariables=new HashSet<Identifier>();
     protected Set<Identifier> individualIRIs=new HashSet<Identifier>();
     protected Set<Identifier> individualVariables=new HashSet<Identifier>();
-    protected Set<ILiteral> literalVariables=new HashSet<ILiteral>();
+    protected Set<Literal> literalVariables=new HashSet<Literal>();
     protected Set<Identifier> propertyIRIs=new HashSet<Identifier>(); // things neither typed as a data or object property - bad!
     protected Set<Identifier> ontologyPropertyIRIs=new HashSet<Identifier>();
     protected Set<Identifier> rdfType=new HashSet<Identifier>();
     protected Set<Identifier> restrictionIRIs=new HashSet<Identifier>(); // IRIs that had a type triple to owl:Restriction
     protected Set<Identifier> axiomIRIs=new HashSet<Identifier>();
     
-    protected Identifier firstOntologyIRI; // The IRI of the first resource that is typed as an ontology
-    protected Set<Identifier> ontologyIRIs=new HashSet<Identifier>(); // IRIs that had a type triple to owl:Ontology
-    protected Identifier ontologyIRI;
+    protected IRI firstOntologyIRI; // The IRI of the first resource that is typed as an ontology
+    protected Set<IRI> ontologyIRIs=new HashSet<IRI>(); // IRIs that had a type triple to owl:Ontology
+    protected IRI ontologyIRI;
+    protected IRI versionIRI;
     protected Identifier xmlBase;
     
     protected Set<Identifier> annotationPropertyIRIs=new HashSet<Identifier>();
     protected Set<Identifier> annotationPropertyVariables=new HashSet<Identifier>();
     protected Set<Identifier> annotationIRIs=new HashSet<Identifier>();
+    protected Set<Annotation> annotations=new HashSet<Annotation>();
     protected Map<Identifier, Annotation> annotationIRI2Annotation=new HashMap<Identifier, Annotation>();
     protected Map<Identifier, Set<Annotation>> annotationsBySubject=new HashMap<Identifier, Set<Annotation>>();
     protected Set<Annotation> pendingAnnotations=new HashSet<Annotation>();
@@ -85,11 +85,11 @@ public class OWLRDFConsumer {
     protected Set<Identifier> listIRIs=new HashSet<Identifier>(); // IRIs that had a type triple to rdf:List
     protected Map<Identifier,Identifier> listRestTripleMap=new HashMap<Identifier, Identifier>(); // Maps rdf:next triple subjects to objects
     protected Map<Identifier,Identifier> listFirstResourceTripleMap=new HashMap<Identifier, Identifier>();
-    protected Map<Identifier,ILiteral> listFirstLiteralTripleMap=new HashMap<Identifier, ILiteral>();
+    protected Map<Identifier,Literal> listFirstLiteralTripleMap=new HashMap<Identifier, Literal>();
     protected OptimisedListTranslator<ClassExpression> classExpressionListTranslator; // A translator for lists of class expressions (such lists are used in intersections, unions etc.)
     protected OptimisedListTranslator<Individual> individualListTranslator; // A translator for individual lists (such lists are used in object oneOf constructs)
     protected OptimisedListTranslator<ObjectPropertyExpression> objectPropertyListTranslator;
-    protected OptimisedListTranslator<ILiteral> constantListTranslator;
+    protected OptimisedListTranslator<Literal> constantListTranslator;
     protected OptimisedListTranslator<DataPropertyExpression> dataPropertyListTranslator;
     protected OptimisedListTranslator<DataRange> dataRangeListTranslator;
     protected OptimisedListTranslator<FacetRestriction> faceRestrictionListTranslator;
@@ -119,9 +119,9 @@ public class OWLRDFConsumer {
     // Predicate, subject, object
     protected Map<Identifier, Map<Identifier, Identifier>> singleValuedResTriplesByPredicate=new HashMap<Identifier, Map<Identifier,Identifier>>();
     // Literal triples
-    protected Map<Identifier, Map<Identifier, Set<ILiteral>>> litTriplesBySubject=new HashMap<Identifier, Map<Identifier,Set<ILiteral>>>();
+    protected Map<Identifier, Map<Identifier, Set<Literal>>> litTriplesBySubject=new HashMap<Identifier, Map<Identifier,Set<Literal>>>();
     // Predicate, subject, object
-    protected Map<Identifier, Map<Identifier, ILiteral>> singleValuedLitTriplesByPredicate=new HashMap<Identifier, Map<Identifier,ILiteral>>();
+    protected Map<Identifier, Map<Identifier, Literal>> singleValuedLitTriplesByPredicate=new HashMap<Identifier, Map<Identifier,Literal>>();
 
     protected Axiom lastAddedAxiom;
     protected Set<Axiom> axioms=new HashSet<Axiom>();
@@ -142,7 +142,7 @@ public class OWLRDFConsumer {
         
         classExpressionListTranslator=new OptimisedListTranslator<ClassExpression>(this, new ClassExpressionListItemTranslator(this));
         individualListTranslator=new OptimisedListTranslator<Individual>(this, new IndividualListItemTranslator(this));
-        constantListTranslator=new OptimisedListTranslator<ILiteral>(this, new TypedConstantListItemTranslator(this));
+        constantListTranslator=new OptimisedListTranslator<Literal>(this, new TypedConstantListItemTranslator(this));
         objectPropertyListTranslator=new OptimisedListTranslator<ObjectPropertyExpression>(this, new ObjectPropertyListItemTranslator(this));
         dataPropertyListTranslator=new OptimisedListTranslator<DataPropertyExpression>(this, new DataPropertyListItemTranslator(this));
         dataRangeListTranslator=new OptimisedListTranslator<DataRange>(this, new DataRangeListItemTranslator(this));
@@ -167,6 +167,12 @@ public class OWLRDFConsumer {
         setupSinglePredicateMaps();
     }
     
+    public void setOntologyIRI(IRI ontologyIRI) {
+        this.ontologyIRI=ontologyIRI;
+    }
+    public void setVersionIRI(IRI versionIRI) {
+        this.versionIRI=versionIRI;
+    }
     public void setClassesInOntologySignature(Set<Identifier> classIRIs) {
         this.classIRIs.addAll(classIRIs);
     }
@@ -290,7 +296,7 @@ public class OWLRDFConsumer {
     protected boolean isVariableNode(Identifier iri) {
         return (iri instanceof Variable);
     }
-    protected boolean isVariableLiteral(ILiteral literal) {
+    protected boolean isVariableLiteral(Literal literal) {
         return (literal instanceof Variable);
     }
     protected void addAxiom(Axiom axiom) {
@@ -315,6 +321,7 @@ public class OWLRDFConsumer {
     }
     public void setPendingAnnotations(Set<Annotation> annotations) {
         pendingAnnotations.clear();
+        this.annotations.addAll(annotations);
         pendingAnnotations.addAll(annotations);
     }
     protected void addClass(Identifier iri) {
@@ -333,7 +340,7 @@ public class OWLRDFConsumer {
         if (isVariableNode(iri)) individualVariables.add(iri);
         else individualIRIs.add(iri);
     }
-    protected void addLiteral(ILiteral iri) {
+    protected void addLiteral(Literal iri) {
         if (isVariableLiteral(iri)) literalVariables.add(iri);
     }
     protected void addDataRange(Identifier iri) {
@@ -412,7 +419,7 @@ public class OWLRDFConsumer {
     protected void consumeTriple(Identifier subject, Identifier predicate, Identifier object) {
         isTriplePresent(subject, predicate, object, true);
     }
-    protected void consumeTriple(Identifier subject, Identifier predicate, ILiteral con) {
+    protected void consumeTriple(Identifier subject, Identifier predicate, Literal con) {
         isTriplePresent(subject, predicate, con, true);
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,7 +461,7 @@ public class OWLRDFConsumer {
             }
         }
     }
-    public void handle(Identifier subject, Identifier predicate, ILiteral object) {
+    public void handle(Identifier subject, Identifier predicate, Literal object) {
         for (AbstractLiteralTripleHandler handler : literalTripleHandlers) {
             if (handler.canHandle(subject, predicate, object)) {
                 handler.handleTriple(subject, predicate, object);
@@ -479,9 +486,9 @@ public class OWLRDFConsumer {
             }
         }
         for (Identifier predicate : singleValuedLitTriplesByPredicate.keySet()) {
-            Map<Identifier, ILiteral> map=singleValuedLitTriplesByPredicate.get(predicate);
+            Map<Identifier, Literal> map=singleValuedLitTriplesByPredicate.get(predicate);
             for (Identifier subject : map.keySet()) {
-                ILiteral object=map.get(subject);
+                Literal object=map.get(subject);
                 printTriple(subject, predicate, object, w);
             }
         }
@@ -495,10 +502,10 @@ public class OWLRDFConsumer {
             }
         }
         for (Identifier subject : litTriplesBySubject.keySet()) {
-            Map<Identifier, Set<ILiteral>> map=litTriplesBySubject.get(subject);
+            Map<Identifier, Set<Literal>> map=litTriplesBySubject.get(subject);
             for (Identifier predicate : map.keySet()) {
-                Set<ILiteral> objects=map.get(predicate);
-                for (ILiteral object : objects) {
+                Set<Literal> objects=map.get(predicate);
+                for (Literal object : objects) {
                     printTriple(subject, predicate, object, w);
                 }
             }
@@ -513,68 +520,68 @@ public class OWLRDFConsumer {
         // we translate all system triples and then go for triples whose predicates
         // are not system/reserved vocabulary IRIs to translate these into ABox assertions
         // or annotationIRIs
-        for (Identifier subject : resTriplesBySubject.keySet()) {
-            Map<Identifier, Set<Identifier>> map=resTriplesBySubject.get(subject);
-            if (map==null) continue;
-            for (Identifier predicate : map.keySet()) {
-                Set<Identifier> objects=map.get(predicate);
-                if (objects==null) continue;
-                for (Identifier object : objects)
-                    if (!(predicate.equals(Vocabulary.RDF_TYPE.getIRI()) && (object.equals(Vocabulary.OWL_AXIOM.getIRI()) || object.equals(Vocabulary.OWL_ALL_DISJOINT_CLASSES.getIRI()))))
-                        handle(subject, predicate, object);
+        iterateResourceTriples(new ResourceTripleIterator() {
+            public void handleResourceTriple(Identifier subject, Identifier predicate, Identifier object) {
+                handle(subject, predicate, object);
             }
-        }
-        // Now handle axiom annotations
-        // TODO: TIDY UP THIS COPY AND PASTE HACK!
-        for (Identifier subject : resTriplesBySubject.keySet()) {
-            Map<Identifier, Set<Identifier>> map=resTriplesBySubject.get(subject);
-            if (map==null) continue;
-            for (Identifier predicate : map.keySet()) {
-                Set<Identifier> objects=map.get(predicate);
-                if (objects==null) continue;
-                for (Identifier object : objects)
-                    if ((predicate.equals(Vocabulary.RDF_TYPE.getIRI()) && (object.equals(Vocabulary.OWL_AXIOM.getIRI()) || object.equals(Vocabulary.OWL_ALL_DISJOINT_CLASSES.getIRI())))) 
-                        handle(subject, predicate, object);
+        });
+
+        iterateLiteralTriples(new LiteralTripleIterator() {
+            public void handleLiteralTriple(Identifier subject, Identifier predicate, Literal object) {
+                handle(subject, predicate, object);
             }
-        }
-        // TODO: TIDY UP!  This is a copy and paste hack!!
-        // Now for the ABox assertions and annotationIRIs
-        for (Identifier subject : resTriplesBySubject.keySet()) {
-            Map<Identifier, Set<Identifier>> map=resTriplesBySubject.get(subject);
-            if (map==null) continue;
-            for (Identifier predicate : map.keySet()) {
-                Set<Identifier> objects=map.get(predicate);
-                if (objects==null) continue;
-                for (Identifier object : objects) {
-                    if (isVariableNode(object) && isDataPropertyOnly(predicate)) {
-                    	ILiteral obj=(ILiteral)object;
-                    	for (AbstractLiteralTripleHandler handler : literalTripleHandlers) {
-                            if (handler.canHandle(subject, predicate, obj)) {
-                                handler.handleTriple(subject, predicate, obj);
-                                continue;
-                            }
-                        }
-                    } else {		
-                	    for (AbstractResourceTripleHandler resTripHandler : resourceTripleHandlers) {
-                            if (resTripHandler.canHandle(subject, predicate, object)) {
-                                resTripHandler.handleTriple(subject, predicate, object);
-                                break;
-                            }
+        });
+        consumeNonReservedPredicateTriples(); // Now handle non-reserved predicate triples
+        consumeAnnotatedAxioms(); // Now axiom annotations
+        // Do we need to change the ontology IRI?
+        chooseOntologyIRI();
+        cleanup();
+    }
+    protected void consumeNonReservedPredicateTriples() {
+        iterateResourceTriples(new ResourceTripleIterator() {
+            public void handleResourceTriple(Identifier subject, Identifier predicate, Identifier object) {
+                if (Vocabulary.valueOf(predicate.getIdentifier().toString())!=null) {
+                    for (AbstractResourceTripleHandler resTripHandler : resourceTripleHandlers) {
+                        if (resTripHandler.canHandle(subject, predicate, object)) {
+                            resTripHandler.handleTriple(subject, predicate, object);
+                            break;
                         }
                     }
                 }
             }
-        }
-        for (Identifier subject : litTriplesBySubject.keySet()) {
-            Map<Identifier, Set<ILiteral>> map=litTriplesBySubject.get(subject);
-            if (map==null) continue;
-            for (Identifier predicate : map.keySet()) {
-                for (ILiteral object : map.get(predicate))
-                    handle(subject, predicate, object);
-            }
-        }
-        cleanup();
+        });
     }
+    protected void consumeAnnotatedAxioms() {
+        iterateResourceTriples(new ResourceTripleIterator() {
+            public void handleResourceTriple(Identifier subject, Identifier predicate, Identifier object) {
+                BuiltInTypeHandler builtInTypeHandler=axiomTypeTripleHandlers.get(object);
+                if (builtInTypeHandler!=null) 
+                    if (builtInTypeHandler.canHandle(subject, predicate, object))
+                        builtInTypeHandler.handleTriple(subject, predicate, object);
+            }
+        });
+    }
+    protected void chooseOntologyIRI() {
+        if (ontologyIRIs.size()==1) {
+            // Exactly one ontologyIRI
+            Identifier ontologyIRI=ontologyIRIs.iterator().next();
+            if (!isAnonymousNode(ontologyIRI) && !isVariableNode(ontologyIRI)) 
+                ontologyIRI=(IRI)ontologyIRI;
+        } else if (ontologyIRIs.size() > 1) {
+            // We have multiple to choose from
+            // Choose one that isn't the object of an annotation assertion
+            Set<IRI> candidateIRIs=new HashSet<IRI>(ontologyIRIs);
+            for (Annotation anno : annotations) {
+                if (anno.getAnnotationValue() instanceof IRI) {
+                    IRI iri=(IRI)anno.getAnnotationValue();
+                    if (ontologyIRIs.contains(iri)) candidateIRIs.remove(iri);
+                }
+            }
+            if (candidateIRIs.contains(firstOntologyIRI)) ontologyIRI=firstOntologyIRI;
+            else if (!candidateIRIs.isEmpty()) ontologyIRI=candidateIRIs.iterator().next();
+        }
+    }
+
     protected void cleanup() {
         classIRIs.clear();
         classVariables.clear();
@@ -618,7 +625,7 @@ public class OWLRDFConsumer {
     }
     protected void handleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         boolean consumed = false;
-        if (predicate.equals(RDF_TYPE.getIRI())) {
+        if (predicate.equals(Vocabulary.RDF_TYPE.getIRI())) {
             BuiltInTypeHandler handler=builtInTypeTripleHandlers.get(object);
             if (handler != null) {
                 if (handler.canHandleStreaming(subject, predicate, object)) {
@@ -678,7 +685,7 @@ public class OWLRDFConsumer {
         addTriple(subject, predicate, object);
     }
     protected void handleStreaming(Identifier subject, Identifier predicate, String lexicalForm, String lang, Datatype datatype) {
-    	ILiteral con=getConstant(lexicalForm, lang, datatype);
+    	Literal con=getConstant(lexicalForm, lang, datatype);
         for (AbstractLiteralTripleHandler handler : literalTripleHandlers) {
             if (handler.canHandleStreaming(subject, predicate, con)) {
             	handler.handleTriple(subject, predicate, con);
@@ -756,8 +763,8 @@ public class OWLRDFConsumer {
         addIndividual(ind.getIdentifier());
         return ind;
     }
-    protected ILiteral getConstant(String literal, String lang, Datatype datatype) {
-        ILiteral lit=Literal.create(literal, lang, datatype);
+    protected Literal getConstant(String literal, String lang, Datatype datatype) {
+        Literal lit=TypedLiteral.create(literal, lang, datatype);
         addLiteral(lit);
         return lit;
     }
@@ -787,7 +794,7 @@ public class OWLRDFConsumer {
                     else mainNodeAnnotations.add(Annotation.create(prop, (IRI)resVal, annosOnMainNodeAnnotations));
                     resVal = getResourceObject(mainNode, predicate, true);
                 }
-                ILiteral litVal=getLiteralObject(mainNode, predicate, true);
+                Literal litVal=getLiteralObject(mainNode, predicate, true);
                 while (litVal != null) {
                     mainNodeAnnotations.add(Annotation.create(prop, litVal, annosOnMainNodeAnnotations));
                     litVal=getLiteralObject(mainNode, predicate, true);
@@ -818,13 +825,13 @@ public class OWLRDFConsumer {
     public DataRange translateDataRange(Identifier iri) {
         Identifier oneOfObject=getResourceObject(iri, Vocabulary.OWL_ONE_OF.getIRI(), true);
         if (oneOfObject!=null) {
-            Set<ILiteral> literals=translateToConstantSet(oneOfObject);
-            Set<ILiteral> typedConstants=new HashSet<ILiteral>(literals.size());
-            for (ILiteral con : literals) {
+            Set<Literal> literals=translateToConstantSet(oneOfObject);
+            Set<Literal> typedConstants=new HashSet<Literal>(literals.size());
+            for (Literal con : literals) {
                 if (con instanceof LiteralVariable) {
                     typedConstants.add((LiteralVariable) con);
                 } else {
-                    typedConstants.add((Literal)con);
+                    typedConstants.add((TypedLiteral)con);
                 }
             }
             return DataOneOf.create(typedConstants);
@@ -867,7 +874,7 @@ public class OWLRDFConsumer {
     public Set<ClassExpression> translateToClassExpressionSet(Identifier mainNode) {
         return classExpressionListTranslator.translateToSet(mainNode);
     }
-    public Set<ILiteral> translateToConstantSet(Identifier mainNode) {
+    public Set<Literal> translateToConstantSet(Identifier mainNode) {
         return constantListTranslator.translateToSet(mainNode);
     }
     public Set<Individual> translateToIndividualSet(Identifier mainNode) {
@@ -888,7 +895,7 @@ public class OWLRDFConsumer {
         if (predObjMap!=null) {
             IRIs.addAll(predObjMap.keySet());
         }
-        Map<Identifier, Set<ILiteral>> predObjMapLit=litTriplesBySubject.get(subject);
+        Map<Identifier, Set<Literal>> predObjMapLit=litTriplesBySubject.get(subject);
         if (predObjMapLit!=null) {
             IRIs.addAll(predObjMapLit.keySet());
         }
@@ -918,19 +925,19 @@ public class OWLRDFConsumer {
         }
         return null;
     }
-    public ILiteral getLiteralObject(Identifier subject, Identifier predicate, boolean consume) {
-        Map<Identifier, ILiteral> subjPredMap=singleValuedLitTriplesByPredicate.get(predicate);
+    public Literal getLiteralObject(Identifier subject, Identifier predicate, boolean consume) {
+        Map<Identifier, Literal> subjPredMap=singleValuedLitTriplesByPredicate.get(predicate);
         if (subjPredMap!=null) {
-            ILiteral obj=subjPredMap.get(subject);
+            Literal obj=subjPredMap.get(subject);
             if (consume) subjPredMap.remove(subject);
             return obj;
         }
-        Map<Identifier, Set<ILiteral>> predObjMap=litTriplesBySubject.get(subject);
+        Map<Identifier, Set<Literal>> predObjMap=litTriplesBySubject.get(subject);
         if (predObjMap!=null) {
-            Set<ILiteral> objects=predObjMap.get(predicate);
+            Set<Literal> objects=predObjMap.get(predicate);
             if (objects!=null) {
                 if (!objects.isEmpty()) {
-                    ILiteral object=objects.iterator().next();
+                    Literal object=objects.iterator().next();
                     if (consume) objects.remove(object);
                     if (objects.isEmpty()) predObjMap.remove(predicate);
                     return object;
@@ -946,7 +953,7 @@ public class OWLRDFConsumer {
                     if (consume) objects.remove(object);
                     if (objects.isEmpty()) predObjMap1.remove(predicate);
                     if ((isVariableNode(object)) && (!rdfType.contains(object))) {
-                        ILiteral litvar=LiteralVariable.create(object.toString());
+                        Literal litvar=LiteralVariable.create(object.toString());
                         return litvar;  
                    	}
                 }
@@ -980,16 +987,16 @@ public class OWLRDFConsumer {
         }
         return false;
     }
-    public boolean isTriplePresent(Identifier subject, Identifier predicate, ILiteral object, boolean consume) {
-        Map<Identifier, ILiteral> subjPredMap=singleValuedLitTriplesByPredicate.get(predicate);
+    public boolean isTriplePresent(Identifier subject, Identifier predicate, Literal object, boolean consume) {
+        Map<Identifier, Literal> subjPredMap=singleValuedLitTriplesByPredicate.get(predicate);
         if (subjPredMap!=null) {
-            ILiteral obj=subjPredMap.get(subject);
+            Literal obj=subjPredMap.get(subject);
             if (consume) subjPredMap.remove(subject);
             return obj!=null;
         }
-        Map<Identifier, Set<ILiteral>> predObjMap=litTriplesBySubject.get(subject);
+        Map<Identifier, Set<Literal>> predObjMap=litTriplesBySubject.get(subject);
         if (predObjMap!=null) {
-            Set<ILiteral> objects=predObjMap.get(predicate);
+            Set<Literal> objects=predObjMap.get(predicate);
             if (objects!=null) {
                 if (objects.contains(object)) {
                     if (consume) {
@@ -1009,14 +1016,14 @@ public class OWLRDFConsumer {
     public boolean hasPredicate(Identifier subject, Identifier predicate) {
         Map<Identifier, Identifier> resPredMap=singleValuedResTriplesByPredicate.get(predicate);
         if (resPredMap!=null) return resPredMap.containsKey(subject);
-        Map<Identifier, ILiteral> litPredMap=singleValuedLitTriplesByPredicate.get(predicate);
+        Map<Identifier, Literal> litPredMap=singleValuedLitTriplesByPredicate.get(predicate);
         if (litPredMap!=null) return litPredMap.containsKey(subject);
         Map<Identifier, Set<Identifier>> resPredObjMap=resTriplesBySubject.get(subject);
         if (resPredObjMap!=null) {
             boolean b=resPredObjMap.containsKey(predicate);
             if (b) return true;
         }
-        Map<Identifier, Set<ILiteral>> litPredObjMap=litTriplesBySubject.get(subject);
+        Map<Identifier, Set<Literal>> litPredObjMap=litTriplesBySubject.get(subject);
         if (litPredObjMap!=null) return litPredObjMap.containsKey(predicate);
         return false;
     }
@@ -1054,14 +1061,14 @@ public class OWLRDFConsumer {
         if (consume) return listFirstResourceTripleMap.remove(subject);
         else return listFirstResourceTripleMap.get(subject);
     }
-    public ILiteral getFirstLiteral(Identifier subject) {
+    public Literal getFirstLiteral(Identifier subject) {
         return listFirstLiteralTripleMap.get(subject);
     }
     public Identifier getRest(Identifier subject, boolean consume) {
         if (consume) return listRestTripleMap.remove(subject);
         else return listRestTripleMap.get(subject);
     }
-    public void addFirst(Identifier subject, ILiteral object) {
+    public void addFirst(Identifier subject, Literal object) {
         listFirstLiteralTripleMap.put(subject, object);
     }
     public boolean isDataRange(Identifier iri) {
@@ -1082,6 +1089,39 @@ public class OWLRDFConsumer {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private interface ResourceTripleIterator {
+        void handleResourceTriple(Identifier subject, Identifier predicate, Identifier object);
+    }
+
+    private interface LiteralTripleIterator {
+        void handleLiteralTriple(Identifier subject, Identifier predicate, Literal object);
+    }
+
+    public void iterateResourceTriples(ResourceTripleIterator iterator) {
+        for (Identifier subject : new ArrayList<Identifier >(resTriplesBySubject.keySet())) {
+            Map<Identifier,Set<Identifier>> map = resTriplesBySubject.get(subject);
+            if (map == null) continue;
+            for (Identifier predicate : new ArrayList<Identifier>(map.keySet())) {
+                Set<Identifier> objects = map.get(predicate);
+                if (objects == null) continue;
+                for (Identifier object : new ArrayList<Identifier>(objects)) 
+                    iterator.handleResourceTriple(subject, predicate, object);
+            }
+        }
+    }
+
+    public void iterateLiteralTriples(LiteralTripleIterator iterator) {
+        for (Identifier subject : new ArrayList<Identifier>(litTriplesBySubject.keySet())) {
+            Map<Identifier , Set<Literal>> map=litTriplesBySubject.get(subject);
+            if (map == null) continue;
+            for (Identifier predicate : new ArrayList<Identifier>(map.keySet())) {
+                Set<Literal> objects=map.get(predicate);
+                for (Literal object : new ArrayList<Literal>(objects))
+                    iterator.handleLiteralTriple(subject, predicate, object);
+            }
+        }
+    }
+    
     /*
         Originally we had a special Triple class, which was specialised into ResourceTriple and
         LiteralTriple - this was used to store triples.  However, with very large ontologies this
@@ -1107,18 +1147,18 @@ public class OWLRDFConsumer {
             objects.add(object);
         }
     }
-    public void addTriple(Identifier subject, Identifier predicate, ILiteral con) {
-        Map<Identifier, ILiteral> subjObjMap=singleValuedLitTriplesByPredicate.get(predicate);
+    public void addTriple(Identifier subject, Identifier predicate, Literal con) {
+        Map<Identifier, Literal> subjObjMap=singleValuedLitTriplesByPredicate.get(predicate);
         if (subjObjMap!=null) subjObjMap.put(subject, con);
         else {
-            Map<Identifier, Set<ILiteral>> map=litTriplesBySubject.get(subject);
+            Map<Identifier, Set<Literal>> map=litTriplesBySubject.get(subject);
             if (map==null) {
-                map=new HashMap<Identifier, Set<ILiteral>>();
+                map=new HashMap<Identifier, Set<Literal>>();
                 litTriplesBySubject.put(subject, map);
             }
-            Set<ILiteral> objects=map.get(predicate);
+            Set<Literal> objects=map.get(predicate);
             if (objects==null) {
-                objects=new FakeSet<ILiteral>();
+                objects=new FakeSet<Literal>();
                 map.put(predicate, objects);
             }
             objects.add(con);

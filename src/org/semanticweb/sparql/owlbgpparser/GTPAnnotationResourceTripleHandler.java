@@ -1,13 +1,13 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
-import org.semanticweb.sparql.owlbgp.model.AnnotationAssertion;
-import org.semanticweb.sparql.owlbgp.model.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.AnnotationSubject;
 import org.semanticweb.sparql.owlbgp.model.AnnotationValue;
-import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationAssertion;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 
 public class GTPAnnotationResourceTripleHandler extends AbstractResourceTripleHandler {
     public GTPAnnotationResourceTripleHandler(OWLRDFConsumer consumer) {
