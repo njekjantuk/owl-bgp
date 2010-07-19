@@ -1,5 +1,81 @@
 package org.semanticweb.sparql.owlbgp.model;
 
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.AsymmetricObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.DatatypeDefinition;
+import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointUnion;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentDataProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalDataProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.HasKey;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.IrreflexiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.ReflexiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.SameIndividual;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubAnnotationPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubDataPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SymmetricObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.TransitiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataAllValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataExactCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataHasValue;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataMaxCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataMinCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.DataSomeValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectAllValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectComplementOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectExactCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectHasSelf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectHasValue;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectMaxCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectMinCardinality;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectOneOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectSomeValuesFrom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectUnionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataComplementOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataOneOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataUnionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
+import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
+
 public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(IRI iri);
     O visit(Clazz clazz);
@@ -30,7 +106,7 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(AnnotationProperty annotationProperty);
     O visit(AnnotationPropertyVariable annotationProperty);
     
-    O visit(Literal literal);
+    O visit(TypedLiteral literal);
     O visit(LiteralVariable literalVariable);
     
     O visit(NamedIndividual namedIndividual);
@@ -45,6 +121,8 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataIntersectionOf dataIntersectionOf);
     O visit(DataUnionOf dataUnionOf);
     O visit(DataOneOf dataOneOf);
+    
+//    O visit(Import axiom);
     
     O visit(Annotation annotation);
     O visit(AnnotationValue annotationValue);

@@ -18,6 +18,7 @@
 package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
@@ -64,7 +65,7 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
-    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
-        return new HashSet<Variable>();
+    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+        return this;
     }
 }

@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
-public interface Identifier extends ExtendedOWLObject {
 
+public interface Identifier extends ExtendedOWLObject {
+    public Identifier getIdentifier();
 }

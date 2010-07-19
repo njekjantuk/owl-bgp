@@ -6,8 +6,21 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.axioms.AbstractAxiom;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
-public class Declaration extends AbstractAxiom implements ClassAxiom {
+public class Declaration extends AbstractAxiom {
     private static final long serialVersionUID = -5136239506197182112L;
 
     protected static InterningManager<Declaration> s_interningManager=new InterningManager<Declaration>() {
@@ -37,8 +50,8 @@ public class Declaration extends AbstractAxiom implements ClassAxiom {
     protected final Atomic m_declaredObject;
     
     protected Declaration(Atomic declaredObject,Set<Annotation> annotations) {
+        super(annotations);
         m_declaredObject=declaredObject;
-        m_annotations=annotations;
     }
     public ExtendedOWLObject getDeclaredObject() {
         return m_declaredObject;
@@ -68,7 +81,7 @@ public class Declaration extends AbstractAxiom implements ClassAxiom {
         return s_interningManager.intern(this);
     }
     public static Declaration create(Atomic declaredObject) {
-        return Declaration.create(declaredObject,new HashSet<Annotation>());
+        return create(declaredObject,new HashSet<Annotation>());
     }
     public static Declaration create(Atomic declaredObject,Set<Annotation> annotations) {
         return s_interningManager.intern(new Declaration(declaredObject,annotations));
@@ -85,16 +98,10 @@ public class Declaration extends AbstractAxiom implements ClassAxiom {
         getAnnotationVariables(varType, variables);
         return variables;
     }
-    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
-        Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_declaredObject.getUnboundVariablesInSignature(varType));
-        getUnboundAnnotationVariables(varType, variables);
-        return variables;
-    }
-    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
-        m_declaredObject.applyBindings(variablesToBindings);
+    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+        return create((Atomic)m_declaredObject.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {
-        return Declaration.create(m_declaredObject);
+        return create(m_declaredObject);
     }
 }

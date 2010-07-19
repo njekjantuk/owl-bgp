@@ -17,14 +17,17 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 
-public class Annotation extends AbstractExtendedOWLObject implements ClassExpression {
+public class Annotation extends AbstractExtendedOWLObject {
     private static final long serialVersionUID = -4586686325214553112L;
 
     protected static InterningManager<Annotation> s_interningManager=new InterningManager<Annotation>() {
@@ -43,7 +46,7 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
     protected Annotation(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
         m_annotationProperty=annotationProperty;
         m_annotationValue=annotationValue;
-        m_annotations=annotations;
+        m_annotations=Collections.unmodifiableSet(new HashSet<Annotation>(annotations)); //immutable
     }
     public AnnotationPropertyExpression getAnnotationProperty() {
         return m_annotationProperty;
@@ -54,6 +57,7 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
     public Set<Annotation> getAnnotations() {
         return m_annotations;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer sb=new StringBuffer();
         sb.append("Annotation(");
@@ -78,29 +82,28 @@ public class Annotation extends AbstractExtendedOWLObject implements ClassExpres
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
         return s_interningManager.intern(new Annotation(annotationProperty,annotationValue,annotations));
     }
-    public Identifier getIdentifier() {
-        return null;
-    }
+    @Override
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+    @Override
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);
     }
+    @Override
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_annotationProperty.getVariablesInSignature(varType));
         variables.addAll(m_annotationValue.getVariablesInSignature(varType));
+        for (Annotation annotation : m_annotations) 
+            variables.addAll(annotation.getVariablesInSignature(varType));
         return variables;
     }
-    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
-        Set<Variable> unbound=new HashSet<Variable>();
-        unbound.addAll(m_annotationProperty.getUnboundVariablesInSignature(varType));
-        unbound.addAll(m_annotationValue.getUnboundVariablesInSignature(varType));
-        return unbound;
-    }
-    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
-        m_annotationProperty.applyBindings(variablesToBindings);
-        m_annotationValue.applyBindings(variablesToBindings);
+    @Override
+    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+        Set<Annotation> annotations=new HashSet<Annotation>();
+        for (Annotation annotation : m_annotations) 
+            annotations.add((Annotation)annotation.getBoundVersion(variablesToBindings));
+        return Annotation.create((AnnotationProperty)m_annotationProperty.getBoundVersion(variablesToBindings), (AnnotationValue)m_annotationValue.getBoundVersion(variablesToBindings),annotations);
     }
 }
