@@ -27,27 +27,27 @@ public class UntypedVariable extends Variable implements Atomic {
     
     protected static InterningManager<UntypedVariable> s_interningManager=new InterningManager<UntypedVariable>() {
         protected boolean equal(UntypedVariable object1,UntypedVariable object2) {
-            return object1.m_variable==object2.m_variable&&object1.m_binding==object2.m_binding;
+            return object1.m_variable==object2.m_variable;
         }
         protected int getHashCode(UntypedVariable object) {
             int hashCode=13;
             hashCode+=object.m_variable.hashCode();
-            if (object.m_binding!=null) hashCode+=object.m_binding.hashCode();
             return hashCode;
         }
     };
     
-    protected UntypedVariable(String variable,Atomic binding) {
-        super(variable,binding);
+    protected UntypedVariable(String variable) {
+        super(variable);
     }
-    public void setBinding(Atomic binding) {
-        if (binding!=null) throw new RuntimeException("Error: Untyped variables cannot be bound, but variable "+m_variable+" was assigned the binding "+binding);
+    public ExtendedOWLObject getBoundVersion(Atomic binding) {
+        if (binding==null) return null;
+        else throw new RuntimeException("Error: Untyped variables cannot be bound, but variable "+m_variable+" was assigned the binding "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static UntypedVariable create(String variable) {
-        return s_interningManager.intern(new UntypedVariable(variable,null));
+        return s_interningManager.intern(new UntypedVariable(variable));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

@@ -20,37 +20,28 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     }
     
     protected final String m_variable;
-    protected Atomic m_binding;
     
-    protected Variable(String variable,Atomic binding) {
+    protected Variable(String variable) {
         m_variable=variable.intern();
-        m_binding=binding;
     }
     public String getVariable() {
         return m_variable;
     }
-    public Atomic getBinding() {
-        return m_binding;
-    }
-    public abstract void setBinding(Atomic binding);
-    public void applyBindings(Map<Variable,Atomic> variablesToBindings) {
-        setBinding(variablesToBindings.get(this));
+    public abstract ExtendedOWLObject getBoundVersion(Atomic binding);
+    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+        return getBoundVersion(variablesToBindings.get(this));
     }
     public String toString(Prefixes prefixes) {
-        if (m_binding!=null) return "("+m_variable+"->"+m_binding.toString(prefixes)+")";
         return m_variable;
     }
     public Identifier getIdentifier() {
         return this;
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
-        throw new RuntimeException("An untyped vriable cannot have a binding and can, consequently, not be converted into an OWL API pbject and variable "+m_variable+" is untyped. "); 
+        throw new RuntimeException("An untyped variable cannot have a binding and can, consequently, not be converted into an OWL API pbject and variable "+m_variable+" is untyped. "); 
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
-    }
-    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
-        return new HashSet<Variable>();
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
