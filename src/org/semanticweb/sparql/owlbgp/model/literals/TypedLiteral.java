@@ -1,0 +1,130 @@
+/* Copyright 2010 by the Oxford University Computing Laboratory
+   
+   This file is part of OWL-BGP.
+
+   OWL-BGP is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
+   OWL-BGP is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+   
+   You should have received a copy of the GNU Lesser General Public License
+   along with OWL-BGP.  If not, see <http://www.gnu.org/licenses/>.
+*/
+package org.semanticweb.sparql.owlbgp.model.literals;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.InterningManager;
+import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.Variable;
+import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+
+public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
+    private static final long serialVersionUID = -8503015611577734737L;
+
+    protected static InterningManager<TypedLiteral> s_interningManager=new InterningManager<TypedLiteral>() {
+        protected boolean equal(TypedLiteral object1,TypedLiteral object2) {
+            return object1.m_lexicalForm==object2.m_lexicalForm;
+        }
+        protected int getHashCode(TypedLiteral object) {
+            return object.m_lexicalForm.hashCode();
+        }
+    };
+    
+    protected final String m_lexicalForm;
+    protected final String m_langTag;
+    protected final Datatype m_dataDatatype;
+    
+    protected TypedLiteral(String lexicalForm,String langTag,Datatype datatype) {
+        m_lexicalForm=lexicalForm.intern();
+        m_langTag=langTag.intern();
+        m_dataDatatype=datatype;
+    }
+    public String getLexicalForm() {
+        return m_lexicalForm;
+    }
+    public String getLangTag() {
+        return m_langTag;
+    }
+    public Datatype getDatatype() {
+        return m_dataDatatype;
+    }
+    @Override
+    public String toString(Prefixes prefixes) {
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("''");
+        buffer.append(m_lexicalForm);
+        if (m_langTag!=null) {
+            buffer.append("@");
+            buffer.append(m_langTag);
+        }
+        buffer.append("''");
+        buffer.append("^^");
+        if (m_dataDatatype==null) buffer.append("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
+        else buffer.append(m_dataDatatype.toString(prefixes));
+        return buffer.toString();
+    }
+    protected Object readResolve() {
+        return s_interningManager.intern(this);
+    }
+    public static TypedLiteral create(String lexicalForm,String langTag,Datatype datatype) {
+        return create(lexicalForm,langTag,datatype);
+    }
+    public static TypedLiteral create(String literal) {
+        String lexicalForm=null;
+        String langTag=null;
+        Datatype datatype=null;
+        String noDatatype=null;
+        int lastCircCircIndex=literal.lastIndexOf("^^");
+        if (lastCircCircIndex>=0) {
+            datatype=Datatype.create(IRI.create(literal.substring(lastCircCircIndex)));
+            noDatatype=literal.substring(1,lastCircCircIndex-3);
+        } else {
+            datatype=Datatype.OWL2_DATATYPES.PLAIN_LITERAL.getDatatype();
+            noDatatype=literal.substring(1,literal.length()-1);
+        }
+        int lastAtIndex=noDatatype.lastIndexOf("@");
+        if (lastAtIndex>=0) {
+            lexicalForm=noDatatype.substring(0,lastAtIndex-1);
+            langTag=noDatatype.substring(lastAtIndex+1);
+        } else {
+            lexicalForm=noDatatype;
+        }
+        return s_interningManager.intern(new TypedLiteral(lexicalForm,langTag,datatype));
+    }
+    @Override
+    public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
+        return visitor.visit(this);
+    }
+    @Override
+    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+        return converter.visit(this);
+    }
+    @Override
+    public Set<Variable> getVariablesInSignature(VarType varType) {
+        return new HashSet<Variable>();
+    }
+    @Override
+    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+        return this;
+    }
+    public Identifier getIdentifier() {
+        return this;
+    }
+}
