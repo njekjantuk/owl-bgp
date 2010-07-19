@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectOneOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectOneOf;
 
 public class TPOneOfHandler extends AbstractNamedEquivalentClassAxiomHandler {
 

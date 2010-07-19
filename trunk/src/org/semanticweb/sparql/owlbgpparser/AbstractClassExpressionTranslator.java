@@ -2,10 +2,10 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public abstract class AbstractClassExpressionTranslator implements ClassExpressionTranslator {
     protected final OWLRDFConsumer consumer;
@@ -19,7 +19,7 @@ public abstract class AbstractClassExpressionTranslator implements ClassExpressi
     protected Identifier getResourceObject(Identifier subject, Identifier predicate, boolean consume) {
         return consumer.getResourceObject(subject, predicate, consume);
     }
-    protected ILiteral getLiteralObject(Identifier subject, Identifier predicate, boolean consume) {
+    protected Literal getLiteralObject(Identifier subject, Identifier predicate, boolean consume) {
         return consumer.getLiteralObject(subject, predicate, consume);
     }
     protected boolean isTriplePresent(Identifier mainNode, Identifier predicate, Identifier value, boolean consume) {

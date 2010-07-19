@@ -1,12 +1,12 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.NegativeDataPropertyAssertion;
-import org.semanticweb.sparql.owlbgp.model.NegativeObjectPropertyAssertion;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class TypeNegativePropertyAssertionHandler extends BuiltInTypeHandler {
 
@@ -29,7 +29,7 @@ public class TypeNegativePropertyAssertionHandler extends BuiltInTypeHandler {
             addAxiom(NegativeObjectPropertyAssertion.create(prop,sourceInd,targetInd,consumer.getPendingAnnotations()));
         } else {
             DataPropertyExpression prop=consumer.translateDataPropertyExpression(property);
-            ILiteral targetLit=consumer.getLiteralObject(subject, Vocabulary.OWL_TARGET_VALUE.getIRI(), true);
+            Literal targetLit=consumer.getLiteralObject(subject, Vocabulary.OWL_TARGET_VALUE.getIRI(), true);
             addAxiom(NegativeDataPropertyAssertion.create(prop,sourceInd,targetLit,consumer.getPendingAnnotations()));
         }
         consumeTriple(subject, predicate, object);

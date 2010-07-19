@@ -2,9 +2,9 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectUnionOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectUnionOf;
 
 public class UnionOfTranslator extends AbstractNaryBooleanClassExpressionTranslator {
 

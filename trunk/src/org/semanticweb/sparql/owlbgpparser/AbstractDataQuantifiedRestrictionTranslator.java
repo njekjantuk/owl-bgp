@@ -1,12 +1,12 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DataRange;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 
 public abstract class AbstractDataQuantifiedRestrictionTranslator extends AbstractDataRestrictionTranslator {
     public AbstractDataQuantifiedRestrictionTranslator(OWLRDFConsumer consumer) {

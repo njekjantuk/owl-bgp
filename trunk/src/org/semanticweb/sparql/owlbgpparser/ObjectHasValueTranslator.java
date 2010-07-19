@@ -1,10 +1,10 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
-import org.semanticweb.sparql.owlbgp.model.ObjectHasValue;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectHasValue;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class ObjectHasValueTranslator extends AbstractObjectRestrictionTranslator {
 

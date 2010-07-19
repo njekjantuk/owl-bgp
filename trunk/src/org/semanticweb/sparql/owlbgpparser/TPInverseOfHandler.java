@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.InverseObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseObjectProperties;
 
 public class TPInverseOfHandler extends TriplePredicateHandler {
 

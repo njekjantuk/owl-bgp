@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public class OptimisedListTranslator<O extends ExtendedOWLObject> {
 
@@ -27,7 +27,7 @@ public class OptimisedListTranslator<O extends ExtendedOWLObject> {
         if (firstResource != null) {
             list.add(translator.translate(firstResource));
         } else {
-            ILiteral literal=getConsumer().getFirstLiteral(mainNode);
+            Literal literal=getConsumer().getFirstLiteral(mainNode);
             if (literal != null) list.add(translator.translate(literal));
         }
         Identifier rest=consumer.getRest(mainNode, true);

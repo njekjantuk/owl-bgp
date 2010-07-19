@@ -1,11 +1,11 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.AnnotationPropertyDomain;
-import org.semanticweb.sparql.owlbgp.model.AnnotationPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 
 public class TPPropertyDomainHandler extends TriplePredicateHandler {
 

@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.Individual;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public class IndividualListItemTranslator implements ListItemTranslator<Individual> {
 
@@ -14,7 +14,7 @@ public class IndividualListItemTranslator implements ListItemTranslator<Individu
     public Individual translate(Identifier iri) {
         return consumer.translateIndividual(iri);
     }
-    public Individual translate(ILiteral firstObject) {
+    public Individual translate(Literal firstObject) {
         return null;
     }
 }

@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.IrreflexiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.IrreflexiveObjectProperty;
 
 public class TypeIrreflexivePropertyHandler extends BuiltInTypeHandler {
 

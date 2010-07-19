@@ -2,9 +2,9 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 
 public interface TripleHandler {
     void handlePrefixDirective(String prefixName, Identifier prefix);

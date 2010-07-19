@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassAssertion;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
 
 public class TPTypeHandler extends TriplePredicateHandler {
 

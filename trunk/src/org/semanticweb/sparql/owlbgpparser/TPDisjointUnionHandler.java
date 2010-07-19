@@ -2,11 +2,11 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.ClassVariable;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
-import org.semanticweb.sparql.owlbgp.model.DisjointUnion;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointUnion;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 
 public class TPDisjointUnionHandler extends TriplePredicateHandler {
 

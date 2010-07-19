@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.FunctionalObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalObjectProperty;
 
 public class TypeFunctionalObjectPropertyHandler extends BuiltInTypeHandler {
 

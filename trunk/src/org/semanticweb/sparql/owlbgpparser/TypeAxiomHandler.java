@@ -3,10 +3,10 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public class TypeAxiomHandler extends BuiltInTypeHandler {
 
@@ -35,7 +35,7 @@ public class TypeAxiomHandler extends BuiltInTypeHandler {
         Identifier annotatedSource=getObjectOfSourceTriple(subject);
         Identifier annotatedProperty=getObjectOfPropertyTriple(subject);
         Identifier annotatedTarget=getObjectOfTargetTriple(subject);
-        ILiteral annotatedTargetLiteral=null;
+        Literal annotatedTargetLiteral=null;
         if (annotatedTarget==null) annotatedTargetLiteral=getTargetLiteral(subject);
         Set<Annotation> annotations=consumer.translateAnnotations(subject);
         consumer.setPendingAnnotations(annotations);
@@ -51,12 +51,12 @@ public class TypeAxiomHandler extends BuiltInTypeHandler {
     protected Axiom handleAxiomTriples(Identifier subjectTriple, Identifier predicateTriple, Identifier objectTriple) {
         return consumer.getLastAddedAxiom();
     }
-    protected Axiom handleAxiomTriples(Identifier subjectTripleObject, Identifier predicateTripleObject, ILiteral con) {
+    protected Axiom handleAxiomTriples(Identifier subjectTripleObject, Identifier predicateTripleObject, Literal con) {
         consumer.handle(subjectTripleObject, predicateTripleObject, con);
         return consumer.getLastAddedAxiom();
     }
-    protected ILiteral getTargetLiteral(Identifier subject) {
-        ILiteral con=consumer.getLiteralObject(subject, getTargetTriplePredicate(), true);
+    protected Literal getTargetLiteral(Identifier subject) {
+        Literal con=consumer.getLiteralObject(subject, getTargetTriplePredicate(), true);
         return con;
     }
     protected Identifier  getObjectOfTargetTriple(Identifier  mainNode) {

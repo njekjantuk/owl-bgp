@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 
 public class GTPObjectPropertyAssertionHandler extends AbstractResourceTripleHandler {
     public GTPObjectPropertyAssertionHandler(OWLRDFConsumer consumer) {

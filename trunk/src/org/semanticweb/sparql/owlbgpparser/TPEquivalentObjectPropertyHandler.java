@@ -3,9 +3,9 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.EquivalentObjectProperties;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class TPEquivalentObjectPropertyHandler extends TriplePredicateHandler {
 

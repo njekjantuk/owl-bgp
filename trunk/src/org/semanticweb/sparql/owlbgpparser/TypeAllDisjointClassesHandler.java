@@ -3,9 +3,9 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 
 public class TypeAllDisjointClassesHandler extends BuiltInTypeHandler {
 

@@ -1,9 +1,9 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Atomic;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.Declaration;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 
 public class TypeDatatypeHandler extends BuiltInTypeHandler {
 

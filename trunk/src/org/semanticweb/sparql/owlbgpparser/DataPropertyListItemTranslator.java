@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.ILiteral;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 
 public class DataPropertyListItemTranslator implements ListItemTranslator<DataPropertyExpression> {
 
@@ -14,7 +14,7 @@ public class DataPropertyListItemTranslator implements ListItemTranslator<DataPr
     public DataPropertyExpression translate(Identifier firstObject) {
         return consumer.translateDataPropertyExpression(firstObject);
     }
-    public DataPropertyExpression translate(ILiteral firstObject) {
+    public DataPropertyExpression translate(Literal firstObject) {
         throw new IllegalArgumentException("Cannot translate list item as an object property, because rdf:first triple is a literal triple");
     }
 }

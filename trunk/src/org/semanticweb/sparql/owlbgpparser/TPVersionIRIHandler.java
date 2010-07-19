@@ -1,5 +1,6 @@
 package org.semanticweb.sparql.owlbgpparser;
 
+import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 
 public class TPVersionIRIHandler extends TriplePredicateHandler {
@@ -9,7 +10,10 @@ public class TPVersionIRIHandler extends TriplePredicateHandler {
     }
 
     public void handleTriple(Identifier subject,Identifier predicate,Identifier object) {
-        consumeTriple(subject, predicate, object);
+        if (object instanceof IRI) {
+            consumer.setVersionIRI((IRI)object);
+            consumeTriple(subject, predicate, object);
+        }
     }
     public boolean canHandleStreaming(Identifier subject,Identifier predicate,Identifier object) {
         // Always apply at the end

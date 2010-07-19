@@ -3,11 +3,11 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.HashSet;
 import java.util.List;
 
-import org.semanticweb.sparql.owlbgp.model.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.DisjointDataProperties;
-import org.semanticweb.sparql.owlbgp.model.DisjointObjectProperties;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class TypeAllDisjointPropertiesHandler extends BuiltInTypeHandler {
 

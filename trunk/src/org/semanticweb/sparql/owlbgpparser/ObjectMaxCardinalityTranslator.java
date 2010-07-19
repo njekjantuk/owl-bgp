@@ -1,10 +1,10 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.Clazz;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.ObjectMaxCardinality;
-import org.semanticweb.sparql.owlbgp.model.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectMaxCardinality;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class ObjectMaxCardinalityTranslator extends AbstractObjectCardinalityTranslator {
 

@@ -3,9 +3,9 @@ package org.semanticweb.sparql.owlbgpparser;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.EquivalentClasses;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 
 public abstract class AbstractNamedEquivalentClassAxiomHandler extends TriplePredicateHandler {
 

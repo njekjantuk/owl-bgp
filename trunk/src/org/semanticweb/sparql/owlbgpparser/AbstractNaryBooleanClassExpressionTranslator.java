@@ -2,8 +2,8 @@ package org.semanticweb.sparql.owlbgpparser;
 
 import java.util.Set;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 
 public abstract class AbstractNaryBooleanClassExpressionTranslator extends AbstractClassExpressionTranslator {
     public AbstractNaryBooleanClassExpressionTranslator(OWLRDFConsumer consumer) {

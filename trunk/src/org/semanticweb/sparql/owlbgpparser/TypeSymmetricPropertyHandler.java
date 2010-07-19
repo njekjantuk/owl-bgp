@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.SymmetricObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.SymmetricObjectProperty;
 
 public class TypeSymmetricPropertyHandler extends BuiltInTypeHandler {
 

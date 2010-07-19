@@ -1,8 +1,8 @@
 package org.semanticweb.sparql.owlbgpparser;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.SubClassOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 
 public class TPSubClassOfHandler extends TriplePredicateHandler {
 

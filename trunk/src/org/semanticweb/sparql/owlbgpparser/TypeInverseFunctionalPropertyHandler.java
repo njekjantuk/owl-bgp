@@ -1,7 +1,7 @@
 package org.semanticweb.sparql.owlbgpparser;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseFunctionalObjectProperty;
 
 public class TypeInverseFunctionalPropertyHandler extends BuiltInTypeHandler {
 
