@@ -22,7 +22,9 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     protected final String m_variable;
     
     protected Variable(String variable) {
-        m_variable=variable.intern();
+        int begin=0;
+        if (variable.startsWith("$") || variable.startsWith("?")) begin=1;
+        m_variable=variable.substring(begin).intern();
     }
     public String getVariable() {
         return m_variable;
@@ -32,7 +34,7 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
         return getBoundVersion(variablesToBindings.get(this));
     }
     public String toString(Prefixes prefixes) {
-        return m_variable;
+        return "?"+m_variable;
     }
     public Identifier getIdentifier() {
         return this;

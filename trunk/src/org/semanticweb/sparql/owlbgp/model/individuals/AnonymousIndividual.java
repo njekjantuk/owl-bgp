@@ -56,7 +56,10 @@ public class AnonymousIndividual extends AbstractExtendedOWLObject implements Id
         return m_nodeID;
     }
     public String toString(Prefixes prefixes) {
-        return m_nodeID;
+        StringBuffer buffer=new StringBuffer();
+        buffer.append("_:");
+        buffer.append(m_nodeID);
+        return buffer.toString();
     }
     public Identifier getIdentifier() {
         return this;
@@ -65,6 +68,7 @@ public class AnonymousIndividual extends AbstractExtendedOWLObject implements Id
         return s_interningManager.intern(this);
     }
     public static AnonymousIndividual create(String nodeID) {
+        if (nodeID.charAt(0)=='_'&&nodeID.charAt(1)==':') nodeID=nodeID.substring(2);
         return s_interningManager.intern(new AnonymousIndividual(nodeID));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

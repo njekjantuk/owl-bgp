@@ -28,6 +28,8 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject {
     private static final long serialVersionUID = -4753012753870470339L;
     
+    public static final String LB=System.getProperty("line.separator");
+    
     protected AbstractExtendedOWLObject() {}
     public final String toString() {
         return toString(Prefixes.STANDARD_PREFIXES);

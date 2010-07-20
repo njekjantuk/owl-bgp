@@ -60,7 +60,8 @@ public class Prefixes implements Serializable {
         s_semanticWebPrefixes.put("ruleml","http://www.w3.org/2003/11/ruleml#");
     }
     public static final Prefixes STANDARD_PREFIXES=new ImmutablePrefixes(s_semanticWebPrefixes);
-
+    public static final Prefixes NO_PREFIXES=new ImmutablePrefixes(new HashMap<String, String>());
+    
     protected final Map<String,String> m_prefixIRIsByPrefixName;
     protected final Map<String,String> m_prefixNamesByPrefixIRI;
     protected Pattern m_prefixIRIMatchingPattern;

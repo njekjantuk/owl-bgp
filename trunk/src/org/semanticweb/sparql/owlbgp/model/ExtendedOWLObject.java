@@ -24,7 +24,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
-
+    
 public interface ExtendedOWLObject extends Serializable {
     public String toString(Prefixes prefixes);
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings);

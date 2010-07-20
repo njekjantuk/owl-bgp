@@ -51,6 +51,7 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
         return s_interningManager.intern(this);
     }
     public static IRI create(String iri) {
+        if (iri.charAt(0)=='<') iri=iri.substring(1,iri.length()-1);
         return s_interningManager.intern(new IRI(iri));
     }
     public Identifier getIdentifier() {
