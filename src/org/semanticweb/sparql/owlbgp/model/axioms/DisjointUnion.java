@@ -99,6 +99,7 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
         return create(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
     }
     public static DisjointUnion create(ClassExpression clazz,Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+        if (!(clazz instanceof Atomic)) throw new IllegalArgumentException("A disjoint union axiom can only have a class or a class variable as first argument, but here we got "+clazz);
         return s_interningManager.intern(new DisjointUnion(clazz,classExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

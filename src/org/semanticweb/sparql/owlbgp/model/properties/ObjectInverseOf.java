@@ -38,32 +38,32 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
 
     protected static InterningManager<ObjectInverseOf> s_interningManager=new InterningManager<ObjectInverseOf>() {
         protected boolean equal(ObjectInverseOf object1,ObjectInverseOf object2) {
-            return object1.m_op==object2.m_op;
+            return object1.m_ope==object2.m_ope;
         }
         protected int getHashCode(ObjectInverseOf object) {
-            return -object.m_op.hashCode();
+            return -object.m_ope.hashCode();
         }
     };
     
-    protected final ObjectProperty m_op;
+    protected final ObjectPropertyExpression m_ope;
    
-    protected ObjectInverseOf(ObjectProperty objectPropertyExpression) {
-        m_op=objectPropertyExpression;
+    protected ObjectInverseOf(ObjectPropertyExpression objectPropertyExpression) {
+        m_ope=objectPropertyExpression;
     }
-    public ObjectProperty getInvertedObjectProperty() {
-        return m_op;
+    public ObjectPropertyExpression getInvertedObjectProperty() {
+        return m_ope;
     }
     public String getIRIString() {
         return null;
     }
     public String toString(Prefixes prefixes) {
-        return "ObjectInverseOf("+m_op.toString(prefixes)+")";
+        return "ObjectInverseOf("+m_ope.toString(prefixes)+")";
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectInverseOf create(ObjectProperty objectProperty) {
-        return s_interningManager.intern(new ObjectInverseOf(objectProperty));
+    public static ObjectInverseOf create(ObjectPropertyExpression objectPropertyExpression) {
+        return s_interningManager.intern(new ObjectInverseOf(objectPropertyExpression));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -73,10 +73,10 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_op.getVariablesInSignature(varType));
+        variables.addAll(m_ope.getVariablesInSignature(varType));
         return variables;
     }
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
-        return create((ObjectProperty)m_op.getBoundVersion(variablesToBindings));
+        return create((ObjectProperty)m_ope.getBoundVersion(variablesToBindings));
     }
 }

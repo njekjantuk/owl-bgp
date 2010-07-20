@@ -5,11 +5,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddImport;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAnnotation;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -23,7 +27,13 @@ import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLPropertyExpression;
+import org.semanticweb.owlapi.model.SetOntologyID;
 import org.semanticweb.owlapi.vocab.OWLFacet;
 import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationPropertyDomain;
@@ -259,9 +269,9 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLDataOneOf(literals);
     }
     
-//    public OWLObject visit(Import imp) {
-//        return m_dataFactory.getOWLImportsDeclaration((IRI)imp.getImport().accept(this));
-//    }
+    public OWLObject visit(Import imp) {
+        return null;
+    }
     public OWLObject visit(Annotation annotation) {
         return m_dataFactory.getOWLAnnotation((OWLAnnotationProperty)annotation.m_annotationProperty.accept(this),(OWLAnnotationValue)annotation.m_annotationValue.accept(this));
     }
@@ -442,5 +452,32 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     }
     public OWLObject visit(NegativeDataPropertyAssertion axiom) {
         return m_dataFactory.getOWLNegativeDataPropertyAssertionAxiom((OWLDataPropertyExpression)axiom.getDataPropertyExpression().accept(this),(OWLIndividual)axiom.getIndividual().accept(this),(OWLLiteral)axiom.getLiteral().accept(this),getAnnotations(axiom));
+    }
+    public OWLObject visit(Ontology ontology) {
+        Identifier iri=ontology.getOntologyIRI();
+        IRI ontologyIRI=(iri!=null?(IRI)iri.accept(this):null);
+        OWLOntologyID id=new OWLOntologyID(ontologyIRI);
+        try {
+            OWLOntologyManager m=OWLManager.createOWLOntologyManager(m_dataFactory);
+            OWLOntology o=m.createOntology(id);
+            Set<OWLAxiom> axioms=new HashSet<OWLAxiom>();
+            for (Axiom ax : ontology.getAxioms())
+                axioms.add((OWLAxiom)ax.accept(this));
+            m.addAxioms(o, axioms);
+            List<OWLOntologyChange> changes=new ArrayList<OWLOntologyChange>();
+            for (Identifier versionIRI : ontology.getVersionIRIs()) {
+                OWLOntologyID oid=new OWLOntologyID(ontologyIRI, (IRI)versionIRI.accept(this));
+                changes.add(new SetOntologyID(o,oid));
+            }
+            for (Annotation annotation : ontology.getAnnotations()) 
+                changes.add(new AddOntologyAnnotation(o,(OWLAnnotation)annotation.accept(this)));
+            for (Import imported : ontology.getDirectImports())
+                changes.add(new AddImport(o, m_dataFactory.getOWLImportsDeclaration((IRI)imported.getImport().accept(this))));
+            m.applyChanges(changes);
+            return o;
+        } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

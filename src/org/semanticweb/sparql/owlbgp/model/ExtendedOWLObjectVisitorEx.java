@@ -122,7 +122,8 @@ public interface ExtendedOWLObjectVisitorEx<O> {
     O visit(DataUnionOf dataUnionOf);
     O visit(DataOneOf dataOneOf);
     
-//    O visit(Import axiom);
+    O visit(Import axiom);
+    O visit(Ontology ontology);
     
     O visit(Annotation annotation);
     O visit(AnnotationValue annotationValue);

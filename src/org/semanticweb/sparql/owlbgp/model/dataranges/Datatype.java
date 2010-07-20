@@ -115,6 +115,7 @@ public class Datatype extends AbstractExtendedOWLObject implements DataRange,Ato
         return s_interningManager.intern(this);
     }
     public static Datatype create(String iriString) {
+        if (iriString.charAt(0)=='<') iriString=iriString.substring(1,iriString.length()-1);
         return create(IRI.create(iriString));
     }
     public static Datatype create(IRI iri) {

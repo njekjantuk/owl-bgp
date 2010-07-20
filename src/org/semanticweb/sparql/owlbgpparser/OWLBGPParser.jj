@@ -10,18 +10,20 @@ PARSER_BEGIN(OWLBGPParser)
 package org.semanticweb.sparql.owlbgpparser;
 
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import org.coode.string.EscapeUtils;
-import org.semanticweb.sparql.owlbgp.model.AnonymousIndividual;
-import org.semanticweb.sparql.owlbgp.model.Axiom;
-import org.semanticweb.sparql.owlbgp.model.Datatype;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.Ontology;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
-import org.semanticweb.sparql.owlbgp.model.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype.OWL2_DATATYPES;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 
 public class OWLBGPParser {
 
@@ -29,7 +31,8 @@ public class OWLBGPParser {
 
     protected Identifier base;
     protected int blankNodeId=0;
-    protected final TripleHandler handler=new OWLRDFConsumerAdapter();
+    protected final Map<String, AnonymousIndividual> string2AnonymousIndividual=new HashMap<String, AnonymousIndividual>();
+    protected final TripleConsumer handler=new TripleConsumer();
     protected final Prefixes pm=new Prefixes();
     {
         pm.declareSemanticWebPrefixes();
@@ -101,22 +104,23 @@ public class OWLBGPParser {
         }
     }
     
-    public boolean isAnonymousNode(Identifier id) {
-        return id.toString().startsWith("_:");
+    protected int getNextBlankNodeID() {
+        return blankNodeId++;
     }
-    public boolean isVariIdentifierde(String iri) {
-        return iri.toString().startsWith("?");
-    }
-    protected String getNextBlankNodeLabel() {
-        String identifier="_:bn"+blankNodeId;
-        blankNodeId++;
-        return identifier;
+    protected AnonymousIndividual getAnonymousIndividual(String label) {
+        if (label==null || "".equals(label)) return AnonymousIndividual.create(""+getNextBlankNodeID());
+        if (string2AnonymousIndividual.containsKey(label)) return string2AnonymousIndividual.get(label);
+        AnonymousIndividual ai=AnonymousIndividual.create(label+"_"+getNextBlankNodeID());
+        string2AnonymousIndividual.put(label, ai);
+        return ai;
     }
     protected Identifier getIRIFromQName(String qname) throws ParseException {
         int colonIndex=qname.indexOf(':');
         if (colonIndex==-1) throw new ParseException("Not a valid qname (missing ':') " + qname);
         String prefix=qname.substring(0,colonIndex);
-        if (prefix.equals("_")) return AnonymousIndividual.create(getNextBlankNodeLabel()+"_"+qname.substring(colonIndex + 1));
+        if (prefix.equals("_")) { 
+            return getAnonymousIndividual(qname.substring(colonIndex + 1));
+        }
         if (pm.getPrefixIRI(prefix)==null) throw new ParseException("Prefix not declared: " + prefix);
         return IRI.create(pm.expandAbbreviatedIRI(qname));
     }
@@ -126,6 +130,28 @@ public class OWLBGPParser {
     }
     public Set<Axiom> getParsedAxioms() {
         return handler.getParsedAxioms();
+    }
+    public Ontology getParsedOntology() {
+        return handler.getParsedOntology();
+    }
+    public static String unescapeString(String s) {
+        if (s.indexOf('\\')==-1) return s;
+        int length=s.length();
+        StringBuilder sb=new StringBuilder(length);
+        for (int i=0; i<length; i++) {
+            char ch=s.charAt(i);
+            if (ch=='\\') {
+                int j=i+1;
+                if (j<length) {
+                    char escCh=s.charAt(j);
+                    if (escCh=='\\' || escCh=='\"') {
+                        i++;
+                        sb.append(escCh);
+                    }
+                } else sb.append('\\');
+            } else sb.append(ch);
+        }
+        return sb.toString();
     }
 }
 
@@ -234,13 +260,16 @@ IRI parseIRI() :
 AnonymousIndividual parseBlankNode() :
 {
     AnonymousIndividual ind=null;
+    Token t;
+    
 }
 {
     (ind=parseNodeID()
     |
-    <NODEID>{ind=AnonymousIndividual.create(getNextBlankNodeLabel());}
+    t=<NODEID>{ind=getAnonymousIndividual(t.image.trim());}
     |
-    <OPEN_SQUARE_BRACKET> ({ind=AnonymousIndividual.create(getNextBlankNodeLabel());} parsePredicateObjectList(ind) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> {if (ind==null) {ind=AnonymousIndividual.create(getNextBlankNodeLabel()); }}
+    <OPEN_SQUARE_BRACKET> ({ind=getAnonymousIndividual("");} parsePredicateObjectList(ind) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> 
+    {if (ind==null) {ind=getAnonymousIndividual(""); }}
     |
     ind=parseCollection()) {
         return ind;
@@ -264,7 +293,7 @@ Variable parseVariable() :
 }
 {
     t=<VAR> {
-        return UntypedVariable.create(t.image);
+        return UntypedVariable.create(t.image.substring(1));
     }
 }
 
@@ -358,7 +387,7 @@ AnonymousIndividual parseItemList() :
     (
     {
         AnonymousIndividual prevSubject = subject;
-        subject=AnonymousIndividual.create(getNextBlankNodeLabel());
+        subject=getAnonymousIndividual("");
         if (prevSubject!=null) handler.handleTriple(prevSubject, rest, subject);
         else firstSubject=subject;
         handler.handleTriple(subject, type, list);
@@ -466,7 +495,7 @@ String parseString() :
     | t=<LONG_STRING> {
         rawString = t.image.substring(3, t.image.length() - 3);
      }) {
-        return EscapeUtils.unescapeString(rawString);
+        return unescapeString(rawString);
      }
 }
 

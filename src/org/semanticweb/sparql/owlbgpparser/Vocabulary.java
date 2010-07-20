@@ -16,7 +16,7 @@ public enum Vocabulary {
     OWL_VERSION_INFO(Prefixes.s_semanticWebPrefixes.get("owl"), "versionInfo"),
     OWL_EQUIVALENT_CLASS(Prefixes.s_semanticWebPrefixes.get("owl"), "equivalentClass"),
     OWL_OBJECT_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "ObjectProperty"),
-    OWL_DATA_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "DatatypeProperty"),
+    OWL_DATA_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "DataProperty"),
     OWL_FUNCTIONAL_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "FunctionalProperty"),
     OWL_INVERSE_FUNCTIONAL_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "InverseFunctionalProperty"),
     OWL_ASYMMETRIC_PROPERTY(Prefixes.s_semanticWebPrefixes.get("owl"), "AsymmetricProperty"),
