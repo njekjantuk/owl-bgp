@@ -67,6 +67,7 @@ public class Annotation extends AbstractExtendedOWLObject {
             else notFirst=true;
             sb.append(anno.toString(prefixes));
         }
+        if (notFirst) sb.append(" ");
         sb.append(m_annotationProperty.toString(prefixes));
         sb.append(" ");
         sb.append(m_annotationValue.toString(prefixes));

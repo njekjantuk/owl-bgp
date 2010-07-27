@@ -52,9 +52,9 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
     protected final Datatype m_dataDatatype;
     
     protected TypedLiteral(String lexicalForm,String langTag,Datatype datatype) {
-        m_lexicalForm=lexicalForm.intern();
-        m_langTag=langTag.intern();
-        m_dataDatatype=datatype;
+        m_lexicalForm=lexicalForm!=null?lexicalForm.intern():"".intern();
+        m_langTag=langTag!=null?langTag.intern():"".intern();
+        m_dataDatatype=datatype!=null?datatype:Datatype.OWL2_DATATYPES.PLAIN_LITERAL.getDatatype();
     }
     public String getLexicalForm() {
         return m_lexicalForm;
@@ -84,7 +84,7 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
         return s_interningManager.intern(this);
     }
     public static TypedLiteral create(String lexicalForm,String langTag,Datatype datatype) {
-        return create(lexicalForm,langTag,datatype);
+        return s_interningManager.intern(new TypedLiteral(lexicalForm,langTag,datatype));
     }
     public static TypedLiteral create(String literal) {
         String lexicalForm=null;
@@ -97,7 +97,7 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
             noDatatype=literal.substring(1,lastCircCircIndex-3);
         } else {
             datatype=Datatype.OWL2_DATATYPES.PLAIN_LITERAL.getDatatype();
-            noDatatype=literal.substring(1,literal.length()-1);
+            noDatatype=literal;
         }
         int lastAtIndex=noDatatype.lastIndexOf("@");
         if (lastAtIndex>=0) {
@@ -106,7 +106,7 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
         } else {
             lexicalForm=noDatatype;
         }
-        return s_interningManager.intern(new TypedLiteral(lexicalForm,langTag,datatype));
+        return create(lexicalForm,langTag,datatype);
     }
     @Override
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
