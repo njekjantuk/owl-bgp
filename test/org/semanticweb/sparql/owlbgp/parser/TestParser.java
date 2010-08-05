@@ -1,10 +1,13 @@
-package org.semanticweb.sparql.owlbgp.model;
+package org.semanticweb.sparql.owlbgp.parser;
 
 import java.io.StringReader;
 import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.sparql.owlbgp.model.Annotation;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Ontology;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
