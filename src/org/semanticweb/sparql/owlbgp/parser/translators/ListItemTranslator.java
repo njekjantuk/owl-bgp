@@ -2,7 +2,6 @@ package org.semanticweb.sparql.owlbgp.parser.translators;
 
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 public interface ListItemTranslator<O extends ExtendedOWLObject> {
     /**
@@ -12,5 +11,4 @@ public interface ListItemTranslator<O extends ExtendedOWLObject> {
      * @return The translated item.
      */
     O translate(Identifier firstObject);
-    O translate(Literal firstObject);
 }

@@ -2,8 +2,6 @@ package org.semanticweb.sparql.owlbgp.parser.translators;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
-import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
 public class ClassExpressionListItemTranslator implements ListItemTranslator<ClassExpression> {
@@ -14,9 +12,7 @@ public class ClassExpressionListItemTranslator implements ListItemTranslator<Cla
         this.consumer = consumer;
     }
     public ClassExpression translate(Identifier iri) {
-        return consumer.translateClassExpression(iri);
-    }
-    public ClassExpression translate(Literal firstObject) {
-        return Clazz.THING;
+        consumer.translateClassExpression(iri);
+        return consumer.getClassExpressionForClassIdentifier(iri);
     }
 }

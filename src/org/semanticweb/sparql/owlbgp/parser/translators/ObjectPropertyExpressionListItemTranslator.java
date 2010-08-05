@@ -1,7 +1,6 @@
 package org.semanticweb.sparql.owlbgp.parser.translators;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
@@ -9,12 +8,9 @@ public class ObjectPropertyExpressionListItemTranslator implements ListItemTrans
     protected final TripleConsumer consumer;
 
     public ObjectPropertyExpressionListItemTranslator(TripleConsumer consumer) {
-        this.consumer = consumer;
+        this.consumer=consumer;
     }
     public ObjectPropertyExpression translate(Identifier iri) {
-        return consumer.translateObjectPropertyExpression(iri);
-    }
-    public ObjectPropertyExpression translate(Literal firstObject) {
-        throw new IllegalArgumentException("Cannot translate list item as an object property, because rdf:first triple is a literal triple");
+        return consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(iri);
     }
 }

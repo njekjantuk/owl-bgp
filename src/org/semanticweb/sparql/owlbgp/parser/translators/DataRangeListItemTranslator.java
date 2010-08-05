@@ -2,7 +2,6 @@ package org.semanticweb.sparql.owlbgp.parser.translators;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
-import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
 public class DataRangeListItemTranslator implements ListItemTranslator<DataRange> {
@@ -12,10 +11,8 @@ public class DataRangeListItemTranslator implements ListItemTranslator<DataRange
     public DataRangeListItemTranslator(TripleConsumer consumer) {
         this.consumer=consumer;
     }
-    public DataRange translate(Literal firstObject) {
-        return null;
-    }
     public DataRange translate(Identifier firstObject) {
-        return consumer.translateDataRange(firstObject);
+        consumer.translateDataRange(firstObject);
+        return consumer.getDataRangeForDataRangeIdentifier(firstObject);
     }
 }
