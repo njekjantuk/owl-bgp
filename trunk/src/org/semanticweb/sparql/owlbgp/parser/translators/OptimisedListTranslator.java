@@ -7,8 +7,8 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class OptimisedListTranslator<O extends ExtendedOWLObject> {
 
@@ -19,26 +19,20 @@ public class OptimisedListTranslator<O extends ExtendedOWLObject> {
         this.consumer=consumer;
         this.translator=translator;
     }
-    protected TripleConsumer getConsumer() {
-        return consumer;
-    }
     protected void translateList(Identifier mainNode,List<O> list) {
-        Identifier firstResource=consumer.getFirstResource(mainNode, true);
-        if (firstResource != null) {
-            list.add(translator.translate(firstResource));
-        } else {
-            Literal literal=getConsumer().getFirstLiteral(mainNode);
-            if (literal != null) list.add(translator.translate(literal));
+        Identifier first=consumer.getFirst(mainNode);
+        if (first!=null) {
+            list.add(translator.translate(first));
         }
-        Identifier rest=consumer.getRest(mainNode, true);
-        if (rest != null)  translateList(rest, list);
+        Identifier rest=consumer.getRest(mainNode);
+        if (rest!=null&&rest!=Vocabulary.RDF_NIL) translateList(rest, list);
     }
-    public List<O> translateList(Identifier mainNode) {
+    public List<O> translateToList(Identifier mainNode) {
         List<O> list=new ArrayList<O>();
         translateList(mainNode, list);
         return list;
     }
     public Set<O> translateToSet(Identifier mainNode) {
-        return new HashSet<O>(translateList(mainNode));
+        return new HashSet<O>(translateToList(mainNode));
     }
 }
