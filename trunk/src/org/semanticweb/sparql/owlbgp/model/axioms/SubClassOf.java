@@ -5,10 +5,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -16,6 +18,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = 1535222085351189793L;
@@ -60,6 +63,7 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     public ClassExpression getSuperClassExpression() {
         return m_superClass;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("SubClassOf(");
@@ -69,6 +73,22 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
         buffer.append(m_superClass.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier subject;
+        if (!(m_subClass instanceof Atomic)) {
+            subject=AbstractExtendedOWLObject.getNextBlankNode();
+            m_subClass.toTurtleString(prefixes, subject);
+        } else 
+            subject=(Atomic)m_subClass;
+        Identifier object;
+        if (!(m_superClass instanceof Atomic)) {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_superClass.toTurtleString(prefixes, object);
+        } else 
+            object=(Atomic)m_superClass;
+        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_SUBCLASS_OF, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

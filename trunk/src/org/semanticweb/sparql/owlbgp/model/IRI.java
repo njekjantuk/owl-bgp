@@ -32,7 +32,7 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
             return object1.m_iri==object2.m_iri;
         }
         protected int getHashCode(IRI object) {
-            return object.m_iri.hashCode();
+            return 1013+object.m_iri.hashCode();
         }
     };
     
@@ -45,6 +45,10 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
         return m_iri;
     }
     public String toString(Prefixes prefixes) {
+        return prefixes.abbreviateIRI(m_iri);
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
         return prefixes.abbreviateIRI(m_iri);
     }
     protected Object readResolve() {

@@ -13,9 +13,13 @@ import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
-import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype.OWL2_DATATYPES;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
 public class OWLBGPParser implements OWLBGPParserConstants {
 
@@ -30,7 +34,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         pm.declareSemanticWebPrefixes();
     }
 
-    public OWLBGPParser(StringReader reader, Set<Identifier> classes, Set<Identifier> objectProperties, Set<Identifier> dataProperties, Set<Identifier> individuals, Set<Identifier> customDatatypes) {
+    public OWLBGPParser(StringReader reader, Set<Clazz> classes, Set<ObjectProperty> objectProperties, Set<DataProperty> dataProperties, Set<Individual> individuals, Set<Datatype> customDatatypes) {
          this(reader);
          handler.setClassesInOntologySignature(classes);
          handler.setObjectPropertiesInOntologySignature(objectProperties);
@@ -38,22 +42,21 @@ public class OWLBGPParser implements OWLBGPParserConstants {
          handler.setIndividualsInOntologySignature(individuals);
          handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-    public void setClassesInOntologySignature(Set<Identifier> classes) {
+    public void setClassesInOntologySignature(Set<Clazz> classes) {
         handler.setClassesInOntologySignature(classes);
     }
-    public void setObjectPropertiesInOntologySignature(Set<Identifier> objectProperties) {
+    public void setObjectPropertiesInOntologySignature(Set<ObjectProperty> objectProperties) {
         handler.setObjectPropertiesInOntologySignature(objectProperties);
     }
-    public void setDataPropertiesInOntologySignature(Set<Identifier> dataProperties) {
+    public void setDataPropertiesInOntologySignature(Set<DataProperty> dataProperties) {
         handler.setDataPropertiesInOntologySignature(dataProperties);
     }
-    public void setIndividualsInOntologySignature(Set<Identifier> individuals) {
+    public void setIndividualsInOntologySignature(Set<Individual> individuals) {
         handler.setIndividualsInOntologySignature(individuals);
     }
-    public void setCustomDatatypesInOntologySignature(Set<Identifier> customDatatypes) {
+    public void setCustomDatatypesInOntologySignature(Set<Datatype> customDatatypes) {
         handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-
     public static void main(String[] args) {
 //        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
 
@@ -121,10 +124,10 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         return IRI.create(s);
     }
     public Set<Axiom> getParsedAxioms() {
-        return handler.getParsedAxioms();
+        return handler.getAxioms();
     }
     public Ontology getParsedOntology() {
-        return handler.getParsedOntology();
+        return handler.getOntology();
     }
     public static String unescapeString(String s) {
         if (s.indexOf('\u005c\u005c')==-1) return s;
@@ -276,7 +279,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     Identifier iri;
     if (jj_2_14(2)) {
       jj_consume_token(A);
-         iri = Vocabulary.RDF_TYPE.getIRI();
+         iri = Vocabulary.RDF_TYPE;
     } else if (jj_2_15(2)) {
       iri = parsePredicate();
     } else {
@@ -349,7 +352,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-        handler.handleTriple(subject, predicate, resObject);
+        handler.handleStreaming(subject, predicate, resObject);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -371,11 +374,9 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     //  _x  rdf:next
     AnonymousIndividual firstSubject=null;
     AnonymousIndividual subject=null;
-    Identifier type=Vocabulary.RDF_TYPE.getIRI();
-    Identifier first=Vocabulary.RDF_FIRST.getIRI();
-    Identifier rest=Vocabulary.RDF_REST.getIRI();
-    Identifier list=Vocabulary.RDF_LIST.getIRI();
-    Identifier nil=Vocabulary.RDF_NIL.getIRI();
+    Identifier first=Vocabulary.RDF_FIRST;
+    Identifier rest=Vocabulary.RDF_REST;
+    Identifier nil=Vocabulary.RDF_NIL;
     label_4:
     while (true) {
       if (jj_2_27(2)) {
@@ -385,13 +386,12 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       }
         AnonymousIndividual prevSubject = subject;
         subject=getAnonymousIndividual("");
-        if (prevSubject!=null) handler.handleTriple(prevSubject, rest, subject);
+        if (prevSubject!=null) handler.handleStreaming(prevSubject, rest, subject);
         else firstSubject=subject;
-        handler.handleTriple(subject, type, list);
       parseObject(subject, first);
     }
         // Terminate list
-        handler.handleTriple(subject, rest, nil);
+        handler.handleStreaming(subject, rest, nil);
         {if (true) return firstSubject;}
     throw new Error("Missing return statement in function");
   }
@@ -402,9 +402,9 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     Identifier datatypeIdentifier=null;
     Datatype dt=null;
     Token t;
-    if (jj_2_31(2)) {
+    if (jj_2_32(2)) {
       lexicalForm = parseQuotedString();
-      if (jj_2_30(2)) {
+      if (jj_2_31(2)) {
         if (jj_2_28(2)) {
           jj_consume_token(DOUBLE_CARET);
           datatypeIdentifier = parseResource();
@@ -412,6 +412,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
           jj_consume_token(AT);
           t = jj_consume_token(PN_LOCAL);
                                                                                                                   lang=t.image;
+        } else if (jj_2_30(2)) {
+          jj_consume_token(AT);
         } else {
           jj_consume_token(-1);
           throw new ParseException();
@@ -419,22 +421,40 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       } else {
         ;
       }
-      if (datatypeIdentifier==null) dt=Datatype.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"));
-      else dt=Datatype.create((IRI)datatypeIdentifier);
+      IRI plainLiteralIRI=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
+      boolean wasAbbreviated=false;
+      if (datatypeIdentifier==null) {
+          datatypeIdentifier=plainLiteralIRI;
+          wasAbbreviated=true;
+      }
+      if (datatypeIdentifier==plainLiteralIRI) {
+          int lastIndexOfAt=lexicalForm.lastIndexOf('@');
+          if (wasAbbreviated)
+              lang="";
+          else if (lastIndexOfAt<0)
+            {if (true) throw new IllegalArgumentException("The lexical forms of rdf:PlainLiteral data values must contain the @ symbol, but the lexical form "+lexicalForm+" does not contain the symbol. ");}
+          else {
+              if (lastIndexOfAt==0) lexicalForm="";
+              else lexicalForm=lexicalForm.substring(0,lastIndexOfAt);
+              if (lastIndexOfAt<lexicalForm.length()-1) lang=lexicalForm.substring(lastIndexOfAt+1);
+              else lang="";
+          }
+      }
+      dt=Datatype.create((IRI)datatypeIdentifier);
       if (lang==null) lang="";
-      handler.handleLiteralTriple(subject, predicate, lexicalForm, lang, dt);
-    } else if (jj_2_32(2)) {
-      lexicalForm = parseInteger();
-                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.INTEGER.getDatatype());
+      handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, lang, dt));
     } else if (jj_2_33(2)) {
-      lexicalForm = parseDouble();
-                               handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DOUBLE.getDatatype());
+      lexicalForm = parseInteger();
+                                handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_INTEGER));
     } else if (jj_2_34(2)) {
-      lexicalForm = parseDecimal();
-                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DECIMAL.getDatatype());
+      lexicalForm = parseDouble();
+                               handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_DOUBLE));
     } else if (jj_2_35(2)) {
+      lexicalForm = parseDecimal();
+                                handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_DECIMAL));
+    } else if (jj_2_36(2)) {
       lexicalForm = parseBoolean();
-                                handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.BOOLEAN.getDatatype());
+                                handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_BOOLEAN));
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -443,10 +463,10 @@ public class OWLBGPParser implements OWLBGPParserConstants {
 
   final public String parseInteger() throws ParseException {
     Token t;
-    if (jj_2_36(2)) {
+    if (jj_2_37(2)) {
       t = jj_consume_token(INTEGER);
         {if (true) return t.image;}
-    } else if (jj_2_37(2)) {
+    } else if (jj_2_38(2)) {
       t = jj_consume_token(DIGIT);
         {if (true) return t.image;}
     } else {
@@ -472,9 +492,9 @@ public class OWLBGPParser implements OWLBGPParserConstants {
 
   final public String parseBoolean() throws ParseException {
     Token t;
-    if (jj_2_38(2)) {
+    if (jj_2_39(2)) {
       t = jj_consume_token(TRUE);
-    } else if (jj_2_39(2)) {
+    } else if (jj_2_40(2)) {
       t = jj_consume_token(FALSE);
     } else {
       jj_consume_token(-1);
@@ -494,10 +514,10 @@ public class OWLBGPParser implements OWLBGPParserConstants {
   final public String parseString() throws ParseException {
     Token t;
     String rawString = "";
-    if (jj_2_40(2)) {
+    if (jj_2_41(2)) {
       t = jj_consume_token(STRING);
         rawString = t.image.substring(1, t.image.length() - 1);
-    } else if (jj_2_41(2)) {
+    } else if (jj_2_42(2)) {
       t = jj_consume_token(LONG_STRING);
         rawString = t.image.substring(3, t.image.length() - 3);
     } else {
@@ -795,6 +815,18 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     finally { jj_save(40, xla); }
   }
 
+  private boolean jj_2_42(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_42(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(41, xla); }
+  }
+
+  private boolean jj_3R_20() {
+    if (jj_scan_token(DOUBLE)) return true;
+    return false;
+  }
+
   private boolean jj_3_11() {
     if (jj_3R_11()) return true;
     return false;
@@ -813,11 +845,6 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     xsp = jj_scanpos;
     if (jj_3_7()) jj_scanpos = xsp;
     if (jj_scan_token(CLOSE_SQUARE_BRACKET)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_21() {
-    if (jj_scan_token(DECIMAL)) return true;
     return false;
   }
 
@@ -858,6 +885,11 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_38() {
+    if (jj_scan_token(DIGIT)) return true;
+    return false;
+  }
+
   private boolean jj_3_6() {
     if (jj_scan_token(DOT)) return true;
     return false;
@@ -873,6 +905,21 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3R_19() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_37()) {
+    jj_scanpos = xsp;
+    if (jj_3_38()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_37() {
+    if (jj_scan_token(INTEGER)) return true;
+    return false;
+  }
+
   private boolean jj_3_21() {
     if (jj_3R_7()) return true;
     return false;
@@ -880,11 +927,6 @@ public class OWLBGPParser implements OWLBGPParserConstants {
 
   private boolean jj_3_22() {
     if (jj_3R_8()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_20() {
-    if (jj_scan_token(DOUBLE)) return true;
     return false;
   }
 
@@ -933,24 +975,37 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_2() {
+    if (jj_3R_6()) return true;
+    return false;
+  }
+
   private boolean jj_3_28() {
     if (jj_scan_token(DOUBLE_CARET)) return true;
     if (jj_3R_7()) return true;
     return false;
   }
 
-  private boolean jj_3_30() {
+  private boolean jj_3_31() {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3_28()) {
     jj_scanpos = xsp;
-    if (jj_3_29()) return true;
+    if (jj_3_29()) {
+    jj_scanpos = xsp;
+    if (jj_3_30()) return true;
+    }
     }
     return false;
   }
 
-  private boolean jj_3_2() {
-    if (jj_3R_6()) return true;
+  private boolean jj_3_36() {
+    if (jj_3R_22()) return true;
+    return false;
+  }
+
+  private boolean jj_3_30() {
+    if (jj_scan_token(AT)) return true;
     return false;
   }
 
@@ -959,13 +1014,13 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_37() {
-    if (jj_scan_token(DIGIT)) return true;
+  private boolean jj_3_13() {
+    if (jj_scan_token(SEMICOLON)) return true;
     return false;
   }
 
-  private boolean jj_3_13() {
-    if (jj_scan_token(SEMICOLON)) return true;
+  private boolean jj_3_35() {
+    if (jj_3R_21()) return true;
     return false;
   }
 
@@ -974,23 +1029,18 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_34() {
+    if (jj_3R_20()) return true;
+    return false;
+  }
+
   private boolean jj_3R_15() {
     if (jj_scan_token(PNAME_LN)) return true;
     return false;
   }
 
-  private boolean jj_3R_19() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_36()) {
-    jj_scanpos = xsp;
-    if (jj_3_37()) return true;
-    }
-    return false;
-  }
-
-  private boolean jj_3_36() {
-    if (jj_scan_token(INTEGER)) return true;
+  private boolean jj_3_33() {
+    if (jj_3R_19()) return true;
     return false;
   }
 
@@ -1033,26 +1083,6 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_35() {
-    if (jj_3R_22()) return true;
-    return false;
-  }
-
-  private boolean jj_3_34() {
-    if (jj_3R_21()) return true;
-    return false;
-  }
-
-  private boolean jj_3_33() {
-    if (jj_3R_20()) return true;
-    return false;
-  }
-
-  private boolean jj_3_32() {
-    if (jj_3R_19()) return true;
-    return false;
-  }
-
   private boolean jj_3R_5() {
     if (jj_3R_23()) return true;
     return false;
@@ -1073,35 +1103,55 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_42() {
+    if (jj_scan_token(LONG_STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3_41() {
+    if (jj_scan_token(STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_26() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_41()) {
+    jj_scanpos = xsp;
+    if (jj_3_42()) return true;
+    }
+    return false;
+  }
+
   private boolean jj_3R_17() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_31()) {
-    jj_scanpos = xsp;
     if (jj_3_32()) {
     jj_scanpos = xsp;
     if (jj_3_33()) {
     jj_scanpos = xsp;
     if (jj_3_34()) {
     jj_scanpos = xsp;
-    if (jj_3_35()) return true;
+    if (jj_3_35()) {
+    jj_scanpos = xsp;
+    if (jj_3_36()) return true;
     }
     }
     }
     }
-    return false;
-  }
-
-  private boolean jj_3_31() {
-    if (jj_3R_18()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_30()) jj_scanpos = xsp;
     return false;
   }
 
   private boolean jj_3_14() {
     if (jj_scan_token(A)) return true;
+    return false;
+  }
+
+  private boolean jj_3_32() {
+    if (jj_3R_18()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_31()) jj_scanpos = xsp;
     return false;
   }
 
@@ -1115,14 +1165,19 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
+  private boolean jj_3_40() {
+    if (jj_scan_token(FALSE)) return true;
+    return false;
+  }
+
   private boolean jj_3_29() {
     if (jj_scan_token(AT)) return true;
     if (jj_scan_token(PN_LOCAL)) return true;
     return false;
   }
 
-  private boolean jj_3_41() {
-    if (jj_scan_token(LONG_STRING)) return true;
+  private boolean jj_3R_18() {
+    if (jj_3R_26()) return true;
     return false;
   }
 
@@ -1132,23 +1187,23 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_40() {
-    if (jj_scan_token(STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_26() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_40()) {
-    jj_scanpos = xsp;
-    if (jj_3_41()) return true;
-    }
-    return false;
-  }
-
   private boolean jj_3_5() {
     if (jj_3R_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3_39() {
+    if (jj_scan_token(TRUE)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_22() {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_39()) {
+    jj_scanpos = xsp;
+    if (jj_3_40()) return true;
+    }
     return false;
   }
 
@@ -1176,13 +1231,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     return false;
   }
 
-  private boolean jj_3_39() {
-    if (jj_scan_token(FALSE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_18() {
-    if (jj_3R_26()) return true;
+  private boolean jj_3R_21() {
+    if (jj_scan_token(DECIMAL)) return true;
     return false;
   }
 
@@ -1194,21 +1244,6 @@ public class OWLBGPParser implements OWLBGPParserConstants {
   private boolean jj_3_20() {
     if (jj_scan_token(COMMA)) return true;
     if (jj_3R_16()) return true;
-    return false;
-  }
-
-  private boolean jj_3_38() {
-    if (jj_scan_token(TRUE)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_22() {
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_38()) {
-    jj_scanpos = xsp;
-    if (jj_3_39()) return true;
-    }
     return false;
   }
 
@@ -1236,7 +1271,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
    private static void jj_la1_init_1() {
       jj_la1_1 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[41];
+  final private JJCalls[] jj_2_rtns = new JJCalls[42];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -1464,7 +1499,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 41; i++) {
+    for (int i = 0; i < 42; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -1512,6 +1547,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
             case 38: jj_3_39(); break;
             case 39: jj_3_40(); break;
             case 40: jj_3_41(); break;
+            case 41: jj_3_42(); break;
           }
         }
         p = p.next;

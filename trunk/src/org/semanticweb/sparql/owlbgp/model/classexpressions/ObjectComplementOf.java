@@ -26,11 +26,14 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class ObjectComplementOf extends AbstractExtendedOWLObject implements ClassExpression {
@@ -53,11 +56,38 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     public ClassExpression getComplementedClassExpression() {
         return m_classExpression;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectComplementOf(");
         buffer.append(m_classExpression.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_CLASS.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_COMPLEMENT_OF.toString(prefixes));
+        buffer.append(" ");
+        if (m_classExpression instanceof Atomic) 
+            buffer.append(m_classExpression.toString(prefixes));
+        else {
+            AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            buffer.append(m_classExpression.toTurtleString(prefixes, bnode));
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

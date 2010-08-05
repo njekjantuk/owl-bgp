@@ -26,11 +26,14 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class ObjectInverseOf extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
@@ -56,8 +59,28 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
     public String getIRIString() {
         return null;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         return "ObjectInverseOf("+m_ope.toString(prefixes)+")";
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_INVERSE_OF.toString(prefixes));
+        buffer.append(" ");
+        if (m_ope instanceof Atomic) 
+            buffer.append(m_ope.toString(prefixes));
+        else {
+            AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            buffer.append(m_ope.toTurtleString(prefixes, bnode));
+        }
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

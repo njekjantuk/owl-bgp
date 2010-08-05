@@ -26,13 +26,17 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class DataMinCardinality extends AbstractExtendedOWLObject implements ClassExpression {
@@ -43,7 +47,7 @@ public class DataMinCardinality extends AbstractExtendedOWLObject implements Cla
             return object1.m_cardinality==object2.m_cardinality && object1.m_dpe==object2.m_dpe && object1.m_dataRange==object2.m_dataRange;
         }
         protected int getHashCode(DataMinCardinality object) {
-            return 23*object.m_cardinality+17*object.m_dpe.hashCode()+7*object.m_dataRange.hashCode();
+            return 4031+23*object.m_cardinality+17*object.m_dpe.hashCode()+(object.m_dataRange!=null?object.m_dataRange.hashCode()*23:1713);
         }
     };
     
@@ -65,19 +69,75 @@ public class DataMinCardinality extends AbstractExtendedOWLObject implements Cla
     public DataRange getDataRange() {
         return m_dataRange;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataMinCardinality(");
         buffer.append(m_cardinality);
         buffer.append(" ");
         buffer.append(m_dpe.toString(prefixes));
-        buffer.append(" ");
-        buffer.append(m_dataRange.toString(prefixes));
+        if (m_dataRange!=null) {
+            buffer.append(" ");
+            buffer.append(m_dataRange.toString(prefixes));
+        }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_RESTRICTION.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        if (m_dataRange==null)
+            buffer.append(Vocabulary.OWL_MIN_CARDINALITY.toString(prefixes));
+        else 
+            buffer.append(Vocabulary.OWL_MIN_QUALIFIED_CARDINALITY.toString(prefixes));
+        buffer.append(" ");
+        buffer.append("\"");
+        buffer.append(m_cardinality);
+        buffer.append("\"^^");
+        buffer.append(Datatype.XSD_NON_NEGATIVE_INTEGER.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_ON_PROPERTY.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_dpe.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        if (m_dataRange!=null) {
+            buffer.append(mainNode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_ON_DATA_RANGE.toString(prefixes));
+            buffer.append(" ");
+            if (m_dataRange instanceof Atomic) {
+                buffer.append(m_dataRange.toString(prefixes));
+                buffer.append(" . ");
+                buffer.append(LB);
+            } else {
+                AnonymousIndividual drbnode=AbstractExtendedOWLObject.getNextBlankNode();
+                buffer.append(drbnode);
+                buffer.append(" . ");
+                buffer.append(LB);
+                buffer.append(m_dataRange.toTurtleString(prefixes, drbnode));
+            }
+        }
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
+    }
+    public static DataMinCardinality create(int cardinality,DataPropertyExpression dpe) {
+        return create(cardinality,dpe,null);
     }
     public static DataMinCardinality create(int cardinality,DataPropertyExpression dpe,DataRange dataRange) {
         return s_interningManager.intern(new DataMinCardinality(cardinality,dpe,dataRange));
@@ -91,10 +151,13 @@ public class DataMinCardinality extends AbstractExtendedOWLObject implements Cla
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_dpe.getVariablesInSignature(varType));
-        variables.addAll(m_dataRange.getVariablesInSignature(varType));
+        if (m_dataRange!=null) variables.addAll(m_dataRange.getVariablesInSignature(varType));
         return variables;
     }
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
-        return create(m_cardinality,(DataPropertyExpression)m_dpe.getBoundVersion(variablesToBindings),(DataRange)m_dataRange.getBoundVersion(variablesToBindings));
+        if (m_dataRange==null)
+            return create(m_cardinality,(DataPropertyExpression)m_dpe.getBoundVersion(variablesToBindings));
+        else 
+            return create(m_cardinality,(DataPropertyExpression)m_dpe.getBoundVersion(variablesToBindings),(DataRange)m_dataRange.getBoundVersion(variablesToBindings));
     }
 }

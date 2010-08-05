@@ -22,16 +22,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class SubObjectPropertyOf extends AbstractAxiom implements ObjectPropertyAxiom {
@@ -77,6 +80,7 @@ public class SubObjectPropertyOf extends AbstractAxiom implements ObjectProperty
     public ObjectPropertyExpression getSuperObjectPropertyExpression() {
         return m_superope;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("SubObjectPropertyOf(");
@@ -86,6 +90,23 @@ public class SubObjectPropertyOf extends AbstractAxiom implements ObjectProperty
         buffer.append(m_superope.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier subject;
+        if (m_subope instanceof Atomic) {
+            subject=(Atomic)m_subope;
+        } else {
+            subject=AbstractExtendedOWLObject.getNextBlankNode();
+            m_subope.toTurtleString(prefixes, subject);
+        }
+        Identifier object;
+        if (!(m_superope instanceof Atomic)) {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_superope.toTurtleString(prefixes, object);
+        } else 
+            object=(Atomic)m_superope;
+        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_SUB_OBJECT_PROPERTY_OF, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

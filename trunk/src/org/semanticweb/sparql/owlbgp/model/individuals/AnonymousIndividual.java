@@ -55,11 +55,16 @@ public class AnonymousIndividual extends AbstractExtendedOWLObject implements Id
     public String getNodeID() {
         return m_nodeID;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("_:");
         buffer.append(m_nodeID);
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return toString(prefixes);
     }
     public Identifier getIdentifier() {
         return this;

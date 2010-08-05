@@ -63,7 +63,11 @@ public class Clazz extends AbstractExtendedOWLObject implements ClassExpression,
     }
     @Override
     public String toString(Prefixes prefixes) {
-        return m_iri.toString();
+        return m_iri.toString(prefixes);
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return m_iri.toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

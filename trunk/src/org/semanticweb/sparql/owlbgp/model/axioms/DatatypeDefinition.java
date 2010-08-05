@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +35,8 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DatatypeDefinition extends AbstractAxiom {
     private static final long serialVersionUID = -3515748752748732664L;
@@ -63,7 +67,7 @@ public class DatatypeDefinition extends AbstractAxiom {
         }
     };
     
-    protected final Datatype m_datatype;
+    protected final Atomic m_datatype;
     protected final DataRange m_dataRange;
     
     protected DatatypeDefinition(Datatype datatype,DataRange dataRange,Set<Annotation> annotations) {
@@ -71,13 +75,19 @@ public class DatatypeDefinition extends AbstractAxiom {
         m_datatype=datatype;
         m_dataRange=dataRange;
     }
-
-    public Datatype getDatatype() {
+    protected DatatypeDefinition(DatatypeVariable datatype,DataRange dataRange,Set<Annotation> annotations) {
+        super(annotations);
+        m_datatype=datatype;
+        m_dataRange=dataRange;
+    }
+    
+    public Atomic getDatatype() {
         return m_datatype;
     }
     public DataRange getDataRange() {
         return m_dataRange;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DatatypeDefinition(");
@@ -88,13 +98,32 @@ public class DatatypeDefinition extends AbstractAxiom {
         buffer.append(")");
         return buffer.toString();
     }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        Identifier object;
+        if (m_dataRange instanceof Atomic)
+            object=(Atomic)m_dataRange;
+        else {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_dataRange.toTurtleString(prefixes, object);
+        }
+        buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_datatype, Vocabulary.OWL_EQUIVALENT_CLASS, object, m_annotations));
+        return buffer.toString();
+    }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static DatatypeDefinition create(Datatype datatype,DataRange dataRange) {
         return create(datatype,dataRange,new HashSet<Annotation>());
     }
+    public static DatatypeDefinition create(DatatypeVariable datatype,DataRange dataRange) {
+        return create(datatype,dataRange,new HashSet<Annotation>());
+    }
     public static DatatypeDefinition create(Datatype datatype,DataRange dataRange,Set<Annotation> annotations) {
+        return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange,annotations));
+    }
+    public static DatatypeDefinition create(DatatypeVariable datatype,DataRange dataRange,Set<Annotation> annotations) {
         return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
@@ -114,6 +143,9 @@ public class DatatypeDefinition extends AbstractAxiom {
         return create((Datatype)m_datatype.getBoundVersion(variablesToBindings), (DataRange)m_dataRange.getBoundVersion(variablesToBindings), getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {
-        return create(m_datatype, m_dataRange);
+        if (m_datatype instanceof Datatype)
+            return create((Datatype)m_datatype, m_dataRange);
+        else 
+            return create((DatatypeVariable)m_datatype, m_dataRange);
     }
 }

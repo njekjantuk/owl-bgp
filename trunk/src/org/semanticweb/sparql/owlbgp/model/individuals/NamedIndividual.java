@@ -58,8 +58,13 @@ public class NamedIndividual extends AbstractExtendedOWLObject implements Indivi
     public String getIRIString() {
         return m_iri.toString();
     }
+    @Override
     public String toString(Prefixes prefixes) {
         return m_iri.toString(prefixes);
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

@@ -7,16 +7,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = -2257083759606842880L;
@@ -66,6 +69,7 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
     public Set<ClassExpression> getClassExpressions() {
         return m_classExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointClasses(");
@@ -80,6 +84,59 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
         }
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        if (m_classExpressions.size()==2) {
+            ClassExpression class1=m_classExpressions.iterator().next();
+            ClassExpression class2=m_classExpressions.iterator().next();
+            Identifier subject;
+            if (!(class1 instanceof Atomic)) {
+                subject=AbstractExtendedOWLObject.getNextBlankNode();
+                class1.toTurtleString(prefixes, subject);
+            } else 
+                subject=(Atomic)class1;
+            Identifier object;
+            if (!(class2 instanceof Atomic)) {
+                object=AbstractExtendedOWLObject.getNextBlankNode();
+                class2.toTurtleString(prefixes, object);
+            } else 
+                object=(Atomic)class2;
+            return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_ALL_DISJOINT_CLASSES, object, m_annotations);
+        } else {
+            StringBuffer buffer=new StringBuffer();
+            Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_ALL_DISJOINT_CLASSES.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(listMainNode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            ClassExpression[] classExpressions=m_classExpressions.toArray(new ClassExpression[0]);
+            Identifier[] classIDs=new Identifier[classExpressions.length];
+            for (int i=0;i<classExpressions.length;i++) {
+                if (classExpressions[i] instanceof Atomic)
+                    classIDs[i]=((Atomic)classExpressions[i]).getIdentifier();
+                else
+                    classIDs[i]=AbstractExtendedOWLObject.getNextBlankNode();
+            }
+            printSequence(buffer, prefixes, listMainNode, classIDs);
+            for (int i=0;i<classExpressions.length;i++)
+                if (!(classExpressions[i] instanceof Atomic))
+                    buffer.append(classExpressions[i].toTurtleString(prefixes, classIDs[i]));
+            for (Annotation anno : m_annotations) 
+                anno.toTurtleString(prefixes, bnode);
+            return buffer.toString();
+        } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

@@ -28,11 +28,13 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class ObjectIntersectionOf extends AbstractExtendedOWLObject implements ClassExpression {
     private static final long serialVersionUID = -3579978710820477558L;
@@ -69,6 +71,7 @@ public class ObjectIntersectionOf extends AbstractExtendedOWLObject implements C
     public  Set<ClassExpression> getClassExpressions() {
         return m_classExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectIntersectionOf(");
@@ -81,6 +84,41 @@ public class ObjectIntersectionOf extends AbstractExtendedOWLObject implements C
             buffer.append(conjunct.toString(prefixes));
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_CLASS.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_INTERSECTION_OF.toString(prefixes));
+        buffer.append(" ");
+        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(listMainNode);
+        buffer.append(" . ");
+        buffer.append(LB);
+        Identifier[] listNodes=new Identifier[m_classExpressions.size()];
+        ClassExpression[] classExpressions=m_classExpressions.toArray(new ClassExpression[0]);
+        for (int i=0;i<classExpressions.length;i++) {
+            if (classExpressions[i] instanceof Atomic)
+                listNodes[i]=((Atomic)classExpressions[i]).getIdentifier();
+            else
+                listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+        }
+        printSequence(buffer, prefixes, listMainNode, listNodes);
+        for (int i=0;i<classExpressions.length;i++) {
+            if (!(classExpressions[i] instanceof Atomic)) {
+                buffer.append(classExpressions[i].toTurtleString(prefixes, listNodes[i]));
+            }
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

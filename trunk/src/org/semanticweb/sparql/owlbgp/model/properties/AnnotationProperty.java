@@ -54,8 +54,13 @@ public class AnnotationProperty extends AbstractExtendedOWLObject implements Ann
     public IRI getIRI() {
         return m_iri;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         return m_iri.toString(prefixes);
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

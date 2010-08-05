@@ -7,16 +7,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DisjointObjectProperties extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = -5653341898298818446L;
@@ -67,6 +70,7 @@ public class DisjointObjectProperties extends AbstractAxiom implements ClassAxio
     public Set<ObjectPropertyExpression> getObjectPropertyExpressions() {
         return m_objectPropertyExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointObjectProperties(");
@@ -81,6 +85,59 @@ public class DisjointObjectProperties extends AbstractAxiom implements ClassAxio
         }
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        if (m_objectPropertyExpressions.size()==2) {
+            ObjectPropertyExpression ope1=m_objectPropertyExpressions.iterator().next();
+            ObjectPropertyExpression ope2=m_objectPropertyExpressions.iterator().next();
+            Identifier subject;
+            if (!(ope1 instanceof Atomic)) {
+                subject=AbstractExtendedOWLObject.getNextBlankNode();
+                ope1.toTurtleString(prefixes, subject);
+            } else 
+                subject=(Atomic)ope1;
+            Identifier object;
+            if (!(ope2 instanceof Atomic)) {
+                object=AbstractExtendedOWLObject.getNextBlankNode();
+                ope2.toTurtleString(prefixes, object);
+            } else 
+                object=(Atomic)ope2;
+            return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_DISJOINT_OBJECT_PROPERTIES, object, m_annotations);
+        } else {
+            StringBuffer buffer=new StringBuffer();
+            Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_ALL_DISJOINT_PROPERTIES.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(listMainNode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            ObjectPropertyExpression[] objectPropertyExpressions=m_objectPropertyExpressions.toArray(new ObjectPropertyExpression[0]);
+            Identifier[] objectPropertyIDs=new Identifier[objectPropertyExpressions.length];
+            for (int i=0;i<objectPropertyExpressions.length;i++) {
+                if (objectPropertyExpressions[i] instanceof Atomic)
+                    objectPropertyIDs[i]=((Atomic)objectPropertyExpressions[i]).getIdentifier();
+                else
+                    objectPropertyIDs[i]=AbstractExtendedOWLObject.getNextBlankNode();
+            }
+            printSequence(buffer, prefixes, listMainNode, objectPropertyIDs);
+            for (int i=0;i<objectPropertyExpressions.length;i++)
+                if (!(objectPropertyExpressions[i] instanceof Atomic))
+                    buffer.append(objectPropertyExpressions[i].toTurtleString(prefixes, objectPropertyIDs[i]));
+            for (Annotation anno : m_annotations) 
+                anno.toTurtleString(prefixes, bnode);
+            return buffer.toString();
+        } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

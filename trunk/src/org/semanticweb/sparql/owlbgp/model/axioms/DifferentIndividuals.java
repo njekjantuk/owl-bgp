@@ -24,16 +24,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class DifferentIndividuals extends AbstractAxiom implements Assertion {
@@ -85,6 +88,7 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
     public Set<Individual> getIndividuals() {
         return m_individuals;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DifferentIndividuals(");
@@ -99,6 +103,39 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
         }
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        if (m_individuals.size()==2)
+            return writeSingleMainTripleAxiom(prefixes, (Atomic)m_individuals.iterator().next(), Vocabulary.OWL_DIFFERENT_FROM, (Atomic)m_individuals.iterator().next(), m_annotations);
+        else {
+            StringBuffer buffer=new StringBuffer();
+            Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_ALL_DIFFERENT.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(listMainNode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            Individual[] individuals=m_individuals.toArray(new Individual[0]);
+            Identifier[] individualIDs=new Identifier[individuals.length];
+            for (int i=0;i<individuals.length;i++) {
+                individualIDs[i]=((Atomic)individuals[i]).getIdentifier();
+            }
+            printSequence(buffer, prefixes, listMainNode, individualIDs);
+            for (Annotation anno : m_annotations) 
+                anno.toTurtleString(prefixes, bnode);
+            return buffer.toString();
+        } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

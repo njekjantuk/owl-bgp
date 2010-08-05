@@ -7,16 +7,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = -9059227935467720333L;
@@ -67,6 +70,7 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     public Set<DataPropertyExpression> getDataPropertyExpressions() {
         return m_dataPropertyExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointDataProperties(");
@@ -81,6 +85,39 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
         }
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        if (m_dataPropertyExpressions.size()==2) {
+            return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dataPropertyExpressions.iterator().next(), Vocabulary.OWL_DISJOINT_DATA_PROPERTIES, (Atomic)m_dataPropertyExpressions.iterator().next(), m_annotations);
+        } else {
+            StringBuffer buffer=new StringBuffer();
+            Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_ALL_DISJOINT_PROPERTIES.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(listMainNode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            DataPropertyExpression[] dataPropertyExpressions=m_dataPropertyExpressions.toArray(new DataPropertyExpression[0]);
+            Identifier[] dataPropertyIDs=new Identifier[dataPropertyExpressions.length];
+            for (int i=0;i<dataPropertyExpressions.length;i++) {
+                dataPropertyIDs[i]=((Atomic)dataPropertyExpressions[i]).getIdentifier();
+            }
+            printSequence(buffer, prefixes, listMainNode, dataPropertyIDs);
+            for (Annotation anno : m_annotations) 
+                anno.toTurtleString(prefixes, bnode);
+            return buffer.toString();
+        } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

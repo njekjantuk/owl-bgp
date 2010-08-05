@@ -17,7 +17,6 @@
 */
 package org.semanticweb.sparql.owlbgp.model.properties;
 
-
 public interface AnnotationPropertyExpression extends PropertyExpression {
     
 }

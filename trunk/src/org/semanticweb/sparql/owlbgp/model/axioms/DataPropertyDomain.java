@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +35,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxiom {
     private static final long serialVersionUID = 7064189891149424128L;
@@ -77,6 +80,7 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
     public ClassExpression getDomain() {
         return m_classExpression;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataPropertyDomain(");
@@ -86,6 +90,16 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
         buffer.append(m_classExpression.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier object;
+        if (!(m_classExpression instanceof Atomic)) {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_classExpression.toTurtleString(prefixes, object);
+        } else 
+            object=(Atomic)m_classExpression;
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDFS_DOMAIN, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

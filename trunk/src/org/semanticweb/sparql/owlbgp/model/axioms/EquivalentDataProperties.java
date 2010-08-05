@@ -11,12 +11,14 @@ import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class EquivalentDataProperties extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = 3226003365814187905L;
@@ -67,6 +69,7 @@ public class EquivalentDataProperties extends AbstractAxiom implements ClassAxio
     public Set<DataPropertyExpression> getDataPropertyExpressions() {
         return m_dataPropertyExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("EquivalentDataProperties(");
@@ -80,6 +83,18 @@ public class EquivalentDataProperties extends AbstractAxiom implements ClassAxio
             buffer.append(equiv.toString(prefixes));
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        DataPropertyExpression[] dataPropertyExpressions=m_dataPropertyExpressions.toArray(new DataPropertyExpression[0]);
+        Identifier[] dataPropertyIDs=new Identifier[dataPropertyExpressions.length];
+        for (int i=0;i<dataPropertyExpressions.length;i++) {
+            dataPropertyIDs[i]=((Atomic)dataPropertyExpressions[i]).getIdentifier();
+        }
+        for (int i=0;i<dataPropertyIDs.length-1;i++)
+            buffer.append(writeSingleMainTripleAxiom(prefixes, dataPropertyIDs[i], Vocabulary.OWL_EQUIVALENT_DATA_PROPERTIES, dataPropertyIDs[i+1], m_annotations));
         return buffer.toString();
     }
     protected Object readResolve() {

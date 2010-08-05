@@ -26,6 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +34,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpression {
@@ -68,6 +70,33 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
         buffer.append(" ");
         buffer.append(m_literal.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_RESTRICTION.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_ON_PROPERTY.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_dpe.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_HAS_VALUE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_literal.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
         return buffer.toString();
     }
     protected Object readResolve() {

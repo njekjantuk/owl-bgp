@@ -26,11 +26,14 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DataComplementOf extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = -8211975109884861171L;
@@ -57,6 +60,31 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
         buffer.append("DataComplementOf(");
         buffer.append(m_dataRange.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDFS_DATATYPE.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_DATATYPE_COMPLEMENT_OF.toString(prefixes));
+        buffer.append(" ");
+        if (m_dataRange instanceof Atomic) 
+            buffer.append(m_dataRange.toString(prefixes));
+        else {
+            AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" . ");
+            buffer.append(LB);
+            buffer.append(m_dataRange.toTurtleString(prefixes, bnode));
+        }
         return buffer.toString();
     }
     protected Object readResolve() {
