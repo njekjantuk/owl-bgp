@@ -8,7 +8,7 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandle
 public class TPAssertionPropertyHandler extends TriplePredicateHandler {
 
     public TPAssertionPropertyHandler(TripleConsumer consumer) {
-        super(consumer,Vocabulary.OWL_ASSERTION_PROPERTY.getIRI());
+        super(consumer,Vocabulary.OWL_ASSERTION_PROPERTY);
     }
 
     public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
