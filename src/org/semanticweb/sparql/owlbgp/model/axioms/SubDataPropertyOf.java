@@ -26,6 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +34,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxiom {
     private static final long serialVersionUID = 7386154464790495292L;
@@ -77,6 +79,7 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
     public DataPropertyExpression getSuperDataPropertyExpression() {
         return m_superdpe;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("SubDataPropertyOf(");
@@ -86,6 +89,10 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
         buffer.append(m_superdpe.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_subdpe, Vocabulary.OWL_SUB_DATA_PROPERTY_OF, (Atomic)m_superdpe, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

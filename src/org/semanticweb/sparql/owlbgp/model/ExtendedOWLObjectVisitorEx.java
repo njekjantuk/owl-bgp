@@ -9,6 +9,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.DatatypeDefinition;
+import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;

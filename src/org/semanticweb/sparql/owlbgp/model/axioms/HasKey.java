@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -20,6 +22,7 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class HasKey extends AbstractAxiom {
     private static final long serialVersionUID = -8985552871990493146L;
@@ -27,33 +30,22 @@ public class HasKey extends AbstractAxiom {
     protected static InterningManager<HasKey> s_interningManager=new InterningManager<HasKey>() {
         protected boolean equal(HasKey object1,HasKey object2) {
             if (object1.m_classExpression!=object2.m_classExpression
-                    ||object1.m_objectPropertyExpressions.size()!=object2.m_objectPropertyExpressions.size()
-                    ||object1.m_dataPropertyExpressions.size()!=object2.m_dataPropertyExpressions.size()
+                    ||object1.m_propertyExpressions.size()!=object2.m_propertyExpressions.size()
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (ObjectPropertyExpression ope : object1.m_objectPropertyExpressions) {
-                if (!contains(ope, object2.m_objectPropertyExpressions))
+            for (PropertyExpression pe : object1.m_propertyExpressions) {
+                if (!contains(pe, object2.m_propertyExpressions))
                     return false;
             }
-            for (DataPropertyExpression dpe : object1.m_dataPropertyExpressions) {
-                if (!contains(dpe, object2.m_dataPropertyExpressions))
-                    return false;
-            } 
             for (Annotation anno : object1.m_annotations) {
                 if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
         }
-        protected boolean contains(ObjectPropertyExpression ope,Set<ObjectPropertyExpression> opes) {
-            for (ObjectPropertyExpression op : opes)
-                if (ope==op)
-                    return true;
-            return false;
-        }
-        protected boolean contains(DataPropertyExpression dpe,Set<DataPropertyExpression> dpes) {
-            for (DataPropertyExpression dp : dpes)
-                if (dpe==dp)
+        protected boolean contains(PropertyExpression pe,Set<PropertyExpression> pes) {
+            for (PropertyExpression prop : pes)
+                if (pe==prop)
                     return true;
             return false;
         }
@@ -66,10 +58,8 @@ public class HasKey extends AbstractAxiom {
         protected int getHashCode(HasKey object) {
             int hashCode=31;
             hashCode+=object.m_classExpression.hashCode();
-            for (ObjectPropertyExpression ope : object.m_objectPropertyExpressions)
-                hashCode+=ope.hashCode();
-            for (DataPropertyExpression dpe : object.m_dataPropertyExpressions)
-                hashCode+=dpe.hashCode();
+            for (PropertyExpression pe : object.m_propertyExpressions)
+                hashCode+=pe.hashCode();
             for (Annotation anno : object.m_annotations)
                 hashCode+=anno.hashCode();
             return hashCode;
@@ -77,24 +67,34 @@ public class HasKey extends AbstractAxiom {
     };
     
     protected final ClassExpression m_classExpression;
-    protected final Set<ObjectPropertyExpression> m_objectPropertyExpressions;
-    protected final Set<DataPropertyExpression> m_dataPropertyExpressions;
-
-    protected HasKey(ClassExpression classExpression, Set<ObjectPropertyExpression> objectPropertyExpressions, Set<DataPropertyExpression> dataPropertyExpressions, Set<Annotation> annotations) {
+    protected final Set<PropertyExpression> m_propertyExpressions;
+    
+    protected HasKey(ClassExpression classExpression, Set<PropertyExpression> propertyExpressions, Set<Annotation> annotations) {
         super(annotations);
         m_classExpression=classExpression;
-        m_objectPropertyExpressions=Collections.unmodifiableSet(objectPropertyExpressions);
-        m_dataPropertyExpressions=Collections.unmodifiableSet(dataPropertyExpressions);
+        m_propertyExpressions=Collections.unmodifiableSet(propertyExpressions);
     }
     public ClassExpression getClassExpression() {
         return m_classExpression;
     }
+    public Set<PropertyExpression> getPropertyExpressions() {
+        return m_propertyExpressions;
+    }
     public Set<ObjectPropertyExpression> getObjectPropertyExpressions() {
-        return m_objectPropertyExpressions;
+        Set<ObjectPropertyExpression> result=new HashSet<ObjectPropertyExpression>();
+        for (PropertyExpression pe : m_propertyExpressions)
+            if (pe instanceof ObjectPropertyExpression) 
+                result.add((ObjectPropertyExpression)pe);
+        return result;
     }
     public Set<DataPropertyExpression> getDataPropertyExpressions() {
-        return m_dataPropertyExpressions;
+        Set<DataPropertyExpression> result=new HashSet<DataPropertyExpression>();
+        for (PropertyExpression pe : m_propertyExpressions)
+            if (pe instanceof DataPropertyExpression) 
+                result.add((DataPropertyExpression)pe);
+        return result;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("HasKey(");
@@ -102,16 +102,16 @@ public class HasKey extends AbstractAxiom {
         buffer.append(m_classExpression.toString(prefixes));
         buffer.append(" (");
         boolean notFirst=false;
-        for (ObjectPropertyExpression ope : m_objectPropertyExpressions) {
+        for (ObjectPropertyExpression pe : getObjectPropertyExpressions()) {
             if (notFirst)
                 buffer.append(" ");
             else 
                 notFirst=true;
-            buffer.append(ope.toString(prefixes));
+            buffer.append(pe.toString(prefixes));
         }
         buffer.append(") (");
         notFirst=false;
-        for (DataPropertyExpression dpe : m_dataPropertyExpressions) {
+        for (DataPropertyExpression dpe : getDataPropertyExpressions()) {
             if (notFirst)
                 buffer.append(" ");
             else 
@@ -120,6 +120,34 @@ public class HasKey extends AbstractAxiom {
         }
         buffer.append(")");
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        Identifier subject;
+        if (m_classExpression instanceof Atomic)
+            subject=(Atomic)m_classExpression;
+        else {
+            subject=AbstractExtendedOWLObject.getNextBlankNode();
+            m_classExpression.toTurtleString(prefixes, subject);
+        }
+        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_HAS_KEY, listMainNode, m_annotations));
+        Identifier[] listNodes=new Identifier[m_propertyExpressions.size()];
+        PropertyExpression[] propertyExpressions=m_propertyExpressions.toArray(new PropertyExpression[0]);
+        for (int i=0;i<propertyExpressions.length;i++) {
+            if (propertyExpressions[i] instanceof Atomic)
+                listNodes[i]=((Atomic)propertyExpressions[i]).getIdentifier();
+            else
+                listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+        }
+        printSequence(buffer, prefixes, listMainNode, listNodes);
+        for (int i=0;i<propertyExpressions.length;i++) {
+            if (!(propertyExpressions[i] instanceof Atomic)) {
+                buffer.append(propertyExpressions[i].toTurtleString(prefixes, listNodes[i]));
+            }
+        }
         return buffer.toString();
     }
     protected Object readResolve() {
@@ -132,17 +160,7 @@ public class HasKey extends AbstractAxiom {
         return create(classExpression,propertyExpressions,new HashSet<Annotation>());
     }
     public static HasKey create(ClassExpression classExpression,Set<PropertyExpression> propertyExpressions,Set<Annotation> annotations) {
-        Set<ObjectPropertyExpression> objectPropertyExpressions=new HashSet<ObjectPropertyExpression>();
-        Set<DataPropertyExpression> dataPropertyExpressions=new HashSet<DataPropertyExpression>();
-        for (PropertyExpression pe : propertyExpressions)
-            if (pe instanceof ObjectPropertyExpression)
-                objectPropertyExpressions.add((ObjectPropertyExpression)pe);
-            else
-                dataPropertyExpressions.add((DataPropertyExpression)pe);
-        return create(classExpression,objectPropertyExpressions,dataPropertyExpressions,annotations);
-    }
-    public static HasKey create(ClassExpression classExpression,Set<ObjectPropertyExpression> objectPropertyExpressions,Set<DataPropertyExpression> dataPropertyExpressions,Set<Annotation> annotations) {
-        return s_interningManager.intern(new HasKey(classExpression,objectPropertyExpressions,dataPropertyExpressions,annotations));
+        return s_interningManager.intern(new HasKey(classExpression,propertyExpressions,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
@@ -153,25 +171,19 @@ public class HasKey extends AbstractAxiom {
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_classExpression.getVariablesInSignature(varType));
-        for (ObjectPropertyExpression ope : m_objectPropertyExpressions)
-            variables.addAll(ope.getVariablesInSignature(varType));
-        for (DataPropertyExpression dpe : m_dataPropertyExpressions)
-            variables.addAll(dpe.getVariablesInSignature(varType));
+        for (PropertyExpression pe : m_propertyExpressions)
+            variables.addAll(pe.getVariablesInSignature(varType));
         getAnnotationVariables(varType, variables);
         return variables;
     }
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
-        Set<ObjectPropertyExpression> objectPropertyExpressions=new HashSet<ObjectPropertyExpression>();
-        for (ObjectPropertyExpression ope : m_objectPropertyExpressions) {
-            objectPropertyExpressions.add((ObjectPropertyExpression)ope.getBoundVersion(variablesToBindings));
+        Set<PropertyExpression> propertyExpressions=new HashSet<PropertyExpression>();
+        for (PropertyExpression pe : m_propertyExpressions) {
+            propertyExpressions.add((PropertyExpression)pe.getBoundVersion(variablesToBindings));
         }
-        Set<DataPropertyExpression> dataPropertyExpressions=new HashSet<DataPropertyExpression>();
-        for (DataPropertyExpression dpe : m_dataPropertyExpressions) {
-            dataPropertyExpressions.add((DataPropertyExpression)dpe.getBoundVersion(variablesToBindings));
-        }
-        return create((ClassExpression)m_classExpression.getBoundVersion(variablesToBindings),objectPropertyExpressions,dataPropertyExpressions,getBoundAnnotations(variablesToBindings));
+        return create((ClassExpression)m_classExpression.getBoundVersion(variablesToBindings),propertyExpressions,getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {
-        return create(m_classExpression, m_objectPropertyExpressions, m_dataPropertyExpressions, new HashSet<Annotation>());
+        return create(m_classExpression,m_propertyExpressions,new HashSet<Annotation>());
     }
 }

@@ -7,7 +7,9 @@ options {
 
 PARSER_BEGIN(OWLBGPParser)
 
-package org.semanticweb.sparql.owlbgpparser;
+// generated with Javacc 5.0: ./javacc -OUTPUT_DIRECTORY=/Users/bglimm/Documents/workspace/OWL-BGP/src/org/semanticweb/sparql/owlbgp/parser/  ~/Documents/workspace/OWL-BGP/src/org/semanticweb/sparql/owlbgp/parser/OWLBGPParser.jj  
+
+package org.semanticweb.sparql.owlbgp.parser;
 
 import java.io.StringReader;
 import java.util.HashMap;
@@ -21,9 +23,13 @@ import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
-import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype.OWL2_DATATYPES;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
 public class OWLBGPParser {
 
@@ -38,7 +44,7 @@ public class OWLBGPParser {
         pm.declareSemanticWebPrefixes();
     }
     
-    public OWLBGPParser(StringReader reader, Set<Identifier> classes, Set<Identifier> objectProperties, Set<Identifier> dataProperties, Set<Identifier> individuals, Set<Identifier> customDatatypes) {
+    public OWLBGPParser(StringReader reader, Set<Clazz> classes, Set<ObjectProperty> objectProperties, Set<DataProperty> dataProperties, Set<Individual> individuals, Set<Datatype> customDatatypes) {
          this(reader);
          handler.setClassesInOntologySignature(classes);
          handler.setObjectPropertiesInOntologySignature(objectProperties);
@@ -46,22 +52,21 @@ public class OWLBGPParser {
          handler.setIndividualsInOntologySignature(individuals);
          handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-    public void setClassesInOntologySignature(Set<Identifier> classes) {
+    public void setClassesInOntologySignature(Set<Clazz> classes) {
         handler.setClassesInOntologySignature(classes);
     }
-    public void setObjectPropertiesInOntologySignature(Set<Identifier> objectProperties) {
+    public void setObjectPropertiesInOntologySignature(Set<ObjectProperty> objectProperties) {
         handler.setObjectPropertiesInOntologySignature(objectProperties);
     }
-    public void setDataPropertiesInOntologySignature(Set<Identifier> dataProperties) {
+    public void setDataPropertiesInOntologySignature(Set<DataProperty> dataProperties) {
         handler.setDataPropertiesInOntologySignature(dataProperties);
     }
-    public void setIndividualsInOntologySignature(Set<Identifier> individuals) {
+    public void setIndividualsInOntologySignature(Set<Individual> individuals) {
         handler.setIndividualsInOntologySignature(individuals);
     }
-    public void setCustomDatatypesInOntologySignature(Set<Identifier> customDatatypes) {
+    public void setCustomDatatypesInOntologySignature(Set<Datatype> customDatatypes) {
         handler.setCustomDatatypesInOntologySignature(customDatatypes);
     }
-    
     public static void main(String[] args) {
 //        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
         
@@ -129,10 +134,10 @@ public class OWLBGPParser {
         return IRI.create(s);
     }
     public Set<Axiom> getParsedAxioms() {
-        return handler.getParsedAxioms();
+        return handler.getAxioms();
     }
     public Ontology getParsedOntology() {
-        return handler.getParsedOntology();
+        return handler.getOntology();
     }
     public static String unescapeString(String s) {
         if (s.indexOf('\\')==-1) return s;
@@ -310,7 +315,7 @@ Identifier parseVerb() :
     Identifier iri;
 }
 {
-    (<A>{iri = Vocabulary.RDF_TYPE.getIRI();} | iri=parsePredicate()) {
+    (<A>{iri = Vocabulary.RDF_TYPE;} | iri=parsePredicate()) {
         return iri;
     }
 }
@@ -356,7 +361,7 @@ void parseObject(Identifier subject, Identifier predicate) :
     resObject=parseBlankNode())
     |
     resObject=parseVariable()) {
-        handler.handleTriple(subject, predicate, resObject);
+        handler.handleStreaming(subject, predicate, resObject);
     })
 }
 
@@ -377,24 +382,21 @@ AnonymousIndividual parseItemList() :
     //  _x  rdf:next
     AnonymousIndividual firstSubject=null;
     AnonymousIndividual subject=null;
-    Identifier type=Vocabulary.RDF_TYPE.getIRI();
-    Identifier first=Vocabulary.RDF_FIRST.getIRI();
-    Identifier rest=Vocabulary.RDF_REST.getIRI();
-    Identifier list=Vocabulary.RDF_LIST.getIRI();
-    Identifier nil=Vocabulary.RDF_NIL.getIRI();
+    Identifier first=Vocabulary.RDF_FIRST;
+    Identifier rest=Vocabulary.RDF_REST;
+    Identifier nil=Vocabulary.RDF_NIL;
 }
 {
     (
     {
         AnonymousIndividual prevSubject = subject;
         subject=getAnonymousIndividual("");
-        if (prevSubject!=null) handler.handleTriple(prevSubject, rest, subject);
+        if (prevSubject!=null) handler.handleStreaming(prevSubject, rest, subject);
         else firstSubject=subject;
-        handler.handleTriple(subject, type, list);
     }
         parseObject(subject, first))* {
         // Terminate list
-        handler.handleTriple(subject, rest, nil);
+        handler.handleStreaming(subject, rest, nil);
         return firstSubject;
     }
 }
@@ -409,22 +411,40 @@ void parseLiteral(Identifier subject, Identifier predicate) :
     Token t;
 }
 {
-    (lexicalForm=parseQuotedString() ((<DOUBLE_CARET> datatypeIdentifier=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}))?
+    (lexicalForm=parseQuotedString() ((<DOUBLE_CARET> datatypeIdentifier=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}) | <AT>)?
         {
-      if (datatypeIdentifier==null) dt=Datatype.create(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral"));
-      else dt=Datatype.create((IRI)datatypeIdentifier);
+      IRI plainLiteralIRI=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
+      boolean wasAbbreviated=false;
+      if (datatypeIdentifier==null) {
+          datatypeIdentifier=plainLiteralIRI;
+          wasAbbreviated=true;
+      }
+      if (datatypeIdentifier==plainLiteralIRI) {
+          int lastIndexOfAt=lexicalForm.lastIndexOf('@');
+          if (wasAbbreviated) 
+              lang="";
+          else if (lastIndexOfAt<0)
+            throw new IllegalArgumentException("The lexical forms of rdf:PlainLiteral data values must contain the @ symbol, but the lexical form "+lexicalForm+" does not contain the symbol. ");
+          else { 
+              if (lastIndexOfAt==0) lexicalForm="";
+              else lexicalForm=lexicalForm.substring(0,lastIndexOfAt);
+              if (lastIndexOfAt<lexicalForm.length()-1) lang=lexicalForm.substring(lastIndexOfAt+1);
+              else lang="";
+          }
+      }
+      dt=Datatype.create((IRI)datatypeIdentifier);
       if (lang==null) lang="";
-      handler.handleLiteralTriple(subject, predicate, lexicalForm, lang, dt);
+      handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, lang, dt));
         }
     )
     |
-    (lexicalForm=parseInteger(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.INTEGER.getDatatype());})
+    (lexicalForm=parseInteger(){handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_INTEGER));})
     |
-    (lexicalForm=parseDouble(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DOUBLE.getDatatype());})
+    (lexicalForm=parseDouble(){handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_DOUBLE));})
     |
-    (lexicalForm=parseDecimal(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.DECIMAL.getDatatype());})
+    (lexicalForm=parseDecimal(){handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_DECIMAL));})
     |
-    (lexicalForm=parseBoolean(){handler.handleLiteralTriple(subject, predicate, lexicalForm, "", OWL2_DATATYPES.BOOLEAN.getDatatype());})
+    (lexicalForm=parseBoolean(){handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, "", Datatype.XSD_BOOLEAN));})
 }
 
 

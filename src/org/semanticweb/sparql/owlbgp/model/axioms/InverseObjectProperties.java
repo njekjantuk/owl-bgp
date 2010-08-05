@@ -22,16 +22,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class InverseObjectProperties extends AbstractAxiom implements ObjectPropertyAxiom {
@@ -77,6 +80,7 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
     public ObjectPropertyExpression getInverseObjectPropertyExpression() {
         return m_inverseOpe;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("InverseObjectProperties(");
@@ -86,6 +90,22 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
         buffer.append(m_inverseOpe.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier subject;
+        if (!(m_ope instanceof Atomic)) {
+            subject=AbstractExtendedOWLObject.getNextBlankNode();
+            m_ope.toTurtleString(prefixes, subject);
+        } else 
+            subject=(Atomic)m_ope;
+        Identifier object;
+        if (!(m_inverseOpe instanceof Atomic)) {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_inverseOpe.toTurtleString(prefixes, object);
+        } else 
+            object=(Atomic)m_inverseOpe;
+        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_INVERSE_OF, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

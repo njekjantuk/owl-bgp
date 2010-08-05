@@ -27,6 +27,7 @@ import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -34,6 +35,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPropertyAxiom {
     private static final long serialVersionUID = 3117954908697132827L;
@@ -78,6 +80,7 @@ public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPro
     public IRI getDomain() {
         return m_domain;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("AnnotationPropertyDomain(");
@@ -87,6 +90,10 @@ public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPro
         buffer.append(m_domain.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_annotationPropertyExpression, Vocabulary.RDFS_DOMAIN, m_domain, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

@@ -11,10 +11,10 @@ public abstract class TriplePredicateHandler extends AbstractResourceTripleHandl
         super(consumer);
         this.predicateIRI=predicateIRI;
     }
-    public boolean canHandle(Identifier subject, Identifier predicate, Identifier object) {
-        return predicate.equals(predicateIRI);
-    }
-    public Identifier getPredicateIRI() {
-        return predicateIRI;
-    }
+//    public boolean canHandle(Identifier subject, Identifier predicate, Identifier object) {
+//        return predicate.equals(predicateIRI);
+//    }
+//    public Identifier getPredicateIRI() {
+//        return predicateIRI;
+//    }
 }

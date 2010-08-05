@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -17,6 +19,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     private static final long serialVersionUID = 7822375000293094470L;
@@ -72,6 +75,7 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     public Set<ClassExpression> getClassExpressions() {
         return m_classExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DisjointUnion(");
@@ -87,6 +91,27 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
             buffer.append(conjunct.toString(prefixes));
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        StringBuffer buffer=new StringBuffer();
+        buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_class, Vocabulary.OWL_DISJOINT_UNION_OF, listMainNode, m_annotations));
+        Identifier[] listNodes=new Identifier[m_classExpressions.size()];
+        ClassExpression[] classExpressions=m_classExpressions.toArray(new ClassExpression[0]);
+        for (int i=0;i<classExpressions.length;i++) {
+            if (classExpressions[i] instanceof Atomic)
+                listNodes[i]=((Atomic)classExpressions[i]).getIdentifier();
+            else
+                listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+        }
+        printSequence(buffer, prefixes, listMainNode, listNodes);
+        for (int i=0;i<classExpressions.length;i++) {
+            if (!(classExpressions[i] instanceof Atomic)) {
+                buffer.append(classExpressions[i].toTurtleString(prefixes, listNodes[i]));
+            }
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

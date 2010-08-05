@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +35,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxiom {
     private static final long serialVersionUID = -2081702943726360480L;
@@ -77,6 +80,7 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
     public DataRange getRange() {
         return m_dataRange;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DataPropertyRange(");
@@ -86,6 +90,16 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
         buffer.append(m_dataRange.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier object;
+        if (!(m_dataRange instanceof Atomic)) {
+            object=AbstractExtendedOWLObject.getNextBlankNode();
+            m_dataRange.toTurtleString(prefixes, object);
+        } else 
+            object=(Atomic)m_dataRange;
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDFS_RANGE, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

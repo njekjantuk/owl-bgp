@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -33,6 +35,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 
 public class NegativeObjectPropertyAssertion extends AbstractAxiom implements Assertion {
@@ -90,6 +93,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     public Individual getobject() {
         return m_individual2;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("NegativeObjectPropertyAssertion(");
@@ -100,6 +104,49 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
         buffer.append(" ");
         buffer.append(m_individual2.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_SOURCE_INDIVIDUAL.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_individual1.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        Identifier property;
+        if (m_ope instanceof Atomic) 
+            property=(Atomic)m_ope;
+        else {
+            property=AbstractExtendedOWLObject.getNextBlankNode();
+            m_ope.toTurtleString(prefixes, property);
+        }
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_ASSERTION_PROPERTY.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(property.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_TARGET_INDIVIDUAL.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_individual2.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        for (Annotation anno : m_annotations) 
+            anno.toTurtleString(prefixes, bnode);
         return buffer.toString();
     }
     protected Object readResolve() {

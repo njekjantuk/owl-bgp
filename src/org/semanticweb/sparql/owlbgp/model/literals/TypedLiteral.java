@@ -54,7 +54,7 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
     protected TypedLiteral(String lexicalForm,String langTag,Datatype datatype) {
         m_lexicalForm=lexicalForm!=null?lexicalForm.intern():"".intern();
         m_langTag=langTag!=null?langTag.intern():"".intern();
-        m_dataDatatype=datatype!=null?datatype:Datatype.OWL2_DATATYPES.PLAIN_LITERAL.getDatatype();
+        m_dataDatatype=datatype!=null?datatype:Datatype.RDF_PLAIN_LITERAL;
     }
     public String getLexicalForm() {
         return m_lexicalForm;
@@ -68,17 +68,20 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
     @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
-        buffer.append("''");
+        buffer.append("\"");
         buffer.append(m_lexicalForm);
-        if (m_langTag!=null) {
+        if (m_dataDatatype==Datatype.RDF_PLAIN_LITERAL) {
             buffer.append("@");
             buffer.append(m_langTag);
         }
-        buffer.append("''");
+        buffer.append("\"");
         buffer.append("^^");
-        if (m_dataDatatype==null) buffer.append("http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral");
-        else buffer.append(m_dataDatatype.toString(prefixes));
+        buffer.append(m_dataDatatype.toString(prefixes));
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return toString(prefixes);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -96,7 +99,7 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
             datatype=Datatype.create(IRI.create(literal.substring(lastCircCircIndex)));
             noDatatype=literal.substring(1,lastCircCircIndex-3);
         } else {
-            datatype=Datatype.OWL2_DATATYPES.PLAIN_LITERAL.getDatatype();
+            datatype=Datatype.RDF_PLAIN_LITERAL;
             noDatatype=literal;
         }
         int lastAtIndex=noDatatype.lastIndexOf("@");

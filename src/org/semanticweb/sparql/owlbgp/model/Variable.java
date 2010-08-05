@@ -33,8 +33,13 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
         return getBoundVersion(variablesToBindings.get(this));
     }
+    @Override
     public String toString(Prefixes prefixes) {
         return "?"+m_variable;
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        return toString(prefixes);
     }
     public Identifier getIdentifier() {
         return this;

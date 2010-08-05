@@ -45,6 +45,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.DatatypeDefinition;
+import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
@@ -216,8 +217,8 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+annotationPropertyVariable.toString()+" is unbound. ");
     }
     public OWLObject visit(TypedLiteral literal) {
-        if (literal.getLangTag()!=null) return m_dataFactory.getOWLStringLiteral(literal.getLexicalForm(),literal.getLangTag());
-        else return m_dataFactory.getOWLTypedLiteral(literal.getLexicalForm(),(OWLDatatype)literal.getDatatype().accept(this));
+        if (literal.getDatatype()==Datatype.RDF_PLAIN_LITERAL) return m_dataFactory.getOWLLiteral(literal.getLexicalForm(),literal.getLangTag());
+        else return m_dataFactory.getOWLLiteral(literal.getLexicalForm(),(OWLDatatype)literal.getDatatype().accept(this));
     }
     public OWLObject visit(LiteralVariable literalVariable) {
         throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+literalVariable.toString()+" is unbound. ");
@@ -291,7 +292,7 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLAnnotationAssertionAxiom((OWLAnnotationProperty)assertion.getAnnotationProperty().accept(this),(OWLAnnotationSubject)assertion.getAnnotationSubject().accept(this), (OWLAnnotationValue)assertion.getAnnotationValue().accept(this),getAnnotations(assertion));
     }
     public OWLObject visit(SubAnnotationPropertyOf axiom) {
-        return m_dataFactory.getOWLSubAnnotationPropertyOfAxiom((OWLAnnotationProperty)axiom.getSubAnnotationPropertyExpression().accept(this),(OWLAnnotationProperty)axiom.getSuperObjectPropertyExpression().accept(this),getAnnotations(axiom));
+        return m_dataFactory.getOWLSubAnnotationPropertyOfAxiom((OWLAnnotationProperty)axiom.getSubAnnotationPropertyExpression().accept(this),(OWLAnnotationProperty)axiom.getSuperAnnotationPropertyExpression().accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(AnnotationPropertyDomain axiom) {
         return m_dataFactory.getOWLAnnotationPropertyDomainAxiom((OWLAnnotationProperty)axiom.getAnnotationPropertyExpression().accept(this),(IRI)axiom.getDomain().accept(this),getAnnotations(axiom));

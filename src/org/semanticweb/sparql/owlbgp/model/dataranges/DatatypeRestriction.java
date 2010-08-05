@@ -28,11 +28,13 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class DatatypeRestriction extends AbstractExtendedOWLObject implements DataRange {
     private static final long serialVersionUID = 4586938662095776040L;
@@ -75,6 +77,7 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
     public Set<FacetRestriction> getFacetRestrictions() {
         return m_facetRestrictions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("DatatypeRestriction(");
@@ -87,6 +90,43 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
             buffer.append(facetRestriction.toString(prefixes));
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDFS_DATATYPE.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_ON_DATA_TYPE.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_datatype.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_WITH_RESTRICTIONS.toString(prefixes));
+        buffer.append(" ");
+        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(listMainNode);
+        buffer.append(" . ");
+        buffer.append(LB);
+        Identifier[] listNodes=new Identifier[m_facetRestrictions.size()];
+        FacetRestriction[] facetRestrictions=m_facetRestrictions.toArray(new FacetRestriction[0]);
+        for (int i=0;i<facetRestrictions.length;i++) {
+            listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+        }
+        printSequence(buffer, prefixes, listMainNode, listNodes);
+        for (int i=0;i<facetRestrictions.length;i++) {
+            buffer.append(facetRestrictions[i].toTurtleString(prefixes, listNodes[i]));
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

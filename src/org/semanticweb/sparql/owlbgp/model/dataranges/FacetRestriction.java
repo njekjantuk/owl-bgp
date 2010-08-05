@@ -26,6 +26,8 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.IRI;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -38,6 +40,33 @@ import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 public class FacetRestriction extends AbstractExtendedOWLObject {
     private static final long serialVersionUID = -3713040265806923820L;
 
+    public enum OWL2_FACET {
+        MIN_INCLUSIVE(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minInclusive")),
+        MAX_INCLUSIVE(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxInclusive")),
+        MIN_EXCLUSIVE(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minExclusive")),
+        MAX_EXCLUSIVE(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxExclusive")),
+        LENGTH(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"length")),
+        MIN_LENGTH(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"minLength")),
+        MAX_LENGTH(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"maxLength")),
+        PATTERN(IRI.create(Prefixes.s_semanticWebPrefixes.get("xsd")+"pattern")),
+        LANG_RANGE(IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"langRange"));
+        
+        protected final IRI m_facetIRI;
+        
+        OWL2_FACET(IRI facetIRI) {
+            this.m_facetIRI=facetIRI;
+        }
+        public IRI getIRI() {
+            return m_facetIRI;
+        }
+        public String toString() {
+            return toString(Prefixes.STANDARD_PREFIXES);
+        }
+        public String toString(Prefixes prefixes) {
+            return m_facetIRI.toString(prefixes);
+        }
+    }
+    
     protected static InterningManager<FacetRestriction> s_interningManager=new InterningManager<FacetRestriction>() {
         protected boolean equal(FacetRestriction object1,FacetRestriction object2) {
             return object1.m_facet==object2.m_facet&&object1.m_literal==object2.m_literal;
@@ -47,26 +76,39 @@ public class FacetRestriction extends AbstractExtendedOWLObject {
         }
     };
     
-    protected final Facet m_facet;
+    protected final OWL2_FACET m_facet;
     protected final TypedLiteral m_literal;
    
-    protected FacetRestriction(Facet facet,TypedLiteral literal) {
+    protected FacetRestriction(OWL2_FACET facet,TypedLiteral literal) {
         m_facet=facet;
         m_literal=literal;
     }
-    public Facet getFacet() {
+    public OWL2_FACET getFacet() {
         return m_facet;
     }
     public Literal getLiteral() {
         return m_literal;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         return m_facet.toString(prefixes)+" "+m_literal.toString(prefixes);
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(m_facet.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_literal.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static FacetRestriction create(Facet facet,TypedLiteral literal) {
+    public static FacetRestriction create(OWL2_FACET facet,TypedLiteral literal) {
         return s_interningManager.intern(new FacetRestriction(facet,literal));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {

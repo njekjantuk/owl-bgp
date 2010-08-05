@@ -13,11 +13,13 @@ import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class ObjectPropertyChain extends AbstractExtendedOWLObject implements ObjectPropertyExpression {
     private static final long serialVersionUID = 3523597422428066846L;
@@ -54,6 +56,7 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
     public List<ObjectPropertyExpression> getObjectPropertyExpressions() {
         return m_objectPropertyExpressions;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("ObjectPropertyChain(");
@@ -66,6 +69,34 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
             buffer.append(ope.toString(prefixes));
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_PROPERTY_CHAIN_AXIOM.toString(prefixes));
+        buffer.append(" ");
+        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(listMainNode);
+        buffer.append(" . ");
+        buffer.append(LB);
+        Identifier[] listNodes=new Identifier[m_objectPropertyExpressions.size()];
+        ObjectPropertyExpression[] objectPropertyExpressions=m_objectPropertyExpressions.toArray(new ObjectPropertyExpression[0]);
+        for (int i=0;i<objectPropertyExpressions.length;i++) {
+            if (objectPropertyExpressions[i] instanceof Atomic)
+                listNodes[i]=((Atomic)objectPropertyExpressions[i]).getIdentifier();
+            else
+                listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+        }
+        printSequence(buffer, prefixes, listMainNode, listNodes);
+        for (int i=0;i<objectPropertyExpressions.length;i++) {
+            if (!(objectPropertyExpressions[i] instanceof Atomic)) {
+                buffer.append(objectPropertyExpressions[i].toTurtleString(prefixes, listNodes[i]));
+            }
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

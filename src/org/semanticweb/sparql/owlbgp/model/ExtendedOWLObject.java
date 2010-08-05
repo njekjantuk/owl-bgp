@@ -27,6 +27,8 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
     
 public interface ExtendedOWLObject extends Serializable {
     public String toString(Prefixes prefixes);
+    public String toTurtleString(Identifier mainNode);
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode);
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings);
     public OWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings,OWLDataFactory dataFactory);
     public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<Atomic>> variablesToBindings);

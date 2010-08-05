@@ -22,10 +22,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -34,6 +36,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class NegativeDataPropertyAssertion extends AbstractAxiom implements Assertion {
     private static final long serialVersionUID = -8885275559316000307L;
@@ -84,6 +87,7 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
     public Literal getLiteral() {
         return m_literal;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("NegativeDataPropertyAssertion(");
@@ -94,6 +98,42 @@ public class NegativeDataPropertyAssertion extends AbstractAxiom implements Asse
         buffer.append(" ");
         buffer.append(m_literal.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_TYPE);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION);
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_SOURCE_INDIVIDUAL);
+        buffer.append(" ");
+        buffer.append(m_individual.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_ASSERTION_PROPERTY);
+        buffer.append(" ");
+        buffer.append(((Atomic)m_dpe).toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(bnode);
+        buffer.append(" ");
+        buffer.append(Vocabulary.OWL_TARGET_VALUE);
+        buffer.append(" ");
+        buffer.append(m_literal.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        for (Annotation anno : m_annotations) 
+            anno.toTurtleString(prefixes, bnode);
         return buffer.toString();
     }
     protected Object readResolve() {

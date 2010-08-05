@@ -25,6 +25,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class Ontology extends AbstractExtendedOWLObject {
     private static final long serialVersionUID = 470208281332338403L;
@@ -125,6 +126,7 @@ public class Ontology extends AbstractExtendedOWLObject {
     public Set<Axiom> getAxioms() {
         return m_axioms;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("Ontology(");
@@ -147,6 +149,39 @@ public class Ontology extends AbstractExtendedOWLObject {
             buffer.append(AbstractExtendedOWLObject.LB);
         }
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes,Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        Identifier ontologyIdentifier;
+        if (m_IRI!=null) ontologyIdentifier=m_IRI;
+        else ontologyIdentifier=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(ontologyIdentifier.toString(prefixes));
+        buffer.append(" rdf:type owl:Ontology . ");
+        buffer.append(LB);
+        for (Identifier id : m_versionIRIs) {
+            buffer.append(ontologyIdentifier.toString(prefixes));
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_VERSION_IRI);
+            buffer.append(" ");
+            buffer.append(id.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+        }
+        buffer.append(LB);
+        for (Import imported : m_directlyImported) {
+            buffer.append(imported.toTurtleString(prefixes,ontologyIdentifier));
+            buffer.append(LB);
+        }
+        for (Annotation annotation : m_annotations) {
+            buffer.append(annotation.toTurtleString(prefixes,ontologyIdentifier));
+            buffer.append(LB);
+        }
+        for (Axiom ax : m_axioms) {
+            buffer.append(ax.toString(prefixes));
+            buffer.append(LB);
+        }
         return buffer.toString();
     }
     protected Object readResolve() {

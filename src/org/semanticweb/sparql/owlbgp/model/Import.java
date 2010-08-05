@@ -30,11 +30,25 @@ public class Import extends AbstractAxiom {
     public Identifier getImport() {
         return m_identifier;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("Import(");
         buffer.append(m_identifier.toString(prefixes));
         buffer.append(")");
+        return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null)
+            buffer.append(AbstractExtendedOWLObject.getNextBlankNode());
+        else 
+            buffer.append(mainNode);
+        buffer.append(" owl:imports ");
+        buffer.append(m_identifier);
+        buffer.append(" . ");
+        buffer.append(LB);
         return buffer.toString();
     }
     protected Object readResolve() {

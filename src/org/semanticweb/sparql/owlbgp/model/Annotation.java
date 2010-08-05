@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 
@@ -73,6 +74,42 @@ public class Annotation extends AbstractExtendedOWLObject {
         sb.append(m_annotationValue.toString(prefixes));
         sb.append(")");
         return sb.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
+        if (mainNode==null) mainNode=AbstractExtendedOWLObject.getNextBlankNode();
+        buffer.append(mainNode);
+        buffer.append(" ");
+        buffer.append(m_annotationProperty.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(m_annotationValue.toString(prefixes));
+        buffer.append(" . ");
+        buffer.append(LB);
+        if (!m_annotations.isEmpty()) {
+            AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(bnode);
+            buffer.append(" rdf:type owl:Annotation .");
+            buffer.append(LB);
+            buffer.append(bnode);
+            buffer.append(" owl:annotatedSource ");
+            buffer.append(mainNode.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            buffer.append(bnode);
+            buffer.append(" owl:annotatedProperty ");
+            buffer.append(m_annotationProperty.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            buffer.append(bnode);
+            buffer.append(" owl:annotatedTarget ");
+            buffer.append(m_annotationValue.toString(prefixes));
+            buffer.append(" . ");
+            buffer.append(LB);
+            for (Annotation anno : m_annotations) 
+                buffer.append(anno.toTurtleString(prefixes, bnode));
+        }
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

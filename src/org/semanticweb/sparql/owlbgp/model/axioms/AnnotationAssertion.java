@@ -11,6 +11,7 @@ import org.semanticweb.sparql.owlbgp.model.AnnotationValue;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
 import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
@@ -68,6 +69,7 @@ public class AnnotationAssertion extends AbstractAxiom {
     public AnnotationValue getAnnotationValue() {
         return m_annotationValue;
     }
+    @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("AnnotationAssertion(");
@@ -79,6 +81,10 @@ public class AnnotationAssertion extends AbstractAxiom {
         buffer.append(m_annotationValue.toString(prefixes));
         buffer.append(")");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_annotationSubject, (Atomic)m_annotationProperty, (Atomic)m_annotationValue, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

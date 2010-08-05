@@ -1,13 +1,20 @@
-package org.semanticweb.sparql.owlbgp.model;
+package org.semanticweb.sparql.owlbgp.model.axioms;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.sparql.owlbgp.model.Annotation;
+import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
+import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.InterningManager;
+import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
-import org.semanticweb.sparql.owlbgp.model.axioms.AbstractAxiom;
-import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
@@ -19,6 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class Declaration extends AbstractAxiom {
     private static final long serialVersionUID = -5136239506197182112L;
@@ -76,6 +84,24 @@ public class Declaration extends AbstractAxiom {
         buffer.append(m_declaredObject.toString(prefixes));
         buffer.append("))");
         return buffer.toString();
+    }
+    @Override
+    public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        Identifier object;
+        if (m_declaredObject instanceof Clazz || m_declaredObject instanceof ClassVariable) {
+            object=Vocabulary.OWL_CLASS;
+        } else if (m_declaredObject instanceof ObjectProperty || m_declaredObject instanceof ObjectPropertyVariable) {
+            object=Vocabulary.OWL_OBJECT_PROPERTY;
+        } else if (m_declaredObject instanceof DataProperty || m_declaredObject instanceof DataPropertyVariable) {
+            object=Vocabulary.OWL_DATA_PROPERTY;
+        } else if (m_declaredObject instanceof NamedIndividual || m_declaredObject instanceof IndividualVariable) {
+            object=Vocabulary.OWL_NAMED_INDIVIDUAL;
+        } else if (m_declaredObject instanceof Datatype || m_declaredObject instanceof DatatypeVariable) {
+            object=Vocabulary.OWL_DATATYPE;
+        } else {
+            object=Vocabulary.OWL_ANNOTATION_PROPERTY;
+        }
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_declaredObject, Vocabulary.RDF_TYPE, object, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
