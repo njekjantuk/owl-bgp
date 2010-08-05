@@ -15,18 +15,25 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandle
 public class TPPropertyChainAxiomHandler extends TriplePredicateHandler {
 
     public TPPropertyChainAxiomHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_PROPERTY_CHAIN_AXIOM.getIRI());
+        super(consumer, Vocabulary.OWL_PROPERTY_CHAIN_AXIOM);
     }
 
-    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
-        return false;
-    }
-    public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
-        ObjectPropertyExpression superProp=consumer.translateObjectPropertyExpression(subject);
-        List<ObjectPropertyExpression> chain=consumer.translateToObjectPropertyList(object);
-        consumer.consumeTriple(subject, predicate, object);
-        Set<Annotation> annos=consumer.getAnnotations(subject, predicate, object, (Identifier)Vocabulary.OWL_AXIOM.getIRI());
-        consumer.addAxiom(SubObjectPropertyOf.create(ObjectPropertyChain.create(chain),superProp,annos));
+    @Override
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
+        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        if (superProperty==null)
+            throw new RuntimeException("Could not find an object property expression for the subject in the triple "+subject+" "+Vocabulary.OWL_PROPERTY_CHAIN_AXIOM+" "+object+". ");
+        else {
+            List<ObjectPropertyExpression> chainList=consumer.translateToObjectPropertyExpressionList(object);
+            if (chainList!=null) {
+                if (chainList.size()>1)
+                    consumer.addAxiom(SubObjectPropertyOf.create(ObjectPropertyChain.create(chainList),superProperty,annotations));
+                else 
+                    consumer.addAxiom(SubObjectPropertyOf.create(chainList.iterator().next(),superProperty,annotations));
+            } else {
+                throw new RuntimeException("Error: A list representing the properties of a property chain could not be assembled. The main triple is: "+subject+" "+Vocabulary.OWL_PROPERTY_CHAIN_AXIOM.toString()+" "+object+" and "+object+" is the main node for the list. ");
+            }
+        }
     }
 
 }

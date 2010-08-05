@@ -1,8 +1,13 @@
 package org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate;
 
+import java.util.Set;
+
+import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubDataPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
@@ -10,45 +15,35 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandle
 public class TPSubPropertyOfHandler extends TriplePredicateHandler {
 
     public TPSubPropertyOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.RDFS_SUB_PROPERTY_OF.getIRI());
+        super(consumer, Vocabulary.RDFS_SUB_PROPERTY_OF);
     }
 
-    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
-        return false;
-    }
-    public void handleTriple(Identifier subject,Identifier predicate,Identifier object) {
-        if (consumer.isObjectPropertyOnly(subject) || consumer.isObjectPropertyOnly(object))
-            translateSubObjectProperty(subject, predicate, object);
-        // If any one of the properties is a data property then assume both are
-        else if (consumer.isDataPropertyOnly(subject) && consumer.isDataPropertyOnly(object))
-            translateSubDataProperty(subject, predicate, object);
-        else {
-            // Check for range statements
-            Identifier subPropRange=consumer.getResourceObject(subject, Vocabulary.RDFS_RANGE.getIRI(), false);
-            if (subPropRange!=null) {
-                if (consumer.isDataRange(subPropRange))
-                    translateSubDataProperty(subject, predicate, object);
-                else
-                    translateSubObjectProperty(subject, predicate, object);
-                return;
+    @Override
+    public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
+        boolean handled=false;
+        ObjectPropertyExpression subProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+        String errorMessage="";
+        if (subProperty==null)
+            errorMessage="Could not find a subclass expression for the subject in the triple "+subject+" rdfs:subClassOf "+object+". ";
+        if (superProperty==null)
+            errorMessage+="Could not find a superclass expression for the object in the triple "+subject+" rdfs:subClassOf "+object+". ";    
+        if (subProperty!=null && superProperty!=null) {
+            consumer.addAxiom(SubObjectPropertyOf.create(subProperty,superProperty,annotations));
+            handled=true;
+        } else if (subProperty==null&&superProperty==null) {
+            DataPropertyExpression subDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
+            DataPropertyExpression superDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
+            if (subDataProperty==null)
+                errorMessage+="Could not find a subclass expression for the subject in the triple "+subject+" rdfs:subClassOf "+object+". ";
+            if (superDataProperty==null)
+                errorMessage+="Could not find a superclass expression for the object in the triple "+subject+" rdfs:subClassOf "+object+". ";    
+            if (subDataProperty!=null && superDataProperty!=null) {
+                consumer.addAxiom(SubDataPropertyOf.create(subDataProperty,superDataProperty,annotations));
+                handled=true;
             }
-            Identifier supPropRange = consumer.getResourceObject(subject, Vocabulary.RDFS_RANGE.getIRI(), false);
-            if (supPropRange!=null) {
-                if (consumer.isDataRange(supPropRange))
-                    translateSubDataProperty(subject, predicate, object);
-                else
-                    translateSubObjectProperty(subject, predicate, object);
-                return;
-            }
-            throw new RuntimeException("Cound not disambiguate properties "+subject+" and "+object+". ");
         }
-    }
-    protected void translateSubObjectProperty(Identifier subject,Identifier predicate,Identifier object) {
-        consumer.addAxiom(SubObjectPropertyOf.create(consumer.translateObjectPropertyExpression(subject),consumer.translateObjectPropertyExpression(object)));
-        consumer.consumeTriple(subject, predicate, object);
-    }
-    protected void translateSubDataProperty(Identifier subject,Identifier predicate,Identifier object) {
-        consumer.addAxiom(SubDataPropertyOf.create(consumer.translateDataPropertyExpression(subject),consumer.translateDataPropertyExpression(object)));
-        consumer.consumeTriple(subject, predicate, object);
+        if (!handled)
+            throw new RuntimeException(errorMessage);
     }
 }
