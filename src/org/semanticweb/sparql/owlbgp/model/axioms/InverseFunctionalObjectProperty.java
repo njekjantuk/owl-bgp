@@ -85,13 +85,15 @@ public class InverseFunctionalObjectProperty extends AbstractAxiom implements Ob
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier subject;
         if (!(m_ope instanceof Atomic)) {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_ope.toTurtleString(prefixes, subject);
+            buffer.append(m_ope.toTurtleString(prefixes, subject));
         } else 
             subject=(Atomic)m_ope;
-        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

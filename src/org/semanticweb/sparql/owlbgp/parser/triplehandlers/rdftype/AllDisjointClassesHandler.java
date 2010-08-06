@@ -18,7 +18,7 @@ public class AllDisjointClassesHandler extends BuiltInTypeHandler {
     @Override
     public void handleStreaming(Identifier subject, Identifier predicate, Identifier object) {
         super.handleStreaming(subject, predicate, object, false);
-        consumer.addReifiedSubject(subject);
+        if (consumer.isAnonymous(subject)) consumer.addReifiedSubject(subject);
     }
     
     @Override

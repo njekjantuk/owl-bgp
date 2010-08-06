@@ -93,20 +93,22 @@ public class SubObjectPropertyOf extends AbstractAxiom implements ObjectProperty
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier subject;
         if (m_subope instanceof Atomic) {
             subject=(Atomic)m_subope;
         } else {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_subope.toTurtleString(prefixes, subject);
+            buffer.append(m_subope.toTurtleString(prefixes, subject));
         }
         Identifier object;
         if (!(m_superope instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_superope.toTurtleString(prefixes, object);
+            buffer.append(m_superope.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_superope;
-        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_SUB_OBJECT_PROPERTY_OF, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_SUB_OBJECT_PROPERTY_OF, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

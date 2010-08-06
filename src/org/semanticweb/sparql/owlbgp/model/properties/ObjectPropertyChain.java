@@ -78,11 +78,6 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_PROPERTY_CHAIN_AXIOM.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_objectPropertyExpressions.size()];
         ObjectPropertyExpression[] objectPropertyExpressions=m_objectPropertyExpressions.toArray(new ObjectPropertyExpression[0]);
         for (int i=0;i<objectPropertyExpressions.length;i++) {
@@ -91,7 +86,7 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
             else
                 listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
         }
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         for (int i=0;i<objectPropertyExpressions.length;i++) {
             if (!(objectPropertyExpressions[i] instanceof Atomic)) {
                 buffer.append(objectPropertyExpressions[i].toTurtleString(prefixes, listNodes[i]));

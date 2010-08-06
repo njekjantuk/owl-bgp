@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -146,14 +147,14 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
         buffer.append(" . ");
         buffer.append(LB);
         for (Annotation anno : m_annotations) 
-            anno.toTurtleString(prefixes, bnode);
+            buffer.append(anno.toTurtleString(prefixes, bnode));
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
-        return NegativeObjectPropertyAssertion.create(ope,individual1,individual2,new HashSet<Annotation>());
+    public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Annotation...annotations) {
+        return NegativeObjectPropertyAssertion.create(ope,individual1,individual2,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static NegativeObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Set<Annotation> anotations) {
         return s_interningManager.intern(new NegativeObjectPropertyAssertion(ope,individual1,individual2,anotations));

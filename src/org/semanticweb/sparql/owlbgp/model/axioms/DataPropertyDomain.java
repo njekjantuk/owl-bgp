@@ -93,13 +93,15 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier object;
         if (!(m_classExpression instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_classExpression.toTurtleString(prefixes, object);
+            buffer.append(m_classExpression.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_classExpression;
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDFS_DOMAIN, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDFS_DOMAIN, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

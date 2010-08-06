@@ -26,16 +26,17 @@ public abstract class AbstractCardinalityHandler extends TriplePredicateHandler 
                 return pe;
         }
         // TODO: error handling
-        System.err.println("error");
-        return null;
+        throw new RuntimeException("error");
     }
     protected ClassExpression getClassExpression(Identifier subject) {
         Identifier classID=consumer.getObject(subject, Vocabulary.OWL_ON_CLASS, true);
+        if (classID==null) return null;
         consumer.translateClassExpression(classID);
         return consumer.getClassExpressionForClassIdentifier(classID);
     }
     protected DataRange getDataRange(Identifier subject) {
         Identifier dataRangeID=consumer.getObject(subject, Vocabulary.OWL_ON_DATA_RANGE, true);
+        if (dataRangeID==null) return null;
         consumer.translateDataRange(dataRangeID);
         return consumer.getDataRangeForDataRangeIdentifier(dataRangeID);
     }

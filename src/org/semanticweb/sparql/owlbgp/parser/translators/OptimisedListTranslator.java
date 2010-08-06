@@ -22,8 +22,11 @@ public class OptimisedListTranslator<O extends ExtendedOWLObject> {
     protected void translateList(Identifier mainNode,List<O> list) {
         Identifier first=consumer.getFirst(mainNode);
         if (first!=null) {
-            list.add(translator.translate(first));
+            O translated=translator.translate(first);
+            if (translated!=null) 
+                list.add(translated);
         }
+        if (list.isEmpty()) return;
         Identifier rest=consumer.getRest(mainNode);
         if (rest!=null&&rest!=Vocabulary.RDF_NIL) translateList(rest, list);
     }

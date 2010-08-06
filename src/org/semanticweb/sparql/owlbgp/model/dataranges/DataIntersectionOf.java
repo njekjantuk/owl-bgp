@@ -100,11 +100,6 @@ public class DataIntersectionOf extends AbstractExtendedOWLObject implements Dat
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_INTERSECTION_OF.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_dataRanges.size()];
         DataRange[] dataRanges=m_dataRanges.toArray(new DataRange[0]);
         for (int i=0;i<dataRanges.length;i++) {
@@ -113,7 +108,7 @@ public class DataIntersectionOf extends AbstractExtendedOWLObject implements Dat
             else
                 listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
         }
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         for (int i=0;i<dataRanges.length;i++) {
             if (!(dataRanges[i] instanceof Atomic)) {
                 buffer.append(dataRanges[i].toTurtleString(prefixes, listNodes[i]));

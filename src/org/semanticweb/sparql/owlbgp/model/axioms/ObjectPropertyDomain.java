@@ -93,19 +93,21 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier subject;
         if (!(m_ope instanceof Atomic)) {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_ope.toTurtleString(prefixes, subject);
+            buffer.append(m_ope.toTurtleString(prefixes, subject));
         } else 
             subject=(Atomic)m_ope;
         Identifier object;
         if (!(m_classExpression instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_classExpression.toTurtleString(prefixes, object);
+            buffer.append(m_classExpression.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_classExpression;
-        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_DOMAIN, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_DOMAIN, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

@@ -1,5 +1,6 @@
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -76,25 +77,27 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier subject;
         if (!(m_subClass instanceof Atomic)) {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_subClass.toTurtleString(prefixes, subject);
+            buffer.append(m_subClass.toTurtleString(prefixes, subject));
         } else 
             subject=(Atomic)m_subClass;
         Identifier object;
         if (!(m_superClass instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_superClass.toTurtleString(prefixes, object);
+            buffer.append(m_superClass.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_superClass;
-        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_SUBCLASS_OF, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_SUBCLASS_OF, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static SubClassOf create(ClassExpression subClass, ClassExpression superClass) {
-        return create(subClass,superClass,new HashSet<Annotation>());
+    public static SubClassOf create(ClassExpression subClass, ClassExpression superClass, Annotation... annotations) {
+        return create(subClass,superClass,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static SubClassOf create(ClassExpression subClass, ClassExpression superClass,Set<Annotation> annotations) {
         return s_interningManager.intern(new SubClassOf(subClass,superClass,annotations));

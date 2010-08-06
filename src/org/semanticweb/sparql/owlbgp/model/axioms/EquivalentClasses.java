@@ -113,6 +113,9 @@ public class EquivalentClasses extends AbstractAxiom implements ClassAxiom {
     public static EquivalentClasses create(ClassExpression... classExpressions) {
         return create(new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
     }
+    public static EquivalentClasses create(Set<ClassExpression> classExpressions,Annotation... annotations) {
+        return create(classExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
     public static EquivalentClasses create(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new EquivalentClasses(classExpressions,annotations));
     }

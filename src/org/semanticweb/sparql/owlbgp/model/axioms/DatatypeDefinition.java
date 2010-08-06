@@ -106,7 +106,7 @@ public class DatatypeDefinition extends AbstractAxiom {
             object=(Atomic)m_dataRange;
         else {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_dataRange.toTurtleString(prefixes, object);
+            buffer.append(m_dataRange.toTurtleString(prefixes, object));
         }
         buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_datatype, Vocabulary.OWL_EQUIVALENT_CLASS, object, m_annotations));
         return buffer.toString();

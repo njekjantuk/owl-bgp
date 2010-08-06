@@ -107,13 +107,15 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier predicate;
         if (!(m_ope instanceof Atomic)) {
             predicate=AbstractExtendedOWLObject.getNextBlankNode();
-            m_ope.toTurtleString(prefixes, predicate);
+            buffer.append(m_ope.toTurtleString(prefixes, predicate));
         } else 
             predicate=(Atomic)m_ope;
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_individual1, predicate, (Atomic)m_individual2, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_individual1, predicate, (Atomic)m_individual2, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
