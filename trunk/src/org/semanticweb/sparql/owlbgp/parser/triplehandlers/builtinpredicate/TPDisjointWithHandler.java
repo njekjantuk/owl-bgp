@@ -23,9 +23,9 @@ public class TPDisjointWithHandler extends TriplePredicateHandler {
         ClassExpression class2=consumer.getClassExpressionForClassIdentifier(object);
         String errorMessage="";
         if (class1==null)
-            errorMessage="Could not find a class expression for the subject in the triple "+subject+" owl:equivalentClass "+object+". ";
+            errorMessage="Could not find a class expression for the subject in the triple "+subject+" "+predicate+" "+object+". ";
         if (class2==null)
-            errorMessage+="Could not find a class expression for the object in the triple "+subject+" owl:equivalentClass "+object+". ";
+            errorMessage+="Could not find a class expression for the object in the triple "+subject+" "+predicate+" "+object+". ";
         if (class1!=null && class2!=null) {
             Set<ClassExpression> classes=new HashSet<ClassExpression>();
             classes.add(class1);

@@ -93,13 +93,15 @@ public class ClassAssertion extends AbstractAxiom implements Assertion {
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier object;
         if (!(m_ce instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_ce.toTurtleString(prefixes, object);
+            buffer.append(m_ce.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_ce;
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_individual, Vocabulary.RDF_TYPE, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, (Atomic)m_individual, Vocabulary.RDF_TYPE, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

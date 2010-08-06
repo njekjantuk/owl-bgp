@@ -20,6 +20,7 @@ package org.semanticweb.sparql.owlbgp.model.axioms;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -106,9 +107,10 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
-        if (m_individuals.size()==2)
-            return writeSingleMainTripleAxiom(prefixes, (Atomic)m_individuals.iterator().next(), Vocabulary.OWL_DIFFERENT_FROM, (Atomic)m_individuals.iterator().next(), m_annotations);
-        else {
+        if (m_individuals.size()==2) {
+            Iterator<Individual> it=m_individuals.iterator();
+            return writeSingleMainTripleAxiom(prefixes, (Atomic)it.next(), Vocabulary.OWL_DIFFERENT_FROM, (Atomic)it.next(), m_annotations);
+        } else {
             StringBuffer buffer=new StringBuffer();
             Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
             buffer.append(bnode);
@@ -118,30 +120,25 @@ public class DifferentIndividuals extends AbstractAxiom implements Assertion {
             buffer.append(Vocabulary.OWL_ALL_DIFFERENT.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
-            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(bnode);
-            buffer.append(" ");
-            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(listMainNode);
-            buffer.append(" . ");
-            buffer.append(LB);
             Individual[] individuals=m_individuals.toArray(new Individual[0]);
             Identifier[] individualIDs=new Identifier[individuals.length];
             for (int i=0;i<individuals.length;i++) {
                 individualIDs[i]=((Atomic)individuals[i]).getIdentifier();
             }
-            printSequence(buffer, prefixes, listMainNode, individualIDs);
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            printSequence(buffer, prefixes, null, individualIDs);
             for (Annotation anno : m_annotations) 
-                anno.toTurtleString(prefixes, bnode);
+                buffer.append(anno.toTurtleString(prefixes, bnode));
             return buffer.toString();
         } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DifferentIndividuals create(Set<Individual> individuals) {
-        return create(individuals,new HashSet<Annotation>());
+    public static DifferentIndividuals create(Set<Individual> individuals,Annotation...annotations) {
+        return create(individuals,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DifferentIndividuals create(Individual... individuals) {
         return create(new HashSet<Individual>(Arrays.asList(individuals)),new HashSet<Annotation>());

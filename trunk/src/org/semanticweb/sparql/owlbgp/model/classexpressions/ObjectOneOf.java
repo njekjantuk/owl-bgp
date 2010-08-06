@@ -101,16 +101,11 @@ public class ObjectOneOf extends AbstractExtendedOWLObject implements ClassExpre
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_ONE_OF.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_enumeration.size()];
         Individual[] individuals=m_enumeration.toArray(new Individual[0]);
         for (int i=0;i<individuals.length;i++)
             listNodes[i]=individuals[i].getIdentifier();
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         return buffer.toString();
     }
     protected Object readResolve() {

@@ -113,17 +113,12 @@ public class DatatypeRestriction extends AbstractExtendedOWLObject implements Da
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_WITH_RESTRICTIONS.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_facetRestrictions.size()];
         FacetRestriction[] facetRestrictions=m_facetRestrictions.toArray(new FacetRestriction[0]);
         for (int i=0;i<facetRestrictions.length;i++) {
             listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
         }
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         for (int i=0;i<facetRestrictions.length;i++) {
             buffer.append(facetRestrictions[i].toTurtleString(prefixes, listNodes[i]));
         }

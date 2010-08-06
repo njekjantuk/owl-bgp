@@ -17,7 +17,9 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,50 +47,41 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject {
     public Set<Variable> getVariablesInSignature() {
         return getVariablesInSignature(null);
     }
+    public final String toTurtleString() {
+        return toTurtleString(null);
+    }
     public final String toTurtleString(Identifier mainNode) {
         return toTurtleString(Prefixes.STANDARD_PREFIXES, mainNode);
     }
     public abstract String toTurtleString(Prefixes prefixes, Identifier mainNode);
-    protected void printSequence(StringBuffer buffer, Prefixes prefixes, Identifier mainNode, Identifier... listIDs) {
-        if (listIDs==null) buffer.append(Vocabulary.RDF_NIL.toString(prefixes));
-        else if (listIDs.length==1) {
-            buffer.append(mainNode);
+    protected void printSequence(StringBuffer buffer, Prefixes prefixes, Identifier listID, Identifier... listIDs) {
+        printSequence(buffer, prefixes, listID, Arrays.asList(listIDs));
+    }
+    protected void printSequence(StringBuffer buffer, Prefixes prefixes, Identifier restOfLastListTriple, List<Identifier> listIDs) {
+        if (restOfLastListTriple==null) {
+            if (listIDs==null||listIDs.size()==0) 
+                restOfLastListTriple=Vocabulary.RDF_NIL;
+            else 
+                restOfLastListTriple=getNextBlankNode();
             buffer.append(" ");
-            buffer.append(Vocabulary.RDF_FIRST.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(listIDs[0]);
+            buffer.append(restOfLastListTriple.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
-            buffer.append(mainNode);
-            buffer.append(" ");
-            buffer.append(Vocabulary.RDF_REST.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(Vocabulary.RDF_NIL.toString(prefixes));
-            buffer.append(" . ");
-            buffer.append(LB);
-        } else {
-            Identifier currentMainNode=mainNode;
-            Identifier currentRest=AbstractExtendedOWLObject.getNextBlankNode();
-            for (int i=0;i<listIDs.length;i++) {
-                buffer.append(currentMainNode);
-                buffer.append(" ");
-                buffer.append(Vocabulary.RDF_FIRST.toString(prefixes));
-                buffer.append(" ");
-                buffer.append(listIDs[i].toString(prefixes));
-                buffer.append(" . ");
-                buffer.append(LB);
-                buffer.append(currentMainNode);
-                buffer.append(" ");
-                buffer.append(Vocabulary.RDF_REST.toString(prefixes));
-                buffer.append(" ");
-                buffer.append(currentRest.toString(prefixes));
-                buffer.append(" . ");
-                buffer.append(LB);
-                currentMainNode=currentRest;
-                if (i<listIDs.length-1) currentRest=AbstractExtendedOWLObject.getNextBlankNode();
-                else currentRest=Vocabulary.RDF_NIL;
-            }
         }
+        if (listIDs==null||listIDs.size()==0) 
+            return;
+        buffer.append(restOfLastListTriple);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_FIRST.toString(prefixes));
+        buffer.append(" ");
+        buffer.append(listIDs.get(listIDs.size()-1));
+        buffer.append(" . ");
+        buffer.append(LB);
+        buffer.append(restOfLastListTriple);
+        buffer.append(" ");
+        buffer.append(Vocabulary.RDF_REST.toString(prefixes));
+        buffer.append(" ");
+        printSequence(buffer, prefixes, null, listIDs.subList(0, listIDs.size()-1));        
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();

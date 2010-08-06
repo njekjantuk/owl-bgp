@@ -3,6 +3,7 @@ package org.semanticweb.sparql.owlbgp.model.axioms;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,8 +89,9 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
         if (m_classExpressions.size()==2) {
-            ClassExpression class1=m_classExpressions.iterator().next();
-            ClassExpression class2=m_classExpressions.iterator().next();
+            Iterator<ClassExpression> it=m_classExpressions.iterator();
+            ClassExpression class1=it.next();
+            ClassExpression class2=it.next();
             Identifier subject;
             if (!(class1 instanceof Atomic)) {
                 subject=AbstractExtendedOWLObject.getNextBlankNode();
@@ -102,7 +104,7 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
                 class2.toTurtleString(prefixes, object);
             } else 
                 object=(Atomic)class2;
-            return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_ALL_DISJOINT_CLASSES, object, m_annotations);
+            return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_DISJOINT_WITH, object, m_annotations);
         } else {
             StringBuffer buffer=new StringBuffer();
             Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
@@ -113,28 +115,23 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
             buffer.append(Vocabulary.OWL_ALL_DISJOINT_CLASSES.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
-            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(bnode);
-            buffer.append(" ");
-            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(listMainNode);
-            buffer.append(" . ");
-            buffer.append(LB);
             ClassExpression[] classExpressions=m_classExpressions.toArray(new ClassExpression[0]);
             Identifier[] classIDs=new Identifier[classExpressions.length];
             for (int i=0;i<classExpressions.length;i++) {
                 if (classExpressions[i] instanceof Atomic)
-                    classIDs[i]=((Atomic)classExpressions[i]).getIdentifier();
+                    classIDs[i]=(Atomic)classExpressions[i];
                 else
                     classIDs[i]=AbstractExtendedOWLObject.getNextBlankNode();
             }
-            printSequence(buffer, prefixes, listMainNode, classIDs);
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            printSequence(buffer, prefixes, null, classIDs);
             for (int i=0;i<classExpressions.length;i++)
                 if (!(classExpressions[i] instanceof Atomic))
                     buffer.append(classExpressions[i].toTurtleString(prefixes, classIDs[i]));
             for (Annotation anno : m_annotations) 
-                anno.toTurtleString(prefixes, bnode);
+                buffer.append(anno.toTurtleString(prefixes, bnode));
             return buffer.toString();
         } 
     }
@@ -146,6 +143,9 @@ public class DisjointClasses extends AbstractAxiom implements ClassAxiom {
     }
     public static DisjointClasses create(ClassExpression... classExpressions) {
         return create(new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
+    }
+    public static DisjointClasses create(Set<ClassExpression> classExpressions,Annotation... annotations) {
+        return create(classExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DisjointClasses create(Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new DisjointClasses(classExpressions,annotations));

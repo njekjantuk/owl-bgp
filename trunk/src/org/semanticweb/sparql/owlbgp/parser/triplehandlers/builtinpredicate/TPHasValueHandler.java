@@ -24,7 +24,7 @@ public class TPHasValueHandler extends TriplePredicateHandler {
                 consumer.mapClassIdentifierToClassExpression(subject, DataHasValue.create(dpe, (Literal)object));
             } else {
                 // TODO: error handling
-                System.err.println("error");
+                throw new RuntimeException("error");
             }
         } else {
             ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(propID);
@@ -32,7 +32,7 @@ public class TPHasValueHandler extends TriplePredicateHandler {
                 consumer.mapClassIdentifierToClassExpression(subject, ObjectHasValue.create(ope,consumer.getNamedIndividual(object)));
             } else {
                 // TODO: error handling
-                System.err.println("error");
+                throw new RuntimeException("error");
             }
         }
     }

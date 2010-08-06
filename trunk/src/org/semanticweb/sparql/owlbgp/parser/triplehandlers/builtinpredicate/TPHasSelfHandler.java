@@ -20,7 +20,7 @@ public class TPHasSelfHandler extends TriplePredicateHandler {
             consumer.mapClassIdentifierToClassExpression(subject, ObjectHasSelf.create(ope));
         } else {
             // TODO: error handling
-            System.err.println("error");
+            throw new RuntimeException("error");
         }
     }
 }

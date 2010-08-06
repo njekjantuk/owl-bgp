@@ -101,11 +101,6 @@ public class ObjectUnionOf extends AbstractExtendedOWLObject implements ClassExp
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_UNION_OF.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_classExpressions.size()];
         ClassExpression[] classExpressions=m_classExpressions.toArray(new ClassExpression[0]);
         for (int i=0;i<classExpressions.length;i++) {
@@ -114,7 +109,7 @@ public class ObjectUnionOf extends AbstractExtendedOWLObject implements ClassExp
             else
                 listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
         }
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         for (int i=0;i<classExpressions.length;i++) {
             if (!(classExpressions[i] instanceof Atomic)) {
                 buffer.append(classExpressions[i].toTurtleString(prefixes, listNodes[i]));

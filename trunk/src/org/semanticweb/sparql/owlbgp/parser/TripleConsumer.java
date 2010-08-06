@@ -31,12 +31,13 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.translators.ClassExpressionListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.DataRangeListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.FacetRestrictionListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.IndividualListItemTranslator;
-import org.semanticweb.sparql.owlbgp.parser.translators.ObjectPropertyExpressionListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.OptimisedListTranslator;
+import org.semanticweb.sparql.owlbgp.parser.translators.PropertyExpressionListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.TypedConstantListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPAllValuesFromHandler;
@@ -44,6 +45,7 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDa
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDataIntersectionOfHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDataOneOfHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDataUnionOfHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDifferentFromHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDisjointUnionHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDisjointWithHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPEquivalentClassHandler;
@@ -111,7 +113,7 @@ public class TripleConsumer {
 
     protected final OptimisedListTranslator<ClassExpression> classExpressionListTranslator=new OptimisedListTranslator<ClassExpression>(this, new ClassExpressionListItemTranslator(this));
     protected final OptimisedListTranslator<Individual> individualListTranslator=new OptimisedListTranslator<Individual>(this, new IndividualListItemTranslator(this));
-    protected final OptimisedListTranslator<ObjectPropertyExpression> objectPropertyListTranslator=new OptimisedListTranslator<ObjectPropertyExpression>(this, new ObjectPropertyExpressionListItemTranslator(this));
+    protected final OptimisedListTranslator<PropertyExpression> propertyListTranslator=new OptimisedListTranslator<PropertyExpression>(this, new PropertyExpressionListItemTranslator(this));
     protected final OptimisedListTranslator<Literal> literalListTranslator=new OptimisedListTranslator<Literal>(this, new TypedConstantListItemTranslator(this));
     protected final OptimisedListTranslator<DataRange> dataRangeListTranslator=new OptimisedListTranslator<DataRange>(this, new DataRangeListItemTranslator(this));
     protected final OptimisedListTranslator<FacetRestriction> faceRestrictionListTranslator=new OptimisedListTranslator<FacetRestriction>(this, new FacetRestrictionListItemTranslator(this));
@@ -182,6 +184,9 @@ public class TripleConsumer {
         byPredicateHandlers.put(Vocabulary.OWL_DISJOINT_UNION_OF,new TPDisjointUnionHandler(this));
         byPredicateHandlers.put(Vocabulary.RDFS_SUB_PROPERTY_OF,new TPSubPropertyOfHandler(this));
         byPredicateHandlers.put(Vocabulary.OWL_PROPERTY_CHAIN_AXIOM,new TPPropertyChainAxiomHandler(this));
+        byPredicateHandlers.put(Vocabulary.OWL_DIFFERENT_FROM,new TPDifferentFromHandler(this));
+        byPredicateHandlers.put(Vocabulary.RDFS_SUBCLASS_OF,new TPSubClassOfHandler(this));
+        byPredicateHandlers.put(Vocabulary.OWL_EQUIVALENT_CLASS,new TPEquivalentClassHandler(this));
         typeHandlers=new HashMap<Identifier, TriplePredicateHandler>();
         typeHandlers.put(Vocabulary.OWL_CLASS, new ClassHandler(this));
         typeHandlers.put(Vocabulary.RDFS_DATATYPE, new DatatypeHandler(this));
@@ -190,6 +195,9 @@ public class TripleConsumer {
         typeHandlers.put(Vocabulary.OWL_ANNOTATION_PROPERTY, new AnnotationPropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_NAMED_INDIVIDUAL, new NamedIndividualHandler(this));
         typeHandlers.put(Vocabulary.OWL_ALL_DISJOINT_CLASSES, new AllDisjointClassesHandler(this));
+        typeHandlers.put(Vocabulary.OWL_ALL_DISJOINT_PROPERTIES, new AllDisjointPropertiesHandler(this));
+        typeHandlers.put(Vocabulary.OWL_ALL_DIFFERENT, new AllDifferentHandler(this));
+        typeHandlers.put(Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION, new NegativePropertyAssertionHandler(this));
         byPredicateAndObjectHandlers.put(rdftype,typeHandlers);
     }
     public void setClassesInOntologySignature(Set<Clazz> classes) {
@@ -216,36 +224,42 @@ public class TripleConsumer {
         CE.put(id,classExpression);
     }
     public ClassExpression getClassExpressionForClassIdentifier(Identifier id) {
+        if (id==null) return null;
         return CE.get(id);
     }
     public void mapObjectPropertyIdentifierToObjectProperty(Identifier id, ObjectPropertyExpression objectPropertyExpression) {
         OPE.put(id, objectPropertyExpression); 
     }
     public ObjectPropertyExpression getObjectPropertyExpressionForObjectPropertyIdentifier(Identifier id) {
+        if (id==null) return null;
         return OPE.get(id);
     }
     public void mapDataPropertyIdentifierToDataProperty(Identifier id, DataPropertyExpression dataProperty) {
         DPE.put(id, dataProperty);
     }
     public DataPropertyExpression getDataPropertyExpressionForDataPropertyIdentifier(Identifier id) {
+        if (id==null) return null;
         return DPE.get(id);
     }
     public void mapAnnotationPropertyIdentifierToAnnotationProperty(Identifier id, AnnotationPropertyExpression annotationProperty) {
         APE.put(id, annotationProperty);
     }
     public AnnotationPropertyExpression getAnnotationPropertyExpressionForAnnotationPropertyIdentifier(Identifier id) {
+        if (id==null) return null;
         return APE.get(id);
     }
     public void mapIndividualIdentifierToindividual(Identifier id, Individual individual) {
         IND.put(id, individual);
     }
     public Individual getIndividualForIndividualIdentifier(Identifier id) {
+        if (id==null) return null;
         return IND.get(id);
     }
     public void mapDataRangeIdentifierToDataRange(Identifier id, DataRange datatype) {
         DR.put(id, datatype);
     }
     public DataRange getDataRangeForDataRangeIdentifier(Identifier id) {
+        if (id==null) return null;
         return DR.get(id);
     }
     public Individual getIndividual(Identifier id) {
@@ -320,8 +334,8 @@ public class TripleConsumer {
     }
     public void addTriple(Identifier subject, Identifier predicate, Identifier object) {
         Map<Identifier, Set<Identifier>> map;
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
-            if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
+            if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(object)) {
                 map=builtInPredToBuiltInObjToSubjects.get(predicate);
                 if (map==null) {
                     map=new HashMap<Identifier, Set<Identifier>>();
@@ -362,8 +376,8 @@ public class TripleConsumer {
     }
     public void removeTriple(Identifier subject, Identifier predicate, Identifier object) {
         Map<Identifier, Set<Identifier>> map;
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
-            if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
+            if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(object)) {
                 map=builtInPredToBuiltInObjToSubjects.get(predicate);
                 if (map!=null) {
                     Set<Identifier> subjects=map.get(object);
@@ -428,7 +442,7 @@ public class TripleConsumer {
     }
     protected void parseNonAnnotatedAxioms() {
         TriplePredicateHandler handler=null;
-        for (Identifier predicate : builtInPredToBuiltInObjToSubjects.keySet()) {
+        for (Identifier predicate : new HashSet<Identifier>(builtInPredToBuiltInObjToSubjects.keySet())) {
             Map<Identifier,Set<Identifier>> objToSubjects=builtInPredToBuiltInObjToSubjects.get(predicate);
             for (Identifier object : new HashSet<Identifier>(objToSubjects.keySet())) {
                 Map<Identifier,TriplePredicateHandler> objToHandler=byPredicateAndObjectHandlers.get(predicate);
@@ -443,12 +457,12 @@ public class TripleConsumer {
                 }
             }
         }
-        for (Identifier predicate : builtInPredToSubToObjects.keySet()) {
+        for (Identifier predicate : new HashSet<Identifier>(builtInPredToSubToObjects.keySet())) {
             Map<Identifier,Set<Identifier>> subjToObjects=builtInPredToSubToObjects.get(predicate);
             handler=byPredicateHandlers.get(predicate);
             if (handler!=null) {
-                for (Identifier subject : subjToObjects.keySet()) {
-                    for (Identifier object : subjToObjects.get(subject)) {
+                for (Identifier subject : new HashSet<Identifier>(subjToObjects.keySet())) {
+                    for (Identifier object : new HashSet<Identifier>(subjToObjects.get(subject))) {
                         handler.handleTriple(subject, predicate, object);
                         removeTriple(subject, predicate, object);
                     }
@@ -471,6 +485,23 @@ public class TripleConsumer {
                             removeTriple(subject, Vocabulary.OWL_ANNOTATED_TARGET, triple[2]);
                             Set<Annotation> axiomAnnotations=ANN.get(subject);
                             parseAxiom(triple[0], triple[1], triple[2], axiomAnnotations);
+                        }
+                    }
+                }
+            }
+            // Axioms represented by blank nodes
+            // _:4 rdf:type owl:AllDisjointClasses . 
+            // _:4 owl:members _:5 . ...
+            // _:4 rdfs:label "CDE2anno@"^^rdf:PlainLiteral . 
+            IRI[] bnodeAxiomObjects=new IRI[] { Vocabulary.OWL_ALL_DISJOINT_CLASSES, Vocabulary.OWL_ALL_DISJOINT_PROPERTIES, Vocabulary.OWL_ALL_DIFFERENT, Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION };
+            for (IRI iri : bnodeAxiomObjects) {
+                subjects=objToSubjects.get(iri);
+                if (subjects!=null) {
+                    for (Identifier subject : new HashSet<Identifier>(subjects)) {
+                        if (isAnonymous(subject)) {
+                            Set<Annotation> axiomAnnotations=ANN.get(subject);
+                            if (axiomAnnotations==null) axiomAnnotations=new HashSet<Annotation>();
+                            parseAxiom(subject, Vocabulary.RDF_TYPE, iri, axiomAnnotations);
                         }
                     }
                 }
@@ -508,7 +539,6 @@ public class TripleConsumer {
                     }
                 }
             }
-            
             identifiers=objToSubjects.get(Vocabulary.OWL_RESTRICTION);
             if (identifiers!=null) {
                 for (Identifier subject : new HashSet<Identifier>(identifiers)) {
@@ -544,8 +574,11 @@ public class TripleConsumer {
             System.err.println("error");
         }
     }
-    public List<ObjectPropertyExpression> translateToObjectPropertyExpressionList(Identifier listMainNode) {
-        return objectPropertyListTranslator.translateToList(listMainNode);
+    public Set<PropertyExpression> translateToPropertyExpressionSet(Identifier listMainNode) {
+        return propertyListTranslator.translateToSet(listMainNode);
+    }
+    public List<PropertyExpression> translateToPropertyExpressionList(Identifier listMainNode) {
+        return propertyListTranslator.translateToList(listMainNode);
     }
     public Set<ClassExpression> translateToClassExpressionSet(Identifier listMainNode) {
         return classExpressionListTranslator.translateToSet(listMainNode);
@@ -668,10 +701,10 @@ public class TripleConsumer {
             annotations=new HashSet<Annotation>();
             Map<Identifier,Set<Identifier>> predToObjects=getPredicateToObjects(subject);
             if (!predToObjects.isEmpty()) {
-                for (Identifier predicate : predToObjects.keySet()) {
+                for (Identifier predicate : new HashSet<Identifier>(predToObjects.keySet())) {
                     AnnotationPropertyExpression ape=APE.get(predicate);
                     if (ape!=null) {
-                        for (Identifier object : predToObjects.get(predicate)) {
+                        for (Identifier object : new HashSet<Identifier>(predToObjects.get(predicate))) {
                             if (object instanceof AnnotationValue) {
                                 annotations.add(Annotation.create(ape, (AnnotationValue)object, getAnnotationAnnotations(subject,predicate,object)));
                                 ANN.put(subject, annotations);
@@ -703,14 +736,16 @@ public class TripleConsumer {
         return annotationAnnotations;
     }
     public Identifier getFirst(Identifier subject) {
+        Identifier object=null;
         Map<Identifier,Set<Identifier>> subjToObjects=builtInPredToSubToObjects.get(Vocabulary.RDF_FIRST);
-        if (subjToObjects==null)
-            throw new RuntimeException("There is no triple with predicate rdf:first, but we have to translate a list with main node: "+subject);
-        Set<Identifier> objects=subjToObjects.get(subject);
-        if (objects==null || objects.size()!=1) 
-            throw new RuntimeException("Error: Could not translate list with main node: "+subject+" because there is no triple with subject "+subject+" and predicate rdf:first or there is more thna one such triple. ");
-        
-        Identifier object=objects.iterator().next();
+        if (subjToObjects!=null) {
+            Set<Identifier> objects=subjToObjects.get(subject);
+            if (objects!=null) {
+                if (objects.size()!=1) 
+                    throw new RuntimeException("Error: Could not translate list with main node: "+subject+" because there is more than one triple with subject "+subject+" and predicate rdf:first. ");
+                object=objects.iterator().next();
+            }
+        } 
         removeTriple(subject, Vocabulary.RDF_FIRST, object);
         return object;
     }
@@ -768,7 +803,7 @@ public class TripleConsumer {
         }
         return null;
     }
-    protected Identifier[] getReifiedTriple(Identifier subject, Identifier axiomType) {
+    public Identifier[] getReifiedTriple(Identifier subject, Identifier axiomType) {
         if (!isAnonymous(subject)) 
             throw new RuntimeException("Only blank nodes can be the subject of reified triples, but here we have: "+subject+" rdf:type "+axiomType.toString());
         Identifier reifiedSubject;
@@ -777,20 +812,30 @@ public class TripleConsumer {
         Map<Identifier,Set<Identifier>> objToSubjects=builtInPredToBuiltInObjToSubjects.get(Vocabulary.RDF_TYPE);
         if (objToSubjects!=null && objToSubjects.containsKey(axiomType)) {
             if (objToSubjects.get(axiomType).contains(subject)) {
-                Set<Identifier> reifiedSubjects=getObjects(subject, Vocabulary.OWL_ANNOTATED_SOURCE);
-                if (reifiedSubjects.size()>1) throw new RuntimeException("Error: We got more than one reified subject for a reification axiom: "+subject+" rdf:type "+axiomType);
-                else if (reifiedSubjects.size()<1) throw new RuntimeException("Error: We didn't get a reified subject for a reification axiom: "+subject+" rdf:type "+axiomType);
+                Identifier subjectIdentifier=(axiomType==Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION)?Vocabulary.OWL_SOURCE_INDIVIDUAL:Vocabulary.OWL_ANNOTATED_SOURCE;
+                Identifier predicateIdentifier=(axiomType==Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION)?Vocabulary.OWL_ASSERTION_PROPERTY:Vocabulary.OWL_ANNOTATED_PROPERTY;
+                Identifier objectIdentifier=(axiomType==Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION)?Vocabulary.OWL_TARGET_INDIVIDUAL:Vocabulary.OWL_ANNOTATED_TARGET;
+                Set<Identifier> reifiedSubjects=getObjects(subject, subjectIdentifier);
+                if (reifiedSubjects==null||reifiedSubjects.size()<1) throw new RuntimeException("Error: We didn't get a reified subject for a reification axiom: "+subject+" rdf:type "+axiomType);
+                else if (reifiedSubjects.size()>1) throw new RuntimeException("Error: We got more than one reified subject for a reification axiom: "+subject+" rdf:type "+axiomType);
                 else reifiedSubject=reifiedSubjects.iterator().next();
-                Set<Identifier> reifiedPredicates=getObjects(subject, Vocabulary.OWL_ANNOTATED_PROPERTY);
-                if (reifiedPredicates.size()>1) throw new RuntimeException("Error: We got more than one reified predicate for a reification axiom: "+subject+" rdf:type "+axiomType);
-                else if (reifiedPredicates.size()<1) throw new RuntimeException("Error: We didn't get a reified predicate for a reification axiom: "+subject+" rdf:type "+axiomType);
+                
+                Set<Identifier> reifiedPredicates=getObjects(subject, predicateIdentifier);
+                if (reifiedPredicates==null || reifiedPredicates.size()<1) throw new RuntimeException("Error: We didn't get a reified predicate for a reification axiom: "+subject+" rdf:type "+axiomType);
+                else if (reifiedPredicates.size()>1) throw new RuntimeException("Error: We got more than one reified predicate for a reification axiom: "+subject+" rdf:type "+axiomType);
                 else reifiedPredicate=reifiedPredicates.iterator().next();
-                Set<Identifier> reifiedObjects=getObjects(subject, Vocabulary.OWL_ANNOTATED_TARGET);
-                if (reifiedObjects.size()>1) throw new RuntimeException("Error: We got more than one reified object for a reification axiom: "+subject+" rdf:type "+axiomType);
-                else if (reifiedObjects.size()<1) throw new RuntimeException("Error: We didn't get a reified object for a reification axiom: "+subject+" rdf:type "+axiomType);
+                
+                Set<Identifier> reifiedObjects=getObjects(subject, objectIdentifier);
+                if (reifiedObjects==null||reifiedObjects.size()<1) {
+                    if (objectIdentifier==Vocabulary.OWL_TARGET_INDIVIDUAL) {
+                        // try literal
+                        objectIdentifier=Vocabulary.OWL_TARGET_VALUE;
+                        reifiedObjects=getObjects(subject, objectIdentifier);
+                    }
+                } 
+                if (reifiedObjects==null||reifiedObjects.size()<1) throw new RuntimeException("Error: We didn't get a reified object for a reification axiom: "+subject+" rdf:type "+axiomType);
+                else if (reifiedObjects.size()>1) throw new RuntimeException("Error: We got more than one reified object for a reification axiom: "+subject+" rdf:type "+axiomType);
                 else reifiedObject=reifiedObjects.iterator().next();
-                if (isAnonymous(reifiedSubject)) throw new RuntimeException("Error: The reified predicate for the reification axiom: "+subject+" rdf:type "+axiomType+" is anonymous. ");
-                if (isAnonymous(reifiedSubject)) throw new RuntimeException("Error: The reified object for the reification axiom: "+subject+" rdf:type "+axiomType+" is anonymous. ");
                 return new Identifier[] {reifiedSubject, reifiedPredicate, reifiedObject};
             }
         }
@@ -831,7 +876,7 @@ public class TripleConsumer {
     protected Set<Identifier[]> getSubjectObjectMap(Identifier predicate) {
         Set<Identifier[]> map=new HashSet<Identifier[]>();
         Identifier[] subjObj;
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
             if (builtInPredToSubToObjects.containsKey(predicate)) {
                 Map<Identifier,Set<Identifier>> subjToObjects=builtInPredToSubToObjects.get(predicate);
                 for (Identifier subject : subjToObjects.keySet()) {
@@ -871,7 +916,7 @@ public class TripleConsumer {
     }
     public Set<Identifier> getObjects(Identifier subject, Identifier predicate) {
         Set<Identifier> objects=new HashSet<Identifier>();
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
             if (builtInPredToSubToObjects.containsKey(predicate)) {
                 Map<Identifier,Set<Identifier>> subjToObjects=builtInPredToSubToObjects.get(predicate);
                 if (subjToObjects.containsKey(subject)) objects.addAll(subjToObjects.get(subject));
@@ -899,11 +944,8 @@ public class TripleConsumer {
             Identifier object=objects.iterator().next();
             if (consume) removeTriple(subject, predicate, object);
             return object;
-        } else {
-            // TODO: error handling
-            System.err.println("error");
+        } else
             return null;
-        }
     }
     public Literal getLiteralObject(Identifier subject, Identifier predicate) {
         Set<Literal> literals=getLiteralObjects(subject,predicate);
@@ -915,8 +957,7 @@ public class TripleConsumer {
             return literal;
         } else { 
             // TODO: error handling
-            System.err.println("error");
-            return null;
+             throw new RuntimeException("error");
         }
     }
     public Set<Literal> getLiteralObjects(Identifier subject, Identifier predicate) {
@@ -927,15 +968,15 @@ public class TripleConsumer {
                 literals.add((Literal)object);
             else {
                 // TODO: error handling
-                System.err.println("error");
+                throw new RuntimeException("error");
             }
         }
         return literals;
     }
     protected Set<Identifier> getSubjects(Identifier predicate, Identifier object) {
         Set<Identifier> subjects=new HashSet<Identifier>();
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
-            if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object) && builtInPredToBuiltInObjToSubjects.containsKey(predicate)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
+            if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(object) && builtInPredToBuiltInObjToSubjects.containsKey(predicate)) {
                 Map<Identifier,Set<Identifier>> builtInObjectToSubjects=builtInPredToBuiltInObjToSubjects.get(predicate);
                 if (builtInObjectToSubjects.containsKey(object)) 
                     return builtInObjectToSubjects.get(object);
@@ -957,8 +998,8 @@ public class TripleConsumer {
         return subjects;
     }
     protected boolean containsTriple(Identifier subject, Identifier predicate, Identifier object) {
-        if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(predicate)) {
-            if (Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object) && builtInPredToBuiltInObjToSubjects.containsKey(predicate)) {
+        if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(predicate)) {
+            if (Vocabulary.BUILT_IN_PREDICATE_IRIS.contains(object) && builtInPredToBuiltInObjToSubjects.containsKey(predicate)) {
                 Map<Identifier,Set<Identifier>> builtInObjectToSubjects=builtInPredToBuiltInObjToSubjects.get(predicate);
                 if (builtInObjectToSubjects.containsKey(object)) 
                     return builtInObjectToSubjects.get(object).contains(subject);
@@ -990,9 +1031,12 @@ public class TripleConsumer {
                                         Map<Identifier,Set<Identifier>> annotatedTargetToDecl=builtInPredToBuiltInObjToSubjects.get(Vocabulary.OWL_ANNOTATED_TARGET);
                                         for (Identifier reifiedObject : annotatedTargetToDecl.keySet()) {
                                             TriplePredicateHandler handler=handlerMap.get(reifiedObject);
-                                            if (handler!=null && annotatedTargetToDecl.get(reifiedObject).contains(subject) && builtInPredToSubToObjects.containsKey(Vocabulary.OWL_ANNOTATED_SOURCE) && builtInPredToSubToObjects.get(Vocabulary.OWL_ANNOTATED_SOURCE).containsKey(subject)) {
+                                            if (handler!=null 
+                                                    && annotatedTargetToDecl.get(reifiedObject).contains(subject) 
+                                                    && builtInPredToSubToObjects.containsKey(Vocabulary.OWL_ANNOTATED_SOURCE) 
+                                                    && builtInPredToSubToObjects.get(Vocabulary.OWL_ANNOTATED_SOURCE).containsKey(subject)) {
                                                 for (Identifier reifiedSubject : builtInPredToSubToObjects.get(Vocabulary.OWL_ANNOTATED_SOURCE).get(subject))  
-                                                    handler.handleTriple(reifiedSubject, reifiedPredicate, reifiedObject);
+                                                    handler.handleStreaming(reifiedSubject, reifiedPredicate, reifiedObject);
                                             }
                                         }
                                     }

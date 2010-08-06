@@ -76,9 +76,11 @@ public class DataComplementOf extends AbstractExtendedOWLObject implements DataR
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_DATATYPE_COMPLEMENT_OF.toString(prefixes));
         buffer.append(" ");
-        if (m_dataRange instanceof Atomic) 
+        if (m_dataRange instanceof Atomic) {
             buffer.append(m_dataRange.toString(prefixes));
-        else {
+            buffer.append(" . ");
+            buffer.append(LB);
+        } else {
             AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
             buffer.append(bnode);
             buffer.append(" . ");

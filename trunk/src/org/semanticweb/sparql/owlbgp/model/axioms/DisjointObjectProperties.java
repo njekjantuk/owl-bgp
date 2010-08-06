@@ -114,36 +114,31 @@ public class DisjointObjectProperties extends AbstractAxiom implements ClassAxio
             buffer.append(Vocabulary.OWL_ALL_DISJOINT_PROPERTIES.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
-            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(bnode);
-            buffer.append(" ");
-            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(listMainNode);
-            buffer.append(" . ");
-            buffer.append(LB);
             ObjectPropertyExpression[] objectPropertyExpressions=m_objectPropertyExpressions.toArray(new ObjectPropertyExpression[0]);
             Identifier[] objectPropertyIDs=new Identifier[objectPropertyExpressions.length];
             for (int i=0;i<objectPropertyExpressions.length;i++) {
                 if (objectPropertyExpressions[i] instanceof Atomic)
-                    objectPropertyIDs[i]=((Atomic)objectPropertyExpressions[i]).getIdentifier();
+                    objectPropertyIDs[i]=(Atomic)objectPropertyExpressions[i];
                 else
                     objectPropertyIDs[i]=AbstractExtendedOWLObject.getNextBlankNode();
             }
-            printSequence(buffer, prefixes, listMainNode, objectPropertyIDs);
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            printSequence(buffer, prefixes, null, objectPropertyIDs);
             for (int i=0;i<objectPropertyExpressions.length;i++)
                 if (!(objectPropertyExpressions[i] instanceof Atomic))
                     buffer.append(objectPropertyExpressions[i].toTurtleString(prefixes, objectPropertyIDs[i]));
             for (Annotation anno : m_annotations) 
-                anno.toTurtleString(prefixes, bnode);
+                buffer.append(anno.toTurtleString(prefixes, bnode));
             return buffer.toString();
         } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions) {
-        return create(objectPropertyExpressions,new HashSet<Annotation>());
+    public static DisjointObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions,Annotation... annotations) {
+        return create(objectPropertyExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DisjointObjectProperties create(ObjectPropertyExpression... objectPropertyExpressions) {
         return create(new HashSet<ObjectPropertyExpression>(Arrays.asList(objectPropertyExpressions)),new HashSet<Annotation>());

@@ -32,11 +32,11 @@ public class TPAllValuesFromHandler extends TriplePredicateHandler {
                     consumer.mapClassIdentifierToClassExpression(subject, DataAllValuesFrom.create(dpe, dr));
                 } else {
                     // TODO: error handling
-                    System.err.println("error");
+                    throw new RuntimeException("error");
                 }
             } else {
                 // TODO: error handling
-                System.err.println("error");
+                throw new RuntimeException("error");
             }
         }
     }

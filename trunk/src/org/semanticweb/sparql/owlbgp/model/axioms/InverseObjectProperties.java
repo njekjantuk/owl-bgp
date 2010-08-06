@@ -93,19 +93,21 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         Identifier subject;
         if (!(m_ope instanceof Atomic)) {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_ope.toTurtleString(prefixes, subject);
+            buffer.append(m_ope.toTurtleString(prefixes, subject));
         } else 
             subject=(Atomic)m_ope;
         Identifier object;
         if (!(m_inverseOpe instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            m_inverseOpe.toTurtleString(prefixes, object);
+            buffer.append(m_inverseOpe.toTurtleString(prefixes, object));
         } else 
             object=(Atomic)m_inverseOpe;
-        return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_INVERSE_OF, object, m_annotations);
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_INVERSE_OF, object, m_annotations));
+        return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

@@ -101,16 +101,11 @@ public class DataOneOf extends AbstractExtendedOWLObject implements DataRange {
         buffer.append(mainNode);
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_ONE_OF.toString(prefixes));
-        buffer.append(" ");
-        Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-        buffer.append(listMainNode);
-        buffer.append(" . ");
-        buffer.append(LB);
         Identifier[] listNodes=new Identifier[m_enumeration.size()];
         Literal[] literals=m_enumeration.toArray(new Literal[0]);
         for (int i=0;i<literals.length;i++)
             listNodes[i]=literals[i].getIdentifier();
-        printSequence(buffer, prefixes, listMainNode, listNodes);
+        printSequence(buffer, prefixes, null, listNodes);
         return buffer.toString();
     }
     protected Object readResolve() {

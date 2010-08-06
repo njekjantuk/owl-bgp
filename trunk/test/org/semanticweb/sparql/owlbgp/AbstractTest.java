@@ -37,12 +37,12 @@ public class AbstractTest extends TestCase {
         if (iri.startsWith("xsd:")) iri=Prefixes.s_semanticWebPrefixes.get("xsd")+iri.substring(4);
         else if (iri.startsWith("rdf:")) iri=Prefixes.s_semanticWebPrefixes.get("rdf")+iri.substring(4);
         else if (iri.startsWith("rdfs:")) iri=Prefixes.s_semanticWebPrefixes.get("rdfs")+iri.substring(5);
+        else if (iri.startsWith("owl:")) iri=Prefixes.s_semanticWebPrefixes.get("owl")+iri.substring(4);
         else if (!iri.startsWith("<") && !iri.startsWith("http")) iri=NS+iri;
         return IRI.create(iri);
     }
     public static Clazz C(String className) {
-        if (!className.startsWith("<") && !className.startsWith("http")) className=NS+className;
-        return Clazz.create(className);
+        return C(IRI(className));
     }
     public static Clazz C(IRI classIri) {
         return Clazz.create(classIri);
@@ -51,11 +51,7 @@ public class AbstractTest extends TestCase {
         return ClassVariable.create(classVarName);
     }
     public static Datatype DT(String datatypeUri) {
-        if (datatypeUri.startsWith("xsd:")) datatypeUri=Prefixes.s_semanticWebPrefixes.get("xsd")+datatypeUri.substring(4);
-        else if (datatypeUri.startsWith("rdf:")) datatypeUri=Prefixes.s_semanticWebPrefixes.get("rdf")+datatypeUri.substring(4);
-        else if (datatypeUri.startsWith("rdfs:")) datatypeUri=Prefixes.s_semanticWebPrefixes.get("rdfs")+datatypeUri.substring(5);
-        else if (!datatypeUri.startsWith("<") && !datatypeUri.startsWith("http")) datatypeUri=NS+datatypeUri;
-        return Datatype.create(datatypeUri);
+        return DT(IRI(datatypeUri));
     }
     public static Datatype DT(IRI datatypeIri) {
         return Datatype.create(datatypeIri);
@@ -67,15 +63,13 @@ public class AbstractTest extends TestCase {
         return DatatypeVariable.create(datatypeVar.toString());
     }
     public static ObjectProperty OP(String objectPropertyName) {
-        if (!objectPropertyName.startsWith("<") && !objectPropertyName.startsWith("http")) objectPropertyName=NS+objectPropertyName;
-        return ObjectProperty.create(objectPropertyName);
+        return OP(IRI(objectPropertyName));
     }
     public static ObjectProperty OP(IRI objectPropertyIri) {
         return ObjectProperty.create(objectPropertyIri);
     }
     public static ObjectInverseOf IOP(String objectPropertyName) {
-        if (!objectPropertyName.startsWith("<") && !objectPropertyName.startsWith("http")) objectPropertyName=NS+objectPropertyName;
-        return ObjectInverseOf.create(OP(objectPropertyName));
+        return IOP(IRI(objectPropertyName));
     }
     public static ObjectInverseOf IOP(IRI objectPropertyIri) {
         return ObjectInverseOf.create(OP(objectPropertyIri));
@@ -84,8 +78,7 @@ public class AbstractTest extends TestCase {
         return ObjectPropertyVariable.create(objectPropertyVarName);
     }
     public static DataProperty DP(String dataPropertyName) {
-        if (!dataPropertyName.startsWith("<") && !dataPropertyName.startsWith("http")) dataPropertyName=NS+dataPropertyName;
-        return DataProperty.create(dataPropertyName);
+        return DP(IRI(dataPropertyName));
     }
     public static DataProperty DP(IRI dataPropertyIri) {
         return DataProperty.create(dataPropertyIri);
@@ -94,8 +87,7 @@ public class AbstractTest extends TestCase {
         return DataPropertyVariable.create(dataPropertyVarName);
     }
     public static AnnotationProperty AP(String annotationPropertyName) {
-        if (!annotationPropertyName.startsWith("<") && !annotationPropertyName.startsWith("http")) annotationPropertyName=NS+annotationPropertyName;
-        return AnnotationProperty.create(annotationPropertyName);
+        return AP(IRI(annotationPropertyName));
     }
     public static AnnotationProperty AP(IRI annotationPropertyIri) {
         return AnnotationProperty.create(annotationPropertyIri);
@@ -104,8 +96,7 @@ public class AbstractTest extends TestCase {
         return AnnotationPropertyVariable.create(annotationPropertyVarName);
     }
     public static NamedIndividual NI(String individualName) {
-        if (!individualName.startsWith("<") && !individualName.startsWith("http")) individualName=NS+individualName;
-        return NamedIndividual.create(individualName);
+        return NI(IRI(individualName));
     }
     public static NamedIndividual NI(IRI individualIri) {
         return NamedIndividual.create(individualIri);
@@ -126,7 +117,7 @@ public class AbstractTest extends TestCase {
         return TL(lexicalForm, langTag, DT(datatypeUri));
     }
     public static TypedLiteral TL(String lexicalForm, String langTag, IRI datatypeIri) {
-        return TypedLiteral.create(lexicalForm, langTag, DT(datatypeIri));
+        return TL(lexicalForm, langTag, DT(datatypeIri));
     }
     public static TypedLiteral TL(String lexicalForm, String langTag, Datatype datatype) {
         return TypedLiteral.create(lexicalForm, langTag, datatype);

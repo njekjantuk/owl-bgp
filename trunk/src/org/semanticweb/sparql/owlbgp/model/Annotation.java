@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -116,6 +117,9 @@ public class Annotation extends AbstractExtendedOWLObject {
     }
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue) {
         return Annotation.create(annotationProperty,annotationValue,new HashSet<Annotation>());
+    }
+    public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Annotation... annotations) {
+        return create(annotationProperty,annotationValue,annotations!=null?new HashSet<Annotation>(Arrays.asList(annotations)):new HashSet<Annotation>());
     }
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
         return s_interningManager.intern(new Annotation(annotationProperty,annotationValue,annotations));

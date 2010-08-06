@@ -100,30 +100,25 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
             buffer.append(Vocabulary.OWL_ALL_DISJOINT_PROPERTIES.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
-            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(bnode);
-            buffer.append(" ");
-            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
-            buffer.append(" ");
-            buffer.append(listMainNode);
-            buffer.append(" . ");
-            buffer.append(LB);
             DataPropertyExpression[] dataPropertyExpressions=m_dataPropertyExpressions.toArray(new DataPropertyExpression[0]);
             Identifier[] dataPropertyIDs=new Identifier[dataPropertyExpressions.length];
             for (int i=0;i<dataPropertyExpressions.length;i++) {
-                dataPropertyIDs[i]=((Atomic)dataPropertyExpressions[i]).getIdentifier();
+                dataPropertyIDs[i]=(Atomic)dataPropertyExpressions[i];
             }
-            printSequence(buffer, prefixes, listMainNode, dataPropertyIDs);
+            buffer.append(bnode);
+            buffer.append(" ");
+            buffer.append(Vocabulary.OWL_MEMBERS.toString(prefixes));
+            printSequence(buffer, prefixes, null, dataPropertyIDs);
             for (Annotation anno : m_annotations) 
-                anno.toTurtleString(prefixes, bnode);
+                buffer.append(anno.toTurtleString(prefixes, bnode));
             return buffer.toString();
         } 
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions) {
-        return create(dataPropertyExpressions,new HashSet<Annotation>());
+    public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions,Annotation... annotations) {
+        return create(dataPropertyExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DisjointDataProperties create(DataPropertyExpression... dataPropertyExpressions) {
         return create(new HashSet<DataPropertyExpression>(Arrays.asList(dataPropertyExpressions)),new HashSet<Annotation>());

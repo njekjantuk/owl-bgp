@@ -71,9 +71,11 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_INVERSE_OF.toString(prefixes));
         buffer.append(" ");
-        if (m_ope instanceof Atomic) 
+        if (m_ope instanceof Atomic) { 
             buffer.append(m_ope.toString(prefixes));
-        else {
+            buffer.append(" . ");
+            buffer.append(LB);
+        } else {
             AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
             buffer.append(bnode);
             buffer.append(" . ");

@@ -1,5 +1,6 @@
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -97,7 +98,7 @@ public class Declaration extends AbstractAxiom {
         } else if (m_declaredObject instanceof NamedIndividual || m_declaredObject instanceof IndividualVariable) {
             object=Vocabulary.OWL_NAMED_INDIVIDUAL;
         } else if (m_declaredObject instanceof Datatype || m_declaredObject instanceof DatatypeVariable) {
-            object=Vocabulary.OWL_DATATYPE;
+            object=Vocabulary.RDFS_DATATYPE;
         } else {
             object=Vocabulary.OWL_ANNOTATION_PROPERTY;
         }
@@ -108,6 +109,10 @@ public class Declaration extends AbstractAxiom {
     }
     public static Declaration create(Atomic declaredObject) {
         return create(declaredObject,new HashSet<Annotation>());
+    }
+    public static Declaration create(Atomic declaredObject,Annotation... annotations) {
+        Set<Annotation> annos=annotations!=null?new HashSet<Annotation>(Arrays.asList(annotations)):new HashSet<Annotation>();
+        return create(declaredObject,annos);
     }
     public static Declaration create(Atomic declaredObject,Set<Annotation> annotations) {
         return s_interningManager.intern(new Declaration(declaredObject,annotations));

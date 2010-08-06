@@ -130,7 +130,7 @@ public class HasKey extends AbstractAxiom {
             subject=(Atomic)m_classExpression;
         else {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            m_classExpression.toTurtleString(prefixes, subject);
+            buffer.append(m_classExpression.toTurtleString(prefixes, subject));
         }
         Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
         buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_HAS_KEY, listMainNode, m_annotations));
