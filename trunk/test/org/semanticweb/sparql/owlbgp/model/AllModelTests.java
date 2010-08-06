@@ -7,7 +7,7 @@ import junit.framework.TestSuite;
 public class AllModelTests extends TestCase {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("Unit tests for the parser.");
+        TestSuite suite = new TestSuite("Unit tests for the model classes.");
         // $JUnit-BEGIN$
         suite.addTestSuite(TestClasses.class);
         // $JUnit-END$
