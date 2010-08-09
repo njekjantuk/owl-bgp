@@ -4,15 +4,16 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
-import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
+import org.semanticweb.sparql.owlbgp.model.axioms.ReflexiveObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class ObjectPropertyHandler extends AbstractResourceTripleHandler {
+public class ReflexivePropertyHandler extends AbstractResourceTripleHandler {
 
-    public ObjectPropertyHandler(TripleConsumer consumer) {
+    public ReflexivePropertyHandler(TripleConsumer consumer) {
         super(consumer);
     }
 
@@ -21,16 +22,15 @@ public class ObjectPropertyHandler extends AbstractResourceTripleHandler {
         super.handleStreaming(subject, predicate, object, false);
         if (consumer.isVariable(subject))
             consumer.mapObjectPropertyIdentifierToObjectProperty(subject, ObjectPropertyVariable.create(subject.toString()));
-        else if (consumer.isAnonymous(subject))
-            throw new IllegalArgumentException("The subject of a declaration triple cannot be a blank node, but here we have the triple: "+subject+" "+predicate+" "+object);
-        else
+        else if (!consumer.isAnonymous(subject))
             consumer.mapObjectPropertyIdentifierToObjectProperty(subject, ObjectProperty.create(subject.toString()));
     }
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        if (consumer.isVariable(subject))
-            consumer.addAxiom(Declaration.create((ObjectPropertyVariable)consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject),annotations));
-        else 
-            consumer.addAxiom(Declaration.create((ObjectProperty)consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject),annotations));
+        ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        if (ope!=null)
+            consumer.addAxiom(ReflexiveObjectProperty.create(ope,annotations));
+        else
+            throw new RuntimeException("Error: The subject of the triple "+subject+" "+predicate+" "+object+" could not be translated into an object property. ");
     }
 }

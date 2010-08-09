@@ -6,13 +6,12 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPDataIntersectionOfHandler extends TriplePredicateHandler {
+public class TPDataIntersectionOfHandler extends AbstractResourceTripleHandler {
 
     public TPDataIntersectionOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_INTERSECTION_OF);
+        super(consumer);
     }
 
     @Override
@@ -25,7 +24,7 @@ public class TPDataIntersectionOfHandler extends TriplePredicateHandler {
                 consumer.mapDataRangeIdentifierToDataRange(subject, dataRangeSet.iterator().next());
         } else {
             // TODO: error handling
-            System.err.println("error");
+            throw new RuntimeException("error");
         }
     }
 }

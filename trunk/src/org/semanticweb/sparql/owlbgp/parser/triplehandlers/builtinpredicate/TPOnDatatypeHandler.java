@@ -8,13 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPOnDatatypeHandler extends TriplePredicateHandler {
+public class TPOnDatatypeHandler extends AbstractResourceTripleHandler {
 
     public TPOnDatatypeHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_INTERSECTION_OF);
+        super(consumer);
     }
 
     @Override
@@ -32,6 +31,6 @@ public class TPOnDatatypeHandler extends TriplePredicateHandler {
                 consumer.mapDataRangeIdentifierToDataRange(subject, datatype);
         } else
             // TODO: error handling
-            System.err.println("error");
+            throw new RuntimeException("error");
     }
 }

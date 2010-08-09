@@ -8,12 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class DatatypeHandler extends BuiltInTypeHandler {
+public class DatatypeHandler extends AbstractResourceTripleHandler {
 
     public DatatypeHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.RDFS_DATATYPE);
+        super(consumer);
     }
 
     @Override

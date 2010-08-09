@@ -8,12 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class AnnotationPropertyHandler extends BuiltInTypeHandler{
+public class AnnotationPropertyHandler extends AbstractResourceTripleHandler {
 
     public AnnotationPropertyHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_ANNOTATION_PROPERTY);
+        super(consumer);
     }
 
     @Override

@@ -2,12 +2,12 @@ package org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class AnnotationHandler extends BuiltInTypeHandler {
+public class AnnotationHandler extends AbstractResourceTripleHandler {
 
     public AnnotationHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_ANNOTATION);
+        super(consumer);
     }
     
     @Override

@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -106,8 +107,8 @@ public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxio
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DataPropertyRange create(DataPropertyExpression dpe,DataRange dataRange) {
-        return create(dpe, dataRange, new HashSet<Annotation>());
+    public static DataPropertyRange create(DataPropertyExpression dpe,DataRange dataRange, Annotation... annotations) {
+        return create(dpe, dataRange, new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DataPropertyRange create(DataPropertyExpression dpe,DataRange dataRange, Set<Annotation> annotations) {
         return s_interningManager.intern(new DataPropertyRange(dpe,dataRange,annotations));

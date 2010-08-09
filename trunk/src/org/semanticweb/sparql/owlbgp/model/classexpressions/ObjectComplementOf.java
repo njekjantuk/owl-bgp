@@ -79,9 +79,11 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
         buffer.append(" ");
         buffer.append(Vocabulary.OWL_COMPLEMENT_OF.toString(prefixes));
         buffer.append(" ");
-        if (m_classExpression instanceof Atomic) 
+        if (m_classExpression instanceof Atomic) { 
             buffer.append(m_classExpression.toString(prefixes));
-        else {
+            buffer.append(" . ");
+            buffer.append(LB);
+        } else {
             AnonymousIndividual bnode=AbstractExtendedOWLObject.getNextBlankNode();
             buffer.append(bnode);
             buffer.append(" . ");

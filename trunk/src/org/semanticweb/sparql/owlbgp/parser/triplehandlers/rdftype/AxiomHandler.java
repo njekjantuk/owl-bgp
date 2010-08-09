@@ -2,12 +2,12 @@ package org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class AxiomHandler extends BuiltInTypeHandler {
+public class AxiomHandler extends AbstractResourceTripleHandler {
 
     public AxiomHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_AXIOM);
+        super(consumer);
     }
     
     @Override

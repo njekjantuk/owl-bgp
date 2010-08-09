@@ -14,9 +14,6 @@ public abstract class AbstractResourceTripleHandler {
     public AbstractResourceTripleHandler(TripleConsumer consumer) {
         this.consumer=consumer;
     }
-//    public boolean isSubjectOrObjectAnonymous(Identifier subject, Identifier object) {
-//        return consumer.isAnonymous(subject) || consumer.isAnonymous(object);
-//    }
     public void handleStreaming(Identifier subject, Identifier predicate, Identifier object, boolean consume) {
         if (!consume) consumer.addTriple(subject, predicate, object);
     }
@@ -27,11 +24,4 @@ public abstract class AbstractResourceTripleHandler {
     }
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
     }
-//    public boolean canHandleStreaming(Identifier subject, Identifier predicate, Identifier object) {
-//        return false;
-//    }
-//    public abstract boolean canHandle(Identifier subject, Identifier predicate, Identifier object);
-//    public boolean consumeWhileStreaming() {
-//        return false;
-//    }
 }

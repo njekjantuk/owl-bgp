@@ -12,51 +12,47 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPEquivalentClassHandler extends TriplePredicateHandler {
+public class TPEquivalentClassHandler extends AbstractResourceTripleHandler {
 
     public TPEquivalentClassHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_EQUIVALENT_CLASS);
+        super(consumer);
     }
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        boolean handled=false;
         ClassExpression class1=consumer.getClassExpressionForClassIdentifier(subject);
-        ClassExpression class2=consumer.getClassExpressionForClassIdentifier(object);
-        String errorMessage="";
+        DataRange dr1=null;
         if (class1==null)
-            errorMessage="Could not find a class expression for the subject in the triple "+subject+" owl:equivalentClass "+object+". ";
+            dr1=consumer.getDataRangeForDataRangeIdentifier(subject);
+        if (class1==null && dr1==null)
+            throw new RuntimeException("Could not find neither a data range nor a clas expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
+        
+        ClassExpression class2=consumer.getClassExpressionForClassIdentifier(object);
+        DataRange dr2=null;
         if (class2==null)
-            errorMessage+="Could not find a class expression for the object in the triple "+subject+" owl:equivalentClass "+object+". ";    
+            dr2=consumer.getDataRangeForDataRangeIdentifier(object);
+        if (class2==null && dr2==null)
+            throw new RuntimeException("Could not find neither a data range nor a clas expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
+        
         if (class1!=null && class2!=null) {
             Set<ClassExpression> classes=new HashSet<ClassExpression>();
             classes.add(class1);
             classes.add(class2);
             consumer.addAxiom(EquivalentClasses.create(classes,annotations));
-            handled=true;
-        } else if (class1==null && class2==null) {
-            // data ranges
-            DataRange dr1=consumer.getDataRangeForDataRangeIdentifier(subject);
-            DataRange dr2=consumer.getDataRangeForDataRangeIdentifier(object);
-            if (dr1==null)
-                errorMessage+="Could not find a data range for the subject in the triple "+subject+" owl:equivalentClass "+object+". ";
-            if (dr2==null)
-                errorMessage+="Could not find a data range for the object in the triple "+subject+" owl:equivalentClass "+object+". ";
-            if (dr1!=null && dr2!=null) {
-                handled=true;
-                if (dr1 instanceof Datatype) 
-                    consumer.addAxiom(DatatypeDefinition.create((Datatype)dr1, dr2,annotations));
-                else if (dr1 instanceof DatatypeVariable)
-                    consumer.addAxiom(DatatypeDefinition.create((DatatypeVariable)dr1, dr2,annotations));
-                else {
-                    errorMessage="The data range for the subject in the triple "+subject+" owl:equivalentClass "+object+" is not a datatype or a datatype variable as required, but a complex data range: "+dr1;
-                    handled=false;
-                }
+        } else if (dr1!=null && dr2!=null) {
+            if (dr1 instanceof Datatype) 
+                consumer.addAxiom(DatatypeDefinition.create((Datatype)dr1, dr2,annotations));
+            else if (dr1 instanceof DatatypeVariable)
+                consumer.addAxiom(DatatypeDefinition.create((DatatypeVariable)dr1, dr2,annotations));
+            else {
+                throw new RuntimeException("The data range for the subject in the triple "+subject+" "+predicate+" "+object+" is not a datatype or a datatype variable as required, but a complex data range: "+dr1);
             }
-        } 
-        if (!handled) throw new RuntimeException(errorMessage);
+        } else if (class1!=null)
+            throw new RuntimeException("Error: The subject of the triple "+subject+" "+predicate+" "+object+"  was tranlated into a class expression, but the object into a data range, which is not allowed in OWL DL. ");
+        else
+            throw new RuntimeException("Error: The object of the triple "+subject+" "+predicate+" "+object+"  was tranlated into a class expression, but the subject into a data range, which is not allowed in OWL DL. ");
+
     }
 }

@@ -7,13 +7,12 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPSubClassOfHandler extends TriplePredicateHandler {
+public class TPSubClassOfHandler extends AbstractResourceTripleHandler {
 
     public TPSubClassOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.RDFS_SUBCLASS_OF);
+        super(consumer);
     }
     
     @Override

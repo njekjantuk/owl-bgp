@@ -3,6 +3,7 @@ package org.semanticweb.sparql.owlbgp.model.axioms;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -88,24 +89,26 @@ public class DisjointObjectProperties extends AbstractAxiom implements ClassAxio
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
+        StringBuffer buffer=new StringBuffer();
         if (m_objectPropertyExpressions.size()==2) {
-            ObjectPropertyExpression ope1=m_objectPropertyExpressions.iterator().next();
-            ObjectPropertyExpression ope2=m_objectPropertyExpressions.iterator().next();
+            Iterator<ObjectPropertyExpression> it=m_objectPropertyExpressions.iterator();
+            ObjectPropertyExpression ope1=it.next();
+            ObjectPropertyExpression ope2=it.next();
             Identifier subject;
             if (!(ope1 instanceof Atomic)) {
                 subject=AbstractExtendedOWLObject.getNextBlankNode();
-                ope1.toTurtleString(prefixes, subject);
+                buffer.append(ope1.toTurtleString(prefixes, subject));
             } else 
                 subject=(Atomic)ope1;
             Identifier object;
             if (!(ope2 instanceof Atomic)) {
                 object=AbstractExtendedOWLObject.getNextBlankNode();
-                ope2.toTurtleString(prefixes, object);
+                buffer.append(ope2.toTurtleString(prefixes, object));
             } else 
                 object=(Atomic)ope2;
-            return writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_DISJOINT_OBJECT_PROPERTIES, object, m_annotations);
+            buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_PROPERTY_DISJOINT_WITH, object, m_annotations));
+            return buffer.toString();
         } else {
-            StringBuffer buffer=new StringBuffer();
             Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
             buffer.append(bnode);
             buffer.append(" ");
@@ -137,11 +140,17 @@ public class DisjointObjectProperties extends AbstractAxiom implements ClassAxio
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions,Annotation... annotations) {
-        return create(objectPropertyExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
+    public static DisjointObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions) {
+        return create(objectPropertyExpressions,new HashSet<Annotation>());
     }
-    public static DisjointObjectProperties create(ObjectPropertyExpression... objectPropertyExpressions) {
-        return create(new HashSet<ObjectPropertyExpression>(Arrays.asList(objectPropertyExpressions)),new HashSet<Annotation>());
+    public static DisjointObjectProperties create(ObjectPropertyExpression objectPropertyExpression1,ObjectPropertyExpression objectPropertyExpression2,Annotation... annotations) {
+        return create(objectPropertyExpression1, objectPropertyExpression2, new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static DisjointObjectProperties create(ObjectPropertyExpression objectPropertyExpression1,ObjectPropertyExpression objectPropertyExpression2,Set<Annotation> annotations) {
+        Set<ObjectPropertyExpression> disjoints=new HashSet<ObjectPropertyExpression>();
+        disjoints.add(objectPropertyExpression1);
+        disjoints.add(objectPropertyExpression2);
+        return create(disjoints,annotations);
     }
     public static DisjointObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new DisjointObjectProperties(objectPropertyExpressions,annotations));

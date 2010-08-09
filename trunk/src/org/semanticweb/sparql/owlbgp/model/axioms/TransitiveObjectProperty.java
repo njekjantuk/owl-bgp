@@ -42,7 +42,7 @@ public class TransitiveObjectProperty extends AbstractAxiom implements ObjectPro
 
     protected static InterningManager<TransitiveObjectProperty> s_interningManager=new InterningManager<TransitiveObjectProperty>() {
         protected boolean equal(TransitiveObjectProperty object1,TransitiveObjectProperty object2) {
-            if (object1.m_ope==object2.m_ope
+            if (object1.m_ope!=object2.m_ope
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Annotation anno : object1.m_annotations) {

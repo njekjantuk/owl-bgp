@@ -8,12 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class ClassHandler extends BuiltInTypeHandler {
+public class ClassHandler extends AbstractResourceTripleHandler {
 
     public ClassHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_CLASS);
+        super(consumer);
     }
 
     @Override

@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class ObjectPropertyRange extends AbstractAxiom implements ObjectProperty
     protected static InterningManager<ObjectPropertyRange> s_interningManager=new InterningManager<ObjectPropertyRange>() {
         protected boolean equal(ObjectPropertyRange object1,ObjectPropertyRange object2) {
             if (object1.m_ope!=object2.m_ope
-                ||object1.m_classExpression==object2.m_classExpression
+                ||object1.m_classExpression!=object2.m_classExpression
                 ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Annotation anno : object1.m_annotations) {
@@ -112,8 +113,8 @@ public class ObjectPropertyRange extends AbstractAxiom implements ObjectProperty
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectPropertyRange create(ObjectPropertyExpression ope,ClassExpression classExpression) {
-        return create(ope,classExpression,new HashSet<Annotation>());
+    public static ObjectPropertyRange create(ObjectPropertyExpression ope,ClassExpression classExpression,Annotation... annotations) {
+        return create(ope,classExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static ObjectPropertyRange create(ObjectPropertyExpression ope,ClassExpression classExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new ObjectPropertyRange(ope,classExpression,annotations));

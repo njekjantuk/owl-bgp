@@ -8,12 +8,15 @@ import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public abstract class AbstractCardinalityHandler extends TriplePredicateHandler {
+public abstract class AbstractCardinalityHandler extends AbstractResourceTripleHandler {
 
+    protected final Identifier predicateIRI;
+    
     public AbstractCardinalityHandler(TripleConsumer consumer, Identifier predicateIRI) {
-        super(consumer, predicateIRI);
+        super(consumer);
+        this.predicateIRI=predicateIRI;
     }
     protected PropertyExpression getPropertyExpression(Identifier subject) {
         Identifier propID=consumer.getObject(subject, Vocabulary.OWL_ON_PROPERTY, true);

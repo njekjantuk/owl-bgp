@@ -11,12 +11,12 @@ import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class NegativePropertyAssertionHandler extends BuiltInTypeHandler {
+public class NegativePropertyAssertionHandler extends AbstractResourceTripleHandler {
 
     public NegativePropertyAssertionHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_NEGATIVE_PROPERTY_ASSERTION);
+        super(consumer);
     }
 
     @Override

@@ -39,7 +39,7 @@ import org.semanticweb.sparql.owlbgp.parser.translators.IndividualListItemTransl
 import org.semanticweb.sparql.owlbgp.parser.translators.OptimisedListTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.PropertyExpressionListItemTranslator;
 import org.semanticweb.sparql.owlbgp.parser.translators.TypedConstantListItemTranslator;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPAllValuesFromHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDataComplementOfHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDataIntersectionOfHandler;
@@ -48,7 +48,9 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDa
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDifferentFromHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDisjointUnionHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDisjointWithHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPDomainHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPEquivalentClassHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPEquivalentPropertyHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPExactCardinalityHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPExactQualifiedCardinalityHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPHasSelfHandler;
@@ -64,6 +66,8 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPOb
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPObjectUnionOfHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPOnDatatypeHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPPropertyChainAxiomHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPPropertyDisjointWithHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPRangeHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPSomeValuesFromHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPSubClassOfHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate.TPSubPropertyOfHandler;
@@ -73,14 +77,21 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AllDisjointCl
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AllDisjointPropertiesHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AnnotationHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AnnotationPropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AsymmetricPropertyHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.AxiomHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.ClassHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.DatatypeHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.DatatypePropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.FunctionalPropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.InverseFunctionalPropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.IrreflexivePropertyHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.NamedIndividualHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.NegativePropertyAssertionHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.ObjectPropertyHandler;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.OntologyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.ReflexivePropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.SymmetricPropertyHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.TransitivePropertyHandler;
 
 public class TripleConsumer {
     public static final String LB=System.getProperty("line.separator");
@@ -100,12 +111,12 @@ public class TripleConsumer {
     protected final Map<Identifier,Individual>                   IND=new HashMap<Identifier,Individual>();
     protected final Map<Identifier,Set<Annotation>>              ANN=new HashMap<Identifier,Set<Annotation>>();
     
-    protected final Map<Identifier,TriplePredicateHandler>                 streamingByPredicateHandlers=new HashMap<Identifier,TriplePredicateHandler>();
-    protected final Map<Identifier,Map<Identifier,TriplePredicateHandler>> streamingByPredicateAndObjectHandlers=new HashMap<Identifier, Map<Identifier,TriplePredicateHandler>>();
-    protected final Map<Identifier,TriplePredicateHandler>                 dataRangePredicateHandlers=new HashMap<Identifier,TriplePredicateHandler>();
-    protected final Map<Identifier,TriplePredicateHandler>                 classExpressionPredicateHandlers=new HashMap<Identifier,TriplePredicateHandler>();
-    protected final Map<Identifier,TriplePredicateHandler>                 byPredicateHandlers=new HashMap<Identifier,TriplePredicateHandler>();
-    protected final Map<Identifier,Map<Identifier,TriplePredicateHandler>> byPredicateAndObjectHandlers=new HashMap<Identifier, Map<Identifier,TriplePredicateHandler>>();
+    protected final Map<Identifier,AbstractResourceTripleHandler>                 streamingByPredicateHandlers=new HashMap<Identifier,AbstractResourceTripleHandler>();
+    protected final Map<Identifier,Map<Identifier,AbstractResourceTripleHandler>> streamingByPredicateAndObjectHandlers=new HashMap<Identifier, Map<Identifier,AbstractResourceTripleHandler>>();
+    protected final Map<Identifier,AbstractResourceTripleHandler>                 dataRangePredicateHandlers=new HashMap<Identifier,AbstractResourceTripleHandler>();
+    protected final Map<Identifier,AbstractResourceTripleHandler>                 classExpressionPredicateHandlers=new HashMap<Identifier,AbstractResourceTripleHandler>();
+    protected final Map<Identifier,AbstractResourceTripleHandler>                 byPredicateHandlers=new HashMap<Identifier,AbstractResourceTripleHandler>();
+    protected final Map<Identifier,Map<Identifier,AbstractResourceTripleHandler>> byPredicateAndObjectHandlers=new HashMap<Identifier, Map<Identifier,AbstractResourceTripleHandler>>();
     
     protected final Map<Identifier, Map<Identifier, Set<Identifier>>> subjToPredToObjects=new HashMap<Identifier, Map<Identifier,Set<Identifier>>>(); // subject, predicate, objects
     protected final Map<Identifier, Map<Identifier, Set<Identifier>>> builtInPredToBuiltInObjToSubjects=new HashMap<Identifier, Map<Identifier,Set<Identifier>>>(); // built-in predicate, built-in object, subjects
@@ -142,7 +153,7 @@ public class TripleConsumer {
     public TripleConsumer() {
         streamingByPredicateHandlers.put(Vocabulary.OWL_IMPORTS,new TPImportsHandler(this));
         IRI rdftype=Vocabulary.RDF_TYPE;
-        Map<Identifier, TriplePredicateHandler> typeHandlers=new HashMap<Identifier, TriplePredicateHandler>();
+        Map<Identifier, AbstractResourceTripleHandler> typeHandlers=new HashMap<Identifier, AbstractResourceTripleHandler>();
         typeHandlers.put(Vocabulary.OWL_CLASS, new ClassHandler(this));
         typeHandlers.put(Vocabulary.RDFS_DATATYPE, new DatatypeHandler(this));
         typeHandlers.put(Vocabulary.OWL_OBJECT_PROPERTY, new ObjectPropertyHandler(this));
@@ -183,14 +194,23 @@ public class TripleConsumer {
         byPredicateHandlers.put(Vocabulary.OWL_DISJOINT_WITH,new TPDisjointWithHandler(this));
         byPredicateHandlers.put(Vocabulary.OWL_DISJOINT_UNION_OF,new TPDisjointUnionHandler(this));
         byPredicateHandlers.put(Vocabulary.RDFS_SUB_PROPERTY_OF,new TPSubPropertyOfHandler(this));
+        byPredicateHandlers.put(Vocabulary.OWL_EQUIVALENT_PROPERTY,new TPEquivalentPropertyHandler(this));
         byPredicateHandlers.put(Vocabulary.OWL_PROPERTY_CHAIN_AXIOM,new TPPropertyChainAxiomHandler(this));
+        byPredicateHandlers.put(Vocabulary.OWL_PROPERTY_DISJOINT_WITH,new TPPropertyDisjointWithHandler(this));
+        byPredicateHandlers.put(Vocabulary.RDFS_DOMAIN,new TPDomainHandler(this));
+        byPredicateHandlers.put(Vocabulary.RDFS_RANGE,new TPRangeHandler(this));
         byPredicateHandlers.put(Vocabulary.OWL_DIFFERENT_FROM,new TPDifferentFromHandler(this));
-        byPredicateHandlers.put(Vocabulary.RDFS_SUBCLASS_OF,new TPSubClassOfHandler(this));
-        byPredicateHandlers.put(Vocabulary.OWL_EQUIVALENT_CLASS,new TPEquivalentClassHandler(this));
-        typeHandlers=new HashMap<Identifier, TriplePredicateHandler>();
+        typeHandlers=new HashMap<Identifier, AbstractResourceTripleHandler>();
         typeHandlers.put(Vocabulary.OWL_CLASS, new ClassHandler(this));
         typeHandlers.put(Vocabulary.RDFS_DATATYPE, new DatatypeHandler(this));
         typeHandlers.put(Vocabulary.OWL_OBJECT_PROPERTY, new ObjectPropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY,new InverseFunctionalPropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_FUNCTIONAL_PROPERTY,new FunctionalPropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_ASYMMETRIC_PROPERTY,new AsymmetricPropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_SYMMETRIC_PROPERTY,new SymmetricPropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_REFLEXIVE_PROPERTY,new ReflexivePropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_IRREFLEXIVE_PROPERTY,new IrreflexivePropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_TRANSITIVE_PROPERTY,new TransitivePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_DATA_PROPERTY, new DatatypePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_ANNOTATION_PROPERTY, new AnnotationPropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_NAMED_INDIVIDUAL, new NamedIndividualHandler(this));
@@ -323,9 +343,9 @@ public class TripleConsumer {
             // Table 7, only one triple declarations, reified ones are dealt with later
             // axioms not yet created and triples not removed
             // Table 8, collect bnode subjects of reified axioms 
-            TriplePredicateHandler handler=streamingByPredicateHandlers.get(predicate);
+            AbstractResourceTripleHandler handler=streamingByPredicateHandlers.get(predicate);
             if (handler==null) { 
-                Map<Identifier,TriplePredicateHandler> handlerMap=streamingByPredicateAndObjectHandlers.get(predicate);
+                Map<Identifier,AbstractResourceTripleHandler> handlerMap=streamingByPredicateAndObjectHandlers.get(predicate);
                 if (handlerMap!=null) handler=handlerMap.get(object);
             }
             if (handler!=null) handler.handleStreaming(subject, predicate, object);
@@ -441,11 +461,11 @@ public class TripleConsumer {
         parseNonAnnotatedAxioms();
     }
     protected void parseNonAnnotatedAxioms() {
-        TriplePredicateHandler handler=null;
+        AbstractResourceTripleHandler handler=null;
         for (Identifier predicate : new HashSet<Identifier>(builtInPredToBuiltInObjToSubjects.keySet())) {
             Map<Identifier,Set<Identifier>> objToSubjects=builtInPredToBuiltInObjToSubjects.get(predicate);
             for (Identifier object : new HashSet<Identifier>(objToSubjects.keySet())) {
-                Map<Identifier,TriplePredicateHandler> objToHandler=byPredicateAndObjectHandlers.get(predicate);
+                Map<Identifier,AbstractResourceTripleHandler> objToHandler=byPredicateAndObjectHandlers.get(predicate);
                 if (objToHandler!=null) {
                     handler=objToHandler.get(object);
                     if (handler!=null) {
@@ -509,9 +529,9 @@ public class TripleConsumer {
         }
     }
     protected void parseAxiom(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> axiomAnnotations) {
-        TriplePredicateHandler handler=byPredicateHandlers.get(predicate);
+        AbstractResourceTripleHandler handler=byPredicateHandlers.get(predicate);
         if (handler==null) { 
-            Map<Identifier,TriplePredicateHandler> handlerMap=byPredicateAndObjectHandlers.get(predicate);
+            Map<Identifier,AbstractResourceTripleHandler> handlerMap=byPredicateAndObjectHandlers.get(predicate);
             if (handlerMap!=null) handler=handlerMap.get(object);
         }
         if (handler!=null) {
@@ -1026,11 +1046,11 @@ public class TripleConsumer {
                             Map<Identifier,Set<Identifier>> apObjToSubjects=builtInPredToBuiltInObjToSubjects.get(Vocabulary.OWL_ANNOTATED_PROPERTY);
                             for (Identifier reifiedPredicate : apObjToSubjects.keySet()) {
                                 if (apObjToSubjects.get(reifiedPredicate).contains(subject)) {
-                                    Map<Identifier,TriplePredicateHandler> handlerMap=streamingByPredicateAndObjectHandlers.get(reifiedPredicate);
+                                    Map<Identifier,AbstractResourceTripleHandler> handlerMap=streamingByPredicateAndObjectHandlers.get(reifiedPredicate);
                                     if (handlerMap!=null && builtInPredToBuiltInObjToSubjects.containsKey(Vocabulary.OWL_ANNOTATED_TARGET)) {
                                         Map<Identifier,Set<Identifier>> annotatedTargetToDecl=builtInPredToBuiltInObjToSubjects.get(Vocabulary.OWL_ANNOTATED_TARGET);
                                         for (Identifier reifiedObject : annotatedTargetToDecl.keySet()) {
-                                            TriplePredicateHandler handler=handlerMap.get(reifiedObject);
+                                            AbstractResourceTripleHandler handler=handlerMap.get(reifiedObject);
                                             if (handler!=null 
                                                     && annotatedTargetToDecl.get(reifiedObject).contains(subject) 
                                                     && builtInPredToSubToObjects.containsKey(Vocabulary.OWL_ANNOTATED_SOURCE) 

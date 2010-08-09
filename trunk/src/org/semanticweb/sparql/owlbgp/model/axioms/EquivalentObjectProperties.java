@@ -93,12 +93,12 @@ public class EquivalentObjectProperties extends AbstractAxiom implements ClassAx
         Identifier[] objectPropertyIDs=new Identifier[objectPropertyExpressions.length];
         for (int i=0;i<objectPropertyExpressions.length;i++) {
             if (objectPropertyExpressions[i] instanceof Atomic)
-                objectPropertyIDs[i]=((Atomic)objectPropertyExpressions[i]).getIdentifier();
+                objectPropertyIDs[i]=(Atomic)objectPropertyExpressions[i];
             else
                 objectPropertyIDs[i]=AbstractExtendedOWLObject.getNextBlankNode();
         }
         for (int i=0;i<objectPropertyIDs.length-1;i++)
-            buffer.append(writeSingleMainTripleAxiom(prefixes, objectPropertyIDs[i], Vocabulary.OWL_EQUIVALENT_OBJECT_PROPERTIES, objectPropertyIDs[i+1], m_annotations));
+            buffer.append(writeSingleMainTripleAxiom(prefixes, objectPropertyIDs[i], Vocabulary.OWL_EQUIVALENT_PROPERTY, objectPropertyIDs[i+1], m_annotations));
         for (int i=0;i<objectPropertyExpressions.length;i++)
             if (!(objectPropertyExpressions[i] instanceof Atomic))
                 buffer.append(objectPropertyExpressions[i].toTurtleString(prefixes, objectPropertyIDs[i]));
@@ -107,11 +107,17 @@ public class EquivalentObjectProperties extends AbstractAxiom implements ClassAx
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static EquivalentObjectProperties create(ObjectPropertyExpression... objectPropertyExpressions) {
-        return create(new HashSet<ObjectPropertyExpression>(Arrays.asList(objectPropertyExpressions)));
-    }
     public static EquivalentObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions) {
         return create(objectPropertyExpressions,new HashSet<Annotation>());
+    }
+    public static EquivalentObjectProperties create(ObjectPropertyExpression objectPropertyExpression1,ObjectPropertyExpression objectPropertyExpression2,Annotation... annotations) {
+        return create(objectPropertyExpression1, objectPropertyExpression2, new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static EquivalentObjectProperties create(ObjectPropertyExpression objectPropertyExpression1,ObjectPropertyExpression objectPropertyExpression2,Set<Annotation> annotations) {
+        Set<ObjectPropertyExpression> equivs=new HashSet<ObjectPropertyExpression>();
+        equivs.add(objectPropertyExpression1);
+        equivs.add(objectPropertyExpression2);
+        return create(equivs,annotations);
     }
     public static EquivalentObjectProperties create(Set<ObjectPropertyExpression> objectPropertyExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new EquivalentObjectProperties(objectPropertyExpressions,annotations));

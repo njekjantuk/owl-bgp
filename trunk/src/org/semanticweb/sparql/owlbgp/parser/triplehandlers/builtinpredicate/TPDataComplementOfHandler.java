@@ -4,13 +4,12 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataComplementOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPDataComplementOfHandler extends TriplePredicateHandler {
+public class TPDataComplementOfHandler extends AbstractResourceTripleHandler {
 
     public TPDataComplementOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_DATATYPE_COMPLEMENT_OF);
+        super(consumer);
     }
 
     @Override
@@ -21,6 +20,7 @@ public class TPDataComplementOfHandler extends TriplePredicateHandler {
             consumer.mapDataRangeIdentifierToDataRange(subject, DataComplementOf.create(dataRange));
         else {
             // TODO: error handling
+            throw new RuntimeException("error");
         }
     }
 }

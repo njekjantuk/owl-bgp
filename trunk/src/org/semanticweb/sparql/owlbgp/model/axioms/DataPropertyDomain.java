@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
     protected static InterningManager<DataPropertyDomain> s_interningManager=new InterningManager<DataPropertyDomain>() {
         protected boolean equal(DataPropertyDomain object1,DataPropertyDomain object2) {
             if (object1.m_dpe!=object2.m_dpe
-                    ||object1.m_classExpression==object2.m_classExpression
+                    ||object1.m_classExpression!=object2.m_classExpression
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Annotation anno : object1.m_annotations) {
@@ -59,7 +60,7 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
             return false;
         }
         protected int getHashCode(DataPropertyDomain object) {
-            int hashCode=11+133*object.m_dpe.hashCode()+5*object.m_classExpression.hashCode();
+            int hashCode=1017+133*object.m_dpe.hashCode()+5*object.m_classExpression.hashCode();
             for (Annotation anno : object.m_annotations)
                 hashCode+=anno.hashCode();
             return hashCode;
@@ -106,8 +107,8 @@ public class DataPropertyDomain extends AbstractAxiom implements DataPropertyAxi
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DataPropertyDomain create(DataPropertyExpression dpe,ClassExpression classExpression) {
-        return create(dpe, classExpression, new HashSet<Annotation>());
+    public static DataPropertyDomain create(DataPropertyExpression dpe,ClassExpression classExpression,Annotation... annotations) {
+        return create(dpe, classExpression, new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DataPropertyDomain create(DataPropertyExpression dpe,ClassExpression classExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new DataPropertyDomain(dpe,classExpression,annotations));

@@ -24,7 +24,7 @@ public class TestDeclarationFixing extends AbstractTest {
         assertTrue(consumer.getAxioms().contains(Declaration.create(OP("invFuncProp"))));
         assertTrue(consumer.getAxioms().contains(InverseFunctionalObjectProperty.create(OP("invFuncProp"))));
         assertTrue(consumer.getAxioms().contains(Declaration.create(OP("transProp"))));
-        assertTrue(consumer.getAxioms().contains(TransitiveObjectProperty.create(OP("invFuncProp"))));
+        assertTrue(consumer.getAxioms().contains(TransitiveObjectProperty.create(OP("transProp"))));
         assertTrue(consumer.getAxioms().contains(Declaration.create(OP("symProp"))));
         assertTrue(consumer.getAxioms().contains(SymmetricObjectProperty.create(OP("symProp"))));
         assertNoTriplesLeft(consumer);

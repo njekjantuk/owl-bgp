@@ -8,11 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class AllDifferentHandler extends BuiltInTypeHandler {
+public class AllDifferentHandler extends AbstractResourceTripleHandler {
 
     public AllDifferentHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_ALL_DIFFERENT);
+        super(consumer);
     }
     
     @Override
