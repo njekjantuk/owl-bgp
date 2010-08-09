@@ -6,9 +6,9 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPDataIntersectionOfHandler extends AbstractResourceTripleHandler {
+public class TPDataIntersectionOfHandler extends TripleHandler {
 
     public TPDataIntersectionOfHandler(TripleConsumer consumer) {
         super(consumer);

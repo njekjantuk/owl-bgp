@@ -11,9 +11,9 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPRangeHandler extends AbstractResourceTripleHandler {
+public class TPRangeHandler extends TripleHandler {
 
     public TPRangeHandler(TripleConsumer consumer) {
         super(consumer);

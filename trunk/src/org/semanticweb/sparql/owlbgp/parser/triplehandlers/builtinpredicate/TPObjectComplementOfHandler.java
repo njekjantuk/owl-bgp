@@ -4,9 +4,9 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectComplementOf;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPObjectComplementOfHandler extends AbstractResourceTripleHandler {
+public class TPObjectComplementOfHandler extends TripleHandler {
 
     public TPObjectComplementOfHandler(TripleConsumer consumer) {
         super(consumer);

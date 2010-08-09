@@ -8,9 +8,9 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPOnDatatypeHandler extends AbstractResourceTripleHandler {
+public class TPOnDatatypeHandler extends TripleHandler {
 
     public TPOnDatatypeHandler(TripleConsumer consumer) {
         super(consumer);

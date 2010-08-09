@@ -7,9 +7,9 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPSubClassOfHandler extends AbstractResourceTripleHandler {
+public class TPSubClassOfHandler extends TripleHandler {
 
     public TPSubClassOfHandler(TripleConsumer consumer) {
         super(consumer);

@@ -12,9 +12,9 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPEquivalentClassHandler extends AbstractResourceTripleHandler {
+public class TPEquivalentClassHandler extends TripleHandler {
 
     public TPEquivalentClassHandler(TripleConsumer consumer) {
         super(consumer);

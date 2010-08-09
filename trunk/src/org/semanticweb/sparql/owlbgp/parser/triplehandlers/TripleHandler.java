@@ -7,11 +7,11 @@ import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
-public abstract class AbstractResourceTripleHandler {
+public abstract class TripleHandler {
     
     protected final TripleConsumer consumer;
     
-    public AbstractResourceTripleHandler(TripleConsumer consumer) {
+    public TripleHandler(TripleConsumer consumer) {
         this.consumer=consumer;
     }
     public void handleStreaming(Identifier subject, Identifier predicate, Identifier object, boolean consume) {

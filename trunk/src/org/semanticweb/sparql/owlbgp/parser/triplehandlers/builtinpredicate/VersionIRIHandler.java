@@ -2,9 +2,9 @@ package org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class VersionIRIHandler extends AbstractResourceTripleHandler {
+public class VersionIRIHandler extends TripleHandler {
 
     public VersionIRIHandler(TripleConsumer consumer) {
         super(consumer);

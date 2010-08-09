@@ -12,9 +12,9 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class AllDisjointPropertiesHandler extends AbstractResourceTripleHandler {
+public class AllDisjointPropertiesHandler extends TripleHandler {
 
     public AllDisjointPropertiesHandler(TripleConsumer consumer) {
         super(consumer);
