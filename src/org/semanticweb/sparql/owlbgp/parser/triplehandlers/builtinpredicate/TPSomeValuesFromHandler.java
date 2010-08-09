@@ -9,12 +9,12 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPSomeValuesFromHandler extends TriplePredicateHandler {
+public class TPSomeValuesFromHandler extends AbstractResourceTripleHandler {
 
     public TPSomeValuesFromHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_SOME_VALUES_FROM);
+        super(consumer);
     }
     
     @Override

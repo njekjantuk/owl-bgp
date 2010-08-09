@@ -6,13 +6,12 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectOneOf;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPObjectOneOfHandler extends TriplePredicateHandler {
+public class TPObjectOneOfHandler extends AbstractResourceTripleHandler {
 
     public TPObjectOneOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_ONE_OF);
+        super(consumer);
     }
 
     @Override

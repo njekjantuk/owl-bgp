@@ -8,12 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPHasValueHandler extends TriplePredicateHandler {
+public class TPHasValueHandler extends AbstractResourceTripleHandler {
 
     public TPHasValueHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_HAS_VALUE);
+        super(consumer);
     }
 
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {

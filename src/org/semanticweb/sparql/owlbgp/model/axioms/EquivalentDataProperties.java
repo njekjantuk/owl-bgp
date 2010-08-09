@@ -91,20 +91,26 @@ public class EquivalentDataProperties extends AbstractAxiom implements ClassAxio
         DataPropertyExpression[] dataPropertyExpressions=m_dataPropertyExpressions.toArray(new DataPropertyExpression[0]);
         Identifier[] dataPropertyIDs=new Identifier[dataPropertyExpressions.length];
         for (int i=0;i<dataPropertyExpressions.length;i++) {
-            dataPropertyIDs[i]=((Atomic)dataPropertyExpressions[i]).getIdentifier();
+            dataPropertyIDs[i]=(Atomic)dataPropertyExpressions[i];
         }
         for (int i=0;i<dataPropertyIDs.length-1;i++)
-            buffer.append(writeSingleMainTripleAxiom(prefixes, dataPropertyIDs[i], Vocabulary.OWL_EQUIVALENT_DATA_PROPERTIES, dataPropertyIDs[i+1], m_annotations));
+            buffer.append(writeSingleMainTripleAxiom(prefixes, dataPropertyIDs[i], Vocabulary.OWL_EQUIVALENT_PROPERTY, dataPropertyIDs[i+1], m_annotations));
         return buffer.toString();
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static EquivalentDataProperties create(DataPropertyExpression... dataPropertyExpressions) {
-        return EquivalentDataProperties.create(new HashSet<DataPropertyExpression>(Arrays.asList(dataPropertyExpressions)));
-    }
     public static EquivalentDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions) {
         return EquivalentDataProperties.create(dataPropertyExpressions,new HashSet<Annotation>());
+    }
+    public static EquivalentDataProperties create(DataPropertyExpression dataPropertyExpression1,DataPropertyExpression dataPropertyExpression2,Annotation... annotations) {
+        return create(dataPropertyExpression1, dataPropertyExpression2, new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static EquivalentDataProperties create(DataPropertyExpression dataPropertyExpression1,DataPropertyExpression dataPropertyExpression2,Set<Annotation> annotations) {
+        Set<DataPropertyExpression> equivs=new HashSet<DataPropertyExpression>();
+        equivs.add(dataPropertyExpression1);
+        equivs.add(dataPropertyExpression2);
+        return create(equivs,annotations);
     }
     public static EquivalentDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new EquivalentDataProperties(dataPropertyExpressions,annotations));

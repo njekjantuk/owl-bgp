@@ -6,13 +6,12 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectIntersectionOf;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPObjectIntersectionOfHandler extends TriplePredicateHandler {
+public class TPObjectIntersectionOfHandler extends AbstractResourceTripleHandler {
 
     public TPObjectIntersectionOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_INTERSECTION_OF);
+        super(consumer);
     }
 
     @Override

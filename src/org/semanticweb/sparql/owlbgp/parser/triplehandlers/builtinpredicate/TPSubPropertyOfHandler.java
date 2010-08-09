@@ -9,41 +9,37 @@ import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPSubPropertyOfHandler extends TriplePredicateHandler {
+public class TPSubPropertyOfHandler extends AbstractResourceTripleHandler {
 
     public TPSubPropertyOfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.RDFS_SUB_PROPERTY_OF);
+        super(consumer);
     }
 
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        boolean handled=false;
         ObjectPropertyExpression subProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
-        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
-        String errorMessage="";
-        if (subProperty==null)
-            errorMessage="Could not find a subclass expression for the subject in the triple "+subject+" rdfs:subClassOf "+object+". ";
-        if (superProperty==null)
-            errorMessage+="Could not find a superclass expression for the object in the triple "+subject+" rdfs:subClassOf "+object+". ";    
-        if (subProperty!=null && superProperty!=null) {
-            consumer.addAxiom(SubObjectPropertyOf.create(subProperty,superProperty,annotations));
-            handled=true;
-        } else if (subProperty==null&&superProperty==null) {
-            DataPropertyExpression subDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
-            DataPropertyExpression superDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
-            if (subDataProperty==null)
-                errorMessage+="Could not find a subclass expression for the subject in the triple "+subject+" rdfs:subClassOf "+object+". ";
-            if (superDataProperty==null)
-                errorMessage+="Could not find a superclass expression for the object in the triple "+subject+" rdfs:subClassOf "+object+". ";    
-            if (subDataProperty!=null && superDataProperty!=null) {
-                consumer.addAxiom(SubDataPropertyOf.create(subDataProperty,superDataProperty,annotations));
-                handled=true;
-            }
+        DataPropertyExpression subDataProperty=null;
+        if (subProperty==null) {
+            subDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
+            throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         }
-        if (!handled)
-            throw new RuntimeException(errorMessage);
+        
+        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+        DataPropertyExpression superDataProperty=null;
+        if (superProperty==null) {
+            superDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
+            throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
+        }    
+            
+        if (subProperty!=null && superProperty!=null)
+            consumer.addAxiom(SubObjectPropertyOf.create(subProperty,superProperty,annotations));
+        else if (subDataProperty!=null && superDataProperty!=null)
+            consumer.addAxiom(SubDataPropertyOf.create(subDataProperty,superDataProperty,annotations));
+        else if (subProperty!=null)
+            throw new RuntimeException("Error: The subject of the triple "+subject+" "+predicate+" "+object+"  was tranlated into an object property, but the object into a data property, which is not allowed in OWL DL. ");
+        else 
+            throw new RuntimeException("Error: The object of the triple "+subject+" "+predicate+" "+object+"  was tranlated into an object property, but the subject into a data property, which is not allowed in OWL DL. ");
     }
 }

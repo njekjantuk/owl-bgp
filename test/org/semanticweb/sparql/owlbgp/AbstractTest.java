@@ -1,10 +1,16 @@
 package org.semanticweb.sparql.owlbgp;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import junit.framework.TestCase;
 
+import org.semanticweb.sparql.owlbgp.model.Annotation;
+import org.semanticweb.sparql.owlbgp.model.AnnotationValue;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
@@ -14,11 +20,14 @@ import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
@@ -72,7 +81,10 @@ public class AbstractTest extends TestCase {
         return IOP(IRI(objectPropertyName));
     }
     public static ObjectInverseOf IOP(IRI objectPropertyIri) {
-        return ObjectInverseOf.create(OP(objectPropertyIri));
+        return IOP(OP(objectPropertyIri));
+    }
+    public static ObjectInverseOf IOP(ObjectPropertyExpression objectProperty) {
+        return ObjectInverseOf.create(objectProperty);
     }
     public static ObjectPropertyVariable OPV(String objectPropertyVarName) {
         return ObjectPropertyVariable.create(objectPropertyVarName);
@@ -91,6 +103,9 @@ public class AbstractTest extends TestCase {
     }
     public static AnnotationProperty AP(IRI annotationPropertyIri) {
         return AnnotationProperty.create(annotationPropertyIri);
+    }
+    public static Annotation ANN(AnnotationPropertyExpression ap, AnnotationValue av, Annotation... annotations) {
+        return Annotation.create(ap,av,annotations);
     }
     public static AnnotationPropertyVariable APV(String annotationPropertyVarName) {
         return AnnotationPropertyVariable.create(annotationPropertyVarName);
@@ -121,5 +136,35 @@ public class AbstractTest extends TestCase {
     }
     public static TypedLiteral TL(String lexicalForm, String langTag, Datatype datatype) {
         return TypedLiteral.create(lexicalForm, langTag, datatype);
+    }
+//    public static <O> Set<O> SET(O... objects) {
+//        Set<O> result=new HashSet<O>();
+//        for (O object : objects)
+//            result.add(object);
+//        return result;
+//    }
+    public static Set<DataPropertyExpression> SET(DataPropertyExpression... dataProperties) {
+        Set<DataPropertyExpression> result=new HashSet<DataPropertyExpression>();
+        for (DataPropertyExpression dp : dataProperties)
+            result.add(dp);
+        return result;
+    }
+    public static Set<ObjectPropertyExpression> SET(ObjectPropertyExpression... objectProperties) {
+        Set<ObjectPropertyExpression> result=new HashSet<ObjectPropertyExpression>();
+        for (ObjectPropertyExpression op : objectProperties)
+            result.add(op);
+        return result;
+    }
+    public static Set<ClassExpression> SET(ClassExpression... classes) {
+        Set<ClassExpression> result=new HashSet<ClassExpression>();
+        for (ClassExpression cls : classes)
+            result.add(cls);
+        return result;
+    }
+    public static Set<Annotation> SET(Annotation... annotations) {
+        Set<Annotation> result=new HashSet<Annotation>();
+        for (Annotation annotation : annotations)
+            result.add(annotation);
+        return result;
     }
 }

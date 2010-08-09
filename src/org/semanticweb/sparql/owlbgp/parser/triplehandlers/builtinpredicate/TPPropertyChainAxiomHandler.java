@@ -12,12 +12,12 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPPropertyChainAxiomHandler extends TriplePredicateHandler {
+public class TPPropertyChainAxiomHandler extends AbstractResourceTripleHandler {
 
     public TPPropertyChainAxiomHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_PROPERTY_CHAIN_AXIOM);
+        super(consumer);
     }
 
     @Override

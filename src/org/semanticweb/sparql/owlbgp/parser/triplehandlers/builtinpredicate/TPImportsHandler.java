@@ -3,13 +3,12 @@ package org.semanticweb.sparql.owlbgp.parser.triplehandlers.builtinpredicate;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.Import;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPImportsHandler extends TriplePredicateHandler {
+public class TPImportsHandler extends AbstractResourceTripleHandler {
 
     public TPImportsHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_IMPORTS);
+        super(consumer);
     }
 
     @Override

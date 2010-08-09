@@ -91,11 +91,7 @@ public class Vocabulary {
     public static final IRI OWL_OBJECT_PROPERTY_RANGE=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"objectPropertyRange");
     public static final IRI OWL_SUB_OBJECT_PROPERTY_OF=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"subObjectPropertyOf");
     public static final IRI OWL_SUB_DATA_PROPERTY_OF=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"subDataPropertyOf");
-    public static final IRI OWL_DISJOINT_DATA_PROPERTIES=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"disjointDataProperties");
-    public static final IRI OWL_DISJOINT_OBJECT_PROPERTIES=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"disjointObjectProperties");
     public static final IRI OWL_PROPERTY_DISJOINT_WITH=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"propertyDisjointWith");
-    public static final IRI OWL_EQUIVALENT_DATA_PROPERTIES=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"equivalentDataProperty");
-    public static final IRI OWL_EQUIVALENT_OBJECT_PROPERTIES=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"equivalentObjectProperty");
     public static final IRI OWL_FUNCTIONAL_DATA_PROPERTY=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"FunctionalDataProperty");
     public static final IRI OWL_FUNCTIONAL_OBJECT_PROPERTY=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"FunctionalObjectProperty");
     public static final IRI OWL_ON_CLASS=IRI.create(Prefixes.s_semanticWebPrefixes.get("owl")+"onClass");
@@ -237,11 +233,7 @@ public class Vocabulary {
         BUILT_IN_PREDICATE_IRIS.add(OWL_OBJECT_PROPERTY_RANGE);
         BUILT_IN_PREDICATE_IRIS.add(OWL_SUB_OBJECT_PROPERTY_OF);
         BUILT_IN_PREDICATE_IRIS.add(OWL_SUB_DATA_PROPERTY_OF);
-        BUILT_IN_PREDICATE_IRIS.add(OWL_DISJOINT_DATA_PROPERTIES);
-        BUILT_IN_PREDICATE_IRIS.add(OWL_DISJOINT_OBJECT_PROPERTIES);
         BUILT_IN_PREDICATE_IRIS.add(OWL_PROPERTY_DISJOINT_WITH);
-        BUILT_IN_PREDICATE_IRIS.add(OWL_EQUIVALENT_DATA_PROPERTIES);
-        BUILT_IN_PREDICATE_IRIS.add(OWL_EQUIVALENT_OBJECT_PROPERTIES);
         BUILT_IN_PREDICATE_IRIS.add(OWL_FUNCTIONAL_DATA_PROPERTY);
         BUILT_IN_PREDICATE_IRIS.add(OWL_FUNCTIONAL_OBJECT_PROPERTY);
         BUILT_IN_PREDICATE_IRIS.add(OWL_ON_CLASS);

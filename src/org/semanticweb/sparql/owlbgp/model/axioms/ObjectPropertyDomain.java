@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -112,8 +113,8 @@ public class ObjectPropertyDomain extends AbstractAxiom implements ObjectPropert
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static ObjectPropertyDomain create(ObjectPropertyExpression ope,ClassExpression classExpression) {
-        return create(ope,classExpression,new HashSet<Annotation>());
+    public static ObjectPropertyDomain create(ObjectPropertyExpression ope,ClassExpression classExpression,Annotation... annotations) {
+        return create(ope,classExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static ObjectPropertyDomain create(ObjectPropertyExpression ope,ClassExpression classExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new ObjectPropertyDomain(ope,classExpression,annotations));

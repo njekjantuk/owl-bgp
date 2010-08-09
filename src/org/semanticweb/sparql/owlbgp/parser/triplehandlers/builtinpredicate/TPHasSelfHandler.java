@@ -5,12 +5,12 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectHasSelf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TriplePredicateHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class TPHasSelfHandler extends TriplePredicateHandler {
+public class TPHasSelfHandler extends AbstractResourceTripleHandler {
 
     public TPHasSelfHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_HAS_SELF);
+        super(consumer);
     }
 
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {

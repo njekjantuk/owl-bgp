@@ -7,14 +7,20 @@ import java.util.Set;
 import org.semanticweb.sparql.owlbgp.AbstractTest;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointObjectProperties;
 import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentDataProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentObjectProperties;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.DataAllValuesFrom;
@@ -35,12 +41,351 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction.OWL2_FACET;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
-import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class TestAxiomParsing extends AbstractTest {
     public static final String LB = System.getProperty("line.separator") ;
+
+    public void testDataPropertyRangeComplex() throws Exception {
+        Declaration c=Declaration.create(DT("C"));
+        Declaration d=Declaration.create(DT("D"));
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration op=Declaration.create(OP("op"));
+        Axiom sco=DataPropertyRange.create(DP("dp1"), DataIntersectionOf.create(DT("C"),DT("D")));
+        Declaration e=Declaration.create(DT("E"));
+        Declaration f=Declaration.create(DT("F"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Axiom scoa=DataPropertyRange.create(DP("dp2"), 
+                DataUnionOf.create(DT("C"), DataIntersectionOf.create(DT("E"),DT("F"))),
+                ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Axiom scoaa=DataPropertyRange.create(DP("dp3"),
+                DatatypeRestriction.create(DT("xsd:int"), 
+                        FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
+                        FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_SHORT))),
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
+            +dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()+op.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(d));
+        assertTrue(consumer.getAxioms().remove(e));
+        assertTrue(consumer.getAxioms().remove(f));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(op));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDataPropertyRange() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration c1=Declaration.create(DT("C1"));
+        Axiom sco=DataPropertyRange.create(DP("dp1"),DT("C1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration c2=Declaration.create(DT("C2"));
+        Axiom scoa=DataPropertyRange.create(DP("dp2"),DT("C2"),ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Declaration c3=Declaration.create(DT("C3"));
+        Axiom scoaa=DataPropertyRange.create(DP("dp3"),DT("C3"),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String s=dp1.toTurtleString()+c1.toTurtleString()+dp2.toTurtleString()+c2.toTurtleString()+dp3.toTurtleString()+c3.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(c2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(c3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testObjectPropertyRangeComplex() throws Exception {
+        Declaration c=Declaration.create(C("C"));
+        Declaration d=Declaration.create(C("D"));
+        Declaration r=Declaration.create(OP("r"));
+        Axiom sco=ObjectPropertyRange.create(IOP("r"), ObjectSomeValuesFrom.create(IOP("r"), ObjectComplementOf.create(C("C"))));
+        Declaration e=Declaration.create(C("E"));
+        Declaration f=Declaration.create(C("F"));
+        Declaration s=Declaration.create(OP("s"));
+        Axiom scoa=ObjectPropertyRange.create(OP("s"), 
+                ObjectAllValuesFrom.create(IOP(IOP("s")), ObjectIntersectionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
+                ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration t=Declaration.create(DP("t"));
+        Axiom scoaa=ObjectPropertyRange.create(OP("r"),
+                DataExactCardinality.create(5, DP("t"), DatatypeRestriction.create(DT("xsd:int"), 
+                        FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
+                        FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_SHORT)))),
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
+            +r.toTurtleString()+s.toTurtleString()+t.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(d));
+        assertTrue(consumer.getAxioms().remove(e));
+        assertTrue(consumer.getAxioms().remove(f));
+        assertTrue(consumer.getAxioms().remove(r));
+        assertTrue(consumer.getAxioms().remove(s));
+        assertTrue(consumer.getAxioms().remove(t));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testObjectPropertyRange() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration c1=Declaration.create(C("C1"));
+        Axiom sco=ObjectPropertyRange.create(OP("op1"),C("C1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration c2=Declaration.create(C("C2"));
+        Axiom scoa=ObjectPropertyRange.create(IOP("op1"),C("C2"),ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration c3=Declaration.create(C("C3"));
+        Axiom scoaa=ObjectPropertyRange.create(OP("op3"),C("C3"),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String s=op1.toTurtleString()+c1.toTurtleString()+op2.toTurtleString()+c2.toTurtleString()+op3.toTurtleString()+c3.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(c2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(c3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
     
+    public void testDataPropertyDomainComplex() throws Exception {
+        Declaration c=Declaration.create(C("C"));
+        Declaration d=Declaration.create(C("D"));
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration op=Declaration.create(OP("op"));
+        Axiom sco=DataPropertyDomain.create(DP("dp1"), ObjectSomeValuesFrom.create(IOP("op"), ObjectIntersectionOf.create(C("C"),C("D"))));
+        Declaration e=Declaration.create(C("E"));
+        Declaration f=Declaration.create(C("F"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Axiom scoa=DataPropertyDomain.create(DP("dp2"), 
+                ObjectAllValuesFrom.create(OP("op"), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
+                ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Axiom scoaa=DataPropertyDomain.create(DP("dp3"),
+                DataMaxCardinality.create(5, DP("dp1"), DatatypeRestriction.create(DT("xsd:int"), 
+                        FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
+                        FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_SHORT)))),
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
+            +dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()+op.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(d));
+        assertTrue(consumer.getAxioms().remove(e));
+        assertTrue(consumer.getAxioms().remove(f));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(op));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDataPropertyDomain() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration c1=Declaration.create(C("C1"));
+        Axiom sco=DataPropertyDomain.create(DP("dp1"),C("C1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration c2=Declaration.create(C("C2"));
+        Axiom scoa=DataPropertyDomain.create(DP("dp2"),C("C2"),ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Declaration c3=Declaration.create(C("C3"));
+        Axiom scoaa=DataPropertyDomain.create(DP("dp3"),C("C3"),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String s=dp1.toTurtleString()+c1.toTurtleString()+dp2.toTurtleString()+c2.toTurtleString()+dp3.toTurtleString()+c3.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(c2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(c3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testObjectPropertyDomainComplex() throws Exception {
+        Declaration c=Declaration.create(C("C"));
+        Declaration d=Declaration.create(C("D"));
+        Declaration r=Declaration.create(OP("r"));
+        Axiom sco=ObjectPropertyDomain.create(IOP("r"), ObjectSomeValuesFrom.create(IOP("r"), ObjectIntersectionOf.create(C("C"),C("D"))));
+        Declaration e=Declaration.create(C("E"));
+        Declaration f=Declaration.create(C("F"));
+        Declaration s=Declaration.create(OP("s"));
+        Axiom scoa=ObjectPropertyDomain.create(OP("s"), 
+                ObjectAllValuesFrom.create(IOP(IOP("s")), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
+                ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration t=Declaration.create(DP("t"));
+        Axiom scoaa=ObjectPropertyDomain.create(OP("r"),
+                DataMaxCardinality.create(5, DP("t"), DatatypeRestriction.create(DT("xsd:int"), 
+                        FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
+                        FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_SHORT)))),
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
+            +r.toTurtleString()+s.toTurtleString()+t.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(d));
+        assertTrue(consumer.getAxioms().remove(e));
+        assertTrue(consumer.getAxioms().remove(f));
+        assertTrue(consumer.getAxioms().remove(r));
+        assertTrue(consumer.getAxioms().remove(s));
+        assertTrue(consumer.getAxioms().remove(t));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testObjectPropertyDomain() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration c1=Declaration.create(C("C1"));
+        Axiom sco=ObjectPropertyDomain.create(OP("op1"),C("C1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration c2=Declaration.create(C("C2"));
+        Axiom scoa=ObjectPropertyDomain.create(IOP("op1"),C("C2"),ANN(AP("rdfs:label"), TL("EFanno")));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration c3=Declaration.create(C("C3"));
+        Axiom scoaa=ObjectPropertyDomain.create(OP("op3"),C("C3"),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String s=op1.toTurtleString()+c1.toTurtleString()+op2.toTurtleString()+c2.toTurtleString()+op3.toTurtleString()+c3.toTurtleString()
+            +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sco));
+        assertTrue(consumer.getAxioms().remove(scoa));
+        assertTrue(consumer.getAxioms().remove(scoaa));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(c2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(c3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDisjointWithObjectProperty() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom spo=DisjointObjectProperties.create(IOP(IOP("op1")), OP("op2"));
+        Axiom spoa=DisjointObjectProperties.create(OP("op1"),OP("op3"),ANN(AP("rdfs:label"), TL("opanno")));
+        Axiom spoaa=DisjointObjectProperties.create(OP("op2"),IOP(IOP("op3")),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(spo));
+        assertTrue(consumer.getAxioms().remove(spoa));
+        assertTrue(consumer.getAxioms().remove(spoaa));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDisjointWithDataProperty() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Axiom spo=DisjointDataProperties.create(DP("dp1"), DP("dp2"));
+        Axiom spoa=DisjointDataProperties.create(DP("dp1"),DP("dp3"),ANN(AP("rdfs:label"), TL("dpanno")));
+        Axiom spoaa=DisjointDataProperties.create(DP("dp2"),DP("dp3"),ANN(AP("rdfs:comment"), TL("dpAanno"), ANN(AP("rdfs:label"), TL("dpannoAnno"))));
+        String str=dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()
+            +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(spo));
+        assertTrue(consumer.getAxioms().remove(spoa));
+        assertTrue(consumer.getAxioms().remove(spoaa));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testEquivalentDataProperties() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Axiom spo=EquivalentDataProperties.create(DP("dp1"), DP("dp2"));
+        Axiom spoa=EquivalentDataProperties.create(DP("dp1"),DP("dp3"),ANN(AP("rdfs:label"), TL("dpanno")));
+        Axiom spoaa=EquivalentDataProperties.create(DP("dp2"),DP("dp3"),ANN(AP("rdfs:comment"), TL("dpAanno"), ANN(AP("rdfs:label"), TL("dpannoAnno"))));
+        String str=dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()
+            +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(spo));
+        assertTrue(consumer.getAxioms().remove(spoa));
+        assertTrue(consumer.getAxioms().remove(spoaa));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testEquivalentObjectProperties() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom spo=EquivalentObjectProperties.create(IOP(IOP("op1")), OP("op2"));
+        Axiom spoa=EquivalentObjectProperties.create(OP("op1"),OP("op3"),ANN(AP("rdfs:label"), TL("opanno")));
+        Axiom spoaa=EquivalentObjectProperties.create(OP("op2"),IOP(IOP("op3")),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(spo));
+        assertTrue(consumer.getAxioms().remove(spoa));
+        assertTrue(consumer.getAxioms().remove(spoaa));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
     public void testEquivalentClassComplex() throws Exception {
         Declaration c=Declaration.create(C("C"));
         Declaration d=Declaration.create(C("D"));
@@ -52,18 +397,17 @@ public class TestAxiomParsing extends AbstractTest {
         Set<ClassExpression> ces=new HashSet<ClassExpression>();
         ces.add(ObjectSomeValuesFrom.create(OP("s"), ObjectComplementOf.create(ObjectIntersectionOf.create(C("E"),C("F")))));
         ces.add(ObjectMinCardinality.create(5, IOP("r")));
-        Axiom scoa=EquivalentClasses.create(ces,Annotation.create(AP("rdfs:label"), TL("EFanno")));
+        Axiom scoa=EquivalentClasses.create(ces,ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration t=Declaration.create(DP("t"));
-        Set<ClassExpression> ces2=new HashSet<ClassExpression>();
-        ces2.add(DataAllValuesFrom.create(DP("t"), DataIntersectionOf.create(DT("xsd:string"), DataComplementOf.create(DT("rdf:PlainLiteral")))));
-        ces2.add(DataExactCardinality.create(1000, DP("t"), DatatypeRestriction.create(DT("xsd:decimal"), 
-                FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
-                FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_INTEGER)))));
-        Axiom scoaa=EquivalentClasses.create(ces2,Annotation.create(AP("rdfs:comment"), TL("GHAanno"), Annotation.create(AP("rdfs:label"), TL("GHannoAnno"))));
+        Axiom scoaa=EquivalentClasses.create(
+                SET(DataAllValuesFrom.create(DP("t"), DataIntersectionOf.create(DT("xsd:string"), DataComplementOf.create(DT("rdf:PlainLiteral")))),
+                    DataExactCardinality.create(1000, DP("t"), DatatypeRestriction.create(DT("xsd:decimal"), 
+                        FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
+                        FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_INTEGER))))),
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
         String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
             +r.toTurtleString()+s.toTurtleString()+t.toTurtleString()
             +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
-        System.out.println(str);
         OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -86,16 +430,10 @@ public class TestAxiomParsing extends AbstractTest {
         Axiom sco=EquivalentClasses.create(C("C"),C("D"));
         Declaration e=Declaration.create(C("E"));
         Declaration f=Declaration.create(C("F"));
-        Set<ClassExpression> ces=new HashSet<ClassExpression>();
-        ces.add(C("E"));
-        ces.add(C("F"));
-        Axiom scoa=EquivalentClasses.create(ces,Annotation.create(AP("rdfs:label"), TL("EFanno")));
+        Axiom scoa=EquivalentClasses.create(SET(C("E"),C("F")),ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration g=Declaration.create(C("G"));
         Declaration h=Declaration.create(C("H"));
-        Set<ClassExpression> ces2=new HashSet<ClassExpression>();
-        ces2.add(C("G"));
-        ces2.add(C("H"));
-        Axiom scoaa=EquivalentClasses.create(ces2,Annotation.create(AP("rdfs:comment"), TL("GHAanno"), Annotation.create(AP("rdfs:label"), TL("GHannoAnno"))));
+        Axiom scoaa=EquivalentClasses.create(SET(C("G"), C("H")),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
         String s=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()+g.toTurtleString()+h.toTurtleString()
             +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
@@ -121,14 +459,14 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration e=Declaration.create(C("E"));
         Declaration f=Declaration.create(C("F"));
         Declaration s=Declaration.create(OP("s"));
-        Axiom scoa=SubClassOf.create(ObjectAllValuesFrom.create(OP("s"), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))), ObjectMinCardinality.create(5, OP("r"), ObjectIntersectionOf.create(C("E"),C("F"))),Annotation.create(AP("rdfs:label"), TL("EFanno")));
+        Axiom scoa=SubClassOf.create(ObjectAllValuesFrom.create(OP("s"), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))), ObjectMinCardinality.create(5, OP("r"), ObjectIntersectionOf.create(C("E"),C("F"))),ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration t=Declaration.create(DP("t"));
         Axiom scoaa=SubClassOf.create(
                 DataSomeValuesFrom.create(DP("t"), DataUnionOf.create(DT("xsd:string"), DT("rdf:PlainLiteral"))), 
                 DataMaxCardinality.create(5, DP("t"), DatatypeRestriction.create(DT("xsd:int"), 
                         FacetRestriction.create(OWL2_FACET.MAX_EXCLUSIVE, TL("23", null, Datatype.XSD_BYTE)), 
                         FacetRestriction.create(OWL2_FACET.MIN_INCLUSIVE, TL("21", null, Datatype.XSD_SHORT)))),
-                Annotation.create(AP("rdfs:comment"), TL("GHAanno"), Annotation.create(AP("rdfs:label"), TL("GHannoAnno"))));
+                ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
         String str=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()
             +r.toTurtleString()+s.toTurtleString()+t.toTurtleString()
             +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
@@ -154,10 +492,10 @@ public class TestAxiomParsing extends AbstractTest {
         Axiom sco=SubClassOf.create(C("C"),C("D"));
         Declaration e=Declaration.create(C("E"));
         Declaration f=Declaration.create(C("F"));
-        Axiom scoa=SubClassOf.create(C("E"),C("F"),Annotation.create(AP("rdfs:label"), TL("EFanno")));
+        Axiom scoa=SubClassOf.create(C("E"),C("F"),ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration g=Declaration.create(C("G"));
         Declaration h=Declaration.create(C("H"));
-        Axiom scoaa=SubClassOf.create(C("G"),C("H"),Annotation.create(AP("rdfs:comment"), TL("GHAanno"), Annotation.create(AP("rdfs:label"), TL("GHannoAnno"))));
+        Axiom scoaa=SubClassOf.create(C("G"),C("H"),ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
         String s=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()+g.toTurtleString()+h.toTurtleString()
             +sco.toTurtleString()+scoa.toTurtleString()+scoaa.toTurtleString();
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
@@ -181,10 +519,10 @@ public class TestAxiomParsing extends AbstractTest {
         Axiom negDP=NegativeDataPropertyAssertion.create(DP("r1"),NI("a1"),TL("b1"));
         Declaration a2=Declaration.create(NI("a2"));
         Declaration r2=Declaration.create(DP("r2"));
-        Axiom negDPa=NegativeDataPropertyAssertion.create(DP("r2"),NI("a2"),TL("b2"),Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom negDPa=NegativeDataPropertyAssertion.create(DP("r2"),NI("a2"),TL("b2"),ANN(AP("rdfs:label"), TL("rst2anno")));
         Declaration a3=Declaration.create(NI("a3"));
         Declaration r3=Declaration.create(DP("r3"));
-        Axiom negDPaa=NegativeDataPropertyAssertion.create(DP("r3"),NI("a3"),TL("b3"),Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom negDPaa=NegativeDataPropertyAssertion.create(DP("r3"),NI("a3"),TL("b3"),ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
         String s=a1.toTurtleString()+r1.toTurtleString()
             +a2.toTurtleString()+r2.toTurtleString()
             +a3.toTurtleString()+r3.toTurtleString()
@@ -212,11 +550,11 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration a2=Declaration.create(NI("a2"));
         Declaration b2=Declaration.create(NI("b2"));
         Declaration r2=Declaration.create(OP("r2"));
-        Axiom negOPa=NegativeObjectPropertyAssertion.create(OP("r2"),NI("a2"),NI("b2"),Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom negOPa=NegativeObjectPropertyAssertion.create(OP("r2"),NI("a2"),NI("b2"),ANN(AP("rdfs:label"), TL("rst2anno")));
         Declaration a3=Declaration.create(NI("a3"));
         Declaration b3=Declaration.create(NI("b3"));
         Declaration r3=Declaration.create(OP("r3"));
-        Axiom negOPaa=NegativeObjectPropertyAssertion.create(OP("r3"),NI("a3"),NI("b3"),Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom negOPaa=NegativeObjectPropertyAssertion.create(OP("r3"),NI("a3"),NI("b3"),ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
         String s=a1.toTurtleString()+b1.toTurtleString()+r1.toTurtleString()
             +a2.toTurtleString()+b2.toTurtleString()+r2.toTurtleString()
             +a3.toTurtleString()+b3.toTurtleString()+r3.toTurtleString()
@@ -248,13 +586,13 @@ public class TestAxiomParsing extends AbstractTest {
         Set<Individual> inds=new HashSet<Individual>();
         inds.add(NI("a2"));
         inds.add(NI("b2"));
-        Axiom diffIndsa=DifferentIndividuals.create(inds, Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom diffIndsa=DifferentIndividuals.create(inds, ANN(AP("rdfs:label"), TL("rst2anno")));
         Declaration a3=Declaration.create(NI("a3"));
         Declaration b3=Declaration.create(NI("b3"));
         Set<Individual> inds2=new HashSet<Individual>();
         inds2.add(NI("a3"));
         inds2.add(NI("b3"));
-        Axiom diffIndsaa=DifferentIndividuals.create(inds2, Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom diffIndsaa=DifferentIndividuals.create(inds2, ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
         String s=a1.toTurtleString()+b1.toTurtleString()
             +a2.toTurtleString()+b2.toTurtleString()
             +a3.toTurtleString()+b3.toTurtleString()
@@ -286,7 +624,7 @@ public class TestAxiomParsing extends AbstractTest {
         inds.add(NI("a2"));
         inds.add(NI("b2"));
         inds.add(NI("c2"));
-        Axiom diffIndsa=DifferentIndividuals.create(inds, Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom diffIndsa=DifferentIndividuals.create(inds, ANN(AP("rdfs:label"), TL("rst2anno")));
         Declaration a3=Declaration.create(NI("a3"));
         Declaration b3=Declaration.create(NI("b3"));
         Declaration c3=Declaration.create(NI("c3"));
@@ -294,7 +632,7 @@ public class TestAxiomParsing extends AbstractTest {
         inds2.add(NI("a3"));
         inds2.add(NI("b3"));
         inds2.add(NI("c3"));
-        Axiom diffIndsaa=DifferentIndividuals.create(inds2, Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom diffIndsaa=DifferentIndividuals.create(inds2, ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
         String s=a1.toTurtleString()+b1.toTurtleString()+c1.toTurtleString()
             +a2.toTurtleString()+b2.toTurtleString()+c2.toTurtleString()
             +a3.toTurtleString()+b3.toTurtleString()+c3.toTurtleString()
@@ -321,23 +659,15 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration r1=Declaration.create(DP("r1"));
         Declaration s1=Declaration.create(DP("s1"));
         Declaration t1=Declaration.create(DP("t1"));
-        Axiom djop=DisjointDataProperties.create(DP("r1"),DP("s1"),DP("t1"));
+        Axiom djop=DisjointDataProperties.create(SET(DP("r1"),DP("s1"),DP("t1")));
         Declaration r2=Declaration.create(DP("r2"));
         Declaration s2=Declaration.create(DP("s2"));
         Declaration t2=Declaration.create(DP("t2"));
-        Set<DataPropertyExpression> dpes=new HashSet<DataPropertyExpression>();
-        dpes.add(DP("r2"));
-        dpes.add(DP("s2"));
-        dpes.add(DP("t2"));
-        Axiom djopa=DisjointDataProperties.create(dpes, Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom djopa=DisjointDataProperties.create(SET(DP("r2"), DP("s2"), DP("t2")), SET(ANN(AP("rdfs:label"), TL("rst2anno"))));
         Declaration r3=Declaration.create(DP("r3"));
         Declaration s3=Declaration.create(DP("s3"));
         Declaration t3=Declaration.create(DP("t3"));
-        Set<DataPropertyExpression> dpes2=new HashSet<DataPropertyExpression>();
-        dpes2.add(DP("r3"));
-        dpes2.add(DP("s3"));
-        dpes2.add(DP("t3"));
-        Axiom djopaa=DisjointDataProperties.create(dpes2, Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom djopaa=DisjointDataProperties.create(SET(DP("r3"), DP("s3"), DP("t3")), SET(ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno")))));
         String s=r1.toTurtleString()+s1.toTurtleString()+t1.toTurtleString()
             +r2.toTurtleString()+s2.toTurtleString()+t2.toTurtleString()
             +r3.toTurtleString()+s3.toTurtleString()+t3.toTurtleString()
@@ -364,23 +694,15 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration r1=Declaration.create(OP("r1"));
         Declaration s1=Declaration.create(OP("s1"));
         Declaration t1=Declaration.create(OP("t1"));
-        Axiom djop=DisjointObjectProperties.create(OP("r1"),OP("s1"),OP("t1"));
+        Axiom djop=DisjointObjectProperties.create(SET(OP("r1"),OP("s1"),OP("t1")));
         Declaration r2=Declaration.create(OP("r2"));
         Declaration s2=Declaration.create(OP("s2"));
         Declaration t2=Declaration.create(OP("t2"));
-        Set<ObjectPropertyExpression> opes=new HashSet<ObjectPropertyExpression>();
-        opes.add(OP("r2"));
-        opes.add(OP("s2"));
-        opes.add(OP("t2"));
-        Axiom djopa=DisjointObjectProperties.create(opes, Annotation.create(AP("rdfs:label"), TL("rst2anno")));
+        Axiom djopa=DisjointObjectProperties.create(SET(OP("r2"), OP("s2"), OP("t2")), SET(ANN(AP("rdfs:label"), TL("rst2anno"))));
         Declaration r3=Declaration.create(OP("r3"));
         Declaration s3=Declaration.create(OP("s3"));
         Declaration t3=Declaration.create(OP("t3"));
-        Set<ObjectPropertyExpression> opes2=new HashSet<ObjectPropertyExpression>();
-        opes2.add(OP("r3"));
-        opes2.add(OP("s3"));
-        opes2.add(OP("t3"));
-        Axiom djopaa=DisjointObjectProperties.create(opes2, Annotation.create(AP("rdfs:comment"), TL("rst3Aanno"), Annotation.create(AP("rdfs:label"), TL("rs3annoAnno"))));
+        Axiom djopaa=DisjointObjectProperties.create(SET(OP("r3"), OP("s3"), OP("t3")), SET(ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno")))));
         String s=r1.toTurtleString()+s1.toTurtleString()+t1.toTurtleString()
             +r2.toTurtleString()+s2.toTurtleString()+t2.toTurtleString()
             +r3.toTurtleString()+s3.toTurtleString()+t3.toTurtleString()
@@ -412,13 +734,13 @@ public class TestAxiomParsing extends AbstractTest {
         Set<ClassExpression> ces=new HashSet<ClassExpression>();
         ces.add(C("E"));
         ces.add(C("F"));
-        Axiom dca=DisjointClasses.create(ces, Annotation.create(AP("rdfs:label"), TL("EFanno")));
+        Axiom dca=DisjointClasses.create(ces, ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration g=Declaration.create(C("G"));
         Declaration h=Declaration.create(C("H"));
         ces=new HashSet<ClassExpression>();
         ces.add(C("G"));
         ces.add(C("H"));
-        Axiom dcaa=DisjointClasses.create(ces, Annotation.create(AP("rdfs:comment"), TL("GHAanno"), Annotation.create(AP("rdfs:label"), TL("GHannoAnno"))));
+        Axiom dcaa=DisjointClasses.create(ces, ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
         String s=c.toTurtleString()+d.toTurtleString()+e.toTurtleString()+f.toTurtleString()+g.toTurtleString()+h.toTurtleString()+dc.toTurtleString()+dca.toTurtleString()+dcaa.toTurtleString();
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
@@ -447,7 +769,7 @@ public class TestAxiomParsing extends AbstractTest {
         ces.add(C("C2"));
         ces.add(C("D2"));
         ces.add(C("E2"));
-        Axiom dca=DisjointClasses.create(ces, Annotation.create(AP("rdfs:label"), TL("CDE2anno")));
+        Axiom dca=DisjointClasses.create(ces, ANN(AP("rdfs:label"), TL("CDE2anno")));
         Declaration c3=Declaration.create(C("C3"));
         Declaration d3=Declaration.create(C("D3"));
         Declaration e3=Declaration.create(C("E3"));
@@ -455,7 +777,7 @@ public class TestAxiomParsing extends AbstractTest {
         ces2.add(C("C3"));
         ces2.add(C("D3"));
         ces2.add(C("E3"));
-        Axiom dcaa=DisjointClasses.create(ces2, Annotation.create(AP("rdfs:comment"), TL("CDE3Aanno"), Annotation.create(AP("rdfs:label"), TL("CDE3annoAnno"))));
+        Axiom dcaa=DisjointClasses.create(ces2, ANN(AP("rdfs:comment"), TL("CDE3Aanno"), ANN(AP("rdfs:label"), TL("CDE3annoAnno"))));
         String s=c1.toTurtleString()+d1.toTurtleString()+e1.toTurtleString()
             +c2.toTurtleString()+d2.toTurtleString()+e2.toTurtleString()
             +c3.toTurtleString()+d3.toTurtleString()+e3.toTurtleString()
@@ -479,18 +801,18 @@ public class TestAxiomParsing extends AbstractTest {
         assertNoTriplesLeft(consumer);
     }
     public void testDeclarationsWithAnnotationAnnotations() throws Exception {
-        Annotation caa=Annotation.create(AP("ap"), TL("caa"));
-        Annotation ca=Annotation.create(AP("ap"), TL("ca"),caa);
-        Annotation opaa=Annotation.create(AP("ap"), TL("opaa"));
-        Annotation opa=Annotation.create(AP("ap"), TL("opa"),opaa);
-        Annotation dpaa=Annotation.create(AP("ap"), TL("dpaa"));
-        Annotation dpa=Annotation.create(AP("ap"), TL("dpa"),dpaa);
-        Annotation apaa=Annotation.create(AP("ap"), TL("apaa"));
-        Annotation apa=Annotation.create(AP("ap"), TL("apa"),apaa);
-        Annotation niaa=Annotation.create(AP("ap"), TL("niaa"));
-        Annotation nia=Annotation.create(AP("ap"), TL("nia"),niaa);
-        Annotation dtaa=Annotation.create(AP("ap"), TL("dtaa"));
-        Annotation dta=Annotation.create(AP("ap"), TL("dta"),dtaa);
+        Annotation caa=ANN(AP("ap"), TL("caa"));
+        Annotation ca=ANN(AP("ap"), TL("ca"),caa);
+        Annotation opaa=ANN(AP("ap"), TL("opaa"));
+        Annotation opa=ANN(AP("ap"), TL("opa"),opaa);
+        Annotation dpaa=ANN(AP("ap"), TL("dpaa"));
+        Annotation dpa=ANN(AP("ap"), TL("dpa"),dpaa);
+        Annotation apaa=ANN(AP("ap"), TL("apaa"));
+        Annotation apa=ANN(AP("ap"), TL("apa"),apaa);
+        Annotation niaa=ANN(AP("ap"), TL("niaa"));
+        Annotation nia=ANN(AP("ap"), TL("nia"),niaa);
+        Annotation dtaa=ANN(AP("ap"), TL("dtaa"));
+        Annotation dta=ANN(AP("ap"), TL("dta"),dtaa);
         Declaration c=Declaration.create(C("C"), ca);
         Declaration op=Declaration.create(OP("op"), opa);
         Declaration dp=Declaration.create(DP("dp"), dpa);
@@ -511,12 +833,12 @@ public class TestAxiomParsing extends AbstractTest {
         assertNoTriplesLeft(consumer);
     }
     public void testDeclarationsWithAnnotations() throws Exception {
-        Annotation ca=Annotation.create(AP("ap"), TL("ca"));
-        Annotation opa=Annotation.create(AP("ap"), TL("opa"));
-        Annotation dpa=Annotation.create(AP("ap"), TL("dpa"));
-        Annotation apa=Annotation.create(AP("ap"), TL("apa"));
-        Annotation nia=Annotation.create(AP("ap"), TL("nia"));
-        Annotation dta=Annotation.create(AP("ap"), TL("dta"));
+        Annotation ca=ANN(AP("ap"), TL("ca"));
+        Annotation opa=ANN(AP("ap"), TL("opa"));
+        Annotation dpa=ANN(AP("ap"), TL("dpa"));
+        Annotation apa=ANN(AP("ap"), TL("apa"));
+        Annotation nia=ANN(AP("ap"), TL("nia"));
+        Annotation dta=ANN(AP("ap"), TL("dta"));
         Declaration c=Declaration.create(C("C"), ca);
         Declaration op=Declaration.create(OP("op"), opa);
         Declaration dp=Declaration.create(DP("dp"), dpa);

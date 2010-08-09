@@ -8,12 +8,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
 
-public class NamedIndividualHandler extends BuiltInTypeHandler {
+public class NamedIndividualHandler extends AbstractResourceTripleHandler {
 
     public NamedIndividualHandler(TripleConsumer consumer) {
-        super(consumer, Vocabulary.OWL_NAMED_INDIVIDUAL);
+        super(consumer);
     }
 
     @Override

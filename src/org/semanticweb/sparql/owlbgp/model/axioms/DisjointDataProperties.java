@@ -3,6 +3,7 @@ package org.semanticweb.sparql.owlbgp.model.axioms;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,8 +30,8 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
             if (object1.m_dataPropertyExpressions.size()!=object2.m_dataPropertyExpressions.size()
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (DataPropertyExpression ope : object1.m_dataPropertyExpressions) {
-                if (!contains(ope, object2.m_dataPropertyExpressions))
+            for (DataPropertyExpression dpe : object1.m_dataPropertyExpressions) {
+                if (!contains(dpe, object2.m_dataPropertyExpressions))
                     return false;
             } 
             for (Annotation anno : object1.m_annotations) {
@@ -89,7 +90,8 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
         if (m_dataPropertyExpressions.size()==2) {
-            return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dataPropertyExpressions.iterator().next(), Vocabulary.OWL_DISJOINT_DATA_PROPERTIES, (Atomic)m_dataPropertyExpressions.iterator().next(), m_annotations);
+            Iterator<DataPropertyExpression> it=m_dataPropertyExpressions.iterator();
+            return writeSingleMainTripleAxiom(prefixes, (Atomic)it.next(), Vocabulary.OWL_PROPERTY_DISJOINT_WITH, (Atomic)it.next(), m_annotations);
         } else {
             StringBuffer buffer=new StringBuffer();
             Identifier bnode=AbstractExtendedOWLObject.getNextBlankNode();
@@ -117,11 +119,17 @@ public class DisjointDataProperties extends AbstractAxiom implements ClassAxiom 
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions,Annotation... annotations) {
-        return create(dataPropertyExpressions,new HashSet<Annotation>(Arrays.asList(annotations)));
+    public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions) {
+        return create(dataPropertyExpressions,new HashSet<Annotation>());
     }
-    public static DisjointDataProperties create(DataPropertyExpression... dataPropertyExpressions) {
-        return create(new HashSet<DataPropertyExpression>(Arrays.asList(dataPropertyExpressions)),new HashSet<Annotation>());
+    public static DisjointDataProperties create(DataPropertyExpression dataPropertyExpression1,DataPropertyExpression dataPropertyExpression2,Annotation... annotations) {
+        return create(dataPropertyExpression1, dataPropertyExpression2, new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static DisjointDataProperties create(DataPropertyExpression dataPropertyExpression1,DataPropertyExpression dataPropertyExpression2,Set<Annotation> annotations) {
+        Set<DataPropertyExpression> disjoints=new HashSet<DataPropertyExpression>();
+        disjoints.add(dataPropertyExpression1);
+        disjoints.add(dataPropertyExpression2);
+        return create(disjoints,annotations);
     }
     public static DisjointDataProperties create(Set<DataPropertyExpression> dataPropertyExpressions,Set<Annotation> annotations) {
         return s_interningManager.intern(new DisjointDataProperties(dataPropertyExpressions,annotations));
