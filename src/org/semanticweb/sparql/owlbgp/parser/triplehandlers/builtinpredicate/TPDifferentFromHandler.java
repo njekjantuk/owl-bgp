@@ -8,9 +8,9 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPDifferentFromHandler extends AbstractResourceTripleHandler {
+public class TPDifferentFromHandler extends TripleHandler {
 
     public TPDifferentFromHandler(TripleConsumer consumer) {
         super(consumer);

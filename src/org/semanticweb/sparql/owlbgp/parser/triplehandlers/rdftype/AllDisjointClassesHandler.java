@@ -8,9 +8,9 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class AllDisjointClassesHandler extends AbstractResourceTripleHandler {
+public class AllDisjointClassesHandler extends TripleHandler {
 
     public AllDisjointClassesHandler(TripleConsumer consumer) {
         super(consumer);

@@ -8,9 +8,9 @@ import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public abstract class AbstractCardinalityHandler extends AbstractResourceTripleHandler {
+public abstract class AbstractCardinalityHandler extends TripleHandler {
 
     protected final Identifier predicateIRI;
     

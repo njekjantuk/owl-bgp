@@ -9,9 +9,9 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class InverseFunctionalPropertyHandler extends AbstractResourceTripleHandler {
+public class InverseFunctionalPropertyHandler extends TripleHandler {
 
     public InverseFunctionalPropertyHandler(TripleConsumer consumer) {
         super(consumer);

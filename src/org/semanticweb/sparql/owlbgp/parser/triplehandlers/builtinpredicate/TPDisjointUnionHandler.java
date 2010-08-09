@@ -10,9 +10,9 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
-import org.semanticweb.sparql.owlbgp.parser.triplehandlers.AbstractResourceTripleHandler;
+import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
-public class TPDisjointUnionHandler extends AbstractResourceTripleHandler {
+public class TPDisjointUnionHandler extends TripleHandler {
 
     public TPDisjointUnionHandler(TripleConsumer consumer) {
         super(consumer);
