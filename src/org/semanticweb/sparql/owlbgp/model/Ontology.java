@@ -94,10 +94,10 @@ public class Ontology extends AbstractExtendedOWLObject {
     
     protected Ontology(Identifier ontologyIRI, Set<Identifier> versionIRIs, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations) {
         m_IRI=ontologyIRI;
-        m_versionIRIs=versionIRIs;
-        m_directlyImported=Collections.unmodifiableSet(directlyImports);
-        m_axioms=Collections.unmodifiableSet(axioms); 
-        m_annotations=Collections.unmodifiableSet(ontologyAnnotations);        
+        m_versionIRIs=Collections.unmodifiableSet(versionIRIs==null?new HashSet<Identifier>():versionIRIs);
+        m_directlyImported=Collections.unmodifiableSet(directlyImports==null?new HashSet<Import>():directlyImports);
+        m_axioms=Collections.unmodifiableSet(axioms==null?new HashSet<Axiom>():axioms); 
+        m_annotations=Collections.unmodifiableSet(ontologyAnnotations==null?new HashSet<Annotation>():ontologyAnnotations);        
     }
     public boolean containsAxiom(Axiom axiom) {
         return m_axioms.contains(axiom);

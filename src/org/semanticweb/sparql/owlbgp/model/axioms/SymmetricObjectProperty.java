@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -100,6 +101,9 @@ public class SymmetricObjectProperty extends AbstractAxiom implements ObjectProp
     }
     public static SymmetricObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
         return create(objectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static SymmetricObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Annotation... annotations) {
+        return create(objectPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static SymmetricObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new SymmetricObjectProperty(objectPropertyExpression,annotations));

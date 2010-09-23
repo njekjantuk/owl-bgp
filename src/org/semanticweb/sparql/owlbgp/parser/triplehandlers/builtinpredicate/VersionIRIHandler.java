@@ -18,7 +18,12 @@ public class VersionIRIHandler extends TripleHandler {
         } else if (consumer.isAnonymous(subject)) {
             throw new RuntimeException("The subject of a version IRI triple is anonymous/a blank node, which is not allowed: "+subject);
         } else {
-            consumer.addVersionIRI(object);
+            Identifier currentOntologyIRI=consumer.getOntologyIRI();
+            if (currentOntologyIRI==null)
+                consumer.setOntologyIRI(subject);
+            else if (currentOntologyIRI!=subject)
+                throw new RuntimeException("The subject ("+subject+") of a version IRI triple uses an IRI that is different from the onology IRI ("+currentOntologyIRI+"), which is not allowed. ");
+            consumer.addVersionIRI(subject,object);
         }
     }
 }

@@ -74,13 +74,13 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject {
         buffer.append(" ");
         buffer.append(Vocabulary.RDF_FIRST.toString(prefixes));
         buffer.append(" ");
-        buffer.append(listIDs.get(listIDs.size()-1));
+        buffer.append(listIDs.get(0));
         buffer.append(" . ");
         buffer.append(LB);
         buffer.append(restOfLastListTriple);
         buffer.append(" ");
         buffer.append(Vocabulary.RDF_REST.toString(prefixes));
-        printSequence(buffer, prefixes, null, listIDs.subList(0, listIDs.size()-1));        
+        printSequence(buffer, prefixes, null, listIDs.subList(1, listIDs.size()));        
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();

@@ -88,7 +88,10 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
         return s_interningManager.intern(this);
     }
     public static ObjectInverseOf create(ObjectPropertyExpression objectPropertyExpression) {
-        return s_interningManager.intern(new ObjectInverseOf(objectPropertyExpression));
+        if (objectPropertyExpression instanceof Atomic)
+            return s_interningManager.intern(new ObjectInverseOf(objectPropertyExpression));
+        else 
+            throw new RuntimeException("Error: In OWL Dl one can only build inverse properties of atomic properties, but "+objectPropertyExpression+" is not aomic. ");
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

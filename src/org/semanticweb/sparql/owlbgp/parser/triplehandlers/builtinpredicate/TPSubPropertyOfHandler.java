@@ -23,14 +23,16 @@ public class TPSubPropertyOfHandler extends TripleHandler {
         DataPropertyExpression subDataProperty=null;
         if (subProperty==null) {
             subDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
-            throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
+            if (subDataProperty==null)
+                throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         }
         
         ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
         DataPropertyExpression superDataProperty=null;
         if (superProperty==null) {
             superDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
-            throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
+            if (superDataProperty==null)
+                throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
         }    
             
         if (subProperty!=null && superProperty!=null)

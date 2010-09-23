@@ -120,6 +120,9 @@ public class SameIndividual extends AbstractAxiom implements Assertion {
     public static SameIndividual create(Set<Individual> individuals) {
         return create(individuals,new HashSet<Annotation>());
     }
+    public static SameIndividual create(Set<Individual> individuals, Annotation... annotations) {
+        return create(individuals,new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
     public static SameIndividual create(Set<Individual> individuals,Set<Annotation> annotations) {
         return s_interningManager.intern(new SameIndividual(individuals,annotations));
     }

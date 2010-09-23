@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +41,7 @@ public class FunctionalDataProperty extends AbstractAxiom implements DataPropert
 
     protected static InterningManager<FunctionalDataProperty> s_interningManager=new InterningManager<FunctionalDataProperty>() {
         protected boolean equal(FunctionalDataProperty object1,FunctionalDataProperty object2) {
-            if (object1.m_dpe==object2.m_dpe
+            if (object1.m_dpe!=object2.m_dpe
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
             for (Annotation anno : object1.m_annotations) {
@@ -83,13 +84,16 @@ public class FunctionalDataProperty extends AbstractAxiom implements DataPropert
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDF_TYPE, Vocabulary.OWL_FUNCTIONAL_DATA_PROPERTY, m_annotations);
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_dpe, Vocabulary.RDF_TYPE, Vocabulary.OWL_FUNCTIONAL_PROPERTY, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
     public static FunctionalDataProperty create(DataPropertyExpression dataPropertyExpression) {
         return create(dataPropertyExpression,new HashSet<Annotation>());
+    }
+    public static FunctionalDataProperty create(DataPropertyExpression dataPropertyExpression,Annotation... annotations) {
+        return create(dataPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static FunctionalDataProperty create(DataPropertyExpression dataPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new FunctionalDataProperty(dataPropertyExpression,annotations));

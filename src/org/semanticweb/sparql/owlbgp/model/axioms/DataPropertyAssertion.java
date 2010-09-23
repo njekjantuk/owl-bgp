@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -108,6 +109,9 @@ public class DataPropertyAssertion extends AbstractAxiom implements Assertion {
     }
     public static DataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,Literal literal) {
         return create(dpe, individual, literal,new HashSet<Annotation>());
+    }
+    public static DataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,Literal literal,Annotation... annotations) {
+        return create(dpe,individual,literal,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,Literal literal,Set<Annotation> annotations) {
         if (!(dpe instanceof DataProperty)) throw new IllegalArgumentException("DatapropertyAssertions cannot contain data property expressions, but only data properties. Here we got an expression: "+dpe);

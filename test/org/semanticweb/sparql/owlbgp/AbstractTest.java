@@ -36,7 +36,7 @@ public class AbstractTest extends TestCase {
     public static final String NS="http://example.org/";
     
     protected void assertNoTriplesLeft(TripleConsumer consumer) {
-//        assertTrue(consumer.allTriplesConsumed());
+        assertTrue(consumer.allTriplesConsumed());
     }
     
     public static UntypedVariable V(String variableName) {

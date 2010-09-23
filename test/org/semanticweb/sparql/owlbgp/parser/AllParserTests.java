@@ -10,6 +10,7 @@ public class AllParserTests extends TestCase {
         TestSuite suite = new TestSuite("Unit tests for the parser.");
         // $JUnit-BEGIN$
         suite.addTestSuite(TestAnnotationParsing.class);
+        suite.addTestSuite(TestAxiomParsing.class);
         suite.addTestSuite(TestClassExpressionParsing.class);
         suite.addTestSuite(TestDataRangeParsing.class);
         suite.addTestSuite(TestDeclarationFixing.class);

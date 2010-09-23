@@ -5,7 +5,7 @@ import java.util.Set;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalDataProperty;
-import org.semanticweb.sparql.owlbgp.model.axioms.InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
@@ -21,7 +21,7 @@ public class FunctionalPropertyHandler extends TripleHandler {
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
         if (ope!=null)
-            consumer.addAxiom(InverseFunctionalObjectProperty.create(ope,annotations));
+            consumer.addAxiom(FunctionalObjectProperty.create(ope,annotations));
         else {
             DataPropertyExpression dpe=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
             if (dpe!=null)
