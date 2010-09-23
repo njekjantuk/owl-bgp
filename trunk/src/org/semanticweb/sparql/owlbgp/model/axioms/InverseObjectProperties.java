@@ -17,7 +17,10 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -42,15 +45,24 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
 
     protected static InterningManager<InverseObjectProperties> s_interningManager=new InterningManager<InverseObjectProperties>() {
         protected boolean equal(InverseObjectProperties object1,InverseObjectProperties object2) {
-            if (object1.m_ope!=object2.m_ope
-                    ||object1.m_inverseOpe!=object2.m_inverseOpe
+            if (object1.m_opes.size()!=object2.m_opes.size()
                     ||object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
+            for (ObjectPropertyExpression ope : object1.m_opes) {
+                if (!contains(ope, object2.m_opes))
+                    return false;
+            } 
             for (Annotation anno : object1.m_annotations) {
                 if (!contains(anno, object2.m_annotations))
                     return false;
             } 
             return true;
+        }
+        protected boolean contains(ObjectPropertyExpression ope,Set<ObjectPropertyExpression> opes) {
+            for (ObjectPropertyExpression op : opes)
+                if (op==ope)
+                    return true;
+            return false;
         }
         protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
             for (Annotation anno : annotations)
@@ -59,53 +71,60 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
             return false;
         }
         protected int getHashCode(InverseObjectProperties object) {
-            int hashCode=7*object.m_ope.hashCode()+11*object.m_inverseOpe.hashCode();
+            int hashCode=97;
+            for (ObjectPropertyExpression ope : object.m_opes) 
+                hashCode+=ope.hashCode();
             for (Annotation anno : object.m_annotations)
                 hashCode+=anno.hashCode();
             return hashCode;
         }
     };
     
-    protected final ObjectPropertyExpression m_ope;
-    protected final ObjectPropertyExpression m_inverseOpe;
+    protected final Set<ObjectPropertyExpression> m_opes;
     
     protected InverseObjectProperties(ObjectPropertyExpression ope,ObjectPropertyExpression inverseOpe,Set<Annotation> annotations) {
         super(annotations);
-        m_ope=ope;
-        m_inverseOpe=inverseOpe;
+        Set<ObjectPropertyExpression> opes=new HashSet<ObjectPropertyExpression>();
+        opes.add(ope);
+        opes.add(inverseOpe);
+        m_opes=Collections.unmodifiableSet(opes);
     }
-    public ObjectPropertyExpression getObjectPropertyExpression() {
-        return m_ope;
-    }
-    public ObjectPropertyExpression getInverseObjectPropertyExpression() {
-        return m_inverseOpe;
+    public Set<ObjectPropertyExpression> getObjectPropertyExpressions() {
+        return m_opes;
     }
     @Override
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("InverseObjectProperties(");
         writeAnnoations(buffer, prefixes);
-        buffer.append(m_ope.toString(prefixes));
-        buffer.append(" ");
-        buffer.append(m_inverseOpe.toString(prefixes));
+        boolean notFirst=false;
+        for (ObjectPropertyExpression ope : m_opes) {
+            if (notFirst) buffer.append(" ");
+            notFirst=true;
+            buffer.append(ope.toString(prefixes));
+        }
         buffer.append(")");
         return buffer.toString();
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
         StringBuffer buffer=new StringBuffer();
+        assert m_opes.size()==2;
+        Iterator<ObjectPropertyExpression> it=m_opes.iterator();
+        ObjectPropertyExpression ope1=it.next();
+        ObjectPropertyExpression ope2=it.next();
         Identifier subject;
-        if (!(m_ope instanceof Atomic)) {
+        if (!(ope1 instanceof Atomic)) {
             subject=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(m_ope.toTurtleString(prefixes, subject));
+            buffer.append(ope1.toTurtleString(prefixes, subject));
         } else 
-            subject=(Atomic)m_ope;
+            subject=(Atomic)ope1;
         Identifier object;
-        if (!(m_inverseOpe instanceof Atomic)) {
+        if (!(ope2 instanceof Atomic)) {
             object=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(m_inverseOpe.toTurtleString(prefixes, object));
+            buffer.append(ope2.toTurtleString(prefixes, object));
         } else 
-            object=(Atomic)m_inverseOpe;
+            object=(Atomic)ope2;
         buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_INVERSE_OF, object, m_annotations));
         return buffer.toString();
     }
@@ -114,6 +133,9 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
     }
     public static InverseObjectProperties create(ObjectPropertyExpression objectPropertyExpression, ObjectPropertyExpression inverseObjectPropertyExpression) {
         return create(objectPropertyExpression,inverseObjectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static InverseObjectProperties create(ObjectPropertyExpression objectPropertyExpression, ObjectPropertyExpression inverseObjectPropertyExpression,Annotation... annotations) {
+        return create(objectPropertyExpression,inverseObjectPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static InverseObjectProperties create(ObjectPropertyExpression objectPropertyExpression, ObjectPropertyExpression inverseObjectPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new InverseObjectProperties(objectPropertyExpression,inverseObjectPropertyExpression,annotations));
@@ -126,15 +148,23 @@ public class InverseObjectProperties extends AbstractAxiom implements ObjectProp
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_ope.getVariablesInSignature(varType));
-        variables.addAll(m_inverseOpe.getVariablesInSignature(varType));
+        for (ObjectPropertyExpression ope : m_opes)
+            variables.addAll(ope.getVariablesInSignature(varType));
         getAnnotationVariables(varType, variables);
         return variables;
     }
     public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
-        return create((ObjectPropertyExpression)m_ope.getBoundVersion(variablesToBindings),(ObjectPropertyExpression)m_inverseOpe.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
+        assert m_opes.size()==2;
+        Iterator<ObjectPropertyExpression> it=m_opes.iterator();
+        ObjectPropertyExpression ope1=it.next();
+        ObjectPropertyExpression ope2=it.next();
+        return create((ObjectPropertyExpression)ope1.getBoundVersion(variablesToBindings),(ObjectPropertyExpression)ope2.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {
-        return create(m_ope,m_inverseOpe);
+        assert m_opes.size()==2;
+        Iterator<ObjectPropertyExpression> it=m_opes.iterator();
+        ObjectPropertyExpression ope1=it.next();
+        ObjectPropertyExpression ope2=it.next();
+        return create(ope1,ope2);
     }
 }

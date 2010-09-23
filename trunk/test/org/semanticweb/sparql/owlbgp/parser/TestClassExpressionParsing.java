@@ -34,6 +34,53 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 public class TestClassExpressionParsing extends AbstractTest {
     public static final String LB = System.getProperty("line.separator") ;
     
+    public void testOWL1Classes() throws Exception {
+        String s="_:v rdf:type owl:Class . "
+            + "_:v owl:unionOf _:u1 . "
+            + "_:u1 rdf:first <http://example.org/C> . "
+            + "_:u1 rdf:rest _:u2 . "
+            + "_:u2 rdf:first <http://example.org/D> . "
+            + "_:u2 rdf:rest rdf:nil . "
+            + "<http://example.org/C> a owl:Class . "
+            + "<http://example.org/D> a owl:Class . "
+            + "_:x rdf:type owl:Class . "
+            + "_:x owl:unionOf <http://example.org/C> . "
+            + "_:y rdf:type owl:Class . "
+            + "_:y owl:unionOf rdf:nil . "
+            + "_:z rdf:type owl:Class . "
+            + "_:z owl:intersectionOf <http://example.org/C> . "
+            + "_:w rdf:type owl:Class . "
+            + "_:w owl:intersectionOf rdf:nil . "
+            + "_:u rdf:type owl:Class . "
+            + "_:u owl:intersectionOf _:i1 . "
+            + "_:i1 rdf:first <http://example.org/C> . "
+            + "_:i1 rdf:rest _:i2 . "
+            + "_:i2 rdf:first <http://example.org/D> . "
+            + "_:i2 rdf:rest rdf:nil . "
+            + "_:o rdf:type owl:Class . "
+            + "_:o owl:oneOf rdf:nil . ";
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        IRI cIRI=IRI("C");
+        Identifier unionIRI=parser.string2AnonymousIndividual.get("x");
+        Identifier unionNilIRI=parser.string2AnonymousIndividual.get("y");
+        Identifier intersecionIRI=parser.string2AnonymousIndividual.get("z");
+        Identifier intersecionNilIRI=parser.string2AnonymousIndividual.get("w");
+        Identifier uIRI=parser.string2AnonymousIndividual.get("u");
+        Identifier vIRI=parser.string2AnonymousIndividual.get("v");
+        Identifier oneOfNilIRI=parser.string2AnonymousIndividual.get("o");
+        Clazz cClass=C(cIRI);
+        assertTrue(consumer.CE.get(cIRI)==cClass);
+        assertTrue(consumer.CE.get(unionIRI)==cClass);
+        assertTrue(consumer.CE.get(unionNilIRI)==Clazz.NOTHING);
+        assertTrue(consumer.CE.get(intersecionIRI)==cClass);
+        assertTrue(consumer.CE.get(intersecionNilIRI)==Clazz.THING);
+        assertTrue(consumer.CE.get(uIRI)==ObjectIntersectionOf.create(C("C"), C("D")));
+        assertTrue(consumer.CE.get(vIRI)==ObjectUnionOf.create(C("C"), C("D")));
+        assertTrue(consumer.CE.get(oneOfNilIRI)==Clazz.NOTHING);
+        assertNoTriplesLeft(consumer);
+    }
     public void testDataMaxQualifiedCardinality() throws Exception {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/r> ."

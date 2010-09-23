@@ -43,20 +43,16 @@ public class TestPropertyParsing extends AbstractTest {
     }
     public void testInverseOfInverse() throws Exception {
         String s="<http://example.org/r> a owl:ObjectProperty ."
-            + "_:x owl:inverseOf _:y . "
-            + "_:y owl:inverseOf <http://example.org/r> . ";
+            + "_:x owl:inverseOf <http://example.org/r> . ";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
         IRI riri=IRI("r");
         ObjectProperty r=OP("r");
         ObjectPropertyExpression invr=IOP("r");
-        ObjectPropertyExpression invinvr=ObjectInverseOf.create(invr);
         Identifier xnode=parser.string2AnonymousIndividual.get("x");
-        Identifier ynode=parser.string2AnonymousIndividual.get("y");
-        assertTrue(consumer.OPE.get(ynode)==invr);
         assertTrue(consumer.OPE.get(riri)==r);
-        assertTrue(consumer.OPE.get(xnode)==invinvr);
+        assertTrue(consumer.OPE.get(xnode)==invr);
         assertNoTriplesLeft(consumer);
     }
 }

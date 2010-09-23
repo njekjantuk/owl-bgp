@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -122,6 +123,9 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
     }
     public static ObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2) {
         return create(ope,individual1,individual2,new HashSet<Annotation>());
+    }
+    public static ObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Annotation... annotations) {
+        return create(ope,individual1,individual2,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static ObjectPropertyAssertion create(ObjectPropertyExpression ope,Individual individual1,Individual individual2,Set<Annotation> annotations) {
         return s_interningManager.intern(new ObjectPropertyAssertion(ope,individual1,individual2,annotations));

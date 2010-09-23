@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class FunctionalObjectProperty extends AbstractAxiom implements ObjectPro
             buffer.append(m_ope.toTurtleString(prefixes, subject));
         } else 
             subject=(Atomic)m_ope;
-        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_FUNCTIONAL_OBJECT_PROPERTY, m_annotations));
+        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_FUNCTIONAL_PROPERTY, m_annotations));
         return buffer.toString();
     }
     protected Object readResolve() {
@@ -100,6 +101,9 @@ public class FunctionalObjectProperty extends AbstractAxiom implements ObjectPro
     }
     public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression) {
         return create(objectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Annotation... annotations) {
+        return create(objectPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static FunctionalObjectProperty create(ObjectPropertyExpression objectPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new FunctionalObjectProperty(objectPropertyExpression,annotations));

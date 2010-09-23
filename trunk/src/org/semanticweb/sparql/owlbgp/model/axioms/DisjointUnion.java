@@ -26,11 +26,12 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
 
     protected static InterningManager<DisjointUnion> s_interningManager=new InterningManager<DisjointUnion>() {
         protected boolean equal(DisjointUnion object1,DisjointUnion object2) {
-            if (object1.m_classExpressions.size()!=object2.m_classExpressions.size()
-                    ||object1.m_annotations.size()!=object2.m_annotations.size())
+            if (object1.m_class!=object2.m_class
+                    || object1.m_classExpressions.size()!=object2.m_classExpressions.size()
+                    || object1.m_annotations.size()!=object2.m_annotations.size())
                 return false;
-            for (ClassExpression equiv : object1.m_classExpressions) {
-                if (!contains(equiv, object2.m_classExpressions))
+            for (ClassExpression exp : object1.m_classExpressions) {
+                if (!contains(exp, object2.m_classExpressions))
                     return false;
             } 
             for (Annotation anno : object1.m_annotations) {
@@ -40,8 +41,8 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
             return true;
         }
         protected boolean contains(ClassExpression classExpression,Set<ClassExpression> classExpressions) {
-            for (ClassExpression equiv: classExpressions)
-                if (equiv==classExpression)
+            for (ClassExpression exp : classExpressions)
+                if (exp==classExpression)
                     return true;
             return false;
         }
@@ -52,9 +53,9 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
             return false;
         }
         protected int getHashCode(DisjointUnion object) {
-            int hashCode=0;
-            for (ClassExpression equiv : object.m_classExpressions)
-                hashCode+=equiv.hashCode();
+            int hashCode=1113+object.m_class.hashCode();
+            for (ClassExpression exp : object.m_classExpressions)
+                hashCode+=exp.hashCode();
             for (Annotation anno : object.m_annotations)
                 hashCode+=anno.hashCode();
             return hashCode;

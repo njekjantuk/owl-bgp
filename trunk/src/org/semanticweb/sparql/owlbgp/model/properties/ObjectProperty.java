@@ -92,6 +92,6 @@ public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectP
         return this;
     }
     public Identifier getIdentifier() {
-        return null;
+        return m_iri;
     }
 }

@@ -34,7 +34,21 @@ public class Annotation extends AbstractExtendedOWLObject {
 
     protected static InterningManager<Annotation> s_interningManager=new InterningManager<Annotation>() {
         protected boolean equal(Annotation object1,Annotation object2) {
-            return object1.m_annotationProperty==object2.m_annotationProperty && object1.m_annotationValue==object2.m_annotationValue;
+            if (object1.m_annotationProperty!=object2.m_annotationProperty 
+                    || object1.m_annotationValue!=object2.m_annotationValue
+                    || object1.m_annotations.size()!=object2.m_annotations.size())
+                return false;
+            for (Annotation anno : object1.m_annotations) {
+                if (!contains(anno, object2.m_annotations))
+                    return false;
+            } 
+            return true;
+        }
+        protected boolean contains(Annotation annotation,Set<Annotation> annotations) {
+            for (Annotation anno : annotations)
+                if (anno==annotation)
+                    return true;
+            return false;
         }
         protected int getHashCode(Annotation object) {
             return 7*object.m_annotationProperty.hashCode()+13*object.m_annotationValue.hashCode();
@@ -116,10 +130,10 @@ public class Annotation extends AbstractExtendedOWLObject {
         return s_interningManager.intern(this);
     }
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue) {
-        return Annotation.create(annotationProperty,annotationValue,new HashSet<Annotation>());
+        return create(annotationProperty,annotationValue,new HashSet<Annotation>());
     }
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Annotation... annotations) {
-        return create(annotationProperty,annotationValue,annotations!=null?new HashSet<Annotation>(Arrays.asList(annotations)):new HashSet<Annotation>());
+        return create(annotationProperty,annotationValue,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static Annotation create(AnnotationPropertyExpression annotationProperty,AnnotationValue annotationValue,Set<Annotation> annotations) {
         return s_interningManager.intern(new Annotation(annotationProperty,annotationValue,annotations));

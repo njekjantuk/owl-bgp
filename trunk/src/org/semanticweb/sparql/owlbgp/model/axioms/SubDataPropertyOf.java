@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -92,7 +93,7 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_subdpe, Vocabulary.OWL_SUB_DATA_PROPERTY_OF, (Atomic)m_superdpe, m_annotations);
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_subdpe, Vocabulary.RDFS_SUB_PROPERTY_OF, (Atomic)m_superdpe, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -100,8 +101,11 @@ public class SubDataPropertyOf extends AbstractAxiom implements DataPropertyAxio
     public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression) {
         return create(subDataPropertyExpression,superDataPropertyExpression,new HashSet<Annotation>());
     }
-    public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression,Set<Annotation> annotation) {
-        return s_interningManager.intern(new SubDataPropertyOf(subDataPropertyExpression,superDataPropertyExpression,annotation));
+    public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression,Annotation... annotations) {
+        return create(subDataPropertyExpression,superDataPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static SubDataPropertyOf create(DataPropertyExpression subDataPropertyExpression, DataPropertyExpression superDataPropertyExpression,Set<Annotation> annotations) {
+        return s_interningManager.intern(new SubDataPropertyOf(subDataPropertyExpression,superDataPropertyExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

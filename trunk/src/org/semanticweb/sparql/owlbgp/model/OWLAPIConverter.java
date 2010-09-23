@@ -2,6 +2,7 @@ package org.semanticweb.sparql.owlbgp.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -356,7 +357,12 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLDisjointObjectPropertiesAxiom(opes,getAnnotations(axiom));
     }
     public OWLObject visit(InverseObjectProperties axiom) {
-        return m_dataFactory.getOWLInverseObjectPropertiesAxiom((OWLObjectPropertyExpression)axiom.getObjectPropertyExpression().accept(this),(OWLObjectPropertyExpression)axiom.getInverseObjectPropertyExpression().accept(this),getAnnotations(axiom));
+        Set<ObjectPropertyExpression> opes=axiom.getObjectPropertyExpressions();
+        assert opes.size()==2;
+        Iterator<ObjectPropertyExpression> it=opes.iterator();
+        ObjectPropertyExpression ope1=it.next();
+        ObjectPropertyExpression ope2=it.next();
+        return m_dataFactory.getOWLInverseObjectPropertiesAxiom((OWLObjectPropertyExpression)ope1.accept(this),(OWLObjectPropertyExpression)ope2.accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(ObjectPropertyDomain axiom) {
         return m_dataFactory.getOWLObjectPropertyDomainAxiom((OWLObjectPropertyExpression)axiom.getObjectPropertyExpression().accept(this),(OWLClassExpression)axiom.getDomain().accept(this),getAnnotations(axiom));

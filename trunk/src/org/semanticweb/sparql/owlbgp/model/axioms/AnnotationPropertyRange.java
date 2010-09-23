@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
@@ -67,17 +69,17 @@ public class AnnotationPropertyRange extends AbstractAxiom implements ObjectProp
     };
     
     protected final AnnotationPropertyExpression m_annotationPropertyExpression;
-    protected final IRI m_range;
+    protected final Identifier m_range;
    
-    protected AnnotationPropertyRange(AnnotationPropertyExpression ope,IRI classExpression,Set<Annotation> annotations) {
+    protected AnnotationPropertyRange(AnnotationPropertyExpression ape,Identifier range,Set<Annotation> annotations) {
         super(annotations);
-        m_annotationPropertyExpression=ope;
-        m_range=classExpression;
+        m_annotationPropertyExpression=ape;
+        m_range=range;
     }
     public AnnotationPropertyExpression getAnnotationPropertyExpression() {
         return m_annotationPropertyExpression;
     }
-    public IRI getRange() {
+    public Identifier getRange() {
         return m_range;
     }
     @Override
@@ -98,11 +100,13 @@ public class AnnotationPropertyRange extends AbstractAxiom implements ObjectProp
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static AnnotationPropertyRange create(AnnotationPropertyExpression annotationPropertyExpression,IRI iri) {
-        return create(annotationPropertyExpression,iri,new HashSet<Annotation>());
+    public static AnnotationPropertyRange create(AnnotationPropertyExpression annotationPropertyExpression,Identifier range,Annotation... annotations) {
+        return create(annotationPropertyExpression,range,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
-    public static AnnotationPropertyRange create(AnnotationPropertyExpression annotationPropertyExpression,IRI iri,Set<Annotation> annotations) {
-        return s_interningManager.intern(new AnnotationPropertyRange(annotationPropertyExpression,iri,annotations));
+    public static AnnotationPropertyRange create(AnnotationPropertyExpression annotationPropertyExpression,Identifier range,Set<Annotation> annotations) {
+        if (range instanceof AnonymousIndividual)
+            throw new IllegalArgumentException("Error: The range of an annotation property range axiom cannot be anonymous, but here we have: "+range);
+        return s_interningManager.intern(new AnnotationPropertyRange(annotationPropertyExpression,range,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

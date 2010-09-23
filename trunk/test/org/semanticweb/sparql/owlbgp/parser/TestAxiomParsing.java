@@ -1,27 +1,49 @@
 package org.semanticweb.sparql.owlbgp.parser;
 
 import java.io.StringReader;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.AbstractTest;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
+import org.semanticweb.sparql.owlbgp.model.AnnotationSubject;
+import org.semanticweb.sparql.owlbgp.model.AnnotationValue;
+import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.AsymmetricObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.DatatypeDefinition;
 import org.semanticweb.sparql.owlbgp.model.axioms.Declaration;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointDataProperties;
 import org.semanticweb.sparql.owlbgp.model.axioms.DisjointObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointUnion;
 import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentDataProperties;
 import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalDataProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.FunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.HasKey;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.InverseObjectProperties;
+import org.semanticweb.sparql.owlbgp.model.axioms.IrreflexiveObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.ReflexiveObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.SameIndividual;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubDataPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.axioms.SymmetricObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.axioms.TransitiveObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.DataAllValuesFrom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.DataExactCardinality;
@@ -35,16 +57,589 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectSomeValuesFrom
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectUnionOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataComplementOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataIntersectionOf;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DataOneOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataUnionOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction;
 import org.semanticweb.sparql.owlbgp.model.dataranges.FacetRestriction.OWL2_FACET;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
+import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 
 public class TestAxiomParsing extends AbstractTest {
     public static final String LB = System.getProperty("line.separator") ;
 
+    public void testDatatypeDefinition() throws Exception {
+        Declaration dt1=Declaration.create(DT("<http://example.org/dt1>"));
+        Declaration dt2=Declaration.create(DT("<http://example.org/dt2>"));
+        Declaration dt3=Declaration.create(DT("<http://example.org/dt3>"));
+        Axiom ax1=DatatypeDefinition.create(DT("<http://example.org/dt1>"),DataIntersectionOf.create(DT("xsd:int"), DataComplementOf.create(DT("xsd:string"))));
+        Axiom ax2=DatatypeDefinition.create(
+                DT("<http://example.org/dt2>"),
+                DataComplementOf.create(
+                        DataUnionOf.create(DT("xsd:int"), DataComplementOf.create(DT("xsd:string")))),
+                        ANN(AP("rdfs:label"), TL("EFanno")));
+        Axiom ax3=DatatypeDefinition.create(
+                DT("<http://example.org/dt2>"),
+                DataComplementOf.create(
+                        DataIntersectionOf.create(DT("xsd:int"), DataOneOf.create(TL("lit1"), TL("lit2")))),
+                        ANN(AP("rdfs:label"), TL("EFanno"), ANN(AP("rdfs:label"), TL("GHannoAnno"))));
+        String s=dt1.toTurtleString()+dt2.toTurtleString()+dt3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(dt1));
+        assertTrue(consumer.getAxioms().remove(dt2));
+        assertTrue(consumer.getAxioms().remove(dt3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testTransitiveObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=TransitiveObjectProperty.create(OP("op1"));
+        Axiom ax2=TransitiveObjectProperty.create(IOP("op2"));
+        Axiom ax3=TransitiveObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=TransitiveObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=TransitiveObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=TransitiveObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testAsymmetricObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=AsymmetricObjectProperty.create(OP("op1"));
+        Axiom ax2=AsymmetricObjectProperty.create(IOP("op2"));
+        Axiom ax3=AsymmetricObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=AsymmetricObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=AsymmetricObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=AsymmetricObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testSymmetricObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=SymmetricObjectProperty.create(OP("op1"));
+        Axiom ax2=SymmetricObjectProperty.create(IOP("op2"));
+        Axiom ax3=SymmetricObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=SymmetricObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=SymmetricObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=SymmetricObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testIrreflexiveObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=IrreflexiveObjectProperty.create(OP("op1"));
+        Axiom ax2=IrreflexiveObjectProperty.create(IOP("op2"));
+        Axiom ax3=IrreflexiveObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=IrreflexiveObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=IrreflexiveObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=IrreflexiveObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testReflexiveObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=ReflexiveObjectProperty.create(OP("op1"));
+        Axiom ax2=ReflexiveObjectProperty.create(IOP("op2"));
+        Axiom ax3=ReflexiveObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=ReflexiveObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=ReflexiveObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=ReflexiveObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testInverseFunctionalObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=InverseFunctionalObjectProperty.create(OP("op1"));
+        Axiom ax2=InverseFunctionalObjectProperty.create(IOP("op2"));
+        Axiom ax3=InverseFunctionalObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=InverseFunctionalObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=InverseFunctionalObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=InverseFunctionalObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testFunctionalDataProp() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Declaration dp4=Declaration.create(DP("dp4"));
+        Axiom ax1=FunctionalDataProperty.create(DP("dp1"));
+        Axiom ax2=FunctionalDataProperty.create(DP("dp2"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax3=FunctionalDataProperty.create(DP("dp3"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax4=FunctionalDataProperty.create(DP("dp4"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()+dp4.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()+ax4.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(dp4));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testFunctionalObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration op4=Declaration.create(OP("op4"));
+        Declaration op5=Declaration.create(OP("op5"));
+        Declaration op6=Declaration.create(OP("op6"));
+        Axiom ax1=FunctionalObjectProperty.create(OP("op1"));
+        Axiom ax2=FunctionalObjectProperty.create(IOP("op2"));
+        Axiom ax3=FunctionalObjectProperty.create(OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax4=FunctionalObjectProperty.create(IOP("op4"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax5=FunctionalObjectProperty.create(IOP("op5"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax6=FunctionalObjectProperty.create(OP("op6"),  
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()+op4.toTurtleString()+op5.toTurtleString()+op6.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString()
+            +ax4.toTurtleString()+ax5.toTurtleString()+ax6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(ax6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(op4));
+        assertTrue(consumer.getAxioms().remove(op5));
+        assertTrue(consumer.getAxioms().remove(op6));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testInvObjPropOf() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom sop1=InverseObjectProperties.create(OP("op1"), OP("op2"));
+        Axiom sop2=InverseObjectProperties.create(IOP("op2"), OP("op3"));
+        Axiom sop2a=InverseObjectProperties.create(OP("op2"), IOP("op3"));
+        Axiom sop3=InverseObjectProperties.create(OP("op1"), OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        
+        Axiom sop4=InverseObjectProperties.create(IOP("op1"), OP("op2"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom sop4a=InverseObjectProperties.create(OP("op1"), IOP("op2"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        
+        Axiom sop5=InverseObjectProperties.create(IOP("op1"), IOP("op2"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        
+        Axiom sop6=InverseObjectProperties.create(OP("op2"), IOP("op3"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom sop6a=InverseObjectProperties.create(IOP("op2"), OP("op3"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        
+//        System.out.println(sop1.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop2.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop2a.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop3.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop4.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop4a.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop5.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop6.toTurtleString());
+//        System.out.println("---------------");
+//        System.out.println(sop6a.toTurtleString());
+//        System.out.println("---------------");
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +sop1.toTurtleString()+sop2.toTurtleString()+sop3.toTurtleString()
+            +sop4.toTurtleString()+sop5.toTurtleString()
+            +sop6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+//        consumer.debug=true;
+        parser.parse();
+//        for (Axiom ax : consumer.getAxioms())
+//            System.out.println(ax);
+//        System.out.println("---------------");
+        assertTrue(consumer.getAxioms().remove(sop1));
+        assertTrue(consumer.getAxioms().remove(sop2) || consumer.getAxioms().remove(sop2a));
+        assertTrue(consumer.getAxioms().remove(sop3));
+        assertTrue(consumer.getAxioms().remove(sop4) || consumer.getAxioms().remove(sop4a));
+        assertTrue(consumer.getAxioms().remove(sop5));
+        assertTrue(consumer.getAxioms().remove(sop6) || consumer.getAxioms().remove(sop6a));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testEquivObjProp() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom sop1=EquivalentObjectProperties.create(OP("op1"), OP("op2"));
+        Axiom sop2=EquivalentObjectProperties.create(IOP("op2"), OP("op3"));
+        Axiom sop3=EquivalentObjectProperties.create(OP("op1"), OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom sop4=EquivalentObjectProperties.create(IOP("op1"), OP("op2"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom sop5=EquivalentObjectProperties.create(IOP("op1"), IOP("op2"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom sop6=EquivalentObjectProperties.create(OP("op2"), IOP("op3"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +sop1.toTurtleString()+sop2.toTurtleString()+sop3.toTurtleString()
+            +sop4.toTurtleString()+sop5.toTurtleString()+sop6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sop1));
+        assertTrue(consumer.getAxioms().remove(sop2));
+        assertTrue(consumer.getAxioms().remove(sop3));
+        assertTrue(consumer.getAxioms().remove(sop4));
+        assertTrue(consumer.getAxioms().remove(sop5));
+        assertTrue(consumer.getAxioms().remove(sop6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testSubChainObjPropOf() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom sop1=SubObjectPropertyOf.create(ObjectPropertyChain.create(OP("op1"), OP("op1")), OP("op2"));
+        Axiom sop2=SubObjectPropertyOf.create(ObjectPropertyChain.create(OP("op3"), OP("op3"), OP("op1"), IOP("op2"), IOP("op3")), OP("op3"));
+        Axiom sop3=SubObjectPropertyOf.create(ObjectPropertyChain.create(IOP("op1"), OP("op1")), OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom sop4=SubObjectPropertyOf.create(ObjectPropertyChain.create(OP("op1"), IOP("op1"), OP("op3")), OP("op2"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom sop5=SubObjectPropertyOf.create(ObjectPropertyChain.create(OP("op3"), OP("op3"), IOP("op3")), IOP("op2"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom sop6=SubObjectPropertyOf.create(ObjectPropertyChain.create(OP("op1"), OP("op2"), OP("op2")), IOP("op3"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +sop1.toTurtleString()+sop2.toTurtleString()+sop3.toTurtleString()
+            +sop4.toTurtleString()+sop5.toTurtleString()+sop6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sop1));
+        assertTrue(consumer.getAxioms().remove(sop2));
+        assertTrue(consumer.getAxioms().remove(sop3));
+        assertTrue(consumer.getAxioms().remove(sop4));
+        assertTrue(consumer.getAxioms().remove(sop5));
+        assertTrue(consumer.getAxioms().remove(sop6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testSubObjPropOf() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration op3=Declaration.create(OP("op3"));
+        Axiom sop1=SubObjectPropertyOf.create(OP("op1"), OP("op2"));
+        Axiom sop2=SubObjectPropertyOf.create(IOP("op2"), OP("op3"));
+        Axiom sop3=SubObjectPropertyOf.create(OP("op1"), OP("op3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom sop4=SubObjectPropertyOf.create(IOP("op1"), OP("op2"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom sop5=SubObjectPropertyOf.create(IOP("op1"), IOP("op2"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom sop6=SubObjectPropertyOf.create(OP("op2"), IOP("op3"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
+            +sop1.toTurtleString()+sop2.toTurtleString()+sop3.toTurtleString()
+            +sop4.toTurtleString()+sop5.toTurtleString()+sop6.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(sop1));
+        assertTrue(consumer.getAxioms().remove(sop2));
+        assertTrue(consumer.getAxioms().remove(sop3));
+        assertTrue(consumer.getAxioms().remove(sop4));
+        assertTrue(consumer.getAxioms().remove(sop5));
+        assertTrue(consumer.getAxioms().remove(sop6));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testSubDataPropOf() throws Exception {
+        Declaration dp1=Declaration.create(DP("dp1"));
+        Declaration dp2=Declaration.create(DP("dp2"));
+        Declaration dp3=Declaration.create(DP("dp3"));
+        Axiom ax1=SubDataPropertyOf.create(DP("dp1"), DP("dp2"));
+        Axiom ax2=SubDataPropertyOf.create(DP("dp1"), DP("dp3"), ANN(AP("rdfs:label"), TL("Anno"))); 
+        Axiom ax3=SubDataPropertyOf.create(DP("dp2"), DP("dp1"), ANN(AP("rdfs:label"), TL("Anno")), ANN(AP("rdfs:comment"), TL("anno2")));
+        Axiom ax4=SubDataPropertyOf.create(DP("dp2"), DP("dp2"), ANN(AP("rdfs:label"), TL("Anno"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        Axiom ax5=SubDataPropertyOf.create(DP("dp3"), DP("dp2"), 
+                ANN(AP("rdfs:label"), TL("Anno")), 
+                ANN(AP("rdfs:comment"), TL("anno2"), ANN(AP("rdfs:label"), TL("AnnoAnno"))));
+        String str=dp1.toTurtleString()+dp2.toTurtleString()+dp3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()
+            +ax3.toTurtleString()+ax4.toTurtleString()+ax5.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(ax4));
+        assertTrue(consumer.getAxioms().remove(ax5));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDisjointUnionOfClasses() throws Exception {
+        Declaration c1=Declaration.create(C("C1"));
+        Declaration d1=Declaration.create(C("D1"));
+        Declaration e1=Declaration.create(C("E1"));
+        Declaration f1=Declaration.create(C("F1"));
+        Declaration op1=Declaration.create(OP("op1"));
+        Axiom ax1a=DisjointUnion.create(C("C1"), ObjectSomeValuesFrom.create(OP("op1"), ObjectIntersectionOf.create(C("D1"), C("E1"))), C("F1"));
+        Axiom ax1b=DisjointUnion.create(C("C1"), C("E1"), ObjectSomeValuesFrom.create(OP("op1"), ObjectIntersectionOf.create(C("D1"), C("E1"))), C("F1"));
+        Annotation ann=ANN(AP("rdfs:label"), TL("anno"));
+        Annotation annAnn=ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno")));
+        Set<ClassExpression> classes=new HashSet<ClassExpression>();
+        classes.add(ObjectSomeValuesFrom.create(OP("op1"), ObjectIntersectionOf.create(C("D1"), C("E1"))));
+        classes.add(C("F1"));
+        Axiom ax2a=DisjointUnion.create(C("C1"), classes, Collections.singleton(ann));
+        Axiom ax2b=DisjointUnion.create(C("E1"), classes, Collections.singleton(ann));
+        Axiom ax3a=DisjointUnion.create(C("C1"), classes, Collections.singleton(annAnn));
+        Axiom ax3b=DisjointUnion.create(C("E1"), classes, Collections.singleton(annAnn));
+        String s=c1.toTurtleString()+d1.toTurtleString()+e1.toTurtleString()+f1.toTurtleString()+op1.toTurtleString()
+            +ax1a.toTurtleString()+ax1b.toTurtleString()+ax2a.toTurtleString()+ax2b.toTurtleString()+ax3a.toTurtleString()+ax3b.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1a));
+        assertTrue(consumer.getAxioms().remove(ax1b));
+        assertTrue(consumer.getAxioms().remove(ax2a));
+        assertTrue(consumer.getAxioms().remove(ax2b));
+        assertTrue(consumer.getAxioms().remove(ax3a));
+        assertTrue(consumer.getAxioms().remove(ax3b));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(d1));
+        assertTrue(consumer.getAxioms().remove(e1));
+        assertTrue(consumer.getAxioms().remove(f1));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testHasKey2() throws Exception {
+        Declaration c=Declaration.create(C("C"));
+        Declaration d=Declaration.create(C("D"));
+        ClassExpression cAndD=ObjectIntersectionOf.create(C("C"), C("D"));
+        Declaration op=Declaration.create(OP("op"));
+        Declaration dp=Declaration.create(DP("dp"));
+        Axiom hasKey=HasKey.create(cAndD, OP("op"), DP("dp"));
+        Set<PropertyExpression> props=new HashSet<PropertyExpression>();
+        props.add(DP("dp"));
+        Axiom hasKeyAnn=HasKey.create((ClassExpression)ObjectUnionOf.create(C("C"), C("D")),props,Collections.singleton(ANN(AP("rdfs:label"), TL("C or D anno"))));
+        props=new HashSet<PropertyExpression>();
+        props.add(DP("dp"));
+        props.add(OP("op"));
+        Axiom hasKeyAnnAnn=HasKey.create((ClassExpression)ObjectComplementOf.create(C("C")),props,
+                Collections.singleton(ANN(AP("rdfs:comment"), TL("GHAanno"), ANN(AP("rdfs:label"), TL("GHannoAnno")))));
+        String s=c.toTurtleString()+d.toTurtleString()+op.toTurtleString()+dp.toTurtleString()
+            +hasKey.toTurtleString()+hasKeyAnn.toTurtleString()+hasKeyAnnAnn.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(hasKey));
+        assertTrue(consumer.getAxioms().remove(hasKeyAnn));
+        assertTrue(consumer.getAxioms().remove(hasKeyAnnAnn));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(d));
+        assertTrue(consumer.getAxioms().remove(op));
+        assertTrue(consumer.getAxioms().remove(dp));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testHasKey() throws Exception {
+        Declaration c=Declaration.create(C("C"));
+        Declaration op=Declaration.create(OP("op"));
+        Axiom hasKey=HasKey.create(C("C"), OP("op"));
+        String s=c.toTurtleString()+op.toTurtleString()
+            +hasKey.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(hasKey));
+        assertTrue(consumer.getAxioms().remove(c));
+        assertTrue(consumer.getAxioms().remove(op));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
     public void testDataPropertyRangeComplex() throws Exception {
         Declaration c=Declaration.create(DT("C"));
         Declaration d=Declaration.create(DT("D"));
@@ -119,7 +714,7 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration f=Declaration.create(C("F"));
         Declaration s=Declaration.create(OP("s"));
         Axiom scoa=ObjectPropertyRange.create(OP("s"), 
-                ObjectAllValuesFrom.create(IOP(IOP("s")), ObjectIntersectionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
+                ObjectAllValuesFrom.create(IOP("s"), ObjectIntersectionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
                 ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration t=Declaration.create(DP("t"));
         Axiom scoaa=ObjectPropertyRange.create(OP("r"),
@@ -248,7 +843,7 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration f=Declaration.create(C("F"));
         Declaration s=Declaration.create(OP("s"));
         Axiom scoa=ObjectPropertyDomain.create(OP("s"), 
-                ObjectAllValuesFrom.create(IOP(IOP("s")), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
+                ObjectAllValuesFrom.create(IOP("s"), ObjectUnionOf.create(C("C"), ObjectIntersectionOf.create(C("E"),C("F")))),
                 ANN(AP("rdfs:label"), TL("EFanno")));
         Declaration t=Declaration.create(DP("t"));
         Axiom scoaa=ObjectPropertyDomain.create(OP("r"),
@@ -306,9 +901,9 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration op1=Declaration.create(OP("op1"));
         Declaration op2=Declaration.create(OP("op2"));
         Declaration op3=Declaration.create(OP("op3"));
-        Axiom spo=DisjointObjectProperties.create(IOP(IOP("op1")), OP("op2"));
+        Axiom spo=DisjointObjectProperties.create(IOP("op1"), OP("op2"));
         Axiom spoa=DisjointObjectProperties.create(OP("op1"),OP("op3"),ANN(AP("rdfs:label"), TL("opanno")));
-        Axiom spoaa=DisjointObjectProperties.create(OP("op2"),IOP(IOP("op3")),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
+        Axiom spoaa=DisjointObjectProperties.create(OP("op2"),IOP("op3"),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
         String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
             +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
         OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
@@ -369,9 +964,9 @@ public class TestAxiomParsing extends AbstractTest {
         Declaration op1=Declaration.create(OP("op1"));
         Declaration op2=Declaration.create(OP("op2"));
         Declaration op3=Declaration.create(OP("op3"));
-        Axiom spo=EquivalentObjectProperties.create(IOP(IOP("op1")), OP("op2"));
+        Axiom spo=EquivalentObjectProperties.create(IOP("op1"), OP("op2"));
         Axiom spoa=EquivalentObjectProperties.create(OP("op1"),OP("op3"),ANN(AP("rdfs:label"), TL("opanno")));
-        Axiom spoaa=EquivalentObjectProperties.create(OP("op2"),IOP(IOP("op3")),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
+        Axiom spoaa=EquivalentObjectProperties.create(OP("op2"),IOP("op3"),ANN(AP("rdfs:comment"), TL("opAanno"), ANN(AP("rdfs:label"), TL("opannoAnno"))));
         String str=op1.toTurtleString()+op2.toTurtleString()+op3.toTurtleString()
             +spo.toTurtleString()+spoa.toTurtleString()+spoaa.toTurtleString();
         OWLBGPParser parser=new OWLBGPParser(new StringReader(str));
@@ -574,6 +1169,134 @@ public class TestAxiomParsing extends AbstractTest {
         assertTrue(consumer.getAxioms().remove(a3));
         assertTrue(consumer.getAxioms().remove(b3));
         assertTrue(consumer.getAxioms().remove(r3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testClassAssertion() throws Exception {
+        Declaration c1=Declaration.create(C("C1"));
+        Declaration b1=Declaration.create(NI("b1"));
+        Axiom ax1=ClassAssertion.create(C("C1"),NI("b1"));
+        Declaration c2=Declaration.create(C("C2"));
+        Declaration b2=Declaration.create(NI("b2"));
+        Axiom ax2=ClassAssertion.create(C("C2"),NI("b2"), ANN(AP("rdfs:label"), TL("rst2anno")));
+        Declaration c3=Declaration.create(C("C3"));
+        Declaration b3=Declaration.create(NI("b3"));
+        Axiom ax3=ClassAssertion.create(C("C3"),NI("b3"), ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
+        String s=c1.toTurtleString()+b1.toTurtleString()
+            +c2.toTurtleString()+b2.toTurtleString()
+            +c3.toTurtleString()+b3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(c1));
+        assertTrue(consumer.getAxioms().remove(b1));
+        assertTrue(consumer.getAxioms().remove(c2));
+        assertTrue(consumer.getAxioms().remove(b2));
+        assertTrue(consumer.getAxioms().remove(c3));
+        assertTrue(consumer.getAxioms().remove(b3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testObjectPropertyAssertion() throws Exception {
+        Declaration op1=Declaration.create(OP("op1"));
+        Declaration a1=Declaration.create(NI("a1"));
+        Declaration b1=Declaration.create(NI("b1"));
+        Axiom ax1=ObjectPropertyAssertion.create(OP("op1"),NI("a1"),NI("b1"));
+        Declaration op2=Declaration.create(OP("op2"));
+        Declaration a2=Declaration.create(NI("a2"));
+        Declaration b2=Declaration.create(NI("b2"));
+        Axiom ax2=ObjectPropertyAssertion.create(OP("op2"),NI("a2"),NI("b2"),ANN(AP("rdfs:label"), TL("rst2anno")));
+        Declaration op3=Declaration.create(OP("op3"));
+        Declaration a3=Declaration.create(NI("a3"));
+        Declaration b3=Declaration.create(NI("b3"));
+        Axiom ax3=ObjectPropertyAssertion.create(OP("op3"),NI("a3"),NI("b3"),ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
+        String s=op1.toTurtleString()+a1.toTurtleString()+b1.toTurtleString()
+            +op2.toTurtleString()+a2.toTurtleString()+b2.toTurtleString()
+            +op3.toTurtleString()+a3.toTurtleString()+b3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(op1));
+        assertTrue(consumer.getAxioms().remove(a1));
+        assertTrue(consumer.getAxioms().remove(b1));
+        assertTrue(consumer.getAxioms().remove(op2));
+        assertTrue(consumer.getAxioms().remove(a2));
+        assertTrue(consumer.getAxioms().remove(b2));
+        assertTrue(consumer.getAxioms().remove(op3));
+        assertTrue(consumer.getAxioms().remove(a3));
+        assertTrue(consumer.getAxioms().remove(b3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testDataPropertyAssertion() throws Exception {
+        Declaration dp1=Declaration.create(DP("op1"));
+        Declaration a1=Declaration.create(NI("a1"));
+        Axiom ax1=DataPropertyAssertion.create(DP("op1"),NI("a1"),TL("b1"));
+        Declaration dp2=Declaration.create(DP("op2"));
+        Declaration a2=Declaration.create(NI("a2"));
+        Axiom ax2=DataPropertyAssertion.create(DP("op2"),NI("a2"),TL("b2"),ANN(AP("rdfs:label"), TL("rst2anno")));
+        Declaration dp3=Declaration.create(DP("op3"));
+        Declaration a3=Declaration.create(NI("a3"));
+        Axiom ax3=DataPropertyAssertion.create(DP("op3"),NI("a3"),TL("b3"),ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
+        String s=dp1.toTurtleString()+a1.toTurtleString()
+            +dp2.toTurtleString()+a2.toTurtleString()
+            +dp3.toTurtleString()+a3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(dp1));
+        assertTrue(consumer.getAxioms().remove(a1));
+        assertTrue(consumer.getAxioms().remove(dp2));
+        assertTrue(consumer.getAxioms().remove(a2));
+        assertTrue(consumer.getAxioms().remove(dp3));
+        assertTrue(consumer.getAxioms().remove(a3));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testSameAs() throws Exception {
+        Declaration a1=Declaration.create(NI("a1"));
+        Declaration b1=Declaration.create(NI("b1"));
+        Axiom ax1=SameIndividual.create(NI("a1"),NI("b1"));
+        Declaration a2=Declaration.create(NI("a2"));
+        Declaration b2=Declaration.create(NI("b2"));
+        Set<Individual> inds=new HashSet<Individual>();
+        inds.add(NI("a2"));
+        inds.add(NI("b2"));
+        Axiom ax2=SameIndividual.create(inds, ANN(AP("rdfs:label"), TL("rst2anno")));
+        Declaration a3=Declaration.create(NI("a3"));
+        Declaration b3=Declaration.create(NI("b3"));
+        Set<Individual> inds2=new HashSet<Individual>();
+        inds2.add(NI("a3"));
+        inds2.add(NI("b3"));
+        Axiom ax3=SameIndividual.create(inds2, ANN(AP("rdfs:comment"), TL("rst3Aanno"), ANN(AP("rdfs:label"), TL("rs3annoAnno"))));
+        String s=a1.toTurtleString()+b1.toTurtleString()
+            +a2.toTurtleString()+b2.toTurtleString()
+            +a3.toTurtleString()+b3.toTurtleString()
+            +ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertTrue(consumer.getAxioms().remove(ax1));
+        assertTrue(consumer.getAxioms().remove(ax2));
+        assertTrue(consumer.getAxioms().remove(ax3));
+        assertTrue(consumer.getAxioms().remove(a1));
+        assertTrue(consumer.getAxioms().remove(b1));
+        assertTrue(consumer.getAxioms().remove(a2));
+        assertTrue(consumer.getAxioms().remove(b2));
+        assertTrue(consumer.getAxioms().remove(a3));
+        assertTrue(consumer.getAxioms().remove(b3));
         assertTrue(consumer.getAxioms().isEmpty());
         assertNoTriplesLeft(consumer);
     }
@@ -875,6 +1598,18 @@ public class TestAxiomParsing extends AbstractTest {
         assertTrue(consumer.getAxioms().remove(ap));
         assertTrue(consumer.getAxioms().remove(ni));
         assertTrue(consumer.getAxioms().remove(dt));
+        assertTrue(consumer.getAxioms().isEmpty());
+        assertNoTriplesLeft(consumer);
+    }
+    public void testAnnotationAssertion() throws Exception {
+        String s=IRI("CDepr").toString()+" rdf:type owl:DeprecatedClass . "+IRI("PropDepr").toString()+" rdf:type owl:DeprecatedProperty . ";
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        AnnotationAssertion assertion=AnnotationAssertion.create((AnnotationPropertyExpression)AP("owl:deprecated"), (AnnotationSubject)IRI("CDepr"), (AnnotationValue)TL("true", null, IRI("xsd:boolean")));
+        AnnotationAssertion assertion2=AnnotationAssertion.create((AnnotationPropertyExpression)AP("owl:deprecated"), (AnnotationSubject)IRI("PropDepr"), (AnnotationValue)TL("true", null, IRI("xsd:boolean")));
+        assertTrue(consumer.getAxioms().remove(assertion));
+        assertTrue(consumer.getAxioms().remove(assertion2));
         assertTrue(consumer.getAxioms().isEmpty());
         assertNoTriplesLeft(consumer);
     }

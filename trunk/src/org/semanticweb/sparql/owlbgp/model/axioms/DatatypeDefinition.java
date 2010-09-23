@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -119,6 +120,12 @@ public class DatatypeDefinition extends AbstractAxiom {
     }
     public static DatatypeDefinition create(DatatypeVariable datatype,DataRange dataRange) {
         return create(datatype,dataRange,new HashSet<Annotation>());
+    }
+    public static DatatypeDefinition create(Datatype datatype,DataRange dataRange,Annotation... annotations) {
+        return create(datatype,dataRange,new HashSet<Annotation>(Arrays.asList(annotations)));
+    }
+    public static DatatypeDefinition create(DatatypeVariable datatype,DataRange dataRange,Annotation... annotations) {
+        return create(datatype,dataRange,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DatatypeDefinition create(Datatype datatype,DataRange dataRange,Set<Annotation> annotations) {
         return s_interningManager.intern(new DatatypeDefinition(datatype,dataRange,annotations));

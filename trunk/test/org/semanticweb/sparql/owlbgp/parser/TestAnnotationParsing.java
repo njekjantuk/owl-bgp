@@ -46,5 +46,6 @@ public class TestAnnotationParsing extends TestCase {
         assertTrue(consumer.ANN.get(anno1IRI).iterator().next()==anno1);
         assertTrue(consumer.ANN.get(anno2IRI).size()==1);
         assertTrue(consumer.ANN.get(anno2IRI).iterator().next()==anno2);
+        assertTrue(consumer.allTriplesConsumed());
     }
 }

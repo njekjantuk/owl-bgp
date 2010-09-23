@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
@@ -94,20 +96,47 @@ public class SubObjectPropertyOf extends AbstractAxiom implements ObjectProperty
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
         StringBuffer buffer=new StringBuffer();
-        Identifier subject;
-        if (m_subope instanceof Atomic) {
-            subject=(Atomic)m_subope;
+        if (m_subope instanceof ObjectPropertyChain) {
+            Identifier subject;
+            if (m_superope instanceof Atomic) {
+                subject=(Atomic)m_superope;
+            } else {
+                subject=AbstractExtendedOWLObject.getNextBlankNode();
+                buffer.append(m_superope.toTurtleString(prefixes, subject));
+            }
+            Identifier listMainNode=AbstractExtendedOWLObject.getNextBlankNode();
+            buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_PROPERTY_CHAIN_AXIOM, listMainNode, m_annotations));
+            ObjectPropertyChain chain=(ObjectPropertyChain)m_subope;
+            Identifier[] listNodes=new Identifier[chain.getObjectPropertyExpressions().size()];
+            ObjectPropertyExpression[] expressions=chain.getObjectPropertyExpressions().toArray(new ObjectPropertyExpression[0]);
+            for (int i=0;i<expressions.length;i++) {
+                if (expressions[i] instanceof Atomic)
+                    listNodes[i]=((Atomic)expressions[i]).getIdentifier();
+                else
+                    listNodes[i]=AbstractExtendedOWLObject.getNextBlankNode();
+            }
+            printSequence(buffer, prefixes, listMainNode, listNodes);
+            for (int i=0;i<expressions.length;i++) {
+                if (!(expressions[i] instanceof Atomic)) {
+                    buffer.append(expressions[i].toTurtleString(prefixes, listNodes[i]));
+                }
+            }
         } else {
-            subject=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(m_subope.toTurtleString(prefixes, subject));
+            Identifier subject;
+            if (m_subope instanceof Atomic) {
+                subject=(Atomic)m_subope;
+            } else {
+                subject=AbstractExtendedOWLObject.getNextBlankNode();
+                buffer.append(m_subope.toTurtleString(prefixes, subject));
+            }
+            Identifier object;
+            if (!(m_superope instanceof Atomic)) {
+                object=AbstractExtendedOWLObject.getNextBlankNode();
+                buffer.append(m_superope.toTurtleString(prefixes, object));
+            } else 
+                object=(Atomic)m_superope;
+            buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.RDFS_SUB_PROPERTY_OF, object, m_annotations));
         }
-        Identifier object;
-        if (!(m_superope instanceof Atomic)) {
-            object=AbstractExtendedOWLObject.getNextBlankNode();
-            buffer.append(m_superope.toTurtleString(prefixes, object));
-        } else 
-            object=(Atomic)m_superope;
-        buffer.append(writeSingleMainTripleAxiom(prefixes, subject, Vocabulary.OWL_SUB_OBJECT_PROPERTY_OF, object, m_annotations));
         return buffer.toString();
     }
     protected Object readResolve() {
@@ -115,6 +144,9 @@ public class SubObjectPropertyOf extends AbstractAxiom implements ObjectProperty
     }
     public static SubObjectPropertyOf create(ObjectPropertyExpression subObjectPropertyExpression, ObjectPropertyExpression superObjectPropertyExpression) {
         return create(subObjectPropertyExpression,superObjectPropertyExpression,new HashSet<Annotation>());
+    }
+    public static SubObjectPropertyOf create(ObjectPropertyExpression subObjectPropertyExpression, ObjectPropertyExpression superObjectPropertyExpression,Annotation... annotations) {
+        return create(subObjectPropertyExpression,superObjectPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static SubObjectPropertyOf create(ObjectPropertyExpression subObjectPropertyExpression, ObjectPropertyExpression superObjectPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new SubObjectPropertyOf(subObjectPropertyExpression,superObjectPropertyExpression,annotations));

@@ -17,7 +17,7 @@ public class TPDataOneOfHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         Set<Literal> literalSet=consumer.translateToLiteralSet(object);
-        if (literalSet!=null&&literalSet.size()>0)
+        if (literalSet!=null && literalSet.size()>0)
             consumer.mapDataRangeIdentifierToDataRange(subject, DataOneOf.create(literalSet));
         else {
             // TODO: error handling
