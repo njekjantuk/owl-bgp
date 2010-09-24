@@ -21,7 +21,7 @@ public abstract class AbstractAxiom extends AbstractExtendedOWLObject implements
     protected final Set<Annotation> m_annotations;
     
     protected AbstractAxiom(Set<Annotation> annotations) {
-        m_annotations=Collections.unmodifiableSet(annotations); //mutable
+        m_annotations=Collections.unmodifiableSet(annotations==null?new HashSet<Annotation>():annotations); //mutable
     }
     public Identifier getIdentifier() {
         return null;
@@ -41,7 +41,7 @@ public abstract class AbstractAxiom extends AbstractExtendedOWLObject implements
     protected void writeTurtleAnnoations(StringBuffer buffer,Prefixes prefixes, Identifier mainNode) {
         for (Annotation annotation : m_annotations) {
             buffer.append(annotation.toTurtleString(prefixes,mainNode));
-            buffer.append(LB);
+//            buffer.append(LB);
         }
     }
     protected String writeSingleMainTripleAxiom(Prefixes prefixes, Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {

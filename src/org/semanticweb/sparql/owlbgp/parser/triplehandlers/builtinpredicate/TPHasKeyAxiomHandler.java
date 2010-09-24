@@ -24,7 +24,7 @@ public class TPHasKeyAxiomHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         //T(CE) owl:hasKey T(SEQ OPE1 ... OPEm DPE1 ... DPEn ) .
-        ClassExpression cls=consumer.getClassExpressionForClassIdentifier(subject);
+        ClassExpression cls=consumer.getCE(subject);
         if (cls==null)
             throw new RuntimeException("Could not find  class expression for the subject in the triple "+subject+" "+Vocabulary.OWL_HAS_KEY+" "+object+". ");
         else {

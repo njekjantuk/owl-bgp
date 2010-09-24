@@ -11,6 +11,6 @@ public class ObjectPropertyExpressionListItemTranslator implements ListItemTrans
         this.consumer=consumer;
     }
     public ObjectPropertyExpression translate(Identifier iri) {
-        return consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(iri);
+        return consumer.getOPE(iri);
     }
 }

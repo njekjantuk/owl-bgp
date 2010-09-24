@@ -71,14 +71,14 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier vIRI=parser.string2AnonymousIndividual.get("v");
         Identifier oneOfNilIRI=parser.string2AnonymousIndividual.get("o");
         Clazz cClass=C(cIRI);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(unionIRI)==cClass);
-        assertTrue(consumer.CE.get(unionNilIRI)==Clazz.NOTHING);
-        assertTrue(consumer.CE.get(intersecionIRI)==cClass);
-        assertTrue(consumer.CE.get(intersecionNilIRI)==Clazz.THING);
-        assertTrue(consumer.CE.get(uIRI)==ObjectIntersectionOf.create(C("C"), C("D")));
-        assertTrue(consumer.CE.get(vIRI)==ObjectUnionOf.create(C("C"), C("D")));
-        assertTrue(consumer.CE.get(oneOfNilIRI)==Clazz.NOTHING);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(unionIRI)==cClass);
+        assertTrue(consumer.getCE(unionNilIRI)==Clazz.NOTHING);
+        assertTrue(consumer.getCE(intersecionIRI)==cClass);
+        assertTrue(consumer.getCE(intersecionNilIRI)==Clazz.THING);
+        assertTrue(consumer.getCE(uIRI)==ObjectIntersectionOf.create(C("C"), C("D")));
+        assertTrue(consumer.getCE(vIRI)==ObjectUnionOf.create(C("C"), C("D")));
+        assertTrue(consumer.getCE(oneOfNilIRI)==Clazz.NOTHING);
         assertNoTriplesLeft(consumer);
     }
     public void testDataMaxQualifiedCardinality() throws Exception {
@@ -95,7 +95,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=DataMaxCardinality.create(3,r,DT("xsd:integer"));
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testDataMinQualifiedCardinality() throws Exception {
@@ -112,7 +112,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=DataMinCardinality.create(3,r,DT("xsd:integer"));
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testDataExactQualifiedCardinality() throws Exception {
@@ -134,7 +134,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier drIRI=parser.string2AnonymousIndividual.get("dr");
         assertTrue(consumer.DPE.get(rIRI)==r);
         assertTrue(consumer.DR.get(drIRI)==dr);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectMaxQualifiedCardinality() throws Exception {
@@ -154,8 +154,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=ObjectMaxCardinality.create(3,r,c);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cIRI)==c);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cIRI)==c);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectMinQualifiedCardinality() throws Exception {
@@ -182,10 +182,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         Identifier conjIRI=parser.string2AnonymousIndividual.get("c");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cIRI)==c);
-        assertTrue(consumer.CE.get(dIRI)==d);
-        assertTrue(consumer.CE.get(conjIRI)==conj);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cIRI)==c);
+        assertTrue(consumer.getCE(dIRI)==d);
+        assertTrue(consumer.getCE(conjIRI)==conj);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectExactQualifiedCardinality() throws Exception {
@@ -205,8 +205,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=ObjectExactCardinality.create(3,r,c);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cIRI)==c);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cIRI)==c);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testDataMaxCardinality() throws Exception {
@@ -222,7 +222,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=DataMaxCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testDataMinCardinality() throws Exception {
@@ -238,7 +238,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=DataMinCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testDataExactCardinality() throws Exception {
@@ -254,7 +254,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=DataExactCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectMaxCardinality() throws Exception {
@@ -270,7 +270,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=ObjectMaxCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectMinCardinality() throws Exception {
@@ -286,7 +286,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=ObjectMinCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectExactCardinality() throws Exception {
@@ -302,7 +302,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cardi=ObjectExactCardinality.create(3,r);
         Identifier cardiIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(cardiIRI)==cardi);
+        assertTrue(consumer.getCE(cardiIRI)==cardi);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectHasSelf() throws Exception {
@@ -318,7 +318,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression hasSelf=ObjectHasSelf.create(r);
         Identifier hasSelfIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.OPE.get(rIRI)==r);
-        assertTrue(consumer.CE.get(hasSelfIRI)==hasSelf);
+        assertTrue(consumer.getCE(hasSelfIRI)==hasSelf);
         assertNoTriplesLeft(consumer);
     }
     public void testDataHasValue() throws Exception {
@@ -335,7 +335,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression hasValue=DataHasValue.create(dp, lit);
         Identifier hasValueIRI=parser.string2AnonymousIndividual.get("x");
         assertTrue(consumer.DPE.get(dpIri)==dp);
-        assertTrue(consumer.CE.get(hasValueIRI)==hasValue);
+        assertTrue(consumer.getCE(hasValueIRI)==hasValue);
         assertNoTriplesLeft(consumer);
     }
     public void testObjectHasValue() throws Exception {
@@ -353,7 +353,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier hasValueIRI=parser.string2AnonymousIndividual.get("x");
         Identifier invIRI=parser.string2AnonymousIndividual.get("inv");
         assertTrue(consumer.OPE.get(invIRI)==invr);
-        assertTrue(consumer.CE.get(hasValueIRI)==hasValue);
+        assertTrue(consumer.getCE(hasValueIRI)==hasValue);
         assertNoTriplesLeft(consumer);
     }
     public void testAllValuesFrom() throws Exception {
@@ -376,8 +376,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier invIRI=parser.string2AnonymousIndividual.get("inv");
         Identifier negIRI=parser.string2AnonymousIndividual.get("neg");
         assertTrue(consumer.OPE.get(invIRI)==invr);
-        assertTrue(consumer.CE.get(negIRI)==notC);
-        assertTrue(consumer.CE.get(someIRI)==some);
+        assertTrue(consumer.getCE(negIRI)==notC);
+        assertTrue(consumer.getCE(someIRI)==some);
         assertNoTriplesLeft(consumer);
     }
     public void testSomeValuesFrom() throws Exception {
@@ -391,7 +391,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         parser.parse();
         ClassExpression some=ObjectSomeValuesFrom.create(OP("r"), C("C"));
         Identifier someIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.CE.get(someIRI)==some);
+        assertTrue(consumer.getCE(someIRI)==some);
         assertNoTriplesLeft(consumer);
     }
     public void testOneOf() throws Exception {
@@ -402,7 +402,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         parser.parse();
         ClassExpression oneOf=ObjectOneOf.create(NamedIndividual.create("http://example.org/a"), NamedIndividual.create("http://example.org/b"), IndividualVariable.create("c"));
         Identifier oneOfIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.CE.get(oneOfIRI)==oneOf);
+        assertTrue(consumer.getCE(oneOfIRI)==oneOf);
         assertNoTriplesLeft(consumer);
     }
     public void testComplicatedComplement() throws Exception {
@@ -443,13 +443,13 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression intersection=ObjectIntersectionOf.create(cClass, dClass);
         ClassExpression union=ObjectUnionOf.create(intersection, classVarCE, eClass);
         ClassExpression complement=ObjectComplementOf.create(union);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(dIRI)==dClass);
-        assertTrue(consumer.CE.get(classVar)==classVarCE);
-        assertTrue(consumer.CE.get(intersectionIRI)==intersection);
-        assertTrue(consumer.CE.get(unionIRI)==union);
-        assertTrue(consumer.CE.get(complementIRI)==complement);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(dIRI)==dClass);
+        assertTrue(consumer.getCE(classVar)==classVarCE);
+        assertTrue(consumer.getCE(intersectionIRI)==intersection);
+        assertTrue(consumer.getCE(unionIRI)==union);
+        assertTrue(consumer.getCE(complementIRI)==complement);
         assertNoTriplesLeft(consumer);
     }
     public void testDoubleComplement() throws Exception {
@@ -467,9 +467,9 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression cClass=C(cIRI);
         ClassExpression complement1=ObjectComplementOf.create(cClass);
         ClassExpression complement2=ObjectComplementOf.create(complement1);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(complement2IRI)==complement1);
-        assertTrue(consumer.CE.get(complement1IRI)==complement2);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(complement2IRI)==complement1);
+        assertTrue(consumer.getCE(complement1IRI)==complement2);
         assertNoTriplesLeft(consumer);
     }
     public void testComplement() throws Exception {
@@ -483,8 +483,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier complementIRI=parser.string2AnonymousIndividual.get("x");
         ClassExpression cClass=C(cIRI);
         ClassExpression complement=ObjectComplementOf.create(cClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(complementIRI)==complement);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(complementIRI)==complement);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionIntersection() throws Exception {
@@ -522,12 +522,12 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression indVarCE=CV(classVar.toString());
         ClassExpression intersection=ObjectIntersectionOf.create(cClass, dClass);
         ClassExpression union=ObjectUnionOf.create(intersection, indVarCE, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(dIRI)==dClass);
-        assertTrue(consumer.CE.get(classVar)==indVarCE);
-        assertTrue(consumer.CE.get(intersectionIRI)==intersection);
-        assertTrue(consumer.CE.get(unionIRI)==union);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(dIRI)==dClass);
+        assertTrue(consumer.getCE(classVar)==indVarCE);
+        assertTrue(consumer.getCE(intersectionIRI)==intersection);
+        assertTrue(consumer.getCE(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOtherSyntax() throws Exception {
@@ -547,10 +547,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression dClass=CV(classVar.toString());
         ClassExpression eClass=C(eIRI);
         ClassExpression union=ObjectUnionOf.create(cClass, dClass, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(classVar)==dClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(unionIRI)==union);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(classVar)==dClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOneVarDisjunct() throws Exception {
@@ -565,8 +565,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier classVar=V("?class");
         ClassExpression dClass=CV(classVar.toString());
         Identifier unionIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.CE.get(classVar)==dClass);
-        assertTrue(consumer.CE.get(unionIRI)==dClass);
+        assertTrue(consumer.getCE(classVar)==dClass);
+        assertTrue(consumer.getCE(unionIRI)==dClass);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOneConjunct() throws Exception {
@@ -581,8 +581,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         IRI cIRI=IRI("C");
         Identifier unionIRI=parser.string2AnonymousIndividual.get("x");
         ClassExpression cClass=C(cIRI);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(unionIRI)==cClass);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(unionIRI)==cClass);
         assertNoTriplesLeft(consumer);
     }
     public void testUnion2() throws Exception {
@@ -608,10 +608,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression dClass=CV(indVar.toString());
         ClassExpression eClass=C(eIRI);
         ClassExpression union=ObjectUnionOf.create(cClass, dClass, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(indVar)==dClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(unionIRI)==union);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(indVar)==dClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnion() throws Exception {
@@ -637,10 +637,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         Clazz dClass=C(dIRI);
         Clazz eClass=C(eIRI);
         ClassExpression union=ObjectUnionOf.create(cClass, dClass, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(dIRI)==dClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(unionIRI)==union);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(dIRI)==dClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersectionOneVarConjunct() throws Exception {
@@ -655,8 +655,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         Identifier classVar=V("?class");
         ClassExpression dClass=CV(classVar.toString());
         Identifier intersectionIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.CE.get(classVar)==dClass);
-        assertTrue(consumer.CE.get(intersectionIRI)==dClass);
+        assertTrue(consumer.getCE(classVar)==dClass);
+        assertTrue(consumer.getCE(intersectionIRI)==dClass);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersectionOneConjunct() throws Exception {
@@ -671,8 +671,8 @@ public class TestClassExpressionParsing extends AbstractTest {
         IRI cIRI=IRI("C");
         Identifier intersectionIRI=parser.string2AnonymousIndividual.get("x");
         ClassExpression cClass=C(cIRI);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(intersectionIRI)==cClass);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(intersectionIRI)==cClass);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersection2() throws Exception {
@@ -698,10 +698,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         ClassExpression dClass=CV(classVar.toString());
         ClassExpression eClass=C(eIRI);
         ClassExpression intersection=ObjectIntersectionOf.create(cClass, dClass, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(classVar)==dClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(intersectionIRI)==intersection);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(classVar)==dClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(intersectionIRI)==intersection);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersection() throws Exception {
@@ -727,10 +727,10 @@ public class TestClassExpressionParsing extends AbstractTest {
         Clazz dClass=C(dIRI);
         Clazz eClass=C(eIRI);
         ClassExpression intersection=ObjectIntersectionOf.create(cClass, dClass, eClass);
-        assertTrue(consumer.CE.get(cIRI)==cClass);
-        assertTrue(consumer.CE.get(dIRI)==dClass);
-        assertTrue(consumer.CE.get(eIRI)==eClass);
-        assertTrue(consumer.CE.get(intersectionIRI)==intersection);
+        assertTrue(consumer.getCE(cIRI)==cClass);
+        assertTrue(consumer.getCE(dIRI)==dClass);
+        assertTrue(consumer.getCE(eIRI)==eClass);
+        assertTrue(consumer.getCE(intersectionIRI)==intersection);
         assertNoTriplesLeft(consumer);
     }
     public void testCustomClazz() throws Exception {
@@ -740,7 +740,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         parser.parse();
         IRI classIRI=IRI("class");
         Clazz clazz=C(classIRI);
-        assertTrue(consumer.CE.get(classIRI)==clazz);
+        assertTrue(consumer.getCE(classIRI)==clazz);
     }
     public void testClassVariable() throws Exception {
         String s="?c a owl:Class .";
@@ -749,6 +749,6 @@ public class TestClassExpressionParsing extends AbstractTest {
         parser.parse();
         Identifier classVar=V("?c");
         ClassExpression classExpression=CV("?c");
-        assertTrue(consumer.CE.get(classVar)==classExpression);
+        assertTrue(consumer.getCE(classVar)==classExpression);
     }
 }

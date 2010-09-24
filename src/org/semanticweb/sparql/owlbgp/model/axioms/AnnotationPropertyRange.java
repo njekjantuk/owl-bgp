@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
@@ -95,7 +96,7 @@ public class AnnotationPropertyRange extends AbstractAxiom implements ObjectProp
     }
     @Override
     public String toTurtleString(Prefixes prefixes, Identifier mainNode) {
-        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_annotationPropertyExpression, Vocabulary.RDFS_DOMAIN, m_range, m_annotations);
+        return writeSingleMainTripleAxiom(prefixes, (Atomic)m_annotationPropertyExpression, Vocabulary.RDFS_RANGE, m_range, m_annotations);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -110,6 +111,9 @@ public class AnnotationPropertyRange extends AbstractAxiom implements ObjectProp
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

@@ -29,8 +29,8 @@ public class NamedIndividualHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         if (consumer.isVariable(subject))
-            consumer.addAxiom(Declaration.create((IndividualVariable)consumer.getIndividualForIndividualIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((IndividualVariable)consumer.getIND(subject),annotations));
         else 
-            consumer.addAxiom(Declaration.create((NamedIndividual)consumer.getIndividualForIndividualIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((NamedIndividual)consumer.getIND(subject),annotations));
     }
 }

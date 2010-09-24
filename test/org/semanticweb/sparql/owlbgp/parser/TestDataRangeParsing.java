@@ -34,7 +34,7 @@ public class TestDataRangeParsing extends AbstractTest {
         facets.add(FacetRestriction.create(OWL2_FACET.MAX_INCLUSIVE, TL("5", "", Datatype.XSD_INT)));
         DataRange restriction=DatatypeRestriction.create(Datatype.XSD_INT,facets);
         Identifier restrictionIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.DR.get(restrictionIRI)==restriction);
+        assertTrue(consumer.getDR(restrictionIRI)==restriction);
         assertNoTriplesLeft(consumer);
     }
     public void testOneOf() throws Exception {
@@ -45,7 +45,7 @@ public class TestDataRangeParsing extends AbstractTest {
         parser.parse();
         DataRange oneOf=DataOneOf.create(TL("1", "", Datatype.XSD_INT), TL("abc", "", Datatype.RDF_PLAIN_LITERAL), TL("abc", "en", Datatype.RDF_PLAIN_LITERAL));
         Identifier oneOfIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.DR.get(oneOfIRI)==oneOf);
+        assertTrue(consumer.getDR(oneOfIRI)==oneOf);
         assertNoTriplesLeft(consumer);
     }
     public void testComplicatedComplement() throws Exception {
@@ -83,13 +83,13 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange intersection=DataIntersectionOf.create(intDT, shortDT);
         DataRange union=DataUnionOf.create(intersection, shortVarDT, byteDT);
         DataRange complement=DataComplementOf.create(union);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(shortIRI)==shortDT);
-        assertTrue(consumer.DR.get(shortVar)==shortVarDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==intersection);
-        assertTrue(consumer.DR.get(unionIRI)==union);
-        assertTrue(consumer.DR.get(complementIRI)==complement);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(shortIRI)==shortDT);
+        assertTrue(consumer.getDR(shortVar)==shortVarDT);
+        assertTrue(consumer.getDR(intersectionIRI)==intersection);
+        assertTrue(consumer.getDR(unionIRI)==union);
+        assertTrue(consumer.getDR(complementIRI)==complement);
         assertNoTriplesLeft(consumer);
     }
     public void testDoubleComplement() throws Exception {
@@ -106,9 +106,9 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange intDT=DT(intIRI);
         DataRange complement1=DataComplementOf.create(intDT);
         DataRange complement2=DataComplementOf.create(complement1);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(complement2IRI)==complement1);
-        assertTrue(consumer.DR.get(complement1IRI)==complement2);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(complement2IRI)==complement1);
+        assertTrue(consumer.getDR(complement1IRI)==complement2);
         assertNoTriplesLeft(consumer);
     }
     public void testComplement() throws Exception {
@@ -121,8 +121,8 @@ public class TestDataRangeParsing extends AbstractTest {
         Identifier complementIRI=parser.string2AnonymousIndividual.get("x");
         DataRange intDT=DT(intIRI);
         DataRange complement=DataComplementOf.create(intDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(complementIRI)==complement);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(complementIRI)==complement);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionIntersection() throws Exception {
@@ -157,12 +157,12 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange shortVarDT=DTV(shortVar);
         DataRange intersection=DataIntersectionOf.create(intDT, shortDT);
         DataRange union=DataUnionOf.create(intersection, shortVarDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(shortIRI)==shortDT);
-        assertTrue(consumer.DR.get(shortVar)==shortVarDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==intersection);
-        assertTrue(consumer.DR.get(unionIRI)==union);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(shortIRI)==shortDT);
+        assertTrue(consumer.getDR(shortVar)==shortVarDT);
+        assertTrue(consumer.getDR(intersectionIRI)==intersection);
+        assertTrue(consumer.getDR(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOtherSyntax() throws Exception {
@@ -180,10 +180,10 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange shortDT=DTV(shortVar);
         DataRange byteDT=DT(byteIRI);
         DataRange union=DataUnionOf.create(intDT, shortDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(shortVar)==shortDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(unionIRI)==union);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(shortVar)==shortDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOneVarConjunct() throws Exception {
@@ -198,8 +198,8 @@ public class TestDataRangeParsing extends AbstractTest {
         UntypedVariable shortVar=V("?short");
         DataRange shortDT=DTV(shortVar);
         Identifier unionIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.DR.get(shortVar)==shortDT);
-        assertTrue(consumer.DR.get(unionIRI)==shortDT);
+        assertTrue(consumer.getDR(shortVar)==shortDT);
+        assertTrue(consumer.getDR(unionIRI)==shortDT);
         assertNoTriplesLeft(consumer);
     }
     public void testUnionOneConjunct() throws Exception {
@@ -213,8 +213,8 @@ public class TestDataRangeParsing extends AbstractTest {
         IRI intIRI=IRI("xsd:int");
         Identifier unionIRI=parser.string2AnonymousIndividual.get("x");
         DataRange intDT=DT(intIRI);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(unionIRI)==intDT);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(unionIRI)==intDT);
         assertNoTriplesLeft(consumer);
     }
     public void testUnion2() throws Exception {
@@ -238,10 +238,10 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange shortDT=DTV(shortVar);
         DataRange byteDT=DT(byteIRI);
         DataRange union=DataUnionOf.create(intDT, shortDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(shortVar)==shortDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(unionIRI)==union);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(shortVar)==shortDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testUnion() throws Exception {
@@ -264,10 +264,10 @@ public class TestDataRangeParsing extends AbstractTest {
         Datatype shortDT=DT(shortIRI);
         Datatype byteDT=DT(byteIRI);
         DataRange union=DataUnionOf.create(intDT, shortDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(shortIRI)==shortDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(unionIRI)==union);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(shortIRI)==shortDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(unionIRI)==union);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersectionOneVarConjunct() throws Exception {
@@ -282,8 +282,8 @@ public class TestDataRangeParsing extends AbstractTest {
         UntypedVariable shortVar=V("?short");
         DataRange shortDT=DTV(shortVar);
         Identifier intersectionIRI=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.DR.get(shortVar)==shortDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==shortDT);
+        assertTrue(consumer.getDR(shortVar)==shortDT);
+        assertTrue(consumer.getDR(intersectionIRI)==shortDT);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersectionOneConjunct() throws Exception {
@@ -297,8 +297,8 @@ public class TestDataRangeParsing extends AbstractTest {
         IRI intIRI=IRI("xsd:int");
         Identifier intersectionIRI=parser.string2AnonymousIndividual.get("x");
         DataRange intDT=DT(intIRI);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==intDT);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(intersectionIRI)==intDT);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersection2() throws Exception {
@@ -322,10 +322,10 @@ public class TestDataRangeParsing extends AbstractTest {
         DataRange shortDT=DTV(shortVar);
         DataRange byteDT=DT(byteIRI);
         DataRange intersection=DataIntersectionOf.create(intDT, shortDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(shortVar)==shortDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==intersection);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(shortVar)==shortDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(intersectionIRI)==intersection);
         assertNoTriplesLeft(consumer);
     }
     public void testIntersection() throws Exception {
@@ -348,10 +348,10 @@ public class TestDataRangeParsing extends AbstractTest {
         Datatype shortDT=DT(shortIRI);
         Datatype byteDT=DT(byteIRI);
         DataRange intersection=DataIntersectionOf.create(intDT, shortDT, byteDT);
-        assertTrue(consumer.DR.get(intIRI)==intDT);
-        assertTrue(consumer.DR.get(shortIRI)==shortDT);
-        assertTrue(consumer.DR.get(byteIRI)==byteDT);
-        assertTrue(consumer.DR.get(intersectionIRI)==intersection);
+        assertTrue(consumer.getDR(intIRI)==intDT);
+        assertTrue(consumer.getDR(shortIRI)==shortDT);
+        assertTrue(consumer.getDR(byteIRI)==byteDT);
+        assertTrue(consumer.getDR(intersectionIRI)==intersection);
         assertNoTriplesLeft(consumer);
     }
     public void testCustomDatatype() throws Exception {
@@ -361,7 +361,7 @@ public class TestDataRangeParsing extends AbstractTest {
         parser.parse();
         IRI datatypeIRI=IRI("http://example.org/datatype");
         Datatype datatype=DT(datatypeIRI);
-        assertTrue(consumer.DR.get(datatypeIRI)==datatype);
+        assertTrue(consumer.getDR(datatypeIRI)==datatype);
     }
     public void testDatatypeVariable() throws Exception {
         String s="?dt a rdfs:Datatype .";
@@ -370,6 +370,6 @@ public class TestDataRangeParsing extends AbstractTest {
         parser.parse();
         Identifier datatypeVar=V("?dt");
         DataRange dataRange=DTV("?dt");
-        assertTrue(consumer.DR.get(datatypeVar)==dataRange);
+        assertTrue(consumer.getDR(datatypeVar)==dataRange);
     }
 }

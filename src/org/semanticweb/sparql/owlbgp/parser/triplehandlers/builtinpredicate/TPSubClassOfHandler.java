@@ -17,8 +17,8 @@ public class TPSubClassOfHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ClassExpression subClass=consumer.getClassExpressionForClassIdentifier(subject);
-        ClassExpression superClass=consumer.getClassExpressionForClassIdentifier(object);
+        ClassExpression subClass=consumer.getCE(subject);
+        ClassExpression superClass=consumer.getCE(object);
         String errorMessage="";
         if (subClass==null)
             errorMessage="Could not find a subclass expression for the subject in the triple "+subject+" rdfs:subClassOf "+object+". ";

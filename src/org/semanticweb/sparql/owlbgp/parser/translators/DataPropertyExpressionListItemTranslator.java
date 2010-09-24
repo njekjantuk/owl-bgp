@@ -11,6 +11,6 @@ public class DataPropertyExpressionListItemTranslator implements ListItemTransla
         this.consumer=consumer;
     }
     public DataPropertyExpression translate(Identifier iri) {
-        return consumer.getDataPropertyExpressionForDataPropertyIdentifier(iri);
+        return consumer.getDPE(iri);
     }
 }

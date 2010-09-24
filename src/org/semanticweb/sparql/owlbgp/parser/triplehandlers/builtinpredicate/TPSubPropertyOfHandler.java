@@ -4,8 +4,10 @@ import java.util.Set;
 
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubAnnotationPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubDataPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
@@ -19,29 +21,33 @@ public class TPSubPropertyOfHandler extends TripleHandler {
 
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ObjectPropertyExpression subProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression subObjProperty=consumer.getOPE(subject);
         DataPropertyExpression subDataProperty=null;
-        if (subProperty==null) {
-            subDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
-            if (subDataProperty==null)
-                throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
-        }
+        AnnotationPropertyExpression subAnnotationProperty=null;
+        if (subObjProperty==null) 
+            subDataProperty=consumer.getDPE(subject);
+        if (subObjProperty==null && subDataProperty==null)
+            subAnnotationProperty=consumer.getAPE(subject);
+        if (subObjProperty==null && subDataProperty==null && subAnnotationProperty==null)
+            throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         
-        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+        ObjectPropertyExpression superObjProperty=consumer.getOPE(object);
         DataPropertyExpression superDataProperty=null;
-        if (superProperty==null) {
-            superDataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
-            if (superDataProperty==null)
-                throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
-        }    
-            
-        if (subProperty!=null && superProperty!=null)
-            consumer.addAxiom(SubObjectPropertyOf.create(subProperty,superProperty,annotations));
+        AnnotationPropertyExpression superAnnotationProperty=null;
+        if (superObjProperty==null)
+            superDataProperty=consumer.getDPE(object);
+        if (superObjProperty==null && superDataProperty==null)
+            superAnnotationProperty=consumer.getAPE(object);
+        if (superObjProperty==null && superDataProperty==null && superAnnotationProperty==null)
+            throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
+
+        if (subObjProperty!=null && superObjProperty!=null)
+            consumer.addAxiom(SubObjectPropertyOf.create(subObjProperty,superObjProperty,annotations));
         else if (subDataProperty!=null && superDataProperty!=null)
             consumer.addAxiom(SubDataPropertyOf.create(subDataProperty,superDataProperty,annotations));
-        else if (subProperty!=null)
-            throw new RuntimeException("Error: The subject of the triple "+subject+" "+predicate+" "+object+"  was tranlated into an object property, but the object into a data property, which is not allowed in OWL DL. ");
+        else if (subAnnotationProperty!=null && superAnnotationProperty!=null)
+            consumer.addAxiom(SubAnnotationPropertyOf.create(subAnnotationProperty,superAnnotationProperty,annotations));
         else 
-            throw new RuntimeException("Error: The object of the triple "+subject+" "+predicate+" "+object+"  was tranlated into an object property, but the subject into a data property, which is not allowed in OWL DL. ");
+            throw new RuntimeException("Error: The subject and object of the triple "+subject+" "+predicate+" "+object+"  were tranlated into different kinds of properties (e.g., one object and one data property). ");
     }
 }

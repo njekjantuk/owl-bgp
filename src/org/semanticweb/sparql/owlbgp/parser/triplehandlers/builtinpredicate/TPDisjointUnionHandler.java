@@ -20,7 +20,7 @@ public class TPDisjointUnionHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object,Set<Annotation> annotations) {
-        ClassExpression cls=consumer.getClassExpressionForClassIdentifier(subject);
+        ClassExpression cls=consumer.getCE(subject);
         Set<ClassExpression> classExpressionSet;
         if (cls==null) 
             throw new RuntimeException("Error: The class for a disjoint union axiom could not be found. The class is represented by the node "+subject+" in the triple: "+subject+" "+predicate+" "+object);

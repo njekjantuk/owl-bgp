@@ -9,6 +9,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
@@ -23,6 +24,7 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
@@ -79,7 +81,7 @@ public class Declaration extends AbstractAxiom {
             buffer.append("NamedIndividual(");
         } else if (m_declaredObject instanceof Datatype || m_declaredObject instanceof DatatypeVariable) {
             buffer.append("Datatype(");
-        } else if (m_declaredObject instanceof AnnotationProperty) {
+        } else if (m_declaredObject instanceof AnnotationProperty || m_declaredObject instanceof AnnotationPropertyVariable) {
             buffer.append("AnnotationProperty(");
         }
         buffer.append(m_declaredObject.toString(prefixes));
@@ -119,6 +121,9 @@ public class Declaration extends AbstractAxiom {
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

@@ -13,6 +13,6 @@ public class DataRangeListItemTranslator implements ListItemTranslator<DataRange
     }
     public DataRange translate(Identifier firstObject) {
         consumer.translateDataRange(firstObject);
-        return consumer.getDataRangeForDataRangeIdentifier(firstObject);
+        return consumer.getDR(firstObject);
     }
 }

@@ -27,7 +27,7 @@ public class AsymmetricPropertyHandler extends TripleHandler {
     }
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression ope=consumer.getOPE(subject);
         if (ope!=null)
             consumer.addAxiom(AsymmetricObjectProperty.create(ope,annotations));
         else

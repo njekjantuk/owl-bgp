@@ -15,7 +15,7 @@ public class TPDataComplementOfHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumer.translateDataRange(object);
-        DataRange dataRange=consumer.getDataRangeForDataRangeIdentifier(object);
+        DataRange dataRange=consumer.getDR(object);
         if (dataRange!=null)
             consumer.mapDataRangeIdentifierToDataRange(subject, DataComplementOf.create(dataRange));
         else {

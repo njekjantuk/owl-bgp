@@ -23,23 +23,23 @@ public class TPRangeHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {    
-        ObjectPropertyExpression objectProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression objectProperty=consumer.getOPE(subject);
         DataPropertyExpression dataProperty=null;
         AnnotationPropertyExpression annotationProperty=null;
         if (objectProperty==null)
-            dataProperty=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
+            dataProperty=consumer.getDPE(subject);
         if (objectProperty==null && dataProperty==null)
-            annotationProperty=consumer.getAnnotationPropertyExpressionForAnnotationPropertyIdentifier(subject);
+            annotationProperty=consumer.getAPE(subject);
         if (objectProperty==null && dataProperty==null && annotationProperty==null)
             throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         
         if (objectProperty!=null) {
-            ClassExpression classExpression=consumer.getClassExpressionForClassIdentifier(object);
+            ClassExpression classExpression=consumer.getCE(object);
             if (classExpression==null)
                 throw new RuntimeException("Could not find a class expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
             consumer.addAxiom(ObjectPropertyRange.create(objectProperty,classExpression,annotations));
         } else if (dataProperty!=null) {
-            DataRange dataRange=consumer.getDataRangeForDataRangeIdentifier(object);
+            DataRange dataRange=consumer.getDR(object);
             if (dataRange==null)
                 throw new RuntimeException("Could not find a data range for the object in the triple "+subject+" "+predicate+" "+object+". ");
             consumer.addAxiom(DataPropertyRange.create(dataProperty,dataRange,annotations));

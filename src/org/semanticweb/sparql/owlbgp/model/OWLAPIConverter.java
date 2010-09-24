@@ -203,7 +203,10 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return m_dataFactory.getOWLObjectInverseOf((OWLObjectPropertyExpression)inverseObjectProperty.getInvertedObjectProperty().accept(this));
     }
     public OWLObject visit(ObjectPropertyVariable objectPropertyVariable) {
-      throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+objectPropertyVariable.toString()+" is unbound. ");
+        throw new RuntimeException("Error: Can only convert to OWL API objects if all variables are bound, but variable "+objectPropertyVariable.toString()+" is unbound. ");
+    }
+    public OWLObject visit(ObjectPropertyChain objectPropertyChain) {
+        throw new RuntimeException("Error: Cannot convert property chains to OWL API objects since chains are just lists in the OWL API. ");
     }
     public OWLObject visit(DataProperty dataProperty) {
         return m_dataFactory.getOWLDataProperty((IRI)dataProperty.getIRI().accept(this));
@@ -309,7 +312,7 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
         return annotations;
     }
     public OWLObject visit(Declaration axiom) {
-        return m_dataFactory.getOWLDeclarationAxiom((OWLEntity)axiom.accept(this),getAnnotations(axiom));
+        return m_dataFactory.getOWLDeclarationAxiom((OWLEntity)axiom.getDeclaredObject().accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(SubClassOf axiom) {
         return m_dataFactory.getOWLSubClassOfAxiom((OWLClassExpression)axiom.getSubClassExpression().accept(this),(OWLClassExpression)axiom.getSuperClassExpression().accept(this),getAnnotations(axiom));
@@ -332,7 +335,6 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
             classExpressions.add((OWLClassExpression)classExpression.accept(this));
         return m_dataFactory.getOWLDisjointUnionAxiom((OWLClass)axiom.getClazz().accept(this), classExpressions,getAnnotations(axiom));
     }
-    
     public OWLObject visit(SubObjectPropertyOf axiom) {
         if (axiom.getSubObjectPropertyExpression() instanceof ObjectPropertyChain) {
             List<OWLObjectPropertyExpression> opes=new ArrayList<OWLObjectPropertyExpression>();

@@ -16,6 +16,7 @@ import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataComplementOf;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
@@ -111,6 +112,13 @@ public class TripleConsumer {
     protected final Map<Identifier,Set<Identifier>> ontologyIRIToVersionIRIs=new HashMap<Identifier,Set<Identifier>>();
     protected final Set<Axiom>      axioms=new HashSet<Axiom>();
     
+    protected final Set<Identifier> CEExt=new HashSet<Identifier>();
+    protected final Set<Identifier> OPEExt=new HashSet<Identifier>();
+    protected final Set<Identifier> DPEExt=new HashSet<Identifier>();
+    protected final Set<Identifier> APEExt=new HashSet<Identifier>();
+    protected final Set<Identifier> INDExt=new HashSet<Identifier>();
+    protected final Set<Identifier> DRExt=new HashSet<Identifier>();
+    
     protected final Set<Identifier>                              RIND=new HashSet<Identifier>();
     protected final Map<Identifier,ClassExpression>              CE=new HashMap<Identifier,ClassExpression>(); 
     protected final Map<Identifier,DataRange>                    DR=new HashMap<Identifier,DataRange>();
@@ -141,23 +149,39 @@ public class TripleConsumer {
     protected final OptimisedListTranslator<DataRange> dataRangeListTranslator=new OptimisedListTranslator<DataRange>(this, new DataRangeListItemTranslator(this));
     protected final OptimisedListTranslator<FacetRestriction> faceRestrictionListTranslator=new OptimisedListTranslator<FacetRestriction>(this, new FacetRestrictionListItemTranslator(this));
     
-    {
-        CE.put(Vocabulary.OWL_THING, Clazz.create(Vocabulary.OWL_THING));
-        CE.put(Vocabulary.OWL_NOTHING, Clazz.create(Vocabulary.OWL_NOTHING));
-        OPE.put(Vocabulary.OWL_TOP_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_TOP_OBJECT_PROPERTY));
-        OPE.put(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY));
-        DPE.put(Vocabulary.OWL_TOP_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_TOP_DATA_PROPERTY));
-        DPE.put(Vocabulary.OWL_BOTTOM_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_BOTTOM_DATA_PROPERTY));
-        APE.put(Vocabulary.OWL_PRIOR_VERSION, AnnotationProperty.create(Vocabulary.OWL_PRIOR_VERSION));
-        APE.put(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH));
-        APE.put(Vocabulary.OWL_INCOMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_INCOMPATIBLE_WITH));
-        APE.put(Vocabulary.OWL_VERSION_INFO, AnnotationProperty.create(Vocabulary.OWL_VERSION_INFO));
-        APE.put(Vocabulary.RDFS_LABEL, AnnotationProperty.create(Vocabulary.RDFS_LABEL));
-        APE.put(Vocabulary.RDFS_COMMENT, AnnotationProperty.create(Vocabulary.RDFS_COMMENT));
-        APE.put(Vocabulary.RDFS_SEE_ALSO, AnnotationProperty.create(Vocabulary.RDFS_SEE_ALSO));
-        APE.put(Vocabulary.RDFS_IS_DEFINED_BY, AnnotationProperty.create(Vocabulary.RDFS_IS_DEFINED_BY));
+    {   
+//        CEExt.put(Vocabulary.OWL_THING, Clazz.create(Vocabulary.OWL_THING));
+//        CEExt.put(Vocabulary.OWL_NOTHING, Clazz.create(Vocabulary.OWL_NOTHING));
+//        OPEExt.put(Vocabulary.OWL_TOP_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_TOP_OBJECT_PROPERTY));
+//        OPEExt.put(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY));
+//        DPEExt.put(Vocabulary.OWL_TOP_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_TOP_DATA_PROPERTY));
+//        DPEExt.put(Vocabulary.OWL_BOTTOM_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_BOTTOM_DATA_PROPERTY));
+//        APEExt.put(Vocabulary.OWL_PRIOR_VERSION, AnnotationProperty.create(Vocabulary.OWL_PRIOR_VERSION));
+//        APEExt.put(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH));
+//        APEExt.put(Vocabulary.OWL_INCOMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_INCOMPATIBLE_WITH));
+//        APEExt.put(Vocabulary.OWL_VERSION_INFO, AnnotationProperty.create(Vocabulary.OWL_VERSION_INFO));
+//        APEExt.put(Vocabulary.RDFS_LABEL, AnnotationProperty.create(Vocabulary.RDFS_LABEL));
+//        APEExt.put(Vocabulary.RDFS_COMMENT, AnnotationProperty.create(Vocabulary.RDFS_COMMENT));
+//        APEExt.put(Vocabulary.RDFS_SEE_ALSO, AnnotationProperty.create(Vocabulary.RDFS_SEE_ALSO));
+//        APEExt.put(Vocabulary.RDFS_IS_DEFINED_BY, AnnotationProperty.create(Vocabulary.RDFS_IS_DEFINED_BY));
+//        for (Datatype dt : Datatype.OWL2_DATATYPES)
+//            DRExt.put(dt.getIdentifier(), dt);
+        CEExt.add(Vocabulary.OWL_THING);
+        CEExt.add(Vocabulary.OWL_NOTHING);
+        OPEExt.add(Vocabulary.OWL_TOP_OBJECT_PROPERTY);
+        OPEExt.add(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY);
+        DPEExt.add(Vocabulary.OWL_TOP_DATA_PROPERTY);
+        DPEExt.add(Vocabulary.OWL_BOTTOM_DATA_PROPERTY);
+        APEExt.add(Vocabulary.OWL_PRIOR_VERSION);
+        APEExt.add(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH);
+        APEExt.add(Vocabulary.OWL_INCOMPATIBLE_WITH);
+        APEExt.add(Vocabulary.OWL_VERSION_INFO);
+        APEExt.add(Vocabulary.RDFS_LABEL);
+        APEExt.add(Vocabulary.RDFS_COMMENT);
+        APEExt.add(Vocabulary.RDFS_SEE_ALSO);
+        APEExt.add(Vocabulary.RDFS_IS_DEFINED_BY);
         for (Datatype dt : Datatype.OWL2_DATATYPES)
-            DR.put(dt.getIdentifier(), dt);
+            DRExt.add(dt.getIdentifier());
     }
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -483,7 +507,7 @@ public class TripleConsumer {
             Set<Identifier> datatypeIdentifiers=builtInPredToBuiltInObjToSubjects.get(Vocabulary.RDF_TYPE).get(Vocabulary.OWL_DATA_RANGE);
             if (datatypeIdentifiers!=null) {
                 for (Identifier subject : new HashSet<Identifier>(datatypeIdentifiers)) {
-                    if (isAnonymous(subject) && DR.get(subject)==null) {
+                    if (isAnonymous(subject) && getDR(subject)==null) {
                         // _:x owl:OneOf rdf:nil or _:x owl:OneOf SEQ
                         // try _:x owl:OneOf rdf:nil -> not rdfs:Literal
                         boolean translated=false;
@@ -513,7 +537,7 @@ public class TripleConsumer {
             if (datatypeIdentifiers!=null) {
                 for (Identifier subject : new HashSet<Identifier>(datatypeIdentifiers)) {
                     // subject rdf:type owl:Class
-                    if (isAnonymous(subject) && CE.get(subject)==null) {
+                    if (isAnonymous(subject) && getCE(subject)==null) {
                         // _:x owl:unionOf rdf:nil . 
                         Map<Identifier, Set<Identifier>> objToSubj=builtInPredToBuiltInObjToSubjects.get(Vocabulary.OWL_UNION_OF);
                         if (objToSubj!=null) {
@@ -531,8 +555,8 @@ public class TripleConsumer {
                             Set<Identifier> obj=subjToObj.get(subject);
                             if (obj.size()==1) {
                                 Identifier object=obj.iterator().next();
-                                if (!isAnonymous(object) && CE.get(object)!=null) { 
-                                    mapClassIdentifierToClassExpression(subject, CE.get(object));
+                                if (!isAnonymous(object) && getCE(object)!=null) { 
+                                    mapClassIdentifierToClassExpression(subject, getCE(object));
                                     removeTriple(subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_CLASS);
                                     removeTriple(subject, Vocabulary.OWL_UNION_OF, object);
                                     continue;
@@ -558,8 +582,8 @@ public class TripleConsumer {
                             Set<Identifier> obj=subjToObj.get(subject);
                             if (obj.size()==1) {
                                 Identifier object=obj.iterator().next();
-                                if (!isAnonymous(object) && CE.get(object)!=null) { 
-                                    mapClassIdentifierToClassExpression(subject, CE.get(object));
+                                if (!isAnonymous(object) && getCE(object)!=null) { 
+                                    mapClassIdentifierToClassExpression(subject, getCE(object));
                                     removeTriple(subject, Vocabulary.RDF_TYPE, Vocabulary.OWL_CLASS);
                                     removeTriple(subject, Vocabulary.OWL_INTERSECTION_OF, object);
                                     continue;
@@ -607,7 +631,7 @@ public class TripleConsumer {
         }
     } 
     public void translateClassExpression(Identifier subject) {
-        if (CE.get(subject)==null) {
+        if (getCE(subject)==null) {
             boolean isTranslated=false;
             for (Identifier predicate : classExpressionPredicateHandlers.keySet()) {
                 if (builtInPredToSubToObjects.containsKey(predicate) && builtInPredToSubToObjects.get(predicate).containsKey(subject)) {
@@ -656,7 +680,7 @@ public class TripleConsumer {
         }
     }   
     public void translateDataRange(Identifier subject) {
-        if (DR.get(subject)==null) {
+        if (getDR(subject)==null) {
             boolean isTranslated=false;
             for (Identifier predicate : dataRangePredicateHandlers.keySet()) {
                 if (builtInPredToSubToObjects.containsKey(predicate) && builtInPredToSubToObjects.get(predicate).containsKey(subject)) {
@@ -756,7 +780,7 @@ public class TripleConsumer {
         }
     }
     public void translateObjectPropertyExpression(Identifier subject, Map<Identifier,Set<Identifier>> inverses) {
-        if (!OPE.containsKey(subject)) {
+        if (!OPE.containsKey(subject) && !OPEExt.contains(subject)) {
             Set<Identifier> inverseProperties=inverses.get(subject);
             boolean translated=false;
             if (inverseProperties!=null) {
@@ -768,7 +792,7 @@ public class TripleConsumer {
                         translated=true;
                         removeTriple(subject, Vocabulary.OWL_INVERSE_OF, object);
                         translateObjectPropertyExpression(object, inverses);
-                        ObjectPropertyExpression inverseOf=getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+                        ObjectPropertyExpression inverseOf=getOPE(object);
                         if (inverseOf!=null)
                             OPE.put(subject, ObjectInverseOf.create(inverseOf));
                         else 
@@ -779,7 +803,7 @@ public class TripleConsumer {
                 }
             } 
             if (!translated)
-                throw new RuntimeException("Error: An inverse object property represented by blank node "+subject+" cannot be resolved to an object property expression. ");
+                throw new RuntimeException("Error: An inverse object property represented by node "+subject+" cannot be resolved to an object property expression. ");
         }
     }
     protected void printIndexedTriples() {
@@ -811,7 +835,10 @@ public class TripleConsumer {
     }
     protected void parseAnnotations() {
         // Table 10
-        for (Identifier annotationProperty : APE.keySet()) {
+        Set<Identifier> annotationProperties=new HashSet<Identifier>(APE.keySet());
+        annotationProperties.addAll(APEExt);
+        annotationProperties.addAll(APE.keySet());
+        for (Identifier annotationProperty : annotationProperties) {
             for (Identifier[] subjObj : getSubjectObjectMap(annotationProperty)) {
                 // x *:y xlt <-> subjObj[0] annotationProperty subjObj[1]
                 if (subjObj[1] instanceof AnnotationValue) {
@@ -820,7 +847,7 @@ public class TripleConsumer {
                         annotationsForX=new HashSet<Annotation>();
                         ANN.put(subjObj[0], annotationsForX);
                     }
-                    annotationsForX.add(Annotation.create(APE.get(annotationProperty), (AnnotationValue)subjObj[1], getAnnotationAnnotations(subjObj[0], annotationProperty, subjObj[1])));
+                    annotationsForX.add(Annotation.create(getAPE(annotationProperty), (AnnotationValue)subjObj[1], getAnnotationAnnotations(subjObj[0], annotationProperty, subjObj[1])));
                     removeTriple(subjObj[0], (Identifier)annotationProperty, subjObj[1]);
                 }
             }
@@ -833,7 +860,7 @@ public class TripleConsumer {
             Map<Identifier,Set<Identifier>> predToObjects=getPredicateToObjects(subject);
             if (!predToObjects.isEmpty()) {
                 for (Identifier predicate : new HashSet<Identifier>(predToObjects.keySet())) {
-                    AnnotationPropertyExpression ape=APE.get(predicate);
+                    AnnotationPropertyExpression ape=getAPE(predicate);
                     if (ape!=null) {
                         for (Identifier object : new HashSet<Identifier>(predToObjects.get(predicate))) {
                             if (object instanceof AnnotationValue) {
@@ -1337,72 +1364,108 @@ public class TripleConsumer {
     public boolean allTriplesConsumed() {
         return builtInPredToBuiltInObjToSubjects.isEmpty() && builtInPredToSubToObjects.isEmpty() && subjToPredToObjects.isEmpty();
     }
+    public ClassExpression getCE(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        ClassExpression ce=CE.get(identifier);
+        if (ce==null && identifier instanceof IRI && CEExt.contains(identifier)) {
+            ce=Clazz.create((IRI)identifier);
+        }
+        return ce;
+    }
+    public ObjectPropertyExpression getOPE(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        ObjectPropertyExpression ope=OPE.get(identifier);
+        if (ope==null && identifier instanceof IRI && OPEExt.contains(identifier)) {
+            ope=ObjectProperty.create((IRI)identifier);
+        }
+        return ope;
+    }
+    public DataPropertyExpression getDPE(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        DataPropertyExpression dpe=DPE.get(identifier);
+        if (dpe==null && identifier instanceof IRI && DPEExt.contains(identifier)) {
+            dpe=DataProperty.create((IRI)identifier);
+        }
+        return dpe;
+    }
+    public AnnotationPropertyExpression getAPE(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        AnnotationPropertyExpression ape=APE.get(identifier);
+        if (ape==null && identifier instanceof IRI && APEExt.contains(identifier)) {
+            ape=AnnotationProperty.create((IRI)identifier);
+        }
+        return ape;
+    }
+    public Individual getIND(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        Individual ind=IND.get(identifier);
+        if (ind==null && identifier instanceof IRI && INDExt.contains(identifier))
+            ind=NamedIndividual.create((IRI)identifier);
+        if (ind==null && isAnonymous(identifier))
+            ind=AnonymousIndividual.create(identifier.toString());
+        if (ind==null && isVariable(identifier))
+            ind=IndividualVariable.create(identifier.toString());
+        if (ind==null)
+            ind=NamedIndividual.create(identifier.toString());    
+        return ind;
+    }
+    public DataRange getDR(Identifier identifier) {
+        if (identifier==null) 
+            return null;
+        DataRange dr=DR.get(identifier);
+        if (dr==null && identifier instanceof IRI && DRExt.contains(identifier)) {
+            dr=Datatype.create((IRI)identifier);
+        }
+        return dr;
+    }
+    
     public void setClassesInOntologySignature(Set<Clazz> classes) {
         for (Clazz cls : classes)
-            CE.put(cls, cls);
+            CEExt.add(cls.getIRI());
     }
     public void setObjectPropertiesInOntologySignature(Set<ObjectProperty> objectProperties) {
         for (ObjectProperty op : objectProperties)
-            OPE.put(op, op); 
+            OPEExt.add(op.getIRI()); 
     }
     public void setDataPropertiesInOntologySignature(Set<DataProperty> dataProperties) {
         for (DataProperty dp : dataProperties)
-            DPE.put(dp, dp);
+            DPEExt.add(dp.getIRI());
     }
-    public void setIndividualsInOntologySignature(Set<Individual> individuals) {
-        for (Individual ind : individuals)
-            IND.put(ind, ind);
+    public void setAnnotationPropertiesInOntologySignature(Set<AnnotationProperty> annotationProperties) {
+        for (AnnotationProperty ap : annotationProperties)
+            APEExt.add(ap.getIRI());
+    }
+    public void setIndividualsInOntologySignature(Set<NamedIndividual> individuals) {
+        for (NamedIndividual ind : individuals)
+            INDExt.add(ind.getIRI());
     }
     public void setCustomDatatypesInOntologySignature(Set<Datatype> customDatatypes) {
         for (Datatype dt : customDatatypes)
-            DR.put(dt, dt);
+            DRExt.add(dt.getIRI());
     }
+    
     public void mapClassIdentifierToClassExpression(Identifier id, ClassExpression classExpression) {
         CE.put(id,classExpression);
-    }
-    public ClassExpression getClassExpressionForClassIdentifier(Identifier id) {
-        if (id==null) return null;
-        return CE.get(id);
     }
     public void mapObjectPropertyIdentifierToObjectProperty(Identifier id, ObjectPropertyExpression objectPropertyExpression) {
         OPE.put(id, objectPropertyExpression); 
     }
-    public ObjectPropertyExpression getObjectPropertyExpressionForObjectPropertyIdentifier(Identifier id) {
-        if (id==null) return null;
-        return OPE.get(id);
-    }
     public void mapDataPropertyIdentifierToDataProperty(Identifier id, DataPropertyExpression dataProperty) {
         DPE.put(id, dataProperty);
-    }
-    public DataPropertyExpression getDataPropertyExpressionForDataPropertyIdentifier(Identifier id) {
-        if (id==null) return null;
-        return DPE.get(id);
     }
     public void mapAnnotationPropertyIdentifierToAnnotationProperty(Identifier id, AnnotationPropertyExpression annotationProperty) {
         APE.put(id, annotationProperty);
     }
-    public AnnotationPropertyExpression getAnnotationPropertyExpressionForAnnotationPropertyIdentifier(Identifier id) {
-        if (id==null) return null;
-        return APE.get(id);
-    }
     public void mapIndividualIdentifierToindividual(Identifier id, Individual individual) {
         IND.put(id, individual);
     }
-    public Individual getIndividualForIndividualIdentifier(Identifier id) {
-        if (id==null) return null;
-        return IND.get(id);
-    }
     public void mapDataRangeIdentifierToDataRange(Identifier id, DataRange datatype) {
         DR.put(id, datatype);
-    }
-    public DataRange getDataRangeForDataRangeIdentifier(Identifier id) {
-        if (id==null) return null;
-        return DR.get(id);
-    }
-    public Individual getIndividual(Identifier id) {
-        if (isVariable(id)) return IndividualVariable.create(id.toString());
-        else if (isAnonymous(id)) return AnonymousIndividual.create(id.toString());
-        return NamedIndividual.create((IRI)id);
     }
     public NamedIndividual getNamedIndividual(Identifier id) {
         if (id instanceof IRI) return NamedIndividual.create((IRI)id);
@@ -1436,7 +1499,16 @@ public class TripleConsumer {
         return axioms;
     }
     public Ontology getOntology() {
-        return Ontology.create(ontologyIRI, ontologyIRIToVersionIRIs.get(ontologyIRI), imports, axioms, ANN.get(ontologyIRI));
+        Set<Clazz> classesInSignature=new HashSet<Clazz>();
+        Set<ClassVariable> classesVariablesInSignature=new HashSet<ClassVariable>();
+        for (Identifier cls : CE.keySet()) {
+            if (cls instanceof Clazz)
+                classesInSignature.add((Clazz)cls);
+            if (cls instanceof ClassVariable)
+                classesVariablesInSignature.add((ClassVariable)cls);
+        }
+        return Ontology.create(ontologyIRI, ontologyIRIToVersionIRIs.get(ontologyIRI), imports, axioms, ANN.get(ontologyIRI)
+                );
     }
     public boolean isOntologyIRI(Identifier iri) {
         return ontologyIRI==iri;

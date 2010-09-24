@@ -18,6 +18,7 @@ import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
 import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
@@ -80,6 +81,9 @@ public class AbstractTest extends TestCase {
     public static ObjectInverseOf IOP(String objectPropertyName) {
         return IOP(IRI(objectPropertyName));
     }
+    public static ObjectInverseOf IOPV(String objectPropertyVarName) {
+        return IOP(OPV(objectPropertyVarName));
+    }
     public static ObjectInverseOf IOP(IRI objectPropertyIri) {
         return IOP(OP(objectPropertyIri));
     }
@@ -121,6 +125,9 @@ public class AbstractTest extends TestCase {
     }
     public static AnonymousIndividual AI(String label) {
         return AnonymousIndividual.create(label);
+    }
+    public static LiteralVariable LV(String varName) {
+        return LiteralVariable.create(varName);
     }
     public static TypedLiteral TL(String lexicalForm) {
         return TL(lexicalForm,(String)null,(Datatype)null);
