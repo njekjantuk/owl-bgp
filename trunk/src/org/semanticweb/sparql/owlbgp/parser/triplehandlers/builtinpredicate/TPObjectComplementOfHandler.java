@@ -15,7 +15,7 @@ public class TPObjectComplementOfHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         consumer.translateClassExpression(object);
-        ClassExpression classExpression=consumer.getClassExpressionForClassIdentifier(object);
+        ClassExpression classExpression=consumer.getCE(object);
         if (classExpression!=null)
             consumer.mapClassIdentifierToClassExpression(subject, ObjectComplementOf.create(classExpression));
         else {

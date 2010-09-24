@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
@@ -35,7 +36,6 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
-import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 
 public class DataPropertyAssertion extends AbstractAxiom implements Assertion {
@@ -72,7 +72,7 @@ public class DataPropertyAssertion extends AbstractAxiom implements Assertion {
     protected final Individual m_individual;
     protected final Literal m_literal;
    
-    protected DataPropertyAssertion(DataProperty dpe,Individual individual,Literal literal,Set<Annotation> annotations) {
+    protected DataPropertyAssertion(DataPropertyExpression dpe,Individual individual,Literal literal,Set<Annotation> annotations) {
         super(annotations);
         m_dpe=dpe;
         m_individual=individual;
@@ -114,11 +114,13 @@ public class DataPropertyAssertion extends AbstractAxiom implements Assertion {
         return create(dpe,individual,literal,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static DataPropertyAssertion create(DataPropertyExpression dpe,Individual individual,Literal literal,Set<Annotation> annotations) {
-        if (!(dpe instanceof DataProperty)) throw new IllegalArgumentException("DatapropertyAssertions cannot contain data property expressions, but only data properties. Here we got an expression: "+dpe);
-        return s_interningManager.intern(new DataPropertyAssertion((DataProperty)dpe,individual,literal,annotations));
+        return s_interningManager.intern(new DataPropertyAssertion(dpe,individual,literal,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

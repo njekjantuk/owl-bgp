@@ -11,9 +11,12 @@ public class AllParserTests extends TestCase {
         // $JUnit-BEGIN$
         suite.addTestSuite(TestAnnotationParsing.class);
         suite.addTestSuite(TestAxiomParsing.class);
+        suite.addTestSuite(TestAxiomParsingWithDeclFromOnt.class);
+        suite.addTestSuite(TestAxiomWithVarParsing.class);
         suite.addTestSuite(TestClassExpressionParsing.class);
         suite.addTestSuite(TestDataRangeParsing.class);
         suite.addTestSuite(TestDeclarationFixing.class);
+        suite.addTestSuite(TestParser.class);
         suite.addTestSuite(TestPropertyParsing.class);
         // $JUnit-END$
         return suite;

@@ -17,8 +17,8 @@ public class TPInverseOfHandler extends TripleHandler {
 
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ObjectPropertyExpression subProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
-        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+        ObjectPropertyExpression subProperty=consumer.getOPE(subject);
+        ObjectPropertyExpression superProperty=consumer.getOPE(object);
         if (subProperty!=null && superProperty!=null)
             consumer.addAxiom(InverseObjectProperties.create(subProperty,superProperty,annotations));
         else 

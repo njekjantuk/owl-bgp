@@ -142,6 +142,9 @@ public class Annotation extends AbstractExtendedOWLObject {
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
+    }
     @Override
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

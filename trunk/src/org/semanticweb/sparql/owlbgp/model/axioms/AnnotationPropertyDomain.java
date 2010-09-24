@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
@@ -33,6 +35,7 @@ import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
@@ -67,9 +70,9 @@ public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPro
     };
     
     protected final AnnotationPropertyExpression m_annotationPropertyExpression;
-    protected final IRI m_domain;
+    protected final Identifier m_domain;
    
-    protected AnnotationPropertyDomain(AnnotationPropertyExpression ope,IRI classExpression,Set<Annotation> annotations) {
+    protected AnnotationPropertyDomain(AnnotationPropertyExpression ope,Identifier classExpression,Set<Annotation> annotations) {
         super(annotations);
         m_annotationPropertyExpression=ope;
         m_domain=classExpression;
@@ -77,7 +80,7 @@ public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPro
     public AnnotationPropertyExpression getAnnotationPropertyExpression() {
         return m_annotationPropertyExpression;
     }
-    public IRI getDomain() {
+    public Identifier getDomain() {
         return m_domain;
     }
     @Override
@@ -98,14 +101,19 @@ public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPro
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static AnnotationPropertyDomain create(AnnotationPropertyExpression annotationPropertyExpression,IRI iri) {
-        return create(annotationPropertyExpression,iri,new HashSet<Annotation>());
+    public static AnnotationPropertyDomain create(AnnotationPropertyExpression annotationPropertyExpression,Identifier domain,Annotation... annotations) {
+        return create(annotationPropertyExpression,domain,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
-    public static AnnotationPropertyDomain create(AnnotationPropertyExpression annotationPropertyExpression,IRI iri,Set<Annotation> annotations) {
-        return s_interningManager.intern(new AnnotationPropertyDomain(annotationPropertyExpression,iri,annotations));
+    public static AnnotationPropertyDomain create(AnnotationPropertyExpression annotationPropertyExpression,Identifier domain,Set<Annotation> annotations) {
+        if (domain instanceof AnonymousIndividual)
+            throw new IllegalArgumentException("Error: The domain of an annotation property domain axiom cannot be anonymous, but here we have: "+domain);
+        return s_interningManager.intern(new AnnotationPropertyDomain(annotationPropertyExpression,domain,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

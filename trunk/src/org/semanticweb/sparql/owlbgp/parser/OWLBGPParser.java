@@ -16,8 +16,9 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
-import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
@@ -33,15 +34,6 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     {
         pm.declareSemanticWebPrefixes();
     }
-
-    public OWLBGPParser(StringReader reader, Set<Clazz> classes, Set<ObjectProperty> objectProperties, Set<DataProperty> dataProperties, Set<Individual> individuals, Set<Datatype> customDatatypes) {
-         this(reader);
-         handler.setClassesInOntologySignature(classes);
-         handler.setObjectPropertiesInOntologySignature(objectProperties);
-         handler.setDataPropertiesInOntologySignature(dataProperties);
-         handler.setIndividualsInOntologySignature(individuals);
-         handler.setCustomDatatypesInOntologySignature(customDatatypes);
-    }
     public void setClassesInOntologySignature(Set<Clazz> classes) {
         handler.setClassesInOntologySignature(classes);
     }
@@ -51,7 +43,10 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     public void setDataPropertiesInOntologySignature(Set<DataProperty> dataProperties) {
         handler.setDataPropertiesInOntologySignature(dataProperties);
     }
-    public void setIndividualsInOntologySignature(Set<Individual> individuals) {
+    public void setAnnotationPropertiesInOntologySignature(Set<AnnotationProperty> properties) {
+        handler.setAnnotationPropertiesInOntologySignature(properties);
+    }
+    public void setIndividualsInOntologySignature(Set<NamedIndividual> individuals) {
         handler.setIndividualsInOntologySignature(individuals);
     }
     public void setCustomDatatypesInOntologySignature(Set<Datatype> customDatatypes) {
@@ -116,7 +111,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         if (prefix.equals("_")) {
             return getAnonymousIndividual(qname.substring(colonIndex + 1));
         }
-        if (pm.getPrefixIRI(prefix)==null) throw new ParseException("Prefix not declared: " + prefix);
+        if (pm.getPrefixIRI(prefix)==null) 
+            throw new ParseException("Prefix not declared: " + prefix);
         return IRI.create(pm.expandAbbreviatedIRI(qname));
     }
     public IRI getIRI(String s) {

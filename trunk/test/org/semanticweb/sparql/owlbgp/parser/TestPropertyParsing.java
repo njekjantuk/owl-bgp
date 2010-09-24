@@ -23,8 +23,8 @@ public class TestPropertyParsing extends AbstractTest {
         ObjectProperty r=OP("r");
         ObjectPropertyExpression invr=IOP("r");
         Identifier invRnode=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.OPE.get(invRnode)==invr);
-        assertTrue(consumer.OPE.get(riri)==r);
+        assertTrue(consumer.getOPE(invRnode)==invr);
+        assertTrue(consumer.getOPE(riri)==r);
         assertNoTriplesLeft(consumer);
     }
     public void testInverseWithVariable() throws Exception {
@@ -37,8 +37,8 @@ public class TestPropertyParsing extends AbstractTest {
         ObjectPropertyVariable rvar=OPV("?r");
         ObjectPropertyExpression invr=ObjectInverseOf.create(rvar);
         Identifier invRnode=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.OPE.get(invRnode)==invr);
-        assertTrue(consumer.OPE.get(runtyped)==rvar);
+        assertTrue(consumer.getOPE(invRnode)==invr);
+        assertTrue(consumer.getOPE(runtyped)==rvar);
         assertNoTriplesLeft(consumer);
     }
     public void testInverseOfInverse() throws Exception {
@@ -51,8 +51,8 @@ public class TestPropertyParsing extends AbstractTest {
         ObjectProperty r=OP("r");
         ObjectPropertyExpression invr=IOP("r");
         Identifier xnode=parser.string2AnonymousIndividual.get("x");
-        assertTrue(consumer.OPE.get(riri)==r);
-        assertTrue(consumer.OPE.get(xnode)==invr);
+        assertTrue(consumer.getOPE(riri)==r);
+        assertTrue(consumer.getOPE(xnode)==invr);
         assertNoTriplesLeft(consumer);
     }
 }

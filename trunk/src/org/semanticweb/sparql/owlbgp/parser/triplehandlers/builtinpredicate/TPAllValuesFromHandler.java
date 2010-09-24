@@ -19,15 +19,15 @@ public class TPAllValuesFromHandler extends TripleHandler {
 
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         Identifier propID=consumer.getObject(subject, Vocabulary.OWL_ON_PROPERTY,true);
-        ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(propID);
+        ObjectPropertyExpression ope=consumer.getOPE(propID);
         if (ope!=null) {
             consumer.translateClassExpression(object);
-            ClassExpression ce=consumer.getClassExpressionForClassIdentifier(object);
+            ClassExpression ce=consumer.getCE(object);
             consumer.mapClassIdentifierToClassExpression(subject, ObjectAllValuesFrom.create(ope, ce));
         } else {
-            DataPropertyExpression dpe=consumer.getDataPropertyExpressionForDataPropertyIdentifier(propID);
+            DataPropertyExpression dpe=consumer.getDPE(propID);
             if (dpe!=null) {
-                DataRange dr=consumer.getDataRangeForDataRangeIdentifier(object);
+                DataRange dr=consumer.getDR(object);
                 if (dr!=null) {
                     consumer.mapClassIdentifierToClassExpression(subject, DataAllValuesFrom.create(dpe, dr));
                 } else {

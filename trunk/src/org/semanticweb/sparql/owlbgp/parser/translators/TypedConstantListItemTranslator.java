@@ -1,7 +1,9 @@
 package org.semanticweb.sparql.owlbgp.parser.translators;
 
 import org.semanticweb.sparql.owlbgp.model.Identifier;
+import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
 public class TypedConstantListItemTranslator implements ListItemTranslator<Literal> {
@@ -11,6 +13,8 @@ public class TypedConstantListItemTranslator implements ListItemTranslator<Liter
     	this.consumer=consumer;
     }
     public Literal translate(Identifier firstObject) {
+        if (firstObject instanceof UntypedVariable)
+            return LiteralVariable.create((UntypedVariable)firstObject);
         if (firstObject instanceof Literal) 
             return (Literal)firstObject;
         else 

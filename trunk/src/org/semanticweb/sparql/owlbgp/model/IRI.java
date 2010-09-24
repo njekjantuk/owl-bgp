@@ -64,6 +64,9 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
+    }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);
     }

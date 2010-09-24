@@ -22,7 +22,7 @@ public class TPPropertyChainAxiomHandler extends TripleHandler {
 
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ObjectPropertyExpression superProperty=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression superProperty=consumer.getOPE(subject);
         if (superProperty==null)
             throw new RuntimeException("Could not find an object property expression for the subject in the triple "+subject+" "+Vocabulary.OWL_PROPERTY_CHAIN_AXIOM+" "+object+". ");
         else {

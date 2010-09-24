@@ -18,8 +18,8 @@ public class TPSameAsHandler extends TripleHandler {
 
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        Individual ind1=consumer.getIndividualForIndividualIdentifier(subject);
-        Individual ind2=consumer.getIndividualForIndividualIdentifier(object);
+        Individual ind1=consumer.getIND(subject);
+        Individual ind2=consumer.getIND(object);
         String errorMessage="";
         if (ind1==null)
             errorMessage="Could not find an individual for the subject in the triple "+subject+" "+predicate+" "+object+". ";

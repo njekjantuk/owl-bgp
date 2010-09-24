@@ -96,6 +96,7 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject {
         return getBoundVersion(variablesToBindings).asOWLAPIObject(dataFactory);
     }
     public abstract <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
+    public abstract void accept(ExtendedOWLObjectVisitor visitor);
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory) {
         return convertToOWLAPIObject(new OWLAPIConverter(dataFactory));
     }

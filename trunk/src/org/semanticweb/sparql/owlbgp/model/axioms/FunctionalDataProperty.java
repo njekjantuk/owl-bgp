@@ -26,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
@@ -100,6 +101,9 @@ public class FunctionalDataProperty extends AbstractAxiom implements DataPropert
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

@@ -29,8 +29,8 @@ public class AnnotationPropertyHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         if (consumer.isVariable(subject))
-            consumer.addAxiom(Declaration.create((AnnotationPropertyVariable)consumer.getAnnotationPropertyExpressionForAnnotationPropertyIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((AnnotationPropertyVariable)consumer.getAPE(subject),annotations));
         else 
-            consumer.addAxiom(Declaration.create((AnnotationProperty)consumer.getAnnotationPropertyExpressionForAnnotationPropertyIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((AnnotationProperty)consumer.getAPE(subject),annotations));
     }
 }

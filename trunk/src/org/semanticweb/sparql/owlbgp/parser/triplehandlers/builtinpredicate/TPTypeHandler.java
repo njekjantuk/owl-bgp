@@ -18,8 +18,8 @@ public class TPTypeHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ClassExpression classexpression=consumer.getClassExpressionForClassIdentifier(object);
-        Individual individual=consumer.getIndividualForIndividualIdentifier(subject);
+        ClassExpression classexpression=consumer.getCE(object);
+        Individual individual=consumer.getIND(subject);
         String errorMessage="";
         if (individual==null)
             errorMessage="Could not find an individual for the subject in the triple "+subject+" "+predicate+" "+object+". ";

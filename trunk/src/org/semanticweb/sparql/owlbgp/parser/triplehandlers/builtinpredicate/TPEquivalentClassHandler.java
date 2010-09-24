@@ -22,19 +22,19 @@ public class TPEquivalentClassHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
-        ClassExpression class1=consumer.getClassExpressionForClassIdentifier(subject);
+        ClassExpression class1=consumer.getCE(subject);
         DataRange dr1=null;
         if (class1==null)
-            dr1=consumer.getDataRangeForDataRangeIdentifier(subject);
+            dr1=consumer.getDR(subject);
         if (class1==null && dr1==null)
-            throw new RuntimeException("Could not find neither a data range nor a clas expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
+            throw new RuntimeException("Could find neither a data range nor a class expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         
-        ClassExpression class2=consumer.getClassExpressionForClassIdentifier(object);
+        ClassExpression class2=consumer.getCE(object);
         DataRange dr2=null;
         if (class2==null)
-            dr2=consumer.getDataRangeForDataRangeIdentifier(object);
+            dr2=consumer.getDR(object);
         if (class2==null && dr2==null)
-            throw new RuntimeException("Could not find neither a data range nor a clas expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
+            throw new RuntimeException("Could find neither a data range nor a class expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
         
         if (class1!=null && class2!=null) {
             Set<ClassExpression> classes=new HashSet<ClassExpression>();

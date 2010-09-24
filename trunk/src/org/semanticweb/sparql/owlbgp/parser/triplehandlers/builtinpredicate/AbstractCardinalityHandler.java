@@ -20,11 +20,11 @@ public abstract class AbstractCardinalityHandler extends TripleHandler {
     }
     protected PropertyExpression getPropertyExpression(Identifier subject) {
         Identifier propID=consumer.getObject(subject, Vocabulary.OWL_ON_PROPERTY, true);
-        PropertyExpression pe=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(propID);
+        PropertyExpression pe=consumer.getOPE(propID);
         if (pe!=null) 
             return pe;
         else {
-            pe=consumer.getDataPropertyExpressionForDataPropertyIdentifier(propID);
+            pe=consumer.getDPE(propID);
             if (pe!=null)
                 return pe;
         }
@@ -35,13 +35,13 @@ public abstract class AbstractCardinalityHandler extends TripleHandler {
         Identifier classID=consumer.getObject(subject, Vocabulary.OWL_ON_CLASS, true);
         if (classID==null) return null;
         consumer.translateClassExpression(classID);
-        return consumer.getClassExpressionForClassIdentifier(classID);
+        return consumer.getCE(classID);
     }
     protected DataRange getDataRange(Identifier subject) {
         Identifier dataRangeID=consumer.getObject(subject, Vocabulary.OWL_ON_DATA_RANGE, true);
         if (dataRangeID==null) return null;
         consumer.translateDataRange(dataRangeID);
-        return consumer.getDataRangeForDataRangeIdentifier(dataRangeID);
+        return consumer.getDR(dataRangeID);
     }
     protected int getCardinality(Identifier object) {
         if (!(object instanceof TypedLiteral)) {

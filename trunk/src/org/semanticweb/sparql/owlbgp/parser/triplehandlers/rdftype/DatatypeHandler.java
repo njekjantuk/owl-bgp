@@ -27,8 +27,8 @@ public class DatatypeHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         if (consumer.isVariable(subject))
-            consumer.addAxiom(Declaration.create((DatatypeVariable)consumer.getDataRangeForDataRangeIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((DatatypeVariable)consumer.getDR(subject),annotations));
         else 
-            consumer.addAxiom(Declaration.create((Datatype)consumer.getDataRangeForDataRangeIdentifier(subject),annotations)); 
+            consumer.addAxiom(Declaration.create((Datatype)consumer.getDR(subject),annotations)); 
     }
 }

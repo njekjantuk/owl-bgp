@@ -17,6 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.axioms;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
+import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
@@ -97,14 +99,17 @@ public class SubAnnotationPropertyOf extends AbstractAxiom {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static SubAnnotationPropertyOf create(AnnotationPropertyExpression subAnnotationPropertyExpression, AnnotationPropertyExpression superAnnotationPropertyExpression) {
-        return create(subAnnotationPropertyExpression,superAnnotationPropertyExpression,new HashSet<Annotation>());
+    public static SubAnnotationPropertyOf create(AnnotationPropertyExpression subAnnotationPropertyExpression, AnnotationPropertyExpression superAnnotationPropertyExpression, Annotation... annotations) {
+        return create(subAnnotationPropertyExpression,superAnnotationPropertyExpression,new HashSet<Annotation>(Arrays.asList(annotations)));
     }
     public static SubAnnotationPropertyOf create(AnnotationPropertyExpression subAnnotationPropertyExpression, AnnotationPropertyExpression superAnnotationPropertyExpression,Set<Annotation> annotations) {
         return s_interningManager.intern(new SubAnnotationPropertyOf(subAnnotationPropertyExpression,superAnnotationPropertyExpression,annotations));
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
         return converter.visit(this);

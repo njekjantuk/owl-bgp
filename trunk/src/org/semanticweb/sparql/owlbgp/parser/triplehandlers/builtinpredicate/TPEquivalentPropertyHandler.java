@@ -19,17 +19,17 @@ public class TPEquivalentPropertyHandler extends TripleHandler {
     
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {    
-        ObjectPropertyExpression property1=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(subject);
+        ObjectPropertyExpression property1=consumer.getOPE(subject);
         DataPropertyExpression dataProperty1=null;
         if (property1==null)
-            dataProperty1=consumer.getDataPropertyExpressionForDataPropertyIdentifier(subject);
+            dataProperty1=consumer.getDPE(subject);
         if (property1==null && dataProperty1==null)
             throw new RuntimeException("Could not find a property expression for the subject in the triple "+subject+" "+predicate+" "+object+". ");
         
-        ObjectPropertyExpression property2=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(object);
+        ObjectPropertyExpression property2=consumer.getOPE(object);
         DataPropertyExpression dataProperty2=null;
         if (property2==null)
-            dataProperty2=consumer.getDataPropertyExpressionForDataPropertyIdentifier(object);
+            dataProperty2=consumer.getDPE(object);
         if (property1==null && dataProperty1==null)
             throw new RuntimeException("Could not find a property expression for the object in the triple "+subject+" "+predicate+" "+object+". ");
         

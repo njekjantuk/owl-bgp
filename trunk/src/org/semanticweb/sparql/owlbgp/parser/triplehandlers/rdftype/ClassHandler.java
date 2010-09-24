@@ -27,8 +27,8 @@ public class ClassHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         if (consumer.isVariable(subject))
-            consumer.addAxiom(Declaration.create((ClassVariable)consumer.getClassExpressionForClassIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((ClassVariable)consumer.getCE(subject),annotations));
         else 
-            consumer.addAxiom(Declaration.create((Clazz)consumer.getClassExpressionForClassIdentifier(subject),annotations));
+            consumer.addAxiom(Declaration.create((Clazz)consumer.getCE(subject),annotations));
     }
 }

@@ -13,6 +13,6 @@ public class ClassExpressionListItemTranslator implements ListItemTranslator<Cla
     }
     public ClassExpression translate(Identifier iri) {
         consumer.translateClassExpression(iri);
-        return consumer.getClassExpressionForClassIdentifier(iri);
+        return consumer.getCE(iri);
     }
 }

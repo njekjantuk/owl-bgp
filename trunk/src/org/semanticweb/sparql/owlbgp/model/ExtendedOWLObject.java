@@ -37,5 +37,6 @@ public interface ExtendedOWLObject extends Serializable {
     public Set<Variable> getVariablesInSignature();
     public Set<Variable> getVariablesInSignature(VarType varType);
     <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
+    public void accept(ExtendedOWLObjectVisitor visitor);
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory);
 }

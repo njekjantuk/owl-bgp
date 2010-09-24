@@ -15,7 +15,7 @@ public class TPHasSelfHandler extends TripleHandler {
 
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object) {
         Identifier propID=consumer.getObject(subject, Vocabulary.OWL_ON_PROPERTY, true);
-        ObjectPropertyExpression ope=consumer.getObjectPropertyExpressionForObjectPropertyIdentifier(propID);
+        ObjectPropertyExpression ope=consumer.getOPE(propID);
         if (ope!=null) {
             consumer.mapClassIdentifierToClassExpression(subject, ObjectHasSelf.create(ope));
         } else {
