@@ -29,8 +29,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
@@ -114,7 +114,7 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
         visitor.visit(this);
     }
     @Override
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     @Override
@@ -125,7 +125,7 @@ public class DataHasValue extends AbstractExtendedOWLObject implements ClassExpr
         return variables;
     }
     @Override
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return create((DataPropertyExpression)m_dpe.getBoundVersion(variablesToBindings),(Literal)m_literal.getBoundVersion(variablesToBindings));
     }
 }

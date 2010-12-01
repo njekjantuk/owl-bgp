@@ -9,7 +9,7 @@ public class AppliedBindingIterator implements Iterator<ExtendedOWLObject>, Iter
     protected final ExtendedOWLObject m_extendedOwlObject;
     protected final BindingIterator m_bindingIterator;
     
-    public AppliedBindingIterator(ExtendedOWLObject extendedOWLObject,Map<Variable,Set<Atomic>> variablesToBindings) {
+    public AppliedBindingIterator(ExtendedOWLObject extendedOWLObject,Map<Variable,Set<? extends Atomic>> variablesToBindings) {
         m_extendedOwlObject=extendedOWLObject;
         m_bindingIterator=new BindingIterator(variablesToBindings);
     }

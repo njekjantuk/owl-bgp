@@ -105,7 +105,7 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.TransitivePro
 public class TripleConsumer {
     public static final String LB=System.getProperty("line.separator");
     
-    protected boolean debug=false;
+    protected boolean debug=true;
     
     protected final Set<Import>     imports=new HashSet<Import>();
     protected Identifier            ontologyIRI;
@@ -385,7 +385,7 @@ public class TripleConsumer {
     }
     public void handleEnd() {
         //if (ontologyIRI==null) throw new RuntimeException("The ontology did not have an ontology IRI, i.e., it is missing a triple of the form: ontologyIRI rdf:type owl:Ontology . ");
-        checkVersionIRIIsForOntologyIRI(); // Table 4
+        checkVersionIRIsForOntologyIRI(); // Table 4
         checkImportsOnlyForOntologyIRI(); // Table 4
         // TODO: Check what happens if two ontology IRIs are given, but the forbidden triples are not fully matched.  
         checkOnytologyIRIIsNeverObject(); // Table 4
@@ -1238,7 +1238,7 @@ public class TripleConsumer {
             }
         }
     }
-    protected void checkVersionIRIIsForOntologyIRI() {
+    protected void checkVersionIRIsForOntologyIRI() {
         if (ontologyIRIToVersionIRIs.keySet().size()>1) {
             throw new RuntimeException("The parsed ontology has version IRIs for more than one ontology IRI, which is not allowed. ");
         } else if (ontologyIRIToVersionIRIs.keySet().size()==1 && ontologyIRIToVersionIRIs.keySet().iterator().next()!=ontologyIRI) {
@@ -1507,8 +1507,13 @@ public class TripleConsumer {
             if (cls instanceof ClassVariable)
                 classesVariablesInSignature.add((ClassVariable)cls);
         }
-        return Ontology.create(ontologyIRI, ontologyIRIToVersionIRIs.get(ontologyIRI), imports, axioms, ANN.get(ontologyIRI)
-                );
+        Identifier versionIRI=null;
+        if (ontologyIRIToVersionIRIs.containsKey(ontologyIRI)) {
+            Set<Identifier> iris=ontologyIRIToVersionIRIs.get(ontologyIRI);
+            if (!iris.isEmpty())
+                versionIRI=iris.iterator().next();
+        }
+        return Ontology.create(ontologyIRI, versionIRI, imports, axioms, ANN.get(ontologyIRI));
     }
     public boolean isOntologyIRI(Identifier iri) {
         return ontologyIRI==iri;

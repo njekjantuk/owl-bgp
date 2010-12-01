@@ -26,7 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public class ClassVariable extends Variable implements ClassExpression {
@@ -60,7 +60,7 @@ public class ClassVariable extends Variable implements ClassExpression {
         visitor.visit(this);
     }
     @Override
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     @Override
@@ -71,7 +71,8 @@ public class ClassVariable extends Variable implements ClassExpression {
     }
     @Override
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding instanceof Clazz || binding==null) return binding;
-        else throw new RuntimeException("Error: Only classes can be assigned to class variables, but class variable "+m_variable+" was assigned the non-class "+binding);
+        if (binding instanceof Clazz) return binding;
+        else if (binding==null) return this;
+        else throw new IllegalArgumentException("Error: Only classes can be assigned to class variables, but class variable "+m_variable+" was assigned the non-class "+binding);
     }
 }

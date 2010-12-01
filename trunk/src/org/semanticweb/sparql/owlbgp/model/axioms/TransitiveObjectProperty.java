@@ -26,12 +26,14 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.AxiomVisitor;
+import org.semanticweb.sparql.owlbgp.model.AxiomVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
@@ -115,7 +117,13 @@ public class TransitiveObjectProperty extends AbstractAxiom implements ObjectPro
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    public <O> O accept(AxiomVisitorEx<O> visitor) {
+        return visitor.visit(this);
+    }
+    public void accept(AxiomVisitor visitor) {
+        visitor.visit(this);
+    }
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
@@ -124,7 +132,7 @@ public class TransitiveObjectProperty extends AbstractAxiom implements ObjectPro
         getAnnotationVariables(varType, variables);
         return variables;
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return create((ObjectPropertyExpression)m_ope.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {

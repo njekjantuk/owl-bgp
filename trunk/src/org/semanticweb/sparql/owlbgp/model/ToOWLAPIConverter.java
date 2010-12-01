@@ -34,7 +34,6 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyID;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.OWLPropertyExpression;
-import org.semanticweb.owlapi.model.SetOntologyID;
 import org.semanticweb.owlapi.vocab.OWLFacet;
 import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.AnnotationPropertyDomain;
@@ -121,10 +120,10 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
-public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
+public class ToOWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     protected final OWLDataFactory m_dataFactory;
     
-    public OWLAPIConverter(OWLDataFactory dataFactory) {
+    public ToOWLAPIConverter(OWLDataFactory dataFactory) {
         m_dataFactory=dataFactory;
     }
     public OWLObject visit(org.semanticweb.sparql.owlbgp.model.IRI iri) {
@@ -422,9 +421,8 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLObject visit(DatatypeDefinition axiom) {
         return m_dataFactory.getOWLDatatypeDefinitionAxiom((OWLDatatype)axiom.getDatatype().accept(this),(OWLDataRange)axiom.getDataRange().accept(this),getAnnotations(axiom));
     }
-    
-    @SuppressWarnings("unchecked")
     public OWLObject visit(HasKey axiom) {
+        @SuppressWarnings("rawtypes")
         Set<OWLPropertyExpression> pes=new HashSet<OWLPropertyExpression>();
         for (ObjectPropertyExpression ope : axiom.getObjectPropertyExpressions()) {
             pes.add((OWLObjectPropertyExpression)ope.accept(this));
@@ -465,7 +463,9 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
     public OWLObject visit(Ontology ontology) {
         Identifier iri=ontology.getOntologyIRI();
         IRI ontologyIRI=(iri!=null?(IRI)iri.accept(this):null);
-        OWLOntologyID id=new OWLOntologyID(ontologyIRI);
+        iri=ontology.getVersionIRI();
+        IRI versionIRI=(iri!=null?(IRI)iri.accept(this):null);
+        OWLOntologyID id=new OWLOntologyID(ontologyIRI,versionIRI);
         try {
             OWLOntologyManager m=OWLManager.createOWLOntologyManager(m_dataFactory);
             OWLOntology o=m.createOntology(id);
@@ -474,10 +474,6 @@ public class OWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> {
                 axioms.add((OWLAxiom)ax.accept(this));
             m.addAxioms(o, axioms);
             List<OWLOntologyChange> changes=new ArrayList<OWLOntologyChange>();
-            for (Identifier versionIRI : ontology.getVersionIRIs()) {
-                OWLOntologyID oid=new OWLOntologyID(ontologyIRI, (IRI)versionIRI.accept(this));
-                changes.add(new SetOntologyID(o,oid));
-            }
             for (Annotation annotation : ontology.getAnnotations()) 
                 changes.add(new AddOntologyAnnotation(o,(OWLAnnotation)annotation.accept(this)));
             for (Import imported : ontology.getDirectImports())

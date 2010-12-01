@@ -13,7 +13,7 @@ public class AppliedBindingOWLAPIIterator implements Iterator<OWLObject>, Iterab
     protected final OWLDataFactory m_dataFactory;
     protected final BindingIterator m_bindingIterator;
     
-    public AppliedBindingOWLAPIIterator(ExtendedOWLObject extendedOWLObject,Map<Variable,Set<Atomic>> variablesToBindings,OWLDataFactory dataFactory) {
+    public AppliedBindingOWLAPIIterator(ExtendedOWLObject extendedOWLObject,Map<Variable,Set<? extends Atomic>> variablesToBindings,OWLDataFactory dataFactory) {
         m_extendedOwlObject=extendedOWLObject;
         m_dataFactory=dataFactory;
         m_bindingIterator=new BindingIterator(variablesToBindings);

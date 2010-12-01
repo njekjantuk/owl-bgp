@@ -26,7 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
@@ -50,8 +50,9 @@ public class LiteralVariable extends Variable implements Literal {
         super(variable);
     }
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding instanceof Literal || binding==null) return binding;
-        throw new RuntimeException("Error: Only literals can be assigned to literal variables, but literal variable "+m_variable+" was assigned the non-literal "+binding);
+        if (binding instanceof Literal) return binding;
+        else if (binding==null) return this;
+        else throw new IllegalArgumentException("Error: Only literals can be assigned to literal variables, but literal variable "+m_variable+" was assigned the non-literal "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -68,7 +69,7 @@ public class LiteralVariable extends Variable implements Literal {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {

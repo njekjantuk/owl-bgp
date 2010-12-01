@@ -118,7 +118,7 @@ public class TestClasses extends TestCase {
         ClassVariable classVar2=ClassVariable.create("?y");
         ClassVariable classVar3=ClassVariable.create("?z");
         ClassExpression or=ObjectUnionOf.create(classVar1, classVar2, classVar3);
-        Map<Variable,Set<Atomic>> varToBindingSets=new HashMap<Variable, Set<Atomic>>();
+        Map<Variable,Set<? extends Atomic>> varToBindingSets=new HashMap<Variable, Set<? extends Atomic>>();
         Set<Atomic> bindingsX=new HashSet<Atomic>();
         bindingsX.add(Clazz.create("http://example.org/a"));
         bindingsX.add(Clazz.create("http://example.org/b"));
@@ -134,7 +134,7 @@ public class TestClasses extends TestCase {
         bindingsZ.add(Clazz.create("http://example.org/s"));
         varToBindingSets.put(classVar3, bindingsZ);
         int i=0;   
-        for (Map<Variable,Atomic> binding : new BindingIterator(varToBindingSets)) {
+        for (Map<Variable,? extends Atomic> binding : new BindingIterator(varToBindingSets)) {
             ExtendedOWLObject boundOr=or.getBoundVersion(binding);
             assertTrue(boundOr.getVariablesInSignature().size()==0);
             i++;

@@ -26,7 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public class AnnotationPropertyVariable extends Variable implements AnnotationPropertyExpression,Atomic {
@@ -46,8 +46,9 @@ public class AnnotationPropertyVariable extends Variable implements AnnotationPr
         super(variable);
     }
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding==null || binding instanceof AnnotationProperty) return binding;
-        else throw new RuntimeException("Error: Only annotation properties can be assigned to annotation property variables, but annotation property variable "+m_variable+" was assigned the non-annotation property "+binding);
+        if (binding==null) return this;
+        else if (binding instanceof AnnotationProperty) return binding;
+        else throw new IllegalArgumentException("Error: Only annotation properties can be assigned to annotation property variables, but annotation property variable "+m_variable+" was assigned the non-annotation property "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -61,7 +62,7 @@ public class AnnotationPropertyVariable extends Variable implements AnnotationPr
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {

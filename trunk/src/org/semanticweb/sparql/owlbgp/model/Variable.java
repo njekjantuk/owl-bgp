@@ -30,7 +30,7 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
         return m_variable;
     }
     public abstract ExtendedOWLObject getBoundVersion(Atomic binding);
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return getBoundVersion(variablesToBindings.get(this));
     }
     @Override
@@ -44,7 +44,7 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     public Identifier getIdentifier() {
         return this;
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         throw new RuntimeException("An untyped variable cannot have a binding and can, consequently, not be converted into an OWL API pbject and variable "+m_variable+" is untyped. "); 
     }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
@@ -52,5 +52,8 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
+    }
+    public boolean isVariable() {
+        return true;
     }
 }

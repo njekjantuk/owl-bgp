@@ -20,4 +20,5 @@ package org.semanticweb.sparql.owlbgp.model.classexpressions;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 
 public interface ClassExpression extends ExtendedOWLObject {
+    
 }

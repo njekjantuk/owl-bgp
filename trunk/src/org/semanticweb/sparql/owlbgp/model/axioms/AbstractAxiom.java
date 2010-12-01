@@ -26,7 +26,7 @@ public abstract class AbstractAxiom extends AbstractExtendedOWLObject implements
     public Identifier getIdentifier() {
         return null;
     }
-    protected Set<Annotation> getBoundAnnotations(Map<Variable,Atomic> variablesToBindings) {
+    protected Set<Annotation> getBoundAnnotations(Map<Variable,? extends Atomic> variablesToBindings) {
         Set<Annotation> annotations=new HashSet<Annotation>();
         for (Annotation annotation : m_annotations) 
             annotations.add((Annotation)annotation.getBoundVersion(variablesToBindings));

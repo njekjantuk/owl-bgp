@@ -146,7 +146,7 @@ public class Annotation extends AbstractExtendedOWLObject {
         visitor.visit(this);
     }
     @Override
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     @Override
@@ -159,7 +159,7 @@ public class Annotation extends AbstractExtendedOWLObject {
         return variables;
     }
     @Override
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         Set<Annotation> annotations=new HashSet<Annotation>();
         for (Annotation annotation : m_annotations) 
             annotations.add((Annotation)annotation.getBoundVersion(variablesToBindings));

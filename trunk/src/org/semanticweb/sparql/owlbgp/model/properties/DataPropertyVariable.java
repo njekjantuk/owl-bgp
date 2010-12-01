@@ -26,7 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public class DataPropertyVariable extends Variable implements DataPropertyExpression {
@@ -47,8 +47,9 @@ public class DataPropertyVariable extends Variable implements DataPropertyExpres
         super(variable);
     }
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding instanceof DataProperty || binding==null) return binding;  
-        else throw new RuntimeException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
+        if (binding instanceof DataProperty) return binding;
+        else if (binding==null)return this;
+        else throw new IllegalArgumentException("Error: Only data properties can be assigned to data property variables, but data proiperty variable "+m_variable+" was assigned the non-data property "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -62,7 +63,7 @@ public class DataPropertyVariable extends Variable implements DataPropertyExpres
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {

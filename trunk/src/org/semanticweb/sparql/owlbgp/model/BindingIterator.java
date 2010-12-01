@@ -7,12 +7,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 
-public class BindingIterator implements Iterator<Map<Variable,Atomic>>, Iterable<Map<Variable,Atomic>> {
+public class BindingIterator implements Iterator<Map<Variable,? extends Atomic>>, Iterable<Map<Variable,? extends Atomic>> {
     protected final Variable[] m_variables;
     protected int[] m_currentBindingIndexes;
     protected final Atomic[][] m_variablesToBindings;
     
-    public BindingIterator(Map<Variable,Set<Atomic>> variablesToBindings) {
+    public BindingIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings) {
         m_variables=variablesToBindings.keySet().toArray(new Variable[0]);
         m_variablesToBindings=new Atomic[m_variables.length][];
         for (int index=0;index<m_variables.length;index++) {
@@ -64,7 +64,7 @@ public class BindingIterator implements Iterator<Map<Variable,Atomic>>, Iterable
     public void remove() {
         throw new UnsupportedOperationException("The binding iterator does not support removal. ");
     }
-    public Iterator<Map<Variable,Atomic>> iterator() {
+    public Iterator<Map<Variable,? extends Atomic>> iterator() {
         return this;
     }    
 }

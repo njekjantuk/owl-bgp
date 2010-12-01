@@ -40,8 +40,8 @@ public class UntypedVariable extends Variable implements Atomic {
         super(variable);
     }
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding==null) return null;
-        else throw new RuntimeException("Error: Untyped variables cannot be bound, but variable "+m_variable+" was assigned the binding "+binding);
+        if (binding==null) return this;
+        else throw new IllegalArgumentException("Error: Untyped variables cannot be bound, but variable "+m_variable+" was assigned the binding "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -55,7 +55,7 @@ public class UntypedVariable extends Variable implements Atomic {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
