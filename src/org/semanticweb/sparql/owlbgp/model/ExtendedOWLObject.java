@@ -30,13 +30,14 @@ public interface ExtendedOWLObject extends Serializable {
     public String toTurtleString();
     public String toTurtleString(Identifier mainNode);
     public String toTurtleString(Prefixes prefixes, Identifier mainNode);
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings);
-    public OWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings,OWLDataFactory dataFactory);
-    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<Atomic>> variablesToBindings);
-    public Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable,Set<Atomic>> variablesToBindings,OWLDataFactory dataFactory);
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings);
+    public OWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings,OWLDataFactory dataFactory);
+    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings);
+    public Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings,OWLDataFactory dataFactory);
     public Set<Variable> getVariablesInSignature();
     public Set<Variable> getVariablesInSignature(VarType varType);
     <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
     public void accept(ExtendedOWLObjectVisitor visitor);
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory);
+    public boolean isVariable();
 }

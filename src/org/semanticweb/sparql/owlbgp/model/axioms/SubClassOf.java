@@ -9,17 +9,18 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Annotation;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.AxiomVisitor;
+import org.semanticweb.sparql.owlbgp.model.AxiomVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
 public class SubClassOf extends AbstractAxiom implements ClassAxiom {
@@ -109,7 +110,13 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    public <O> O accept(AxiomVisitorEx<O> visitor) {
+        return visitor.visit(this);
+    }
+    public void accept(AxiomVisitor visitor) {
+        visitor.visit(this);
+    }
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
@@ -119,8 +126,8 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
         getAnnotationVariables(varType, variables);
         return variables;
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
-        return create((Clazz)m_subClass.getBoundVersion(variablesToBindings),(Clazz)m_superClass.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
+        return create((ClassExpression)m_subClass.getBoundVersion(variablesToBindings),(ClassExpression)m_superClass.getBoundVersion(variablesToBindings),getBoundAnnotations(variablesToBindings));
     }
     public Axiom getAxiomWithoutAnnotations() {
         return create(m_subClass, m_superClass);

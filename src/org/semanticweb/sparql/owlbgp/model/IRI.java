@@ -67,13 +67,13 @@ public class IRI extends AbstractExtendedOWLObject implements Identifier,Annotat
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return this;
     }
 }

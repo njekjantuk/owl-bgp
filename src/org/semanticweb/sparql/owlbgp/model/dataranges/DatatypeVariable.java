@@ -26,7 +26,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public class DatatypeVariable extends Variable implements DataRange {
@@ -47,8 +47,9 @@ public class DatatypeVariable extends Variable implements DataRange {
         super(variable);
     }
     public ExtendedOWLObject getBoundVersion(Atomic binding) {
-        if (binding instanceof Datatype || binding==null) return binding;
-        else throw new RuntimeException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
+        if (binding instanceof Datatype) return binding;
+        else if (binding==null) return this;
+        else throw new IllegalArgumentException("Error: Only datatypes can be assigned to datatype variables, but datatype variable "+m_variable+" was assigned the non-datatype "+binding);
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
@@ -62,7 +63,7 @@ public class DatatypeVariable extends Variable implements DataRange {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {

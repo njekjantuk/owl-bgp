@@ -28,8 +28,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public class AnnotationProperty extends AbstractExtendedOWLObject implements AnnotationPropertyExpression, Atomic {
@@ -82,11 +82,11 @@ public class AnnotationProperty extends AbstractExtendedOWLObject implements Ann
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     @Override
-    public ExtendedOWLObject getBoundVersion(Map<Variable, Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return this;
     }
 }

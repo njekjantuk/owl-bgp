@@ -34,6 +34,14 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     {
         pm.declareSemanticWebPrefixes();
     }
+    public void loadDeclarations(Set<Clazz> classes, Set<Datatype> dts, Set<ObjectProperty> ops, Set<DataProperty> dps, Set<AnnotationProperty> aps, Set<NamedIndividual> inds) {
+        handler.setClassesInOntologySignature(classes);
+        handler.setCustomDatatypesInOntologySignature(dts);
+        handler.setObjectPropertiesInOntologySignature(ops);
+        handler.setDataPropertiesInOntologySignature(dps);
+        handler.setAnnotationPropertiesInOntologySignature(aps);
+        handler.setIndividualsInOntologySignature(inds);
+    }
     public void setClassesInOntologySignature(Set<Clazz> classes) {
         handler.setClassesInOntologySignature(classes);
     }
@@ -54,8 +62,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
     public static void main(String[] args) {
 //        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
-
-        String s="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
+        String s="?x a owl:ObjectProperty ."+LB;
+        s+="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
         s+= "<http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> a owl:ObjectProperty ."+LB;
 
         s+= "?prop a owl:ObjectProperty ."+LB
@@ -382,7 +390,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       }
         AnonymousIndividual prevSubject = subject;
         subject=getAnonymousIndividual("");
-        if (prevSubject!=null) handler.handleStreaming(prevSubject, rest, subject);
+        if (prevSubject!=null) 
+            handler.handleStreaming(prevSubject, rest, subject);
         else firstSubject=subject;
       parseObject(subject, first);
     }
@@ -532,7 +541,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
   }
 
   private boolean jj_2_2(int xla) {
-    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    jj_la = xla; 
+    jj_lastpos = jj_scanpos = token;
     try { return !jj_3_2(); }
     catch(LookaheadSuccess ls) { return true; }
     finally { jj_save(1, xla); }

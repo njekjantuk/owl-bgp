@@ -16,7 +16,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
@@ -110,7 +110,7 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return null;
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
@@ -120,7 +120,7 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
         }
         return variables;
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         List<ObjectPropertyExpression> objectPropertyExpressions=new ArrayList<ObjectPropertyExpression>();
         for (ObjectPropertyExpression ope : m_objectPropertyExpressions) {
             objectPropertyExpressions.add((ObjectPropertyExpression)ope.getBoundVersion(variablesToBindings));

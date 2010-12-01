@@ -85,23 +85,26 @@ public abstract class AbstractExtendedOWLObject implements ExtendedOWLObject {
     public Set<Variable> getVariablesInSignature(VarType varType) {
         return new HashSet<Variable>();
     }
-    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<Atomic>> variablesToBindings) {
+    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings) {
         return new AppliedBindingIterator(this,variablesToBindings);
     }
-    public Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable, Set<Atomic>> variablesToBindings,OWLDataFactory dataFactory) {
+    public Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable, Set<? extends Atomic>> variablesToBindings,OWLDataFactory dataFactory) {
         return new AppliedBindingOWLAPIIterator(this,variablesToBindings,dataFactory);
     }
-    public abstract ExtendedOWLObject getBoundVersion(Map<Variable, Atomic> variablesToBindings);
-    public OWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings,OWLDataFactory dataFactory) {
+    public abstract ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings);
+    public OWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings,OWLDataFactory dataFactory) {
         return getBoundVersion(variablesToBindings).asOWLAPIObject(dataFactory);
     }
     public abstract <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
     public abstract void accept(ExtendedOWLObjectVisitor visitor);
     public OWLObject asOWLAPIObject(OWLDataFactory dataFactory) {
-        return convertToOWLAPIObject(new OWLAPIConverter(dataFactory));
+        return convertToOWLAPIObject(new ToOWLAPIConverter(dataFactory));
     }
-    public OWLObject asOWLAPIObject(OWLAPIConverter converter) {
+    public OWLObject asOWLAPIObject(ToOWLAPIConverter converter) {
         return convertToOWLAPIObject(converter);
     }
-    protected abstract OWLObject convertToOWLAPIObject(OWLAPIConverter converter);
+    protected abstract OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter);
+    public boolean isVariable() {
+        return false;
+    }
 }

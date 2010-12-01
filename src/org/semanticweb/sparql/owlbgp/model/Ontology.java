@@ -46,7 +46,7 @@ public class Ontology extends AbstractExtendedOWLObject {
     protected static InterningManager<Ontology> s_interningManager=new InterningManager<Ontology>() {
         protected boolean equal(Ontology object1,Ontology object2) {
             if (object1.m_IRI!=object2.m_IRI 
-                        || object1.m_versionIRIs.size()!=object2.m_versionIRIs.size()
+                        || object1.m_versionIRI!=object2.m_versionIRI
                         || object1.m_directlyImported.size()!=object2.m_directlyImported.size()
                         || object1.m_axioms.size()!=object2.m_axioms.size()
                         || object1.m_annotations.size()!=object2.m_annotations.size()
@@ -66,10 +66,6 @@ public class Ontology extends AbstractExtendedOWLObject {
                         || object1.m_untypedVariablesInSignature.size()!=object2.m_untypedVariablesInSignature.size()
                     ) 
                 return false;
-            for (Identifier id : object1.m_versionIRIs) {
-                if (!contains(id, object2.m_versionIRIs))
-                    return false;
-            }
             for (Import imported : object1.m_directlyImported) {
                 if (!contains(imported, object2.m_directlyImported))
                     return false;
@@ -139,11 +135,6 @@ public class Ontology extends AbstractExtendedOWLObject {
                     return false;
             }  
             return true;
-        }
-        protected boolean contains(Identifier id,Set<Identifier> ids) {
-            for (Identifier ident : ids)
-                if (ident==id) return true;
-            return false;
         }
         protected boolean contains(Import imported,Set<Import> imports) {
             for (Import imp : imports)
@@ -234,8 +225,7 @@ public class Ontology extends AbstractExtendedOWLObject {
         protected int getHashCode(Ontology object) {
             int hashCode=1313;
             if (object.m_IRI!=null) hashCode+=object.m_IRI.hashCode();
-            for (Identifier id : object.m_versionIRIs) 
-                hashCode+=id.hashCode();
+            if (object.m_versionIRI!=null) hashCode+=object.m_versionIRI.hashCode();
             for (Import imported : object.m_directlyImported) 
                 hashCode+=imported.hashCode();
             for (Axiom ax : object.m_axioms)
@@ -275,7 +265,7 @@ public class Ontology extends AbstractExtendedOWLObject {
     };
     
     protected final Identifier m_IRI;
-    protected final Set<Identifier> m_versionIRIs;
+    protected final Identifier m_versionIRI;
     protected final Set<Import> m_directlyImported;
     protected final Set<Annotation> m_annotations;
     protected final Set<Axiom> m_axioms;
@@ -294,17 +284,17 @@ public class Ontology extends AbstractExtendedOWLObject {
     protected final Set<LiteralVariable> m_literalVariablesInSignature;
     protected final Set<UntypedVariable> m_untypedVariablesInSignature;
 
-    protected Ontology(Identifier ontologyIRI, Set<Identifier> versionIRIs, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations) {
+    protected Ontology(Identifier ontologyIRI, Identifier versionIRI, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations) {
         m_IRI=ontologyIRI;
-        m_versionIRIs=Collections.unmodifiableSet(versionIRIs==null?new HashSet<Identifier>():versionIRIs);
+        m_versionIRI=versionIRI;
         m_directlyImported=Collections.unmodifiableSet(directlyImports==null?new HashSet<Import>():directlyImports);
         m_axioms=Collections.unmodifiableSet(axioms==null?new HashSet<Axiom>():axioms); 
         m_annotations=Collections.unmodifiableSet(ontologyAnnotations==null?new HashSet<Annotation>():ontologyAnnotations);
         SignatureExtractor signatureExtractor=new SignatureExtractor();
         if (ontologyIRI!=null) 
             ontologyIRI.accept(signatureExtractor);
-        for (Identifier version : m_versionIRIs) 
-            version.accept(signatureExtractor);
+        if (versionIRI!=null) 
+            versionIRI.accept(signatureExtractor);
         for (Import directImport : m_directlyImported)
             directImport.accept(signatureExtractor);
         for (Axiom ax : m_axioms)
@@ -326,7 +316,7 @@ public class Ontology extends AbstractExtendedOWLObject {
         m_literalVariablesInSignature=Collections.unmodifiableSet(signatureExtractor.getLiteralVariablesInSignature());
         m_untypedVariablesInSignature=Collections.unmodifiableSet(signatureExtractor.getUntypedVariablesInSignature());         
     }
-    protected Ontology(Identifier ontologyIRI, Set<Identifier> versionIRIs, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations,
+    protected Ontology(Identifier ontologyIRI, Identifier versionIRI, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations,
                 Set<Clazz> classesInSignature,Set<Datatype> datatypesInSignature,Set<ObjectProperty> objectPropertiesInSignature,
                 Set<DataProperty> dataPropertiesInSignature,Set<AnnotationProperty> annotationPropertiesInSignature,Set<NamedIndividual> individualsInSignature,
                 Set<ClassVariable> classVariablesInSignature,Set<DatatypeVariable> datatypeVariablesInSignature,
@@ -334,7 +324,7 @@ public class Ontology extends AbstractExtendedOWLObject {
                 Set<AnnotationPropertyVariable> annotationPropertyVariablesInSignature,Set<IndividualVariable> individualVariablesInSignature,
                 Set<LiteralVariable> literalVariablesInSignature,Set<UntypedVariable> untypedVariablesInSignature) {
         m_IRI=ontologyIRI;
-        m_versionIRIs=Collections.unmodifiableSet(versionIRIs==null?new HashSet<Identifier>():versionIRIs);
+        m_versionIRI=versionIRI;
         m_directlyImported=Collections.unmodifiableSet(directlyImports==null?new HashSet<Import>():directlyImports);
         m_axioms=Collections.unmodifiableSet(axioms==null?new HashSet<Axiom>():axioms); 
         m_annotations=Collections.unmodifiableSet(ontologyAnnotations==null?new HashSet<Annotation>():ontologyAnnotations);
@@ -401,8 +391,8 @@ public class Ontology extends AbstractExtendedOWLObject {
     public boolean containsImport(Import imported) {
         return m_directlyImported.contains(imported);
     }
-    public boolean containsVersionIRI(Identifier versionIRI) {
-        return m_versionIRIs.contains(versionIRI);
+    public boolean hasVersionIRI(Identifier versionIRI) {
+        return m_versionIRI.equals(versionIRI);
     }
     public boolean containsAnnotation(Annotation annotation) {
         return m_annotations.contains(annotation);
@@ -410,8 +400,8 @@ public class Ontology extends AbstractExtendedOWLObject {
     public Identifier getOntologyIRI() {
         return m_IRI;
     }
-    public Set<Identifier> getVersionIRIs() {
-        return m_versionIRIs;
+    public Identifier getVersionIRI() {
+        return m_versionIRI;
     }
     public Set<Import> getDirectImports() {
         return m_directlyImported;
@@ -426,23 +416,20 @@ public class Ontology extends AbstractExtendedOWLObject {
     public String toString(Prefixes prefixes) {
         StringBuffer buffer=new StringBuffer();
         buffer.append("Ontology(");
-        if (m_IRI!=null) buffer.append(m_IRI);
-        for (Identifier id : m_versionIRIs) {
-            buffer.append(AbstractExtendedOWLObject.LB);
-            buffer.append(id);
-        }
-        buffer.append(AbstractExtendedOWLObject.LB);
+        if (m_IRI!=null) buffer.append(m_IRI+LB);
+        if (m_versionIRI!=null) buffer.append(m_versionIRI+LB);
+        buffer.append(LB);
         for (Import imported : m_directlyImported) {
             buffer.append(imported.toString(prefixes));
-            buffer.append(AbstractExtendedOWLObject.LB);
+            buffer.append(LB);
         }
         for (Annotation annotation : m_annotations) {
             buffer.append(annotation.toString(prefixes));
-            buffer.append(AbstractExtendedOWLObject.LB);
+            buffer.append(LB);
         }
         for (Axiom ax : m_axioms) {
             buffer.append(ax.toString(prefixes));
-            buffer.append(AbstractExtendedOWLObject.LB);
+            buffer.append(LB);
         }
         buffer.append(")");
         return buffer.toString();
@@ -456,16 +443,15 @@ public class Ontology extends AbstractExtendedOWLObject {
         buffer.append(ontologyIdentifier.toString(prefixes));
         buffer.append(" rdf:type owl:Ontology . ");
         buffer.append(LB);
-        for (Identifier id : m_versionIRIs) {
+        if (m_versionIRI!=null) {
             buffer.append(ontologyIdentifier.toString(prefixes));
             buffer.append(" ");
             buffer.append(Vocabulary.OWL_VERSION_IRI);
             buffer.append(" ");
-            buffer.append(id.toString(prefixes));
+            buffer.append(m_versionIRI.toString(prefixes));
             buffer.append(" . ");
             buffer.append(LB);
         }
-        buffer.append(LB);
         for (Import imported : m_directlyImported) {
             buffer.append(imported.toTurtleString(prefixes,ontologyIdentifier));
             buffer.append(LB);
@@ -483,14 +469,15 @@ public class Ontology extends AbstractExtendedOWLObject {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static Ontology create(Identifier ontologyIRI, Set<Identifier> versionIRIs, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations) {
-        return s_interningManager.intern(new Ontology(ontologyIRI,versionIRIs,directlyImports,axioms,ontologyAnnotations));
+    public static Ontology create(Identifier ontologyIRI, Identifier versionIRI, Set<Import> directlyImports, Set<Axiom> axioms, Set<Annotation> ontologyAnnotations) {
+        return s_interningManager.intern(new Ontology(ontologyIRI,versionIRI,directlyImports,axioms,ontologyAnnotations));
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
-        variables.addAll(m_IRI.getVariablesInSignature(varType));
-        for (Identifier id : m_versionIRIs)
-            variables.addAll(id.getVariablesInSignature(varType));
+        if (m_IRI!=null)
+            variables.addAll(m_IRI.getVariablesInSignature(varType));
+        if (m_versionIRI!=null)
+            variables.addAll(m_versionIRI.getVariablesInSignature(varType));
         for (Import imported : m_directlyImported)
             variables.addAll(imported.getVariablesInSignature(varType));
         for (Axiom ax : m_axioms)
@@ -505,14 +492,12 @@ public class Ontology extends AbstractExtendedOWLObject {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         Identifier boundIRI=(m_IRI!=null?(Identifier)m_IRI.getBoundVersion(variablesToBindings):null);
-        Set<Identifier> boundVersionIRIs=new HashSet<Identifier>();
-        for (Identifier version : m_versionIRIs)
-            boundVersionIRIs.add((IRI)version.getBoundVersion(variablesToBindings));
+        Identifier boundVersionIRI=(m_versionIRI!=null?(Identifier)m_versionIRI.getBoundVersion(variablesToBindings):null);
         Set<Import> boundImports=new HashSet<Import>();
         for (Import imported : m_directlyImported)
             boundImports.add((Import)imported.getBoundVersion(variablesToBindings));
@@ -522,6 +507,6 @@ public class Ontology extends AbstractExtendedOWLObject {
         Set<Annotation> boundAnnotations=new HashSet<Annotation>();
         for (Annotation anno : m_annotations)
             boundAnnotations.add((Annotation)anno.getBoundVersion(variablesToBindings));
-        return create(boundIRI,boundVersionIRIs,boundImports,boundAxioms,boundAnnotations);
+        return create(boundIRI,boundVersionIRI,boundImports,boundAxioms,boundAnnotations);
     }
 }

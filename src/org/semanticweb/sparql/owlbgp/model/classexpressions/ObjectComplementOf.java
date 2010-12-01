@@ -29,7 +29,7 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.OWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
@@ -105,7 +105,7 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    protected OWLObject convertToOWLAPIObject(OWLAPIConverter converter) {
+    protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
     public Set<Variable> getVariablesInSignature(VarType varType) {
@@ -113,7 +113,7 @@ public class ObjectComplementOf extends AbstractExtendedOWLObject implements Cla
         variables.addAll(m_classExpression.getVariablesInSignature(varType));
         return variables;
     }
-    public ExtendedOWLObject getBoundVersion(Map<Variable,Atomic> variablesToBindings) {
+    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return create((ClassExpression)m_classExpression.getBoundVersion(variablesToBindings));
     }
 }

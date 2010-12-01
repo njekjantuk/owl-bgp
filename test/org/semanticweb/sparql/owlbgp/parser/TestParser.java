@@ -44,7 +44,6 @@ public class TestParser extends TestCase {
     public void testParseOntology() throws Exception {
         String s="<http://example.org/myOnt> rdf:type owl:Ontology ."+LB
             + "<http://example.org/myOnt> owl:versionIRI <http://example.org/myOnt/1.0> ."+LB
-            + "<http://example.org/myOnt> owl:versionIRI <http://example.org/myOnt/2.0> ."+LB
             + "<http://example.org/myOnt> owl:imports <http://example.org/myOtherOnt> ."+LB
             + "<http://example.org/myOnt> owl:imports <http://example.org/anotherOnt> ."+LB
             + "<http://example.org/myOnt/C1> rdf:type owl:Class . "+LB
@@ -58,8 +57,7 @@ public class TestParser extends TestCase {
         assertTrue(ontology.containsAxiom(Declaration.create(Clazz.create("http://example.org/myOnt/C1"))));
         assertTrue(ontology.containsAxiom(Declaration.create(Clazz.create("http://example.org/myOnt/C2"))));
         assertTrue(ontology.containsAxiom(SubClassOf.create(Clazz.create("http://example.org/myOnt/C1"), Clazz.create("http://example.org/myOnt/C2"))));
-        assertTrue(ontology.containsVersionIRI(IRI.create("http://example.org/myOnt/2.0")));
-        assertTrue(ontology.containsVersionIRI(IRI.create("http://example.org/myOnt/1.0")));
+        assertTrue(ontology.hasVersionIRI(IRI.create("http://example.org/myOnt/1.0")));
         assertTrue(ontology.getOntologyIRI()==IRI.create("http://example.org/myOnt"));
         assertTrue(ontology.getAxioms().size()==3);
         assertTrue(parser.handler.allTriplesConsumed());
@@ -67,7 +65,6 @@ public class TestParser extends TestCase {
     public void testParseOntologyWithVars() throws Exception {
         String s="?ontIRI rdf:type owl:Ontology ."+LB
             + "?ontIRI owl:versionIRI ?versionIRI ."+LB
-            + "?ontIRI owl:versionIRI <http://example.org/myOnt/2.0> ."+LB
             + "<http://example.org/myOnt> owl:imports ?imports ."+LB
             + "<http://example.org/myOnt> owl:imports <http://example.org/anotherOnt> ."+LB
             + "?class rdf:type owl:Class . "+LB
@@ -81,8 +78,7 @@ public class TestParser extends TestCase {
         assertTrue(ontology.containsAxiom(Declaration.create(ClassVariable.create("?class"))));
         assertTrue(ontology.containsAxiom(Declaration.create(Clazz.create("http://example.org/myOnt/C2"))));
         assertTrue(ontology.containsAxiom(SubClassOf.create(ClassVariable.create("?class"), Clazz.create("http://example.org/myOnt/C2"))));
-        assertTrue(ontology.containsVersionIRI(IRI.create("http://example.org/myOnt/2.0")));
-        assertTrue(ontology.containsVersionIRI(UntypedVariable.create("?versionIRI")));
+        assertTrue(ontology.hasVersionIRI(UntypedVariable.create("?versionIRI")));
         assertTrue(ontology.getOntologyIRI()==UntypedVariable.create("?ontIRI"));
         assertTrue(ontology.getAxioms().size()==3);
         assertTrue(parser.handler.allTriplesConsumed());
