@@ -17,14 +17,14 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
-public class EquivalentObjectProperties extends AbstractAxiom implements ClassAxiom {
+public class EquivalentObjectProperties extends AbstractAxiom {
     private static final long serialVersionUID = -5653341898298818446L;
 
     protected static InterningManager<EquivalentObjectProperties> s_interningManager=new InterningManager<EquivalentObjectProperties>() {

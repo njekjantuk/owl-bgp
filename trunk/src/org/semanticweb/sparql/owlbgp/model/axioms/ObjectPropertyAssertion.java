@@ -33,11 +33,12 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 
@@ -80,6 +81,24 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
         m_ope=ope;
         m_individual1=individual1;
         m_individual2=individual2;
+    }
+    public ObjectPropertyAssertion getNormalizedAssertion() {
+        if (m_ope instanceof Atomic) 
+            return this;
+        else { 
+            ObjectPropertyExpression ope=((ObjectInverseOf) m_ope).getInvertedObjectProperty();
+            boolean flip=true;
+            while (!(ope instanceof Atomic)) {
+                ope=((ObjectInverseOf) m_ope).getInvertedObjectProperty();
+                flip=!flip;
+            }
+            if (flip) {
+                Individual ind1=m_individual2;
+                Individual ind2=m_individual1;
+                return ObjectPropertyAssertion.create(ope, ind1, ind2, m_annotations);
+            } else
+                return ObjectPropertyAssertion.create(ope, m_individual1, m_individual2, m_annotations);
+        }
     }
     public ObjectPropertyExpression getObjectPropertyExpression() {
         return m_ope;
