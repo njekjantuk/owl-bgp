@@ -95,8 +95,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         try {
             parser.parse();
-            for (Axiom axiom :parser.getParsedAxioms())
-                System.out.println(axiom);
+//            for (Axiom axiom :parser.getParsedAxioms())
+//                System.out.println(axiom);
         } catch (ParseException e) {
             e.printStackTrace();
         }

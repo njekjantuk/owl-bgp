@@ -105,7 +105,7 @@ import org.semanticweb.sparql.owlbgp.parser.triplehandlers.rdftype.TransitivePro
 public class TripleConsumer {
     public static final String LB=System.getProperty("line.separator");
     
-    protected boolean debug=true;
+    protected boolean debug=false;
     
     protected final Set<Import>     imports=new HashSet<Import>();
     protected Identifier            ontologyIRI;
@@ -150,22 +150,6 @@ public class TripleConsumer {
     protected final OptimisedListTranslator<FacetRestriction> faceRestrictionListTranslator=new OptimisedListTranslator<FacetRestriction>(this, new FacetRestrictionListItemTranslator(this));
     
     {   
-//        CEExt.put(Vocabulary.OWL_THING, Clazz.create(Vocabulary.OWL_THING));
-//        CEExt.put(Vocabulary.OWL_NOTHING, Clazz.create(Vocabulary.OWL_NOTHING));
-//        OPEExt.put(Vocabulary.OWL_TOP_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_TOP_OBJECT_PROPERTY));
-//        OPEExt.put(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY, ObjectProperty.create(Vocabulary.OWL_BOTTOM_OBJECT_PROPERTY));
-//        DPEExt.put(Vocabulary.OWL_TOP_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_TOP_DATA_PROPERTY));
-//        DPEExt.put(Vocabulary.OWL_BOTTOM_DATA_PROPERTY, DataProperty.create(Vocabulary.OWL_BOTTOM_DATA_PROPERTY));
-//        APEExt.put(Vocabulary.OWL_PRIOR_VERSION, AnnotationProperty.create(Vocabulary.OWL_PRIOR_VERSION));
-//        APEExt.put(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_BACKWARD_COMPATIBLE_WITH));
-//        APEExt.put(Vocabulary.OWL_INCOMPATIBLE_WITH, AnnotationProperty.create(Vocabulary.OWL_INCOMPATIBLE_WITH));
-//        APEExt.put(Vocabulary.OWL_VERSION_INFO, AnnotationProperty.create(Vocabulary.OWL_VERSION_INFO));
-//        APEExt.put(Vocabulary.RDFS_LABEL, AnnotationProperty.create(Vocabulary.RDFS_LABEL));
-//        APEExt.put(Vocabulary.RDFS_COMMENT, AnnotationProperty.create(Vocabulary.RDFS_COMMENT));
-//        APEExt.put(Vocabulary.RDFS_SEE_ALSO, AnnotationProperty.create(Vocabulary.RDFS_SEE_ALSO));
-//        APEExt.put(Vocabulary.RDFS_IS_DEFINED_BY, AnnotationProperty.create(Vocabulary.RDFS_IS_DEFINED_BY));
-//        for (Datatype dt : Datatype.OWL2_DATATYPES)
-//            DRExt.put(dt.getIdentifier(), dt);
         CEExt.add(Vocabulary.OWL_THING);
         CEExt.add(Vocabulary.OWL_NOTHING);
         OPEExt.add(Vocabulary.OWL_TOP_OBJECT_PROPERTY);

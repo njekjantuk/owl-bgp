@@ -33,15 +33,15 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
-public class DataPropertyRange extends AbstractAxiom implements DataPropertyAxiom {
+public class DataPropertyRange extends AbstractAxiom {
     private static final long serialVersionUID = -2081702943726360480L;
 
     protected static InterningManager<DataPropertyRange> s_interningManager=new InterningManager<DataPropertyRange>() {

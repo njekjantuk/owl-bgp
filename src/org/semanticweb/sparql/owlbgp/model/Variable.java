@@ -35,7 +35,7 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     }
     @Override
     public String toString(Prefixes prefixes) {
-        return "?"+m_variable;
+        return m_variable;
     }
     @Override
     public String toTurtleString(Prefixes prefixes,Identifier mainNode) {

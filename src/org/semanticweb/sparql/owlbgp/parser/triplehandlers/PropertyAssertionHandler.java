@@ -32,14 +32,18 @@ public class PropertyAssertionHandler extends TripleHandler {
                 throw new RuntimeException("Could not find an individual for the object in the triple "+subject+" "+predicate+" "+object+", but "+predicate+" is an object property. ");
         } else {
             DataPropertyExpression dpe=consumer.getDPE(predicate);
-            Literal literal=null;
-            if (object instanceof UntypedVariable)
-                literal=LiteralVariable.create((UntypedVariable)object);
-            else if (object instanceof Literal) 
-                literal=(Literal)object;
-            if (literal==null)
-                throw new RuntimeException("It seems "+object+" is not a literal although the triple "+subject+" "+predicate+" "+object+" seems to be a data property assertion since "+predicate+" is a data property. ");
-            consumer.addAxiom(DataPropertyAssertion.create(dpe,individual,literal,annotations));
+            if (dpe!=null) {
+                Literal literal=null;
+                if (object instanceof UntypedVariable)
+                    literal=LiteralVariable.create((UntypedVariable)object);
+                else if (object instanceof Literal) 
+                    literal=(Literal)object;
+                if (literal==null)
+                    throw new RuntimeException("It seems "+object+" is not a literal although the triple "+subject+" "+predicate+" "+object+" seems to be a data property assertion since "+predicate+" is a data property. ");
+                consumer.addAxiom(DataPropertyAssertion.create(dpe,individual,literal,annotations));
+            } else {
+                throw new RuntimeException("Could not find neither a data nor an object property for the predicate in the triple "+subject+" "+predicate+" "+object+". ");
+            }
         }
     }
 }

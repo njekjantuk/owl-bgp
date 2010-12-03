@@ -33,8 +33,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
@@ -42,7 +42,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyExpression;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 
-public class AnnotationPropertyDomain extends AbstractAxiom implements ObjectPropertyAxiom {
+public class AnnotationPropertyDomain extends AbstractAxiom implements AnnotationPropertyAxiom {
     private static final long serialVersionUID = 3117954908697132827L;
 
     protected static InterningManager<AnnotationPropertyDomain> s_interningManager=new InterningManager<AnnotationPropertyDomain>() {

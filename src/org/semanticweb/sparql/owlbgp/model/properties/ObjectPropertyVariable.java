@@ -71,4 +71,7 @@ public class ObjectPropertyVariable extends Variable implements ObjectPropertyEx
         if (varType==null||varType==VarType.OBJECT_PROPERTY) variables.add(this);
         return variables;
     }
+    public ObjectPropertyExpression getNormalized() {
+        return this;
+    }
 }

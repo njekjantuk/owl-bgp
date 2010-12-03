@@ -16,8 +16,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
@@ -126,5 +126,8 @@ public class ObjectPropertyChain extends AbstractExtendedOWLObject implements Ob
             objectPropertyExpressions.add((ObjectPropertyExpression)ope.getBoundVersion(variablesToBindings));
         }
         return create(objectPropertyExpressions);
+    }
+    public ObjectPropertyExpression getNormalized() {
+        return this;
     }
 }

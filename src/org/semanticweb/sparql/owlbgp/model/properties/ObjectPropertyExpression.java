@@ -17,5 +17,7 @@
 */
 package org.semanticweb.sparql.owlbgp.model.properties;
 
+
 public interface ObjectPropertyExpression extends PropertyExpression {
+    public ObjectPropertyExpression getNormalized();
 }

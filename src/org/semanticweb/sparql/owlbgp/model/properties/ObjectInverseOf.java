@@ -29,8 +29,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
@@ -110,5 +110,11 @@ public class ObjectInverseOf extends AbstractExtendedOWLObject implements Object
     }
     public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings) {
         return create((ObjectProperty)m_ope.getBoundVersion(variablesToBindings));
+    }
+    public ObjectPropertyExpression getNormalized() {
+        if (m_ope instanceof ObjectProperty || m_ope instanceof ObjectPropertyVariable) // r- x-
+            return m_ope;
+        else 
+            return ((ObjectInverseOf)m_ope).getInvertedObjectProperty().getNormalized();
     }
 }
