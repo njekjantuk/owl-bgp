@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation.queryobjects;
+package org.semanticweb.sparql.bgpevaluation.queryobjects;
 
 import java.util.ArrayList;
 import java.util.HashMap;
