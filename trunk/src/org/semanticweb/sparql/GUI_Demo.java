@@ -12,12 +12,12 @@ import javax.swing.JScrollPane;
 
 import org.semanticweb.HermiT.debugger.ConsoleTextArea;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.sparql.arq.HermiTDataSet;
+import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 
-public class SparqlingHermiTDemo {
+public class GUI_Demo {
 	public static final Font s_monospacedFont=new Font("Monospaced",Font.PLAIN,12);
 	public static final String LB = System.getProperty("line.separator") ;
 	public static final String STD_PROLOG="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
@@ -36,12 +36,12 @@ public class SparqlingHermiTDemo {
 	protected final JFrame mainFrame;
 	protected final Dimension screenSize;
 	protected final Dimension preferredSize;
-	protected final HermiTSPARQLEngine sparqlEngine;
-	protected final HermiTDataSet ds;
+	protected final OWLReasonerSPARQLEngine sparqlEngine;
+	protected final OWLOntologyDataSet ds;
 	protected boolean inMainLoop;
 	protected StringBuffer commandStringBuffer;
 	
-	public SparqlingHermiTDemo(File defaultOntologyFile) throws OWLOntologyCreationException {
+	public GUI_Demo(File defaultOntologyFile) throws OWLOntologyCreationException {
 		consoleTextArea=new ConsoleTextArea();
 		consoleTextArea.setFont(s_monospacedFont);
 	    output=new PrintWriter(consoleTextArea.getWriter());
@@ -58,8 +58,8 @@ public class SparqlingHermiTDemo {
         commandStringBuffer=new StringBuffer();
         mainFrame.setVisible(true);
         output.println("Loading and preparing the default ontlogy...");
-        ds=new HermiTDataSet(defaultOntologyFile);
-        sparqlEngine=new HermiTSPARQLEngine();
+        ds=new OWLOntologyDataSet(defaultOntologyFile);
+        sparqlEngine=new OWLReasonerSPARQLEngine();
         output.println("The ontology "+ds.getDefaultGraph().getReasoner().getRootOntology()+" is set-up as default graph. ");
         output.println("Please enter a query (possibly on multiple lines) followed by the keyword 'GO'. ");
         output.println("Prefixes for rdf, rdfs, owl, xsd, swrl, swrlb, swrlx, and ruleml will automatically be added. ");
@@ -72,7 +72,7 @@ public class SparqlingHermiTDemo {
 		} else {
 			defaultOntologyFile=new File("src/ontologies/pizza.owl");
 		}
-		SparqlingHermiTDemo demo=new SparqlingHermiTDemo(defaultOntologyFile);
+		GUI_Demo demo=new GUI_Demo(defaultOntologyFile);
 		demo.mainLoop();
 	}
 	public void mainLoop() {

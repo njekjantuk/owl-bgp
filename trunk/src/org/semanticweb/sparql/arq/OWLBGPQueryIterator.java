@@ -21,15 +21,15 @@ import com.hp.hpl.jena.sparql.engine.iterator.QueryIteratorBase;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.IndentedWriter;
 
-public class HermiTQueryIterator extends QueryIteratorBase {
+public class OWLBGPQueryIterator extends QueryIteratorBase {
     protected final Map<Variable,Integer> positionInTuple;
     protected final Set<String> m_skolemConstants;
     protected QueryIterator input;
     protected List<Atomic[]> results;
     protected int currentRow;
 
-    public HermiTQueryIterator(QueryIterator input,ExecutionContext execCxt,List<Atomic[]> results,Map<Variable,Integer> positionInTuple) {
-        m_skolemConstants=((HermiTGraph)execCxt.getActiveGraph()).getSkolemConstants();
+    public OWLBGPQueryIterator(QueryIterator input,ExecutionContext execCxt,List<Atomic[]> results,Map<Variable,Integer> positionInTuple) {
+        m_skolemConstants=((OWLOntologyGraph)execCxt.getActiveGraph()).getSkolemConstants();
         this.positionInTuple=positionInTuple;
         this.input=input;
         this.results=results;

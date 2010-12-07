@@ -3,7 +3,7 @@ package org.semanticweb.sparql.bgpevaluation.queryobjects;
 import java.util.Map;
 
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.AxiomVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Import;
 import org.semanticweb.sparql.owlbgp.model.Variable;
@@ -49,9 +49,9 @@ import org.semanticweb.sparql.owlbgp.model.axioms.TransitiveObjectProperty;
 public class AxiomTemplaeToQueryObjectConverter implements AxiomVisitorEx<QueryObject<? extends Axiom>> {
     protected final OWLDataFactory dataFactory;
     protected final Map<Variable,Integer> positionInTuple;
-    protected final HermiTGraph graph;
+    protected final OWLOntologyGraph graph;
     
-    public AxiomTemplaeToQueryObjectConverter(OWLDataFactory dataFactory, Map<Variable,Integer> positionInTuple, HermiTGraph graph) {
+    public AxiomTemplaeToQueryObjectConverter(OWLDataFactory dataFactory, Map<Variable,Integer> positionInTuple, OWLOntologyGraph graph) {
         this.dataFactory=dataFactory;
         this.positionInTuple=positionInTuple;
         this.graph=graph;

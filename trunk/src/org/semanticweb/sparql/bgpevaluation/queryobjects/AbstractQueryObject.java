@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.BindingIterator;
 import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
@@ -24,10 +24,6 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public abstract class AbstractQueryObject<T extends Axiom> implements QueryObject<T> {
     
-    public static int COST_ENTAILMENT=100;
-    public static int COST_LOOKUP=1;
-    public static int COST_CLASS_HIERARCHY_INSERTION=10*COST_ENTAILMENT;
-    
     protected static final FromOWLAPIConverter s_fromOWLAPIConverter=new FromOWLAPIConverter();
     
     protected final T m_axiomTemplate;
@@ -39,21 +35,21 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
     public T getAxiomTemplate() {
         return m_axiomTemplate;
     }
-    public List<Atomic[]> computeBindings(Reasoner reasoner, HermiTGraph graph, List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions) {
+    public List<Atomic[]> computeBindings(OWLReasoner reasoner, OWLOntologyGraph graph, List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions) {
         // if no solutions are computed yet, candidate bindings should have one all null array as an entry 
         // if candidateBindings is empty, there are no solutions already due to other constraints
         if (candidateBindings.size()==0)
             return candidateBindings;
         
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        OWLDataFactory dataFactory=reasoner.getDataFactory();
+        OWLDataFactory dataFactory=reasoner.getRootOntology().getOWLOntologyManager().getOWLDataFactory();
         for (int i=0;i<candidateBindings.size();i++)
             newBindings.addAll(addBindings(reasoner, dataFactory, graph, candidateBindings.get(i), bindingPositions));
         return newBindings;
     }
-    protected abstract List<Atomic[]> addBindings(Reasoner reasoner, OWLDataFactory dataFactory, HermiTGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions);
+    protected abstract List<Atomic[]> addBindings(OWLReasoner reasoner, OWLDataFactory dataFactory, OWLOntologyGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions);
 
-    protected List<Atomic[]> complex(Reasoner reasoner, OWLDataFactory dataFactory, HermiTGraph graph, Atomic[] currentBinding, Axiom axiom, Map<Variable,Integer> bindingPositions) {
+    protected List<Atomic[]> complex(OWLReasoner reasoner, OWLDataFactory dataFactory, OWLOntologyGraph graph, Atomic[] currentBinding, Axiom axiom, Map<Variable,Integer> bindingPositions) {
         List<Atomic[]> results=new ArrayList<Atomic[]>();
         Atomic[] result;
         List<Variable> vars=new ArrayList<Variable>(axiom.getVariablesInSignature());
@@ -83,35 +79,6 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
             }
         }
         return results;
-    }
-    protected int complexCost(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions, HermiTGraph graph) {
-        Set<Variable> vars=m_axiomTemplate.getVariablesInSignature();
-        return complexCost(candidateBindings, bindingPositions, graph, vars);
-    }
-    protected int complexCost(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions, HermiTGraph graph, Set<Variable> vars) {
-        int cost=0;
-        // complex
-        boolean first=true;
-        for (Variable var : vars) {
-            int signatureSize=0;
-            if (var instanceof ClassVariable)
-                signatureSize=graph.getClassesInSignature().size();
-            else if (var instanceof DatatypeVariable)
-                signatureSize=graph.getDatatypesInSignature().size();
-            else if (var instanceof ObjectPropertyVariable)
-                signatureSize=graph.getObjectPropertiesInSignature().size();
-            else if (var instanceof DataPropertyVariable)
-                signatureSize=graph.getDataPropertiesInSignature().size();
-            else if (var instanceof AnnotationPropertyVariable)
-                signatureSize=graph.getAnnotationPropertiesInSignature().size();
-            else if (var instanceof IndividualVariable)
-                signatureSize=graph.getIndividualsInSignature().size();
-            if (first)
-                cost+=signatureSize;
-            else 
-                cost*=signatureSize;
-        }
-        return candidateBindings.size()*cost;
     }
     public String toString() {
         return m_axiomTemplate.toString();

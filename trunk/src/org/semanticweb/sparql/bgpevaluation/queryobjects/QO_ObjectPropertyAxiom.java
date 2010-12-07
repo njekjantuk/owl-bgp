@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAxiom;
@@ -24,7 +23,7 @@ public abstract class QO_ObjectPropertyAxiom<T extends ObjectPropertyAxiom> exte
     public QO_ObjectPropertyAxiom(T axiomTemplate) {
 	    super(axiomTemplate);
 	}
-	protected List<Atomic[]> addBindings(Reasoner reasoner, OWLDataFactory dataFactory, HermiTGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
+	protected List<Atomic[]> addBindings(OWLReasoner reasoner, OWLDataFactory dataFactory, OWLOntologyGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
 		Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
 		// apply bindings that are already computed from previous steps
 		for (Variable var : bindingPositions.keySet())
@@ -52,13 +51,13 @@ public abstract class QO_ObjectPropertyAxiom<T extends ObjectPropertyAxiom> exte
 	
 	protected abstract OWLAxiom getEntailmentAxiom(OWLDataFactory dataFactory, OWLObjectPropertyExpression ope);
 	
-    protected List<Atomic[]> check(Reasoner reasoner, OWLDataFactory dataFactory, Atomic[] currentBinding, OWLObjectPropertyExpression ope) {
+    protected List<Atomic[]> check(OWLReasoner reasoner, OWLDataFactory dataFactory, Atomic[] currentBinding, OWLObjectPropertyExpression ope) {
 	    List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         if (reasoner.isEntailed(getEntailmentAxiom(dataFactory, ope))) 
             newBindings.add(currentBinding);
         return newBindings;
     }
-	protected List<Atomic[]> compute(Reasoner reasoner, OWLDataFactory dataFactory, Atomic[] currentBinding, int bindingPosition, boolean inverse) {
+	protected List<Atomic[]> compute(OWLReasoner reasoner, OWLDataFactory dataFactory, Atomic[] currentBinding, int bindingPosition, boolean inverse) {
 	    // FunctionalObjectProperty(?x)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
@@ -71,20 +70,5 @@ public abstract class QO_ObjectPropertyAxiom<T extends ObjectPropertyAxiom> exte
             }
         }
         return newBindings;
-    }
-    public int getCurrentCost(Reasoner reasoner, List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions, HermiTGraph graph) {
-        int cost=0;
-        if (candidateBindings.isEmpty())
-            return cost; // no answers, no tests
-        // check just one binding
-        Atomic[] testBinding=candidateBindings.get(0);
-        Set<Variable> opeVar=m_axiomTemplate.getObjectPropertyExpression().getVariablesInSignature();
-        boolean hasUnboundVar=false;
-        if (!opeVar.isEmpty() && testBinding[bindingPositions.get(opeVar.iterator().next())]!=null)
-            hasUnboundVar=true;
-        if (hasUnboundVar)
-            return reasoner.getRootOntology().getObjectPropertiesInSignature(true).size()*COST_ENTAILMENT; // check entailment for each candidate binding, might have to really test, not just lookup
-        else 
-            return candidateBindings.size()*COST_ENTAILMENT;
     }
 }
