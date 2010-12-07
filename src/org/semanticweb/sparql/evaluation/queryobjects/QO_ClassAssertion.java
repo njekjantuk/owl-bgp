@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;

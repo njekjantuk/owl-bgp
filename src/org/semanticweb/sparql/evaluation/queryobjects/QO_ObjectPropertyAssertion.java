@@ -13,7 +13,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.reasoner.NodeSet;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
@@ -106,9 +106,15 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
     protected List<Atomic[]> compute0Bound(Reasoner reasoner, Atomic[] currentBinding, OWLObjectProperty ope, int[] bindingPositions) {
         // ObjectPropertyAssertion(:r ?x ?y)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        Atomic[] binding;
         Map<OWLNamedIndividual,Set<OWLNamedIndividual>> instances=reasoner.getObjectPropertyInstances(ope);
         for (OWLNamedIndividual ind1 : instances.keySet())
-            newBindings.addAll(compute01Bound(reasoner, currentBinding, ope, ind1, bindingPositions));
+            for (OWLNamedIndividual ind2 : instances.get(ind1)) {
+                binding=currentBinding.clone();
+                binding[bindingPositions[0]]=NamedIndividual.create(ind1.getIRI().toString());
+                binding[bindingPositions[1]]=NamedIndividual.create(ind2.getIRI().toString());
+                newBindings.add(binding);
+            }
         return newBindings;
     }
     protected List<Atomic[]> compute02Bound(Reasoner reasoner, Atomic[] currentBinding, OWLObjectProperty ope, OWLNamedIndividual ind, int[] bindingPositions) {

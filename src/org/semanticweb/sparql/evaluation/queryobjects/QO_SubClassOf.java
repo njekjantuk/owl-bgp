@@ -10,7 +10,7 @@ import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;

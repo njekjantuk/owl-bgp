@@ -3,7 +3,7 @@ package org.semanticweb.sparql.evaluation.queryobjects;
 import java.util.Map;
 
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.AxiomVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Import;
 import org.semanticweb.sparql.owlbgp.model.Variable;

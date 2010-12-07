@@ -15,7 +15,7 @@
    You should have received a copy of the GNU Lesser General Public License
    along with HermiT.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.bgpevaluation;
 
 import java.io.BufferedOutputStream;
 import java.io.File;

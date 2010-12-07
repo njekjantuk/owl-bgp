@@ -9,7 +9,7 @@ import java.util.Set;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.BindingIterator;
 import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
@@ -112,5 +112,8 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
                 cost*=signatureSize;
         }
         return candidateBindings.size()*cost;
+    }
+    public String toString() {
+        return m_axiomTemplate.toString();
     }
 }

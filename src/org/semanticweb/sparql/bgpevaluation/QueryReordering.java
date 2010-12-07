@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.bgpevaluation;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.evaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
