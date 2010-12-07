@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.bgpevaluation.Skolemizer;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
@@ -37,7 +38,7 @@ import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
-public class HermiTGraph implements Graph {
+public class OWLOntologyGraph implements Graph {
 	
 	protected final OWLOntology m_ontology;
 	protected final Set<String> m_skolemConstants;
@@ -47,10 +48,10 @@ public class HermiTGraph implements Graph {
     protected final Set<DataProperty> m_dataProperties;
     protected final Set<AnnotationProperty> m_annotationProperties;
     protected final Set<NamedIndividual> m_individuals;
-    protected final Reasoner m_reasoner;
+    protected final OWLReasoner m_reasoner;
     protected final CountingMonitor m_countingMonitor;
     
-	public HermiTGraph(final OWLOntology ontology) {
+	public OWLOntologyGraph(final OWLOntology ontology) {
 	    Skolemizer skolemizer=new Skolemizer();
 		this.m_ontology=skolemizer.skolemize(ontology);
 		m_skolemConstants=skolemizer.getSkolems();
@@ -81,7 +82,7 @@ public class HermiTGraph implements Graph {
 	public Set<String>  getSkolemConstants() {
         return this.m_skolemConstants;
     }
-	public Reasoner getReasoner() {
+	public OWLReasoner getReasoner() {
         return this.m_reasoner;
     }
 	public OWLOntology getDefaultOntology() {

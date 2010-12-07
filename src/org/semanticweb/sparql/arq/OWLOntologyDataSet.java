@@ -19,90 +19,92 @@ import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 
-public class HermiTDataSet implements Dataset, DatasetGraph {
+public class OWLOntologyDataSet implements Dataset, DatasetGraph {
+    protected static final String DEFAULT_IRI_PREFIX="http://sparql.org/defaultOntology";
+
     protected static int ontologyCounter=0;
     
-    protected final HermiTGraph defaultGraph;
-    protected final Map<String,HermiTGraph> namedGraphURIsToGraphs;
+    protected final OWLOntologyGraph defaultGraph;
+    protected final Map<String,OWLOntologyGraph> namedGraphURIsToGraphs;
     
-    public HermiTDataSet(File defaultGraphFile) throws OWLOntologyCreationException {
+    public OWLOntologyDataSet(File defaultGraphFile) throws OWLOntologyCreationException {
         this(defaultGraphFile,null);
     } 
-    public HermiTDataSet(File defaultGraphFile, List<File> namedGraphFiles) throws OWLOntologyCreationException {
+    public OWLOntologyDataSet(File defaultGraphFile, List<File> namedGraphFiles) throws OWLOntologyCreationException {
         OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
         OWLOntology defaultOntology=manager.loadOntologyFromOntologyDocument(defaultGraphFile);
-        defaultGraph=new HermiTGraph(defaultOntology);
-        namedGraphURIsToGraphs=new HashMap<String,HermiTGraph>();
+        defaultGraph=new OWLOntologyGraph(defaultOntology);
+        namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
         if (namedGraphFiles!=null) {
             for (File namedGraphFile : namedGraphFiles) {
                 OWLOntology o=manager.loadOntologyFromOntologyDocument(namedGraphFile);
-                namedGraphURIsToGraphs.put(o.getOntologyID().getOntologyIRI().toString(), new HermiTGraph(o));
+                namedGraphURIsToGraphs.put(o.getOntologyID().getOntologyIRI().toString(), new OWLOntologyGraph(o));
             }
         }
     }
-    public HermiTDataSet(HermiTGraph defaultGraph, Map<String,HermiTGraph> namedGraphURIsToGraphs) {
+    public OWLOntologyDataSet(OWLOntologyGraph defaultGraph, Map<String,OWLOntologyGraph> namedGraphURIsToGraphs) {
         this.defaultGraph=defaultGraph;
         this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
     } 
-    public HermiTDataSet(OWLOntology defaultOntology, Map<String,OWLOntology> namedGraphURIsToOntologies) throws OWLOntologyCreationException {
-        this.defaultGraph=new HermiTGraph(defaultOntology);
-        namedGraphURIsToGraphs=new HashMap<String,HermiTGraph>();
+    public OWLOntologyDataSet(OWLOntology defaultOntology, Map<String,OWLOntology> namedGraphURIsToOntologies) throws OWLOntologyCreationException {
+        this.defaultGraph=new OWLOntologyGraph(defaultOntology);
+        namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
         for (String oName : namedGraphURIsToOntologies.keySet())
-            namedGraphURIsToGraphs.put(oName, new HermiTGraph(namedGraphURIsToOntologies.get(oName)));
+            namedGraphURIsToGraphs.put(oName, new OWLOntologyGraph(namedGraphURIsToOntologies.get(oName)));
     } 
-    public HermiTDataSet(String defaultGraphURI) throws OWLOntologyCreationException {
+    public OWLOntologyDataSet(String defaultGraphURI) throws OWLOntologyCreationException {
         this(defaultGraphURI,null);
     } 
-    public HermiTDataSet(String defaultGraphURI, List<String> namedGraphURIs) throws OWLOntologyCreationException {
+    public OWLOntologyDataSet(String defaultGraphURI, List<String> namedGraphURIs) throws OWLOntologyCreationException {
         OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
         OWLOntology defaultOntology=manager.loadOntology(IRI.create(defaultGraphURI));
-        defaultGraph=new HermiTGraph(defaultOntology);
-        namedGraphURIsToGraphs=new HashMap<String,HermiTGraph>();
+        defaultGraph=new OWLOntologyGraph(defaultOntology);
+        namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
         if (namedGraphURIs!=null) {
             for (String namedGraphURI : namedGraphURIs) {
                 OWLOntology o=manager.loadOntology(IRI.create(namedGraphURI));
-                namedGraphURIsToGraphs.put(namedGraphURI, new HermiTGraph(o));
+                namedGraphURIsToGraphs.put(namedGraphURI, new OWLOntologyGraph(o));
             }
         }
     }
-	public HermiTDataSet(List<String> graphURIs, List<String> namedGraphURIs) throws OWLOntologyCreationException {
+	public OWLOntologyDataSet(List<String> graphURIs, List<String> namedGraphURIs) throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
         ontologyCounter++;
-        OWLOntology ontology=manager.createOntology(IRI.create("http://sparql.org/defaultOntology"+ontologyCounter+"/"));
+        OWLOntology ontology=manager.createOntology(IRI.create(DEFAULT_IRI_PREFIX+ontologyCounter+"/"));
         for (String uri : graphURIs) {
             OWLOntology o=manager.loadOntology(IRI.create(uri));
             manager.addAxioms(ontology, o.getLogicalAxioms());
             manager.removeOntology(o);
         }
-        defaultGraph=new HermiTGraph(ontology);
-        namedGraphURIsToGraphs=new HashMap<String,HermiTGraph>();
+        defaultGraph=new OWLOntologyGraph(ontology);
+        namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
         for (String namedGraphURI : namedGraphURIs) {
             OWLOntology o=manager.loadOntology(IRI.create(namedGraphURI));
-            namedGraphURIsToGraphs.put(namedGraphURI, new HermiTGraph(o));
+            namedGraphURIsToGraphs.put(namedGraphURI, new OWLOntologyGraph(o));
         }
 	} 
-    public HermiTDataSet(List<String> graphURIs, Map<String,HermiTGraph> namedGraphURIsToGraphs) throws OWLOntologyCreationException {
+    public OWLOntologyDataSet(List<String> graphURIs, Map<String,OWLOntologyGraph> namedGraphURIsToGraphs) throws OWLOntologyCreationException {
         OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
         ontologyCounter++;
-        OWLOntology ontology=manager.createOntology(IRI.create("http://sparql.org/defaultOntology"+ontologyCounter+"/"));
+        OWLOntology ontology=manager.createOntology(IRI.create(DEFAULT_IRI_PREFIX+ontologyCounter+"/"));
         for (String uri : graphURIs) {
             OWLOntology o=manager.loadOntology(IRI.create(uri));
             manager.addAxioms(ontology, o.getLogicalAxioms());
             manager.removeOntology(o);
         }
-        defaultGraph=new HermiTGraph(ontology);
+        defaultGraph=new OWLOntologyGraph(ontology);
         this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
     } 
-    public Map<String,HermiTGraph> getNamedGraphURIsToGraphs() {
+    public Map<String,OWLOntologyGraph> getNamedGraphURIsToGraphs() {
         return namedGraphURIsToGraphs;
     } 
 	public DatasetGraph asDatasetGraph() {
 		return this;
 	} 
-    public HermiTGraph getDefaultGraph() {
+    public OWLOntologyGraph getDefaultGraph() {
         return defaultGraph;
     }
-    public HermiTGraph getNamedGraph(String uri) {
+    public OWLOntologyGraph getNamedGraph(String uri) {
         return namedGraphURIsToGraphs.get(uri);
     }
 	public void close() {
@@ -138,7 +140,7 @@ public class HermiTDataSet implements Dataset, DatasetGraph {
                 return Node.createURI(internalGraphNameIterator.next());
             }
             public void remove() {
-                throw new UnsupportedOperationException("Internal Error: HermiT dataset models do notallow removal from an iterator. ");
+                throw new UnsupportedOperationException("Internal Error: This dataset models do not allow removal from an iterator. ");
             }
         };
         return graphNameIterator;

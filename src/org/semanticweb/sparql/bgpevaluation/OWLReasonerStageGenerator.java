@@ -12,10 +12,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.semanticweb.HermiT.HermiTCostEstimator;
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.sparql.HermiTSPARQLEngine;
-import org.semanticweb.sparql.arq.HermiTGraph;
-import org.semanticweb.sparql.arq.HermiTQueryIterator;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
+import org.semanticweb.sparql.arq.OWLBGPQueryIterator;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.QueryReordering.CostComparator;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.AxiomTemplaeToQueryObjectConverter;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
@@ -34,20 +37,20 @@ import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;
 import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
 
-public class HermiTStageGenerator implements StageGenerator {
+public class OWLReasonerStageGenerator implements StageGenerator {
     StageGenerator above=null;
     
-    public HermiTStageGenerator(StageGenerator original){
+    public OWLReasonerStageGenerator(StageGenerator original){
         above=original;
     }
     @Override
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         Graph g = execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
-        if (!(g instanceof HermiTGraph))
+        if (!(g instanceof OWLOntologyGraph))
             // Not us - bounce up the StageGenerator chain
             return above.execute(pattern, input, execCxt) ;
-        HermiTGraph graph=(HermiTGraph)g;
+        OWLOntologyGraph graph=(OWLOntologyGraph)g;
         // Create a QueryIterator for this request
         StringBuffer buffer=new StringBuffer();
         Iterator<Triple> it=pattern.iterator();
@@ -59,11 +62,12 @@ public class HermiTStageGenerator implements StageGenerator {
             buffer.append(" ");
             buffer.append(printNode(t.getObject()));
             buffer.append(" . ");
-            buffer.append(HermiTSPARQLEngine.LB);
+            buffer.append(OWLReasonerSPARQLEngine.LB);
         }
         OWLBGPParser parser=new OWLBGPParser(new StringReader(buffer.toString()));
         parser.loadDeclarations(graph.getClassesInSignature(),graph.getDatatypesInSignature(), graph.getObjectPropertiesInSignature(), graph.getDataPropertiesInSignature(), graph.getAnnotationPropertiesInSignature(), graph.getIndividualsInSignature());
-        
+        OWLReasoner reasoner=graph.getReasoner();
+        OWLDataFactory dataFactory=reasoner.getRootOntology().getOWLOntologyManager().getOWLDataFactory();
         try {
             parser.parse();
             Ontology queryOntology=parser.getParsedOntology();
@@ -75,8 +79,7 @@ public class HermiTStageGenerator implements StageGenerator {
                 position++;
             } 
             AxiomRewriter.rewriteAxioms(queryAxiomTemplates);
-            Reasoner hermit=graph.getReasoner();
-            AxiomVisitorEx<QueryObject<? extends Axiom>> axiomVisitor=new AxiomTemplaeToQueryObjectConverter(hermit.getDataFactory(),positionInTuple,graph);
+            AxiomVisitorEx<QueryObject<? extends Axiom>> axiomVisitor=new AxiomTemplaeToQueryObjectConverter(dataFactory,positionInTuple,graph);
             Set<QueryObject<? extends Axiom>> queryObjects=new HashSet<QueryObject<? extends Axiom>>();
             for (Axiom axiom : queryAxiomTemplates) {
                 QueryObject<? extends Axiom> at=axiom.accept(axiomVisitor);
@@ -86,17 +89,22 @@ public class HermiTStageGenerator implements StageGenerator {
             Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
             List<Atomic[]> bindings=new ArrayList<Atomic[]>();
             bindings.add(initialBinding);
-            Comparator<QueryObject<? extends Axiom>> costComparator=new CostComparator(hermit, bindings, positionInTuple, graph);
+            StandardCostEstimator costEstimator;
+            if (reasoner instanceof Reasoner)
+                costEstimator=new HermiTCostEstimator(graph);
+            else 
+                costEstimator=new StandardCostEstimator(graph);
+            Comparator<QueryObject<? extends Axiom>> costComparator=new CostComparator(costEstimator, bindings, positionInTuple);
             SortedSet<QueryObject<? extends Axiom>> orderedQueryObjects=new TreeSet<QueryObject<? extends Axiom>>(costComparator);
             orderedQueryObjects.addAll(queryObjects);
             for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
                 System.out.println(qo);
             for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
-                bindings=qo.computeBindings(hermit, graph, bindings, positionInTuple);
-            return new HermiTQueryIterator(input,execCxt,bindings,positionInTuple);
+                bindings=qo.computeBindings(reasoner, graph, bindings, positionInTuple);
+            return new OWLBGPQueryIterator(input,execCxt,bindings,positionInTuple);
         } catch (Exception e) {
             // TODO Auto-generated catch block
-            return new HermiTQueryIterator(input,execCxt,new ArrayList<Atomic[]>(),new HashMap<Variable,Integer>());
+            return new OWLBGPQueryIterator(input,execCxt,new ArrayList<Atomic[]>(),new HashMap<Variable,Integer>());
         }
     }
     protected String printNode(Node node) {

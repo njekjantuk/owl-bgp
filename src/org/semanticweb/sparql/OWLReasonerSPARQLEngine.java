@@ -6,9 +6,9 @@ import java.util.List;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.sparql.arq.HermiTDataSet;
-import org.semanticweb.sparql.arq.HermiTGraph;
-import org.semanticweb.sparql.bgpevaluation.HermiTStageGenerator;
+import org.semanticweb.sparql.arq.OWLOntologyDataSet;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.OWLReasonerStageGenerator;
 
 import com.hp.hpl.jena.query.ARQ;
 import com.hp.hpl.jena.query.Query;
@@ -21,28 +21,28 @@ import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.sparql.engine.main.StageBuilder;
 import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
 
-public class HermiTSPARQLEngine {
+public class OWLReasonerSPARQLEngine {
 	public static final String LB = System.getProperty("line.separator") ; 
 	
-	public HermiTSPARQLEngine() {
+	public OWLReasonerSPARQLEngine() {
 //	    HermiTQueryEngine.register();
 	    // Get the standard stage generator 
 	    StageGenerator orig=(StageGenerator)ARQ.getContext().get(ARQ.stageGenerator);
 	    // Create our own 
-	    StageGenerator hermiTStageGenerator=new HermiTStageGenerator(orig) ;
+	    StageGenerator hermiTStageGenerator=new OWLReasonerStageGenerator(orig) ;
 	    // Register it for all queries
 	    StageBuilder.setGenerator(ARQ.getContext(), hermiTStageGenerator) ;
     }
-	public ResultSet execQuery(String sparqlQueryString, HermiTDataSet dataSet) {
+	public ResultSet execQuery(String sparqlQueryString, OWLOntologyDataSet dataSet) {
 		Query query=QueryFactory.create(sparqlQueryString, Syntax.syntaxSPARQL_11); // create Jena query object
         return execQuery(query,dataSet);
 	}
-	public ResultSet execQuery(Query query, HermiTDataSet dataSet) {
+	public ResultSet execQuery(Query query, OWLOntologyDataSet dataSet) {
         List<String> graphURIs=query.getGraphURIs(); // FROM
         //List<String> namedGraphURIs=query.getNamedGraphURIs(); // FROM NAMED
         if (graphURIs.size()>0) {
             try {
-                dataSet=new HermiTDataSet(graphURIs,dataSet.getNamedGraphURIsToGraphs());
+                dataSet=new OWLOntologyDataSet(graphURIs,dataSet.getNamedGraphURIsToGraphs());
             } catch (OWLOntologyCreationException e) {
                 e.printStackTrace();
                 return null;
@@ -54,11 +54,11 @@ public class HermiTSPARQLEngine {
 
 	public static void main(String[] args) throws Exception {
 	    long t=System.currentTimeMillis();
-	    HermiTDataSet dataset=getLUBMDataSet();
+	    OWLOntologyDataSet dataset=getLUBMDataSet();
 //	    HermiTDataSet dataset=getPizzaDataSet();
 //	    HermiTDataSet dataset=getPizzaTestDataSet();
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
-	    HermiTGraph graph=dataset.getDefaultGraph();
+	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();
 	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
 	    System.out.println("Class classification: "+(System.currentTimeMillis()-t));
@@ -73,7 +73,7 @@ public class HermiTSPARQLEngine {
 	    System.out.println("Realisation: "+(System.currentTimeMillis()-t));
 //	    System.out.println("HermiT: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
-	    HermiTSPARQLEngine sparqlEngine=new HermiTSPARQLEngine();
+	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
 //	    getPizzaQ1(sparqlEngine, dataset);
 //	    getPizzaTestQ1(sparqlEngine, dataset);
         getLUBMQ1(sparqlEngine, dataset);
@@ -92,19 +92,19 @@ public class HermiTSPARQLEngine {
         getLUBMQ14(sparqlEngine, dataset);
 	}
 	
-	public static HermiTDataSet getPizzaDataSet() throws OWLOntologyCreationException {
-	    return new HermiTDataSet("http://www.co-ode.org/ontologies/pizza/pizza.owl#");
+	public static OWLOntologyDataSet getPizzaDataSet() throws OWLOntologyCreationException {
+	    return new OWLOntologyDataSet("http://www.co-ode.org/ontologies/pizza/pizza.owl#");
 	}
-	public static HermiTDataSet getPizzaTestDataSet() throws OWLOntologyCreationException {
+	public static OWLOntologyDataSet getPizzaTestDataSet() throws OWLOntologyCreationException {
         File inputOntologyFile = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/test.owl");
         File inputNamed1File = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/pizza.owl");
         File inputNamed2File = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/test2.owl");
         List<File> named=new ArrayList<File>();
         named.add(inputNamed1File);
         named.add(inputNamed2File);
-        return new HermiTDataSet(inputOntologyFile,named);
+        return new OWLOntologyDataSet(inputOntologyFile,named);
     }
-	public static void getPizzaTestQ1(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getPizzaTestQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         String queryString="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
         + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
         + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
@@ -124,7 +124,7 @@ public class HermiTSPARQLEngine {
         ResultSetFormatter.out(result) ;
         System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
-    public static void getPizzaQ1(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getPizzaQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         String queryString="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
         + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
         + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
@@ -143,9 +143,9 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static HermiTDataSet getLUBMDataSet() throws OWLOntologyCreationException {
+	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    File inputOntologyFile = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/University0_0.owl");
-        return new HermiTDataSet(inputOntologyFile);
+        return new OWLOntologyDataSet(inputOntologyFile);
     }
 	public static String getLUBMPrefix() {
 	   String prefix="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
@@ -157,7 +157,7 @@ public class HermiTSPARQLEngine {
 	        + "SELECT * WHERE { " +LB;
 	    return prefix;
 	}
-	public static void getLUBMQ0(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ0(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q0");
 	    String queryString=getLUBMPrefix()
 	        + "  ?x a owl:Class."
@@ -171,7 +171,7 @@ public class HermiTSPARQLEngine {
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
 	}
-	public static void getLUBMQ1(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q1");
 //	    OWLOntology: 6102
 //	    HermiT: 188608
@@ -188,7 +188,7 @@ public class HermiTSPARQLEngine {
        sparqlEngine.execQuery(query,dataset);
        System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
-	public static void getLUBMQ2(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q2");
 //	    OWLOntology: 5949
 //	    HermiT: 184355
@@ -209,7 +209,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
-	public static void getLUBMQ3(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q3");
 //	    Query: 2
 //	    Result: 45
@@ -224,7 +224,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getLUBMQ4(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 2
 //	    Result: 16
 	    System.out.println("Q4");
@@ -242,7 +242,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getLUBMQ5(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 1
 //	    Result: 100
 	    System.out.println("Q5");
@@ -257,7 +257,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getLUBMQ6(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ6(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 1
 //	    Result: 161
 	    System.out.println("Q6");
@@ -271,7 +271,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getLUBMQ7(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+	public static void getLUBMQ7(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 2
 //	    Result: 1537
 	    System.out.println("Q7");
@@ -289,7 +289,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ8(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ8(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //        Query: 10
 //        Result: 3201
         System.out.println("Q8");
@@ -307,7 +307,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ9(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ9(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q9");
 //        Query: 1607
 //        Result: 1116
@@ -326,7 +326,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ10(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ10(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q10");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Student. " +LB
@@ -339,7 +339,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ11(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ11(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q11");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:ResearchGroup. " +LB   
@@ -352,7 +352,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ12(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ12(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q12");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Chair. " +LB
@@ -367,7 +367,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ13(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ13(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q13");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Person. " +LB
@@ -380,7 +380,7 @@ public class HermiTSPARQLEngine {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getLUBMQ14(HermiTSPARQLEngine sparqlEngine, HermiTDataSet dataset) {
+    public static void getLUBMQ14(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q14");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:UndergraduateStudent. " +LB

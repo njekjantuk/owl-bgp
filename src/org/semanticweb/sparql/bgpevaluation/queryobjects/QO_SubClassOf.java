@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
@@ -22,7 +22,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
 	public QO_SubClassOf(SubClassOf axiomTemplateTemplate) {
 	    super(axiomTemplateTemplate);
 	}
-	protected List<Atomic[]> addBindings(Reasoner reasoner, OWLDataFactory dataFactory, HermiTGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
+	protected List<Atomic[]> addBindings(OWLReasoner reasoner, OWLDataFactory dataFactory, OWLOntologyGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
 	    Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
         // apply bindings that are already computed from previous steps
         for (Variable var : bindingPositions.keySet())
@@ -52,7 +52,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             return new ArrayList<Atomic[]>();
         }
 	}
-	protected List<Atomic[]> computeAllSubClassOfRelations(Reasoner reasoner, Atomic[] currentBinding, int[] bindingPositions) {
+	protected List<Atomic[]> computeAllSubClassOfRelations(OWLReasoner reasoner, Atomic[] currentBinding, int[] bindingPositions) {
         // SubClassOf(?x ?y)
 	    Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
@@ -68,7 +68,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         }
         return newBindings;
 	}
-    protected List<Atomic[]> computeSubClasses(Reasoner reasoner, Atomic[] currentBinding, OWLClassExpression superClass, int bindingPosition) {
+    protected List<Atomic[]> computeSubClasses(OWLReasoner reasoner, Atomic[] currentBinding, OWLClassExpression superClass, int bindingPosition) {
          // SubClassOf(?x :C)
 	     Atomic[] binding;
 	     List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
@@ -81,7 +81,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
          }
 	     return newBindings;
 	 }
-    protected List<Atomic[]> computeSuperClasses(Reasoner reasoner, Atomic[] currentBinding, OWLClassExpression subClass, int bindingPosition) {
+    protected List<Atomic[]> computeSuperClasses(OWLReasoner reasoner, Atomic[] currentBinding, OWLClassExpression subClass, int bindingPosition) {
         // SubClassOf(?x :C)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
@@ -94,15 +94,11 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         }
         return newBindings;
     }
-    protected List<Atomic[]> checkSubsumption(Reasoner reasoner, OWLDataFactory datafactory, Atomic[] currentBinding, OWLClassExpression subClass, OWLClassExpression superClass) {
+    protected List<Atomic[]> checkSubsumption(OWLReasoner reasoner, OWLDataFactory datafactory, Atomic[] currentBinding, OWLClassExpression subClass, OWLClassExpression superClass) {
         // SubClassOf(:C :D)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         if (reasoner.isEntailed(datafactory.getOWLSubClassOfAxiom(subClass, superClass)))
             newBindings.add(currentBinding);
         return newBindings;
-    }
-    @Override
-    public int getCurrentCost(Reasoner reasoner, List<Atomic[]> candidateBindings, Map<Variable, Integer> bindingPositions, HermiTGraph graph) {
-        return COST_LOOKUP; // estimate, needs refinment
     }
 }
