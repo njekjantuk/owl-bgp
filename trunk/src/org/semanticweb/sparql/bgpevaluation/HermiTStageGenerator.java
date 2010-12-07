@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.bgpevaluation;
 
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -13,7 +13,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.sparql.evaluation.QueryReordering.CostComparator;
+import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTQueryIterator;
+import org.semanticweb.sparql.bgpevaluation.QueryReordering.CostComparator;
 import org.semanticweb.sparql.evaluation.queryobjects.AxiomTemplaeToQueryObjectConverter;
 import org.semanticweb.sparql.evaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
@@ -86,6 +88,8 @@ public class HermiTStageGenerator implements StageGenerator {
             Comparator<QueryObject<? extends Axiom>> costComparator=new CostComparator(hermit, bindings, positionInTuple, graph);
             SortedSet<QueryObject<? extends Axiom>> orderedQueryObjects=new TreeSet<QueryObject<? extends Axiom>>(costComparator);
             orderedQueryObjects.addAll(queryObjects);
+            for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
+                System.out.println(qo);
             for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
                 bindings=qo.computeBindings(hermit, graph, bindings, positionInTuple);
             return new HermiTQueryIterator(input,execCxt,bindings,positionInTuple);

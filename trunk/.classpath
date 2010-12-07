@@ -12,5 +12,7 @@
 	<classpathentry kind="lib" path="lib/xercesImpl-2.7.1.jar"/>
 	<classpathentry kind="lib" path="lib/owlapi-3.1.0.jar" sourcepath="lib/owlapi-3.1.0-src.jar"/>
 	<classpathentry kind="lib" path="lib/HermiT.jar"/>
+	<classpathentry kind="lib" path="lib/iri-0.8.jar"/>
+	<classpathentry kind="lib" path="lib/icu4j-3.4.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

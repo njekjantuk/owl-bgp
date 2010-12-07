@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.arq;
 
 import java.io.File;
 import java.util.HashMap;
@@ -12,12 +12,14 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
+import com.hp.hpl.jena.graph.Graph;
+import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
 
-public class HermiTDataSet implements Dataset {
+public class HermiTDataSet implements Dataset, DatasetGraph {
     protected static int ontologyCounter=0;
     
     protected final HermiTGraph defaultGraph;
@@ -38,6 +40,16 @@ public class HermiTDataSet implements Dataset {
             }
         }
     }
+    public HermiTDataSet(HermiTGraph defaultGraph, Map<String,HermiTGraph> namedGraphURIsToGraphs) {
+        this.defaultGraph=defaultGraph;
+        this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
+    } 
+    public HermiTDataSet(OWLOntology defaultOntology, Map<String,OWLOntology> namedGraphURIsToOntologies) throws OWLOntologyCreationException {
+        this.defaultGraph=new HermiTGraph(defaultOntology);
+        namedGraphURIsToGraphs=new HashMap<String,HermiTGraph>();
+        for (String oName : namedGraphURIsToOntologies.keySet())
+            namedGraphURIsToGraphs.put(oName, new HermiTGraph(namedGraphURIsToOntologies.get(oName)));
+    } 
     public HermiTDataSet(String defaultGraphURI) throws OWLOntologyCreationException {
         this(defaultGraphURI,null);
     } 
@@ -85,7 +97,7 @@ public class HermiTDataSet implements Dataset {
         return namedGraphURIsToGraphs;
     } 
 	public DatasetGraph asDatasetGraph() {
-		return new HermiTDatasetGraph(defaultGraph, namedGraphURIsToGraphs);
+		return this;
 	} 
     public HermiTGraph getDefaultGraph() {
         return defaultGraph;
@@ -110,4 +122,28 @@ public class HermiTDataSet implements Dataset {
 	public Iterator<String> listNames() {
 		return namedGraphURIsToGraphs.keySet().iterator();
 	}
+	public Graph getGraph(Node graphNode) {
+        return namedGraphURIsToGraphs.get(graphNode.getURI());
+    }
+    public boolean containsGraph(Node graphNode) {
+        return namedGraphURIsToGraphs.containsKey(graphNode.getURI());
+    }
+    public Iterator<Node> listGraphNodes() {
+        final Iterator<String> internalGraphNameIterator=namedGraphURIsToGraphs.keySet().iterator();
+        Iterator<Node> graphNameIterator=new Iterator<Node>() {
+            public boolean hasNext() {
+                return internalGraphNameIterator.hasNext();
+            }
+            public Node next() {
+                return Node.createURI(internalGraphNameIterator.next());
+            }
+            public void remove() {
+                throw new UnsupportedOperationException("Internal Error: HermiT dataset models do notallow removal from an iterator. ");
+            }
+        };
+        return graphNameIterator;
+    }
+    public int size() {
+        return namedGraphURIsToGraphs.keySet().size()+1;
+    }
 }

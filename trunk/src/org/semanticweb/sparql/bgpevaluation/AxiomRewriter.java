@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.bgpevaluation;
 
 import java.util.Set;
 

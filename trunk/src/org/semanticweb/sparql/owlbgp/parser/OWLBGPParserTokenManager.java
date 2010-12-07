@@ -1266,6 +1266,7 @@ private final int jjStopStringLiteralDfa_1(int pos, long active0)
          return -1;
    }
 }
+@SuppressWarnings("unused")
 private final int jjStartNfa_1(int pos, long active0)
 {
    return jjMoveNfa_1(jjStopStringLiteralDfa_1(pos, active0), pos + 1);
@@ -1312,7 +1313,8 @@ private int jjMoveNfa_1(int startState, int curPos)
       }
       else if (curChar < 128)
       {
-         long l = 1L << (curChar & 077);
+         @SuppressWarnings("unused")
+        long l = 1L << (curChar & 077);
          do
          {
             switch(jjstateSet[--i])

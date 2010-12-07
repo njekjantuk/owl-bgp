@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.bgpevaluation;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 
 import org.semanticweb.HermiT.debugger.ConsoleTextArea;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.sparql.arq.HermiTDataSet;
 
 import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;

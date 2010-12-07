@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.arq;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +46,14 @@ public class HermiTQueryIterator extends QueryIteratorBase {
             currentRow++;
             for (Variable variable : positionInTuple.keySet()) {
                 Var var=Var.alloc(variable.toString());
+                if (positionInTuple==null || variable==null || positionInTuple.get(variable)==null || result[positionInTuple.get(variable)]==null) {
+                    System.out.println("Ups, we should not be here:");
+                    System.out.println("Variable: "+var);
+                    System.out.println("position in tuple: "+positionInTuple.get(variable));
+                    System.out.println("In this result: ");
+                    for (Atomic at : result)
+                        System.out.println(at);
+                }
                 Node node=createNode(result[positionInTuple.get(variable)]);
                 bindingMap.add(var,node);
             }

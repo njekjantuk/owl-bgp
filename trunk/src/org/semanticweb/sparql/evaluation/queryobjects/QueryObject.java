@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.sparql.evaluation.HermiTGraph;
+import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 

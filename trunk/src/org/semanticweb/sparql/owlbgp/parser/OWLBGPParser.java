@@ -21,7 +21,7 @@ import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
-
+@SuppressWarnings("unused")
 public class OWLBGPParser implements OWLBGPParserConstants {
 
     public static final String LB = System.getProperty("line.separator") ;
@@ -179,7 +179,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
   }
 
-  final public Identifier parseSubject() throws ParseException {
+final public Identifier parseSubject() throws ParseException {
     Identifier identifier;
     if (jj_2_3(2)) {
       identifier = parseResource();
@@ -1377,7 +1377,8 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     throw generateParseException();
   }
 
-  static private final class LookaheadSuccess extends java.lang.Error { }
+  @SuppressWarnings("serial")
+static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {
     if (jj_scanpos == jj_lastpos) {

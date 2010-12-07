@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.evaluation;
+package org.semanticweb.sparql.arq;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,6 +13,7 @@ import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.sparql.bgpevaluation.Skolemizer;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
