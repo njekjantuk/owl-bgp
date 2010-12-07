@@ -13,6 +13,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.sparql.HermiTSPARQLEngine;
 import org.semanticweb.sparql.arq.HermiTGraph;
 import org.semanticweb.sparql.arq.HermiTQueryIterator;
 import org.semanticweb.sparql.bgpevaluation.QueryReordering.CostComparator;

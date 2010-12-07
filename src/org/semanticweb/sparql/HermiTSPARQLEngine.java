@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.bgpevaluation;
+package org.semanticweb.sparql;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.sparql.arq.HermiTDataSet;
 import org.semanticweb.sparql.arq.HermiTGraph;
+import org.semanticweb.sparql.bgpevaluation.HermiTStageGenerator;
 
 import com.hp.hpl.jena.query.ARQ;
 import com.hp.hpl.jena.query.Query;
