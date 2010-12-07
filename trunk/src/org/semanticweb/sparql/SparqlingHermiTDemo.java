@@ -1,4 +1,4 @@
-package org.semanticweb.sparql.bgpevaluation;
+package org.semanticweb.sparql;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
