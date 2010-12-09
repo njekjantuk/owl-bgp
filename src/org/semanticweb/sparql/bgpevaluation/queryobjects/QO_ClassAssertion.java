@@ -1,11 +1,13 @@
 package org.semanticweb.sparql.bgpevaluation.queryobjects;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -13,6 +15,7 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
@@ -47,7 +50,10 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
                 int position=bindingPositions.get(ind);
                 return computeInstances(reasoner,currentBinding,(OWLClassExpression)ce.asOWLAPIObject(dataFactory),position);
             } else if (!ce.isVariable() && !ind.isVariable()) {
-                return checkType(reasoner,currentBinding,(OWLClassExpression)ce.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(dataFactory));
+                if (checkType(reasoner,currentBinding,(OWLClassExpression)ce.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(dataFactory)))
+                    return Collections.singletonList(currentBinding);
+                else 
+                    return new ArrayList<Atomic[]>();
             } else {
                 return complex(reasoner, dataFactory, graph, currentBinding, assertion, bindingPositions);
             }
@@ -56,12 +62,12 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
 		    return new ArrayList<Atomic[]>();
 		}
 	}
-    protected List<Atomic[]> checkType(OWLReasoner reasoner, Atomic[] currentBinding, OWLClassExpression classExpression, OWLNamedIndividual individual) {
+    protected boolean checkType(OWLReasoner reasoner, Atomic[] currentBinding, OWLClassExpression classExpression, OWLNamedIndividual individual) {
         // ClassAssertion(:C :a)
-	    List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        if (reasoner.getInstances(classExpression, false).containsEntity(individual)) 
-            newBindings.add(currentBinding);
-        return newBindings;
+        if (reasoner instanceof Reasoner)
+            return ((Reasoner)reasoner).hasType(individual, classExpression, false);
+        else
+    	    return reasoner.getInstances(classExpression, false).containsEntity(individual); 
     }
 	protected List<Atomic[]> computeTypes(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual individual, int bindingPosition) {
         // ClassAssertion(?x :a)
@@ -101,5 +107,8 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
             }
         }
         return newBindings;
+    }
+    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+        return visitor.visit(this);
     }
 }

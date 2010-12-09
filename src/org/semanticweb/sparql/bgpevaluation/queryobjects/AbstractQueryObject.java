@@ -10,6 +10,7 @@ import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.BindingIterator;
 import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
@@ -80,6 +81,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         }
         return results;
     }
+    public abstract <O> O accept(QueryObjectVisitorEx<O> visitor);
     public String toString() {
         return m_axiomTemplate.toString();
     }

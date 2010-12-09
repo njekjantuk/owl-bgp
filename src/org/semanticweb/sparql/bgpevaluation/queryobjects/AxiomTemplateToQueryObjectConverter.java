@@ -46,12 +46,12 @@ import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.axioms.SymmetricObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.axioms.TransitiveObjectProperty;
 
-public class AxiomTemplaeToQueryObjectConverter implements AxiomVisitorEx<QueryObject<? extends Axiom>> {
+public class AxiomTemplateToQueryObjectConverter implements AxiomVisitorEx<QueryObject<? extends Axiom>> {
     protected final OWLDataFactory dataFactory;
     protected final Map<Variable,Integer> positionInTuple;
     protected final OWLOntologyGraph graph;
     
-    public AxiomTemplaeToQueryObjectConverter(OWLDataFactory dataFactory, Map<Variable,Integer> positionInTuple, OWLOntologyGraph graph) {
+    public AxiomTemplateToQueryObjectConverter(OWLDataFactory dataFactory, Map<Variable,Integer> positionInTuple, OWLOntologyGraph graph) {
         this.dataFactory=dataFactory;
         this.positionInTuple=positionInTuple;
         this.graph=graph;

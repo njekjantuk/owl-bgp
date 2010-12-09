@@ -30,8 +30,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.IRI;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
@@ -133,5 +133,8 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
     }
     public Identifier getIdentifier() {
         return this;
+    }
+    public String getIdentifierString() {
+        return toString();
     }
 }

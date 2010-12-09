@@ -125,6 +125,7 @@ import org.semanticweb.owlapi.model.SWRLVariable;
 public class Skolemizer {
     protected final SkolemizationVisitor m_skolemizationVisitor;
     protected final Set<String> m_skolems=new HashSet<String>();
+    protected final Set<OWLLiteral> m_literals=new HashSet<OWLLiteral>();
     protected OWLOntology m_ontology;
     protected OWLDataFactory m_factory;
     protected boolean m_modified=false;
@@ -158,6 +159,9 @@ public class Skolemizer {
     }
     public Set<String> getSkolems() {
         return m_skolems;
+    }
+    public Set<OWLLiteral> getLiterals() {
+        return m_literals;
     }
     public static String millisToHoursMinutesSecondsString(long millis) {
         long time=millis/1000;
@@ -559,6 +563,7 @@ public class Skolemizer {
             return node;
         }
         public OWLObject visit(OWLLiteral node) {
+            m_literals.add(node);
             return node;
         }
         public OWLObject visit(OWLFacetRestriction node) {

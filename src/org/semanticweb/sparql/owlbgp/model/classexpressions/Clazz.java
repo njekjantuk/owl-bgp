@@ -83,6 +83,9 @@ public class Clazz extends AbstractExtendedOWLObject implements ClassExpression,
     public Identifier getIdentifier() {
         return m_iri;
     }
+    public String getIdentifierString() {
+        return m_iri.getIRIString();
+    }
     @Override
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

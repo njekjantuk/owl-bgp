@@ -44,6 +44,9 @@ public abstract class Variable extends AbstractExtendedOWLObject implements Atom
     public Identifier getIdentifier() {
         return this;
     }
+    public String getIdentifierString() {
+        return m_variable;
+    }
     protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         throw new RuntimeException("An untyped variable cannot have a binding and can, consequently, not be converted into an OWL API pbject and variable "+m_variable+" is untyped. "); 
     }

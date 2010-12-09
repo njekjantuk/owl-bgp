@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.bgpevaluation.queryobjects;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,13 +13,16 @@ import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 
 public class QO_DataPropertyAssertion  extends AbstractQueryObject<DataPropertyAssertion> {
 
@@ -77,7 +81,10 @@ public class QO_DataPropertyAssertion  extends AbstractQueryObject<DataPropertyA
                 return compute01Bound(reasoner,currentBinding,(OWLDataProperty)dpe.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(dataFactory),positions);
             } else if (!dpe.isVariable() && !ind.isVariable() && !lit.isVariable()) {
                 // dp(:a lit)
-                return compute012Bound(reasoner,currentBinding,(OWLDataProperty)dpe.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(dataFactory),(OWLLiteral)lit.asOWLAPIObject(dataFactory));
+                if (compute012Bound(reasoner,currentBinding,(OWLDataProperty)dpe.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(dataFactory),(OWLLiteral)lit.asOWLAPIObject(dataFactory)))
+                    return Collections.singletonList(currentBinding);
+                else 
+                    return new ArrayList<Atomic[]>();
             } else {
                 return complex(reasoner,dataFactory,graph,currentBinding,assertion,bindingPositions);
             }
@@ -89,49 +96,94 @@ public class QO_DataPropertyAssertion  extends AbstractQueryObject<DataPropertyA
     protected List<Atomic[]> compute012UnBound(OWLReasoner reasoner,Atomic[] currentBinding, int[] bindingPositions) {
         // DataPropertyAssertion(?x ?y ?z)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        Atomic[] binding;
         OWLOntology ont=reasoner.getRootOntology();
-        for (OWLDataProperty owlDp : ont.getDataPropertiesInSignature(true))
-            newBindings.addAll(compute0Bound(reasoner, currentBinding, owlDp, bindingPositions));
+        for (OWLDataProperty owlDp : ont.getDataPropertiesInSignature(true)) {
+            DataProperty dp=DataProperty.create(owlDp.getIRI().toString());
+            for (OWLNamedIndividual owlInd : ont.getIndividualsInSignature(true)) {
+                NamedIndividual ind=NamedIndividual.create(owlInd.getIRI().toString());
+                for (OWLLiteral lit : reasoner.getDataPropertyValues(owlInd, owlDp)) {
+                    binding=currentBinding.clone();
+                    binding[bindingPositions[0]]=dp;
+                    binding[bindingPositions[1]]=ind;
+                    binding[bindingPositions[2]]=TypedLiteral.create(lit.getLiteral(), lit.getLang(), Datatype.create(lit.getDatatype().getIRI().toString()));
+                    newBindings.add(binding);
+                }
+            }
+        }
         return newBindings;
     }
     protected List<Atomic[]> compute2Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLLiteral lit, int[] bindingPositions) {
         // DataPropertyAssertion(?x ?y :a)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        Atomic[] binding;
         OWLOntology ont=reasoner.getRootOntology();
         for (OWLDataProperty owlDp : ont.getDataPropertiesInSignature(true)) {
-            newBindings.addAll(compute02Bound(reasoner, currentBinding, owlDp, lit, bindingPositions));
+            DataProperty dp=DataProperty.create(owlDp.getIRI().toString());
+            for (OWLNamedIndividual owlInd : ont.getIndividualsInSignature(true)) {
+                if (reasoner.getDataPropertyValues(owlInd, owlDp).contains(lit)) {
+                    binding=currentBinding.clone();
+                    binding[bindingPositions[0]]=dp;
+                    binding[bindingPositions[1]]=NamedIndividual.create(owlInd.getIRI().toString());
+                    newBindings.add(binding);
+                }
+            }
         }
         return newBindings;
     }
     protected List<Atomic[]> compute1Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual ind, int[] bindingPositions) {
         // DataPropertyAssertion(?x :a ?y)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        Atomic[] binding;
         OWLOntology ont=reasoner.getRootOntology();
-        for (OWLDataProperty owlDp : ont.getDataPropertiesInSignature(true))
-            newBindings.addAll(compute01Bound(reasoner, currentBinding, owlDp, ind, bindingPositions));
+        for (OWLDataProperty owlDp : ont.getDataPropertiesInSignature(true)) {
+            DataProperty dp=DataProperty.create(owlDp.getIRI().toString());
+            for (OWLLiteral lit : reasoner.getDataPropertyValues(ind, owlDp)) {
+                binding=currentBinding.clone();
+                binding[bindingPositions[0]]=dp;
+                binding[bindingPositions[1]]=TypedLiteral.create(lit.getLiteral(), lit.getLang(), Datatype.create(lit.getDatatype().getIRI().toString()));
+                newBindings.add(binding);
+            }
+        }
         return newBindings;
     }
     protected List<Atomic[]> compute12Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual ind, OWLLiteral lit, int[] bindingPositions) {
         // DataPropertyAssertion(?x :a :b)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        for (OWLDataProperty owlDp : reasoner.getRootOntology().getDataPropertiesInSignature(true))
-            newBindings.addAll(compute012Bound(reasoner, currentBinding, owlDp, ind, lit));
+        Atomic[] binding;
+        for (OWLDataProperty owlDp : reasoner.getRootOntology().getDataPropertiesInSignature(true)) {
+            if (reasoner.getDataPropertyValues(ind, owlDp).contains(lit)) {
+                binding=currentBinding.clone();
+                binding[bindingPositions[0]]=DataProperty.create(owlDp.getIRI().toString());
+            }
+        }
         return newBindings;
     }
     protected List<Atomic[]> compute0Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLDataProperty dpe, int[] bindingPositions) {
         // DataPropertyAssertion(:r ?x ?y)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        OWLOntology ont=reasoner.getRootOntology();
-        for (OWLNamedIndividual ind : ont.getIndividualsInSignature(true))
-            newBindings.addAll(compute01Bound(reasoner, currentBinding, dpe, ind, bindingPositions));
+        Atomic[] binding;
+        for (OWLNamedIndividual owlInd : reasoner.getRootOntology().getIndividualsInSignature(true)) {
+            NamedIndividual ind=NamedIndividual.create(owlInd.getIRI().toString());
+            for (OWLLiteral lit : reasoner.getDataPropertyValues(owlInd, dpe)) {
+                binding=currentBinding.clone();
+                binding[bindingPositions[1]]=ind;
+                binding[bindingPositions[0]]=TypedLiteral.create(lit.getLiteral(), lit.getLang(), Datatype.create(lit.getDatatype().getIRI().toString()));
+                newBindings.add(binding);
+            }
+        }
         return newBindings;
     }
     protected List<Atomic[]> compute02Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLDataProperty dpe, OWLLiteral lit, int[] bindingPositions) {
         // DataPropertyAssertion(:r ?x :a)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        OWLOntology ont=reasoner.getRootOntology();
-        for (OWLNamedIndividual ind : ont.getIndividualsInSignature(true)) 
-            newBindings.addAll(compute012Bound(reasoner, currentBinding, dpe, ind, lit));
+        Atomic[] binding;
+        for (OWLNamedIndividual owlInd : reasoner.getRootOntology().getIndividualsInSignature(true)) {
+            if (reasoner.getDataPropertyValues(owlInd, dpe).contains(lit)) {
+                binding=currentBinding.clone();
+                binding[bindingPositions[0]]=NamedIndividual.create(owlInd.getIRI().toString());
+            }
+        }
         return newBindings;
     }
     protected List<Atomic[]> compute01Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLDataProperty dpe, OWLNamedIndividual ind, int[] bindingPositions) {
@@ -145,11 +197,11 @@ public class QO_DataPropertyAssertion  extends AbstractQueryObject<DataPropertyA
         }
         return newBindings;
     }
-    protected List<Atomic[]> compute012Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLDataProperty dpe, OWLNamedIndividual ind, OWLLiteral lit) {
+    protected boolean compute012Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLDataProperty dpe, OWLNamedIndividual ind, OWLLiteral lit) {
         // DataPropertyAssertion(:r :a :b)
-        List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        if (reasoner.getDataPropertyValues(ind, dpe).contains(lit))
-            newBindings.add(currentBinding);
-        return newBindings;
+        return (reasoner.getDataPropertyValues(ind, dpe).contains(lit));
+    }
+    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+        return visitor.visit(this);
     }
 }

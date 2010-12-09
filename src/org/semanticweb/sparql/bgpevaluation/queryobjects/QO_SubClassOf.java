@@ -11,6 +11,7 @@ import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
@@ -100,5 +101,8 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         if (reasoner.isEntailed(datafactory.getOWLSubClassOfAxiom(subClass, superClass)))
             newBindings.add(currentBinding);
         return newBindings;
+    }
+    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+        return visitor.visit(this);
     }
 }

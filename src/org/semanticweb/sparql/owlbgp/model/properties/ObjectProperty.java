@@ -98,6 +98,9 @@ public class ObjectProperty extends AbstractExtendedOWLObject implements ObjectP
     public Identifier getIdentifier() {
         return m_iri;
     }
+    public String getIdentifierString() {
+        return m_iri.getIRIString();
+    }
     public ObjectPropertyExpression getNormalized() {
         return this;
     }
