@@ -2,25 +2,20 @@ package org.semanticweb.sparql.bgpevaluation;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
-import org.semanticweb.HermiT.HermiTCostEstimator;
+import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLBGPQueryIterator;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
-import org.semanticweb.sparql.bgpevaluation.QueryReordering.CostComparator;
-import org.semanticweb.sparql.bgpevaluation.queryobjects.AxiomTemplaeToQueryObjectConverter;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.AxiomTemplateToQueryObjectConverter;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.AxiomVisitorEx;
@@ -79,8 +74,8 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 position++;
             } 
             AxiomRewriter.rewriteAxioms(queryAxiomTemplates);
-            AxiomVisitorEx<QueryObject<? extends Axiom>> axiomVisitor=new AxiomTemplaeToQueryObjectConverter(dataFactory,positionInTuple,graph);
-            Set<QueryObject<? extends Axiom>> queryObjects=new HashSet<QueryObject<? extends Axiom>>();
+            AxiomVisitorEx<QueryObject<? extends Axiom>> axiomVisitor=new AxiomTemplateToQueryObjectConverter(dataFactory,positionInTuple,graph);
+            List<QueryObject<? extends Axiom>> queryObjects=new ArrayList<QueryObject<? extends Axiom>>();
             for (Axiom axiom : queryAxiomTemplates) {
                 QueryObject<? extends Axiom> at=axiom.accept(axiomVisitor);
                 if (at!=null) // should be all not null eventually
@@ -89,18 +84,33 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
             List<Atomic[]> bindings=new ArrayList<Atomic[]>();
             bindings.add(initialBinding);
-            StandardCostEstimator costEstimator;
+            CostEstimationVisitor costEstimator;
             if (reasoner instanceof Reasoner)
-                costEstimator=new HermiTCostEstimator(graph);
+                costEstimator=new HermiTCostEstimationVisitor(graph,positionInTuple,bindings);
             else 
-                costEstimator=new StandardCostEstimator(graph);
-            Comparator<QueryObject<? extends Axiom>> costComparator=new CostComparator(costEstimator, bindings, positionInTuple);
-            SortedSet<QueryObject<? extends Axiom>> orderedQueryObjects=new TreeSet<QueryObject<? extends Axiom>>(costComparator);
-            orderedQueryObjects.addAll(queryObjects);
-            for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
-                System.out.println(qo);
-            for (QueryObject<? extends Axiom> qo : orderedQueryObjects)
-                bindings=qo.computeBindings(reasoner, graph, bindings, positionInTuple);
+                costEstimator=new CostEstimationVisitor(graph,positionInTuple,bindings);
+//            System.out.println("Start evaluation: ");
+            long t;
+            long t_cost=0;
+            long t_compute=0;
+            while (!queryObjects.isEmpty() && !bindings.isEmpty()) {
+//                System.out.println("Costs: ");
+//                for (QueryObject<? extends Axiom> qo : queryObjects) {
+//                    t=System.currentTimeMillis();
+//                    double[] cost=qo.accept(costEstimator);
+//                    t_cost+=(System.currentTimeMillis()-t);
+//                    System.out.println(qo+", cost: "+cost[0]+", results: "+cost[1]);
+//                }
+                QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, queryObjects);
+                queryObjects.remove(cheapest);
+//                System.out.println("cheaptest: "+cheapest);
+                t=System.currentTimeMillis();
+                bindings=cheapest.computeBindings(reasoner, graph, bindings, positionInTuple);
+                t_compute+=(System.currentTimeMillis()-t);
+//                System.out.println("Cost estimation time: "+t_cost+", computation time: "+t_compute+", results size: "+bindings.size());
+                costEstimator.updateCandidateBindings(bindings);
+            }
+            System.out.println("Cost estimation time: "+t_cost+", computation time: "+t_compute+", results size: "+bindings.size());
             return new OWLBGPQueryIterator(input,execCxt,bindings,positionInTuple);
         } catch (Exception e) {
             // TODO Auto-generated catch block

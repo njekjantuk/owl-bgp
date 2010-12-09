@@ -76,6 +76,9 @@ public class AnnotationProperty extends AbstractExtendedOWLObject implements Ann
     public Identifier getIdentifier() {
         return m_iri;
     }
+    public String getIdentifierString() {
+        return m_iri.getIRIString();
+    }
     public <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }

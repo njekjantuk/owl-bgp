@@ -44,13 +44,17 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
     }
     public OWLOntologyDataSet(OWLOntologyGraph defaultGraph, Map<String,OWLOntologyGraph> namedGraphURIsToGraphs) {
         this.defaultGraph=defaultGraph;
-        this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
+        if (namedGraphURIsToGraphs!=null)
+            this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
+        else 
+            this.namedGraphURIsToGraphs=new HashMap<String, OWLOntologyGraph>();
     } 
     public OWLOntologyDataSet(OWLOntology defaultOntology, Map<String,OWLOntology> namedGraphURIsToOntologies) throws OWLOntologyCreationException {
         this.defaultGraph=new OWLOntologyGraph(defaultOntology);
         namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
-        for (String oName : namedGraphURIsToOntologies.keySet())
-            namedGraphURIsToGraphs.put(oName, new OWLOntologyGraph(namedGraphURIsToOntologies.get(oName)));
+        if (namedGraphURIsToOntologies!=null)
+            for (String oName : namedGraphURIsToOntologies.keySet())
+                namedGraphURIsToGraphs.put(oName, new OWLOntologyGraph(namedGraphURIsToOntologies.get(oName)));
     } 
     public OWLOntologyDataSet(String defaultGraphURI) throws OWLOntologyCreationException {
         this(defaultGraphURI,null);
@@ -78,10 +82,11 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
         }
         defaultGraph=new OWLOntologyGraph(ontology);
         namedGraphURIsToGraphs=new HashMap<String,OWLOntologyGraph>();
-        for (String namedGraphURI : namedGraphURIs) {
-            OWLOntology o=manager.loadOntology(IRI.create(namedGraphURI));
-            namedGraphURIsToGraphs.put(namedGraphURI, new OWLOntologyGraph(o));
-        }
+        if (namedGraphURIs!=null)
+            for (String namedGraphURI : namedGraphURIs) {
+                OWLOntology o=manager.loadOntology(IRI.create(namedGraphURI));
+                namedGraphURIsToGraphs.put(namedGraphURI, new OWLOntologyGraph(o));
+            }
 	} 
     public OWLOntologyDataSet(List<String> graphURIs, Map<String,OWLOntologyGraph> namedGraphURIsToGraphs) throws OWLOntologyCreationException {
         OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -93,7 +98,10 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
             manager.removeOntology(o);
         }
         defaultGraph=new OWLOntologyGraph(ontology);
-        this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
+        if (namedGraphURIsToGraphs!=null)
+            this.namedGraphURIsToGraphs=namedGraphURIsToGraphs;
+        else
+            this.namedGraphURIsToGraphs=new HashMap<String, OWLOntologyGraph>();
     } 
     public Map<String,OWLOntologyGraph> getNamedGraphURIsToGraphs() {
         return namedGraphURIsToGraphs;

@@ -30,8 +30,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 
@@ -69,6 +69,9 @@ public class AnonymousIndividual extends AbstractExtendedOWLObject implements Id
     }
     public Identifier getIdentifier() {
         return this;
+    }
+    public String getIdentifierString() {
+        return m_nodeID;
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);

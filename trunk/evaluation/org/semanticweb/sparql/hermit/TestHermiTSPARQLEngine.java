@@ -4,7 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
@@ -42,20 +45,20 @@ public class TestHermiTSPARQLEngine {
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
 //	    getPizzaQ1(sparqlEngine, dataset);
 //	    getPizzaTestQ1(sparqlEngine, dataset);
-        getLUBMQ1(sparqlEngine, dataset);
-        getLUBMQ2(sparqlEngine, dataset);
-        getLUBMQ3(sparqlEngine, dataset);
-        getLUBMQ4(sparqlEngine, dataset);
-        getLUBMQ5(sparqlEngine, dataset);
-        getLUBMQ6(sparqlEngine, dataset);
+//        getLUBMQ1(sparqlEngine, dataset);
+//        getLUBMQ2(sparqlEngine, dataset);
+//        getLUBMQ3(sparqlEngine, dataset);
+//        getLUBMQ4(sparqlEngine, dataset);
+//        getLUBMQ5(sparqlEngine, dataset);
+//        getLUBMQ6(sparqlEngine, dataset);
         getLUBMQ7(sparqlEngine, dataset);
-        getLUBMQ8(sparqlEngine, dataset);
-        getLUBMQ9(sparqlEngine, dataset);
-        getLUBMQ10(sparqlEngine, dataset);
-        getLUBMQ11(sparqlEngine, dataset);
-        getLUBMQ12(sparqlEngine, dataset);
-        getLUBMQ13(sparqlEngine, dataset);
-        getLUBMQ14(sparqlEngine, dataset);
+//        getLUBMQ8(sparqlEngine, dataset);
+//        getLUBMQ9(sparqlEngine, dataset);
+//        getLUBMQ10(sparqlEngine, dataset);
+//        getLUBMQ11(sparqlEngine, dataset);
+//        getLUBMQ12(sparqlEngine, dataset);
+//        getLUBMQ13(sparqlEngine, dataset);
+//        getLUBMQ14(sparqlEngine, dataset);
 	}
 	
 	public static OWLOntologyDataSet getPizzaDataSet() throws OWLOntologyCreationException {
@@ -110,15 +113,20 @@ public class TestHermiTSPARQLEngine {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
-	    File inputOntologyFile = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/University0_0.owl");
-        return new OWLOntologyDataSet(inputOntologyFile);
+	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/bglimm/Documents/workspace/OWL-BGP/evaluation/ontologies/University0_0.owl"));
+	    for (int i=1;i<15;i++) {
+	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/bglimm/Documents/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
+	        manager.addAxioms(ont, tmp.getAxioms());
+	    }
+        return new OWLOntologyDataSet(ont, null);
     }
 	public static String getLUBMPrefix() {
 	   String prefix="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
 	        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
 	        + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
 	        + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB
-	        + "PREFIX ub: <http://example.org/university.owl#> " +LB
+	        + "PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +LB
 	        + "PREFIX g: <http://www.co-ode.org/ontologies/galen#>"
 	        + "SELECT * WHERE { " +LB;
 	    return prefix;
@@ -238,15 +246,12 @@ public class TestHermiTSPARQLEngine {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ7(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-//	    Query: 2
-//	    Result: 1537
 	    System.out.println("Q7");
         String queryString=getLUBMPrefix()
             +"  ?x rdf:type ub:Student. " +LB
-            +"  ?y rdf:type ub:Department. " +LB
-            +"  ?x ub:memberOf ?y. " +LB
-            +"  ?y ub:subOrganizationOf <http://www.University0.edu>."
-            +"  ?x ub:emailAddress ?z." +LB
+            +"  ?y rdf:type ub:Course. " +LB
+            +"  <http://www.Department0.University0.edu/AssociateProfessor0> ub:teacherOf ?y. " +LB
+            +"  ?x ub:takesCourse ?y." +LB
             + "} "+LB;
         long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
@@ -256,8 +261,6 @@ public class TestHermiTSPARQLEngine {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ8(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-//        Query: 10
-//        Result: 3201
         System.out.println("Q8");
         String queryString=getLUBMPrefix()
             +"  ?x rdf:type ub:Student. " +LB
@@ -275,8 +278,6 @@ public class TestHermiTSPARQLEngine {
     }
     public static void getLUBMQ9(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q9");
-//        Query: 1607
-//        Result: 1116
         String queryString=getLUBMPrefix()
             +"  ?x rdf:type ub:Student. " +LB
             +"  ?y rdf:type ub:Faculty. " +LB
@@ -372,3 +373,64 @@ public class TestHermiTSPARQLEngine {
 //	  ?y rdf:type pizza:Country . 
 //	  ?x owl:differentFrom ?y . 
 //	}
+
+
+//OWLOntology: 13654
+//Class classification: 6201
+//Realisation: 42420
+//Q1
+//Query: 243
+//Cost estimation time: 0, computation time: 30, results size: 4
+//Result: 311
+//Q2
+//Query: 3
+//Cost estimation time: 0, computation time: 32, results size: 0
+//Result: 278
+//Q3
+//Query: 11
+//Cost estimation time: 0, computation time: 6, results size: 6
+//Result: 29
+//Q4
+//Query: 4
+//Cost estimation time: 0, computation time: 4, results size: 34
+//Result: 33
+//Q5
+//Query: 3
+//Cost estimation time: 0, computation time: 259, results size: 719
+//Result: 318
+//Q6
+//Query: 4
+//Cost estimation time: 0, computation time: 228, results size: 7790
+//Result: 243
+//Q7
+//Query: 727
+//Cost estimation time: 0, computation time: 40, results size: 67
+//Result: 1414
+//Q8
+//Query: 1
+//Cost estimation time: 0, computation time: 408, results size: 7790
+//Result: 497
+//Q9
+//Query: 3
+//Cost estimation time: 0, computation time: 7164, results size: 208
+//Result: 235818
+//Q10
+//Query: 2
+//Cost estimation time: 0, computation time: 4, results size: 4
+//Result: 12
+//Q11
+//Query: 1
+//Cost estimation time: 0, computation time: 4, results size: 224
+//Result: 11
+//Q12
+//Query: 2
+//Cost estimation time: 0, computation time: 306, results size: 15
+//Result: 2866
+//Q13
+//Query: 3
+//Cost estimation time: 0, computation time: 0, results size: 1
+//Result: 14
+//Q14
+//Query: 2
+//Cost estimation time: 0, computation time: 133, results size: 5916
+//Result: 149

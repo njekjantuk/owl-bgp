@@ -42,6 +42,7 @@ public class OWLOntologyGraph implements Graph {
 	
 	protected final OWLOntology m_ontology;
 	protected final Set<String> m_skolemConstants;
+	protected final int m_noLiterals;
 	protected final Set<Clazz> m_classes;
     protected final Set<Datatype> m_datatypes;
     protected final Set<ObjectProperty> m_objectProperties;
@@ -55,6 +56,7 @@ public class OWLOntologyGraph implements Graph {
 	    Skolemizer skolemizer=new Skolemizer();
 		this.m_ontology=skolemizer.skolemize(ontology);
 		m_skolemConstants=skolemizer.getSkolems();
+		m_noLiterals=skolemizer.getLiterals().size();
 		m_classes=new HashSet<Clazz>();
         for (OWLClass cls : m_ontology.getClassesInSignature(true))
             m_classes.add(Clazz.create(cls.toString()));
@@ -105,6 +107,9 @@ public class OWLOntologyGraph implements Graph {
     }
     public Set<NamedIndividual> getIndividualsInSignature() {
         return m_individuals;
+    }
+    public int getLiteralCount() {
+        return m_noLiterals;
     }
     @Override
 	public void close() {
