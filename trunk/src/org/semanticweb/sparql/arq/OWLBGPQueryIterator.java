@@ -22,41 +22,68 @@ import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.IndentedWriter;
 
 public class OWLBGPQueryIterator extends QueryIteratorBase {
-    protected final Map<Variable,Integer> positionInTuple;
+    protected final List<Map<Variable,Integer>> bindingPositionsPerComponent;
     protected final Set<String> m_skolemConstants;
     protected QueryIterator input;
-    protected List<Atomic[]> results;
+    protected List<List<Atomic[]>> resultsPerComponent;
     protected int currentRow;
-
-    public OWLBGPQueryIterator(QueryIterator input,ExecutionContext execCxt,List<Atomic[]> results,Map<Variable,Integer> positionInTuple) {
+    protected int[] m_currentBindingIndexes;
+    protected final int numRows;
+    
+    public OWLBGPQueryIterator(QueryIterator input, ExecutionContext execCxt, List<List<Atomic[]>> results, List<Map<Variable,Integer>> bindingPositionsPerComponent) {
         m_skolemConstants=((OWLOntologyGraph)execCxt.getActiveGraph()).getSkolemConstants();
-        this.positionInTuple=positionInTuple;
+        this.bindingPositionsPerComponent=bindingPositionsPerComponent;
         this.input=input;
-        this.results=results;
+        this.resultsPerComponent=results;
         this.currentRow=0;
+        int size=0;
+        boolean first=true;
+        for (List<Atomic[]> result : resultsPerComponent) {
+            if (first) {
+                first=false;
+                size+=result.size();
+            } else {
+                size*=result.size();
+            }
+        }
+        numRows=size;
+        m_currentBindingIndexes=new int[resultsPerComponent.size()];
     }
     protected boolean hasNextBinding() {
-        return currentRow<results.size();
+        return currentRow<numRows;
     }
     protected Binding moveToNextBinding() {
         if (hasNextBinding()) {
             Binding bindingMap=new BindingMap();
 //            Binding bindingMap=new BindingMap(input);
-            Atomic[] result=results.get(currentRow);
-            currentRow++;
-            for (Variable variable : positionInTuple.keySet()) {
-                Var var=Var.alloc(variable.toString());
-                if (positionInTuple==null || variable==null || positionInTuple.get(variable)==null || result[positionInTuple.get(variable)]==null) {
-                    System.out.println("Ups, we should not be here:");
-                    System.out.println("Variable: "+var);
-                    System.out.println("position in tuple: "+positionInTuple.get(variable));
-                    System.out.println("In this result: ");
-                    for (Atomic at : result)
-                        System.out.println(at);
+            boolean flip=false;
+            for (int index=resultsPerComponent.size()-1;index>=0;index--) {
+                if (index==resultsPerComponent.size()-1) {
+                    // last bit, always flip
+                    if (m_currentBindingIndexes[index]<resultsPerComponent.get(index).size()-1)
+                        m_currentBindingIndexes[index]+=1;
+                    else {
+                        m_currentBindingIndexes[index]=0;
+                        flip=true;
+                    }
+                } else if (flip) {
+                    if (m_currentBindingIndexes[index]<resultsPerComponent.get(index).size()-1) {
+                        m_currentBindingIndexes[index]=m_currentBindingIndexes[index]+1;
+                        flip=false;
+                    } else 
+                        m_currentBindingIndexes[index]=0; 
                 }
-                Node node=createNode(result[positionInTuple.get(variable)]);
-                bindingMap.add(var,node);
             }
+            for (int i=0;i<resultsPerComponent.size();i++) {
+                Map<Variable,Integer> positionInTuple=bindingPositionsPerComponent.get(i);
+                for (Variable variable : positionInTuple.keySet()) {
+                    Var var=Var.alloc(variable.toString());
+                    Atomic[] result=resultsPerComponent.get(i).get(m_currentBindingIndexes[i]);
+                    Node node=createNode(result[positionInTuple.get(variable)]);
+                    bindingMap.add(var,node);
+                }
+            }
+            currentRow++;
             return bindingMap;
         } else 
             return null;
@@ -64,7 +91,7 @@ public class OWLBGPQueryIterator extends QueryIteratorBase {
     protected void closeIterator() {
         input.close();
         input=null;
-        results=null;
+        resultsPerComponent=null;
     }
     public void output(IndentedWriter out, SerializationContext sCxt) {
         // TODO Auto-generated method stub

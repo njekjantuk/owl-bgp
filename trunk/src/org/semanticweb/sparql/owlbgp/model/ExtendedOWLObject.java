@@ -26,18 +26,19 @@ import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
     
 public interface ExtendedOWLObject extends Serializable {
-    public String toString(Prefixes prefixes);
-    public String toTurtleString();
-    public String toTurtleString(Identifier mainNode);
-    public String toTurtleString(Prefixes prefixes, Identifier mainNode);
-    public ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings);
-    public OWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings,OWLDataFactory dataFactory);
-    public Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings);
-    public Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings,OWLDataFactory dataFactory);
-    public Set<Variable> getVariablesInSignature();
-    public Set<Variable> getVariablesInSignature(VarType varType);
+    String toString(Prefixes prefixes);
+    String toTurtleString();
+    String toTurtleString(Identifier mainNode);
+    String toTurtleString(Prefixes prefixes, Identifier mainNode);
+    ExtendedOWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings);
+    OWLObject getBoundVersion(Map<Variable,? extends Atomic> variablesToBindings,OWLDataFactory dataFactory);
+    Iterable<ExtendedOWLObject> getAppliedBindingsIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings);
+    Iterable<OWLObject> getAppliedBindingsOWLAPIIterator(Map<Variable,Set<? extends Atomic>> variablesToBindings,OWLDataFactory dataFactory);
+    Set<Variable> getVariablesInSignature();
+    Set<Variable> getVariablesInSignature(VarType varType);
     <O> O accept(ExtendedOWLObjectVisitorEx<O> visitor);
-    public void accept(ExtendedOWLObjectVisitor visitor);
-    public OWLObject asOWLAPIObject(OWLDataFactory dataFactory);
-    public boolean isVariable();
+    void accept(ExtendedOWLObjectVisitor visitor);
+    OWLObject asOWLAPIObject(OWLDataFactory dataFactory);
+    OWLObject asOWLAPIObject(ToOWLAPIConverter converter);
+    boolean isVariable();
 }

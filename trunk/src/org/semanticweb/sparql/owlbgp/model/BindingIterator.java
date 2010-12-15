@@ -31,11 +31,8 @@ public class BindingIterator implements Iterator<Map<Variable,? extends Atomic>>
         if (!hasNext()) throw new NoSuchElementException();
         Map<Variable,Atomic> currentBinding=new HashMap<Variable, Atomic>();
         if (m_currentBindingIndexes==null) {
-            // first entry, initialise
+            // first entry, initialize
             m_currentBindingIndexes=new int[m_variables.length];
-            for (int index=0;index<m_variables.length;index++) {
-                m_currentBindingIndexes[index]=0;
-            }
         } else {
             boolean flip=false;
             for (int index=m_variables.length-1;index>=0;index--) {

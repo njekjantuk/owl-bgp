@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.monitor.PrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -24,7 +25,7 @@ public class TestHermiTSPARQLEngine {
 	public static void main(String[] args) throws Exception {
 	    long t=System.currentTimeMillis();
 	    OWLOntologyDataSet dataset=getLUBMDataSet();
-//	    HermiTDataSet dataset=getPizzaDataSet();
+//	    OWLOntologyDataSet dataset=getPizzaDataSet();
 //	    HermiTDataSet dataset=getPizzaTestDataSet();
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
@@ -42,23 +43,23 @@ public class TestHermiTSPARQLEngine {
 	    System.out.println("Realisation: "+(System.currentTimeMillis()-t));
 //	    System.out.println("HermiT: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
-	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new PrintingMonitor());
 //	    getPizzaQ1(sparqlEngine, dataset);
 //	    getPizzaTestQ1(sparqlEngine, dataset);
-//        getLUBMQ1(sparqlEngine, dataset);
-//        getLUBMQ2(sparqlEngine, dataset);
-//        getLUBMQ3(sparqlEngine, dataset);
-//        getLUBMQ4(sparqlEngine, dataset);
-//        getLUBMQ5(sparqlEngine, dataset);
-//        getLUBMQ6(sparqlEngine, dataset);
+        getLUBMQ1(sparqlEngine, dataset);
+        getLUBMQ2(sparqlEngine, dataset);
+        getLUBMQ3(sparqlEngine, dataset);
+        getLUBMQ4(sparqlEngine, dataset);
+        getLUBMQ5(sparqlEngine, dataset);
+        getLUBMQ6(sparqlEngine, dataset);
         getLUBMQ7(sparqlEngine, dataset);
-//        getLUBMQ8(sparqlEngine, dataset);
-//        getLUBMQ9(sparqlEngine, dataset);
-//        getLUBMQ10(sparqlEngine, dataset);
-//        getLUBMQ11(sparqlEngine, dataset);
-//        getLUBMQ12(sparqlEngine, dataset);
-//        getLUBMQ13(sparqlEngine, dataset);
-//        getLUBMQ14(sparqlEngine, dataset);
+        getLUBMQ8(sparqlEngine, dataset);
+        getLUBMQ9(sparqlEngine, dataset);
+        getLUBMQ10(sparqlEngine, dataset);
+        getLUBMQ11(sparqlEngine, dataset);
+        getLUBMQ12(sparqlEngine, dataset);
+        getLUBMQ13(sparqlEngine, dataset);
+        getLUBMQ14(sparqlEngine, dataset);
 	}
 	
 	public static OWLOntologyDataSet getPizzaDataSet() throws OWLOntologyCreationException {
@@ -379,58 +380,118 @@ public class TestHermiTSPARQLEngine {
 //Class classification: 6201
 //Realisation: 42420
 //Q1
-//Query: 243
+//Query: 243, 253
 //Cost estimation time: 0, computation time: 30, results size: 4
-//Result: 311
+//Result: 311, 278
 //Q2
-//Query: 3
+//Query: 3, 3
 //Cost estimation time: 0, computation time: 32, results size: 0
-//Result: 278
+//Result: 278, 125
 //Q3
-//Query: 11
+//Query: 11, 2
 //Cost estimation time: 0, computation time: 6, results size: 6
-//Result: 29
+//Result: 29, 12
 //Q4
-//Query: 4
+//Query: 4, 2
 //Cost estimation time: 0, computation time: 4, results size: 34
-//Result: 33
+//Result: 33, 86
 //Q5
-//Query: 3
+//Query: 3, 1
 //Cost estimation time: 0, computation time: 259, results size: 719
-//Result: 318
+//Result: 318, 46
 //Q6
-//Query: 4
+//Query: 4, 2
 //Cost estimation time: 0, computation time: 228, results size: 7790
-//Result: 243
+//Result: 243, 117
 //Q7
-//Query: 727
+//Query: 727, 2
 //Cost estimation time: 0, computation time: 40, results size: 67
-//Result: 1414
+//Result: 1414, 38
 //Q8
-//Query: 1
+//Query: 1, 1
 //Cost estimation time: 0, computation time: 408, results size: 7790
-//Result: 497
+//Result: 497, 853
 //Q9
-//Query: 3
+//Query: 3, 1
 //Cost estimation time: 0, computation time: 7164, results size: 208
-//Result: 235818
+//Result: 235818, 221652
 //Q10
-//Query: 2
+//Query: 2, 1
 //Cost estimation time: 0, computation time: 4, results size: 4
-//Result: 12
+//Result: 12, 12
+//Q11
+//Query: 1, 2
+//Cost estimation time: 0, computation time: 4, results size: 224
+//Result: 11, 11
+//Q12
+//Query: 2, 1
+//Cost estimation time: 0, computation time: 306, results size: 15
+//Result: 2866, 8
+//Q13
+//Query: 3, 2
+//Cost estimation time: 0, computation time: 0, results size: 1
+//Result: 14, 5
+//Q14
+//Query: 2, 0
+//Cost estimation time: 0, computation time: 133, results size: 5916
+//Result: 149, 53
+
+//OWLOntology: 9248
+//Class classification: 3822
+//Realisation: 26900
+//Q1
+//Query: 316
+//Cost estimation time: 26, computation time: 58, results size: 4
+//Result: 430
+//Q2
+//Query: 39
+//Cost estimation time: 238, computation time: 20, results size: 0
+//Result: 345
+//Q3
+//Query: 3
+//Cost estimation time: 2, computation time: 4, results size: 6
+//Result: 17
+//Q4
+//Query: 2
+//Cost estimation time: 24, computation time: 51, results size: 34
+//Result: 94
+//Q5
+//Query: 1
+//Cost estimation time: 13, computation time: 29, results size: 719
+//Result: 48
+//Q6
+//Query: 1
+//Cost estimation time: 0, computation time: 105, results size: 7790
+//Result: 110
+//Q7
+//Query: 1
+//Cost estimation time: 13, computation time: 17, results size: 67
+//Result: 37
+//Q8
+//Query: 2
+//Cost estimation time: 184, computation time: 664, results size: 7790
+//Result: 855
+//Q9
+//Query: 2
+//Cost estimation time: 221190, computation time: 6631, results size: 208
+//Result: 227827
+//Q10
+//Query: 1
+//Cost estimation time: 3, computation time: 4, results size: 4
+//Result: 14
 //Q11
 //Query: 1
-//Cost estimation time: 0, computation time: 4, results size: 224
-//Result: 11
+//Cost estimation time: 0, computation time: 5, results size: 224
+//Result: 27
 //Q12
-//Query: 2
-//Cost estimation time: 0, computation time: 306, results size: 15
-//Result: 2866
+//Query: 1
+//Cost estimation time: 2496, computation time: 166, results size: 15
+//Result: 2669
 //Q13
-//Query: 3
-//Cost estimation time: 0, computation time: 0, results size: 1
-//Result: 14
+//Query: 1
+//Cost estimation time: 1, computation time: 0, results size: 1
+//Result: 7
 //Q14
-//Query: 2
-//Cost estimation time: 0, computation time: 133, results size: 5916
-//Result: 149
+//Query: 1
+//Cost estimation time: 1, computation time: 37, results size: 5916
+//Result: 43

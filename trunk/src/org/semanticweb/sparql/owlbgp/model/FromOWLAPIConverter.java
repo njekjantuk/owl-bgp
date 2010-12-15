@@ -180,8 +180,18 @@ import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 
 public class FromOWLAPIConverter implements OWLObjectVisitorEx<ExtendedOWLObject> {
     
+    protected static FromOWLAPIConverter instance;
+    
+    private FromOWLAPIConverter() {
+        // empty
+    }
+    public static FromOWLAPIConverter getInstance() {
+        if (instance==null) 
+            instance=new FromOWLAPIConverter();
+        return instance;
+    }
     public static ExtendedOWLObject convert(OWLObject object) {
-        return object.accept(new FromOWLAPIConverter());
+        return object.accept(FromOWLAPIConverter.getInstance());
     }
     public ExtendedOWLObject visit(OWLSubClassOfAxiom axiom) {
         return SubClassOf.create((ClassExpression)axiom.getSubClass().accept(this), (ClassExpression)axiom.getSuperClass().accept(this), convertAnnotations(axiom.getAnnotations()));
