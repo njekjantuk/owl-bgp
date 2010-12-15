@@ -8,15 +8,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.reasoner.NodeSet;
-import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
-import org.semanticweb.sparql.bgpevaluation.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
@@ -25,16 +23,17 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
 public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPropertyAssertion> {
 
-    public QO_ObjectPropertyAssertion(ObjectPropertyAssertion axiomTemplate) {
-        super(axiomTemplate);
+    public QO_ObjectPropertyAssertion(ObjectPropertyAssertion axiomTemplate, OWLOntologyGraph graph) {
+        super(axiomTemplate, graph);
     }
-    protected List<Atomic[]> addBindings(OWLReasoner reasoner, OWLDataFactory dataFactory, OWLOntologyGraph graph, Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
+    
+    protected List<Atomic[]> addBindings(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
         Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
         // apply bindings that are already computed from previous steps
         for (Variable var : bindingPositions.keySet())
             bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
         try {
-            ObjectPropertyAssertion assertion=((ObjectPropertyAssertion)m_axiomTemplate.getBoundVersion(bindingMap)).getNormalizedAssertion();
+            ObjectPropertyAssertion assertion=((ObjectPropertyAssertion)m_axiomTemplate.getBoundVersion(bindingMap));
             Atomic ope=(Atomic)assertion.getObjectPropertyExpression();
             Individual ind1=assertion.getIndividual1();
             Individual ind2=assertion.getIndividual2();
@@ -43,78 +42,77 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
                 positions[0]=bindingPositions.get(ope);
                 positions[1]=bindingPositions.get(ind1);
                 positions[2]=bindingPositions.get(ind2);
-                return compute012UnBound(reasoner,currentBinding,positions);
+                return compute012UnBound(currentBinding,positions);
             } else if (ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
                 int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ope);
                 positions[1]=bindingPositions.get(ind1);
-                return compute2Bound(reasoner,currentBinding,(OWLNamedIndividual)ind2.asOWLAPIObject(dataFactory),positions);
+                return compute2Bound(currentBinding,(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
                 int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ope);
                 positions[1]=bindingPositions.get(ind2);
-                return compute1Bound(reasoner,currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(dataFactory),positions);
+                return compute1Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
                 int[] positions=new int[1];
                 positions[0]=bindingPositions.get(ope);
-                return compute12Bound(reasoner,currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind2.asOWLAPIObject(dataFactory),positions);
+                return compute12Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
                 int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ind1);
                 positions[1]=bindingPositions.get(ind2);
-                return compute0Bound(reasoner,currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(dataFactory),positions);
+                return compute0Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
                 int[] positions=new int[1];
                 positions[0]=bindingPositions.get(ind1);
-                return compute02Bound(reasoner,currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind2.asOWLAPIObject(dataFactory),positions);
+                return compute02Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
                 int[] positions=new int[1];
                 positions[0]=bindingPositions.get(ind2);
-                return compute01Bound(reasoner,currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind1.asOWLAPIObject(dataFactory),positions);
+                return compute01Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
             } else if (!ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
-                if (compute012Bound(reasoner,currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind1.asOWLAPIObject(dataFactory),(OWLNamedIndividual)ind2.asOWLAPIObject(dataFactory)))
+                if (compute012Bound((OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter)))
                     return Collections.singletonList(currentBinding);
                 else 
                     return new ArrayList<Atomic[]>();
             } else {
-                return complex(reasoner,dataFactory,graph,currentBinding,assertion,bindingPositions);
+                return complex(currentBinding,assertion,bindingPositions);
             }
         } catch (IllegalArgumentException e) {
             // current binding is incompatible will not add new bindings in newBindings
             return new ArrayList<Atomic[]>();
         }
     }
-    protected List<Atomic[]> compute012UnBound(OWLReasoner reasoner,Atomic[] currentBinding, int[] bindingPositions) {
+    protected List<Atomic[]> compute012UnBound(Atomic[] currentBinding, int[] bindingPositions) {
         // ObjectPropertyAssertion(?x ?y ?z)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Atomic[] binding;
-        for (OWLObjectProperty owlOP : reasoner.getRootOntology().getObjectPropertiesInSignature(true)) {
-            if (reasoner instanceof Reasoner) {
-                Map<OWLNamedIndividual,Set<OWLNamedIndividual>> instances=((Reasoner)reasoner).getObjectPropertyInstances(owlOP);
+        for (ObjectProperty op : m_graph.getObjectPropertiesInSignature()) {
+            OWLObjectProperty owlOP=(OWLObjectProperty)op.asOWLAPIObject(m_toOWLAPIConverter);
+            if (m_reasoner instanceof Reasoner) {
+                Map<OWLNamedIndividual,Set<OWLNamedIndividual>> instances=((Reasoner)m_reasoner).getObjectPropertyInstances(owlOP);
                 if (!instances.isEmpty()) {
-                    ObjectProperty op=ObjectProperty.create(owlOP.getIRI().toString());
                     for (OWLNamedIndividual ind1 : instances.keySet()) {
-                        NamedIndividual ind=NamedIndividual.create(ind1.getIRI().toString());
+                        NamedIndividual ind=(NamedIndividual)FromOWLAPIConverter.convert(ind1);
                         for (OWLNamedIndividual ind2 : instances.get(ind1)) {
                             binding=currentBinding.clone();
                             binding[bindingPositions[0]]=op;
                             binding[bindingPositions[1]]=ind;
-                            binding[bindingPositions[2]]=NamedIndividual.create(ind2.getIRI().toString());
+                            binding[bindingPositions[2]]=(NamedIndividual)FromOWLAPIConverter.convert(ind2);
                             newBindings.add(binding);
                         }
                     }
                 }
             } else {
-                for (OWLNamedIndividual ind1 : reasoner.getRootOntology().getIndividualsInSignature(true)) {
-                    NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind1, owlOP);
+                for (NamedIndividual ind1 : m_graph.getIndividualsInSignature()) {
+                    OWLNamedIndividual owlInd1=(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter);
+                    NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(owlInd1, owlOP);
                     if (!instances.isEmpty()) {
-                        ObjectProperty op=ObjectProperty.create(owlOP.getIRI().toString());
-                        NamedIndividual ind=NamedIndividual.create(ind1.getIRI().toString());
                         for (OWLNamedIndividual ind2 : instances.getFlattened()) {
                             binding=currentBinding.clone();
                             binding[bindingPositions[0]]=op;
-                            binding[bindingPositions[1]]=ind;
-                            binding[bindingPositions[2]]=NamedIndividual.create(ind2.getIRI().toString());
+                            binding[bindingPositions[1]]=ind1;
+                            binding[bindingPositions[2]]=(NamedIndividual)FromOWLAPIConverter.convert(ind2);
                             newBindings.add(binding);
                         }
                     }
@@ -123,111 +121,113 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
         }
         return newBindings;
     }
-    protected List<Atomic[]> compute2Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual ind, int[] bindingPositions) {
+    protected List<Atomic[]> compute2Bound(Atomic[] currentBinding, OWLNamedIndividual ind, int[] bindingPositions) {
         // ObjectPropertyAssertion(?x ?y :a)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Atomic[] binding;
-            for (OWLObjectProperty owlOP : reasoner.getRootOntology().getObjectPropertiesInSignature(true)) {
-                NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind, owlOP.getInverseProperty());
-                if (!instances.isEmpty()) {
-                    ObjectProperty op=ObjectProperty.create(owlOP.getIRI().toString());
-                    for (OWLNamedIndividual relatedInd : instances.getFlattened()) {
-                        binding=currentBinding.clone();
-                        binding[bindingPositions[0]]=op;
-                        binding[bindingPositions[1]]=NamedIndividual.create(relatedInd.getIRI().toString());
-                        newBindings.add(binding);
-                    }
-                }
-            }
-        return newBindings;
-    }
-    protected List<Atomic[]> compute1Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual ind, int[] bindingPositions) {
-        // ObjectPropertyAssertion(?x :a ?y)
-        List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        Atomic[] binding;
-        for (OWLObjectProperty owlOP : reasoner.getRootOntology().getObjectPropertiesInSignature(true)) {
-            NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind, owlOP);
+        for (ObjectProperty op : m_graph.getObjectPropertiesInSignature()) {
+            OWLObjectProperty owlOP=(OWLObjectProperty)op.asOWLAPIObject(m_toOWLAPIConverter);
+            NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(ind, owlOP.getInverseProperty());
             if (!instances.isEmpty()) {
-                ObjectProperty op=ObjectProperty.create(owlOP.getIRI().toString());
                 for (OWLNamedIndividual relatedInd : instances.getFlattened()) {
                     binding=currentBinding.clone();
                     binding[bindingPositions[0]]=op;
-                    binding[bindingPositions[1]]=NamedIndividual.create(relatedInd.getIRI().toString());
+                    binding[bindingPositions[1]]=(NamedIndividual)FromOWLAPIConverter.convert(relatedInd);
                     newBindings.add(binding);
                 }
             }
         }
         return newBindings;
     }
-    protected List<Atomic[]> compute12Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLNamedIndividual ind1, OWLNamedIndividual ind2, int[] bindingPositions) {
+    protected List<Atomic[]> compute1Bound(Atomic[] currentBinding, OWLNamedIndividual ind, int[] bindingPositions) {
+        // ObjectPropertyAssertion(?x :a ?y)
+        List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        Atomic[] binding;
+        for (ObjectProperty op : m_graph.getObjectPropertiesInSignature()) {
+            OWLObjectProperty owlOP=(OWLObjectProperty)op.asOWLAPIObject(m_toOWLAPIConverter);
+            NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(ind, owlOP);
+            if (!instances.isEmpty()) {
+                for (OWLNamedIndividual relatedInd : instances.getFlattened()) {
+                    binding=currentBinding.clone();
+                    binding[bindingPositions[0]]=op;
+                    binding[bindingPositions[1]]=(NamedIndividual)FromOWLAPIConverter.convert(relatedInd);
+                    newBindings.add(binding);
+                }
+            }
+        }
+        return newBindings;
+    }
+    protected List<Atomic[]> compute12Bound(Atomic[] currentBinding, OWLNamedIndividual ind1, OWLNamedIndividual ind2, int[] bindingPositions) {
         // ObjectPropertyAssertion(?x :a :b)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Atomic[] binding;
-        for (OWLObjectProperty owlOP : reasoner.getRootOntology().getObjectPropertiesInSignature(true)) 
-            if (compute012Bound(reasoner, currentBinding, owlOP, ind1, ind2)) {
+        for (ObjectProperty op : m_graph.getObjectPropertiesInSignature()) {
+            OWLObjectProperty owlOP=(OWLObjectProperty)op.asOWLAPIObject(m_toOWLAPIConverter);
+            if (compute012Bound(owlOP, ind1, ind2)) {
                 binding=currentBinding.clone();
-                binding[bindingPositions[0]]=ObjectProperty.create(owlOP.getIRI().toString());
+                binding[bindingPositions[0]]=op;
                 newBindings.add(binding);
             }
+        }
         return newBindings;
     }
-    protected List<Atomic[]> compute0Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLObjectProperty ope, int[] bindingPositions) {
+    protected List<Atomic[]> compute0Bound(Atomic[] currentBinding, OWLObjectProperty ope, int[] bindingPositions) {
         // ObjectPropertyAssertion(:r ?x ?y)
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Atomic[] binding;
-        if (reasoner instanceof Reasoner) {
-            Map<OWLNamedIndividual,Set<OWLNamedIndividual>> instances=((Reasoner)reasoner).getObjectPropertyInstances(ope);
+        if (m_reasoner instanceof Reasoner) {
+            Map<OWLNamedIndividual,Set<OWLNamedIndividual>> instances=((Reasoner)m_reasoner).getObjectPropertyInstances(ope);
             for (OWLNamedIndividual ind1 : instances.keySet())
                 for (OWLNamedIndividual ind2 : instances.get(ind1)) {
                     binding=currentBinding.clone();
-                    binding[bindingPositions[0]]=NamedIndividual.create(ind1.getIRI().toString());
-                    binding[bindingPositions[1]]=NamedIndividual.create(ind2.getIRI().toString());
+                    binding[bindingPositions[0]]=(NamedIndividual)FromOWLAPIConverter.convert(ind1);
+                    binding[bindingPositions[1]]=(NamedIndividual)FromOWLAPIConverter.convert(ind2);
                     newBindings.add(binding);
                 }
         } else {
-            for (OWLNamedIndividual ind1 : reasoner.getRootOntology().getIndividualsInSignature(true)) {
-                NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind1, ope);
+            for (OWLNamedIndividual ind1 : m_reasoner.getRootOntology().getIndividualsInSignature(true)) {
+                NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(ind1, ope);
                 for (OWLNamedIndividual ind2 : instances.getFlattened()) {
                     binding=currentBinding.clone();
-                    binding[bindingPositions[0]]=NamedIndividual.create(ind1.getIRI().toString());
-                    binding[bindingPositions[1]]=NamedIndividual.create(ind2.getIRI().toString());
+                    binding[bindingPositions[0]]=(NamedIndividual)FromOWLAPIConverter.convert(ind1);
+                    binding[bindingPositions[1]]=(NamedIndividual)FromOWLAPIConverter.convert(ind2);
                     newBindings.add(binding);
                 }
             }
         }
         return newBindings;
     }
-    protected List<Atomic[]> compute02Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLObjectProperty ope, OWLNamedIndividual ind, int[] bindingPositions) {
+    protected List<Atomic[]> compute02Bound(Atomic[] currentBinding, OWLObjectProperty ope, OWLNamedIndividual ind, int[] bindingPositions) {
         // ObjectPropertyAssertion(:r ?x :a)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind, ope.getInverseProperty());
+        NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(ind, ope.getInverseProperty());
         for (OWLNamedIndividual relatedInd : instances.getFlattened()) {
             binding=currentBinding.clone();
-            binding[bindingPositions[0]]=NamedIndividual.create(relatedInd.getIRI().toString());
+            binding[bindingPositions[0]]=(NamedIndividual)FromOWLAPIConverter.convert(relatedInd);
             newBindings.add(binding);
         }
         return newBindings;
     }
 
-    protected List<Atomic[]> compute01Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLObjectPropertyExpression ope, OWLNamedIndividual ind, int[] bindingPositions) {
+    protected List<Atomic[]> compute01Bound(Atomic[] currentBinding, OWLObjectPropertyExpression ope, OWLNamedIndividual ind, int[] bindingPositions) {
         // ObjectPropertyAssertion(:r :a ?x)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-        NodeSet<OWLNamedIndividual> instances=reasoner.getObjectPropertyValues(ind, ope);
+        NodeSet<OWLNamedIndividual> instances=m_reasoner.getObjectPropertyValues(ind, ope);
         for (OWLNamedIndividual relatedInd : instances.getFlattened()) {
             binding=currentBinding.clone();
-            binding[bindingPositions[0]]=NamedIndividual.create(relatedInd.getIRI().toString());
+            binding[bindingPositions[0]]=(NamedIndividual)FromOWLAPIConverter.convert(relatedInd);
             newBindings.add(binding);
         }
         return newBindings;
     }
-    protected boolean compute012Bound(OWLReasoner reasoner, Atomic[] currentBinding, OWLObjectProperty ope, OWLNamedIndividual ind1, OWLNamedIndividual ind2) {
+    protected boolean compute012Bound(OWLObjectProperty ope, OWLNamedIndividual ind1, OWLNamedIndividual ind2) {
         // ObjectPropertyAssertion(:r :a :b)
-        if (reasoner instanceof Reasoner)
-            return ((Reasoner)reasoner).hasObjectPropertyRelationship(ind1, ope, ind2);
+        if (m_reasoner instanceof Reasoner)
+            return ((Reasoner)m_reasoner).hasObjectPropertyRelationship(ind1, ope, ind2);
         else
-            return reasoner.getObjectPropertyValues(ind1, ope).containsEntity(ind2);
+            return m_reasoner.getObjectPropertyValues(ind1, ope).containsEntity(ind2);
     }
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);

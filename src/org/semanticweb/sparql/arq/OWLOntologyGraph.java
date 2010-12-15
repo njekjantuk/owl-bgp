@@ -12,12 +12,17 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDatatype;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.bgpevaluation.Skolemizer;
+import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
@@ -40,46 +45,53 @@ import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
 public class OWLOntologyGraph implements Graph {
 	
-	protected final OWLOntology m_ontology;
+    protected final ToOWLAPIConverter m_toOWLAPIConverter;
 	protected final Set<String> m_skolemConstants;
-	protected final int m_noLiterals;
 	protected final Set<Clazz> m_classes;
     protected final Set<Datatype> m_datatypes;
     protected final Set<ObjectProperty> m_objectProperties;
     protected final Set<DataProperty> m_dataProperties;
     protected final Set<AnnotationProperty> m_annotationProperties;
     protected final Set<NamedIndividual> m_individuals;
+    protected final Set<Literal> m_literals;
+    protected final Set<ObjectProperty> m_knownFunctionalObjectProperties;
+    protected final Set<ObjectProperty> m_toTestFunctionalObjectProperties;
     protected final OWLReasoner m_reasoner;
     protected final CountingMonitor m_countingMonitor;
     
 	public OWLOntologyGraph(final OWLOntology ontology) {
+	    m_toOWLAPIConverter=new ToOWLAPIConverter(ontology.getOWLOntologyManager().getOWLDataFactory());
 	    Skolemizer skolemizer=new Skolemizer();
-		this.m_ontology=skolemizer.skolemize(ontology);
+		OWLOntology skolomized=skolemizer.skolemize(ontology);
 		m_skolemConstants=skolemizer.getSkolems();
-		m_noLiterals=skolemizer.getLiterals().size();
+		m_literals=skolemizer.getLiterals();
 		m_classes=new HashSet<Clazz>();
-        for (OWLClass cls : m_ontology.getClassesInSignature(true))
+        for (OWLClass cls : skolomized.getClassesInSignature(true))
             m_classes.add(Clazz.create(cls.toString()));
         m_datatypes=new HashSet<Datatype>();
-        for (OWLDatatype dt : m_ontology.getDatatypesInSignature(true))
+        for (OWLDatatype dt : skolomized.getDatatypesInSignature(true))
             if (!dt.isBuiltIn()) 
                 m_datatypes.add(Datatype.create(dt.toString()));
         m_objectProperties=new HashSet<ObjectProperty>();
-        for (OWLObjectProperty op : m_ontology.getObjectPropertiesInSignature(true))
+        for (OWLObjectProperty op : skolomized.getObjectPropertiesInSignature(true))
             m_objectProperties.add(ObjectProperty.create(op.toString()));
         m_dataProperties=new HashSet<DataProperty>();
-        for (OWLDataProperty dp : m_ontology.getDataPropertiesInSignature(true))
+        for (OWLDataProperty dp : skolomized.getDataPropertiesInSignature(true))
             m_dataProperties.add(DataProperty.create(dp.toString()));
         m_annotationProperties=new HashSet<AnnotationProperty>();
-        for (OWLAnnotationProperty ap : m_ontology.getAnnotationPropertiesInSignature())
+        for (OWLAnnotationProperty ap : skolomized.getAnnotationPropertiesInSignature())
             m_annotationProperties.add(AnnotationProperty.create(ap.toString()));
         m_individuals=new HashSet<NamedIndividual>();
-        for (OWLNamedIndividual ind : m_ontology.getIndividualsInSignature(true))
+        for (OWLNamedIndividual ind : skolomized.getIndividualsInSignature(true))
             m_individuals.add(NamedIndividual.create(ind.toString()));
+        m_knownFunctionalObjectProperties=skolemizer.getToldFunctionalObjectProperties();
+        Set<ObjectProperty> toTestFunctionalObjectProperties=new HashSet<ObjectProperty>(m_objectProperties);
+        toTestFunctionalObjectProperties.removeAll(m_knownFunctionalObjectProperties);
+        m_toTestFunctionalObjectProperties=toTestFunctionalObjectProperties;
         m_countingMonitor=new CountingMonitor();
         Configuration c=new Configuration();
         c.monitor=m_countingMonitor;
-        m_reasoner=new Reasoner(c, m_ontology);
+        m_reasoner=new Reasoner(c, skolomized);
 	}
 	public Set<String>  getSkolemConstants() {
         return this.m_skolemConstants;
@@ -87,8 +99,24 @@ public class OWLOntologyGraph implements Graph {
 	public OWLReasoner getReasoner() {
         return this.m_reasoner;
     }
-	public OWLOntology getDefaultOntology() {
-		return this.m_ontology;
+	public void precompute(InferenceType... inferenceTypes) {
+	    m_reasoner.precomputeInferences(inferenceTypes);
+	    if (m_reasoner.isPrecomputed(InferenceType.OBJECT_PROPERTY_HIERARCHY)) {
+	        Set<ObjectProperty> inferredFunctional=new HashSet<ObjectProperty>();
+	        for (ObjectProperty op : m_knownFunctionalObjectProperties) {
+	            OWLObjectProperty owlOp=(OWLObjectProperty)op.asOWLAPIObject(m_toOWLAPIConverter);
+	            for (OWLObjectPropertyExpression ope : m_reasoner.getSubObjectProperties(owlOp, false).getFlattened())
+	                if (!ope.isAnonymous())
+    	               inferredFunctional.add((ObjectProperty)FromOWLAPIConverter.convert(ope));
+	            for (OWLObjectPropertyExpression ope : m_reasoner.getEquivalentObjectProperties(owlOp).getEntities())
+                    if (!ope.isAnonymous())
+                       inferredFunctional.add((ObjectProperty)FromOWLAPIConverter.convert(ope));
+	        }
+	        m_knownFunctionalObjectProperties.addAll(inferredFunctional);
+	    }
+	}
+	public OWLOntology getOntology() {
+		return m_reasoner.getRootOntology();
 	}
     public Set<Clazz> getClassesInSignature() {
         return m_classes;
@@ -99,6 +127,12 @@ public class OWLOntologyGraph implements Graph {
     public Set<ObjectProperty> getObjectPropertiesInSignature() {
         return m_objectProperties;
     }
+    public Set<ObjectProperty> getKnownFunctionalObjectProperties() {
+        return m_knownFunctionalObjectProperties;
+    }
+    public Set<ObjectProperty> getToTestFunctionalObjectProperties() {
+        return m_toTestFunctionalObjectProperties;
+    }
     public Set<DataProperty> getDataPropertiesInSignature() {
         return m_dataProperties;
     }
@@ -108,8 +142,8 @@ public class OWLOntologyGraph implements Graph {
     public Set<NamedIndividual> getIndividualsInSignature() {
         return m_individuals;
     }
-    public int getLiteralCount() {
-        return m_noLiterals;
+    public Set<Literal> getLiteralsInSignature() {
+        return m_literals;
     }
     @Override
 	public void close() {
@@ -172,7 +206,7 @@ public class OWLOntologyGraph implements Graph {
 	}
 	@Override
 	public boolean isEmpty() {
-		return m_ontology.isEmpty();
+		return size()==0;
 	}
 	@Override
 	public boolean isIsomorphicWith(Graph g) {
@@ -184,7 +218,7 @@ public class OWLOntologyGraph implements Graph {
 	}
 	@Override
 	public int size() {
-		return m_ontology.getAxiomCount();
+		return m_reasoner.getRootOntology().getAxiomCount();
 	}
 	@Override
 	public void add(Triple t) throws AddDeniedException {

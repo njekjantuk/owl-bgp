@@ -94,7 +94,7 @@ public class NegativeObjectPropertyAssertion extends AbstractAxiom implements As
     public Individual getIndividual2() {
         return m_individual2;
     }
-    public Individual getobject() {
+    public Individual getObject() {
         return m_individual2;
     }
     @Override

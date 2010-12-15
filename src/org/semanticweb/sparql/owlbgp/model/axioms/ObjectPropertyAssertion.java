@@ -112,7 +112,7 @@ public class ObjectPropertyAssertion extends AbstractAxiom implements Assertion 
     public Individual getIndividual2() {
         return m_individual2;
     }
-    public Individual getobject() {
+    public Individual getObject() {
         return m_individual2;
     }
     @Override

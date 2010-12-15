@@ -16,8 +16,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
@@ -65,15 +65,15 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
         }
     };
     
-    protected final ClassExpression m_class;
+    protected final Atomic m_class;
     protected final Set<ClassExpression> m_classExpressions;
     
-    protected DisjointUnion(ClassExpression clazz, Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+    protected DisjointUnion(Atomic clazz, Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         super(annotations);
         m_class=clazz;
         m_classExpressions=classExpressions;
     }
-    public ClassExpression getClazz() {
+    public Atomic getClazz() {
         return m_class;
     }
     public Set<ClassExpression> getClassExpressions() {
@@ -121,13 +121,13 @@ public class DisjointUnion extends AbstractAxiom implements ClassAxiom {
     protected Object readResolve() {
         return s_interningManager.intern(this);
     }
-    public static DisjointUnion create(ClassExpression clazz,Set<ClassExpression> classExpressions) {
+    public static DisjointUnion create(Atomic clazz,Set<ClassExpression> classExpressions) {
         return create(clazz,classExpressions,new HashSet<Annotation>());
     }
-    public static DisjointUnion create(ClassExpression clazz,ClassExpression... classExpressions) {
+    public static DisjointUnion create(Atomic clazz,ClassExpression... classExpressions) {
         return create(clazz,new HashSet<ClassExpression>(Arrays.asList(classExpressions)),new HashSet<Annotation>());
     }
-    public static DisjointUnion create(ClassExpression clazz,Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
+    public static DisjointUnion create(Atomic clazz,Set<ClassExpression> classExpressions,Set<Annotation> annotations) {
         if (!(clazz instanceof Atomic)) throw new IllegalArgumentException("A disjoint union axiom can only have a class or a class variable as first argument, but here we got "+clazz);
         return s_interningManager.intern(new DisjointUnion(clazz,classExpressions,annotations));
     }

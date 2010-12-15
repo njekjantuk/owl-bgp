@@ -50,6 +50,7 @@ import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
+import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLDataSomeValuesFrom;
 import org.semanticweb.owlapi.model.OWLDataUnionOf;
 import org.semanticweb.owlapi.model.OWLDatatype;
@@ -118,6 +119,10 @@ import org.semanticweb.owlapi.model.SWRLObjectPropertyAtom;
 import org.semanticweb.owlapi.model.SWRLRule;
 import org.semanticweb.owlapi.model.SWRLSameIndividualAtom;
 import org.semanticweb.owlapi.model.SWRLVariable;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.literals.Literal;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
 /**
  * This class implements the structural transformation from our new tableau paper. This transformation departs in the following way from the paper: it keeps the concepts of the form \exists R.{ a_1, ..., a_n }, \forall R.{ a_1, ..., a_n }, and \forall R.\neg { a } intact. These concepts are then clausified in a more efficient way.
@@ -125,7 +130,8 @@ import org.semanticweb.owlapi.model.SWRLVariable;
 public class Skolemizer {
     protected final SkolemizationVisitor m_skolemizationVisitor;
     protected final Set<String> m_skolems=new HashSet<String>();
-    protected final Set<OWLLiteral> m_literals=new HashSet<OWLLiteral>();
+    protected final Set<Literal> m_literals=new HashSet<Literal>();
+    protected final Set<ObjectProperty> m_toldFunctionalObjectProperties=new HashSet<ObjectProperty>();
     protected OWLOntology m_ontology;
     protected OWLDataFactory m_factory;
     protected boolean m_modified=false;
@@ -160,8 +166,11 @@ public class Skolemizer {
     public Set<String> getSkolems() {
         return m_skolems;
     }
-    public Set<OWLLiteral> getLiterals() {
+    public Set<Literal> getLiterals() {
         return m_literals;
+    }
+    public Set<ObjectProperty> getToldFunctionalObjectProperties() {
+        return m_toldFunctionalObjectProperties; 
     }
     public static String millisToHoursMinutesSecondsString(long millis) {
         long time=millis/1000;
@@ -192,8 +201,6 @@ public class Skolemizer {
                     newAxioms.add((OWLAxiom)axiom.accept(skolemizationVisitor));
                 else 
                     newAxioms.add(axiom);
-//        for (OWLNamedIndividual skolem : m_skolems)
-//            newAxioms.add(m_factory.getOWLDeclarationAxiom(skolem));
         try {
             return OWLManager.createOWLOntologyManager().createOntology(newAxioms);
         } catch (OWLOntologyCreationException e) {
@@ -325,6 +332,9 @@ public class Skolemizer {
                 return axiom;
         }
         public OWLAxiom visit(OWLFunctionalObjectPropertyAxiom axiom) {
+            OWLObjectPropertyExpression ope=axiom.getProperty().getSimplified();
+            if (!ope.isAnonymous())
+                m_toldFunctionalObjectProperties.add(ObjectProperty.create(ope.getNamedProperty().getIRI().toString()));
             return axiom;
         }
         public OWLAxiom visit(OWLSubObjectPropertyOfAxiom axiom) {
@@ -346,6 +356,7 @@ public class Skolemizer {
             return axiom;
         }
         public OWLAxiom visit(OWLDataPropertyRangeAxiom axiom) {
+            axiom.getRange().accept(this);
             return axiom;
         }
         public OWLAxiom visit(OWLFunctionalDataPropertyAxiom axiom) {
@@ -375,7 +386,8 @@ public class Skolemizer {
                 return axiom;
         }
         public OWLAxiom visit(OWLDataPropertyAssertionAxiom axiom) { 
-            OWLIndividual ind=(OWLIndividual)axiom.getSubject().accept(this);  
+            OWLIndividual ind=(OWLIndividual)axiom.getSubject().accept(this);
+            axiom.getObject().accept(this);
             if (m_modified) {
                 m_modified=false;
                 return m_factory.getOWLDataPropertyAssertionAxiom(axiom.getProperty(), ind, axiom.getObject());
@@ -548,22 +560,29 @@ public class Skolemizer {
             return node;
         }
         public OWLObject visit(OWLDataComplementOf node) {
+            node.getDataRange().accept(this);
             return node;
         }
         public OWLObject visit(OWLDataOneOf node) {
+            for (OWLLiteral lit : node.getValues())
+                lit.accept(this);
             return node;
         }
         public OWLObject visit(OWLDataIntersectionOf node) {
+            for (OWLDataRange dr : node.getOperands())
+                dr.accept(this);
             return node;
         }
         public OWLObject visit(OWLDataUnionOf node) {
+            for (OWLDataRange dr : node.getOperands())
+                dr.accept(this);
             return node;
         }
         public OWLObject visit(OWLDatatypeRestriction node) {
             return node;
         }
         public OWLObject visit(OWLLiteral node) {
-            m_literals.add(node);
+            m_literals.add(TypedLiteral.create(node.getLiteral(), node.getLang(), Datatype.create(node.getDatatype().getIRI().toString())));
             return node;
         }
         public OWLObject visit(OWLFacetRestriction node) {

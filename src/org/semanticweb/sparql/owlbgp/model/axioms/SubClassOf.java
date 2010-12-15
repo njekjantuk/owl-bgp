@@ -16,8 +16,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
@@ -97,6 +97,9 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     }
     protected Object readResolve() {
         return s_interningManager.intern(this);
+    }
+    public static SubClassOf create(ClassExpression subClass, ClassExpression superClass) {
+        return create(subClass,superClass,new HashSet<Annotation>());
     }
     public static SubClassOf create(ClassExpression subClass, ClassExpression superClass, Annotation... annotations) {
         return create(subClass,superClass,new HashSet<Annotation>(Arrays.asList(annotations)));
