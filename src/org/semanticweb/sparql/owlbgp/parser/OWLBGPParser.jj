@@ -1,4 +1,5 @@
 options {
+    JAVA_UNICODE_ESCAPE=true;
     STATIC=false;
     LOOKAHEAD=2;
     //DEBUG_TOKEN_MANAGER=true;
@@ -32,6 +33,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
+@SuppressWarnings("unused")
 public class OWLBGPParser {
 
     public static final String LB = System.getProperty("line.separator") ;
@@ -43,6 +45,14 @@ public class OWLBGPParser {
     protected final Prefixes pm=new Prefixes();
     {
         pm.declareSemanticWebPrefixes();
+    }
+    public void loadDeclarations(Set<Clazz> classes, Set<Datatype> dts, Set<ObjectProperty> ops, Set<DataProperty> dps, Set<AnnotationProperty> aps, Set<NamedIndividual> inds) {
+        handler.setClassesInOntologySignature(classes);
+        handler.setCustomDatatypesInOntologySignature(dts);
+        handler.setObjectPropertiesInOntologySignature(ops);
+        handler.setDataPropertiesInOntologySignature(dps);
+        handler.setAnnotationPropertiesInOntologySignature(aps);
+        handler.setIndividualsInOntologySignature(inds);
     }
     public void setClassesInOntologySignature(Set<Clazz> classes) {
         handler.setClassesInOntologySignature(classes);
@@ -64,8 +74,8 @@ public class OWLBGPParser {
     }
     public static void main(String[] args) {
 //        String s="<http://example.org/Person> rdf:type owl:Class . <http://example.org/Birte> rdf:type <http://example.org/Person> .";
-        
-        String s="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
+        String s="?x a owl:ObjectProperty ."+LB;
+        s+="<http://www.co-ode.org/ontologies/galen#hasShapeAnalogousTo> a owl:ObjectProperty ."+LB;
         s+= "<http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> a owl:ObjectProperty ."+LB;
 
         s+= "?prop a owl:ObjectProperty ."+LB
@@ -97,13 +107,13 @@ public class OWLBGPParser {
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         try {
             parser.parse();
-            for (Axiom axiom :parser.getParsedAxioms())
-                System.out.println(axiom);
+//            for (Axiom axiom :parser.getParsedAxioms())
+//                System.out.println(axiom);
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
-    
+
     protected int getNextBlankNodeID() {
         return blankNodeId++;
     }
@@ -118,10 +128,11 @@ public class OWLBGPParser {
         int colonIndex=qname.indexOf(':');
         if (colonIndex==-1) throw new ParseException("Not a valid qname (missing ':') " + qname);
         String prefix=qname.substring(0,colonIndex);
-        if (prefix.equals("_")) { 
+        if (prefix.equals("_")) {
             return getAnonymousIndividual(qname.substring(colonIndex + 1));
         }
-        if (pm.getPrefixIRI(prefix)==null) throw new ParseException("Prefix not declared: " + prefix);
+        if (pm.getPrefixIRI(prefix)==null) 
+            throw new ParseException("Prefix not declared: " + prefix);
         return IRI.create(pm.expandAbbreviatedIRI(qname));
     }
     public IRI getIRI(String s) {
@@ -135,20 +146,20 @@ public class OWLBGPParser {
         return handler.getOntology();
     }
     public static String unescapeString(String s) {
-        if (s.indexOf('\\')==-1) return s;
+        if (s.indexOf('\u005c\u005c')==-1) return s;
         int length=s.length();
         StringBuilder sb=new StringBuilder(length);
         for (int i=0; i<length; i++) {
             char ch=s.charAt(i);
-            if (ch=='\\') {
+            if (ch=='\u005c\u005c') {
                 int j=i+1;
                 if (j<length) {
                     char escCh=s.charAt(j);
-                    if (escCh=='\\' || escCh=='\"') {
+                    if (escCh=='\u005c\u005c' || escCh=='\u005c"') {
                         i++;
                         sb.append(escCh);
                     }
-                } else sb.append('\\');
+                } else sb.append('\u005c\u005c');
             } else sb.append(ch);
         }
         return sb.toString();
@@ -224,9 +235,11 @@ void parse() :
 void parseTriples() :
 {
     Identifier subject;
+    //subject = parseSubject() (parsePredicateObjectList(subject))?
 }
 {
-    subject = parseSubject() (parsePredicateObjectList(subject))?
+    subject = parseSubject() parsePredicateObjectList(subject)
+    
 }
 
 Identifier parseSubject() :
@@ -261,15 +274,13 @@ AnonymousIndividual parseBlankNode() :
 {
     AnonymousIndividual ind=null;
     Token t;
-    
 }
 {
     (ind=parseNodeID()
     |
-    t=<NODEID>{ind=getAnonymousIndividual(t.image.trim());}
+    <EMPTY_BLANK_NODE>{ if (ind==null) { ind=getAnonymousIndividual(""); } } (parsePredicateObjectList(ind))
     |
-    <OPEN_SQUARE_BRACKET> ({ind=getAnonymousIndividual("");} parsePredicateObjectList(ind) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> 
-    {if (ind==null) {ind=getAnonymousIndividual(""); }}
+    <OPEN_SQUARE_BRACKET> ({ if (ind==null) { ind=getAnonymousIndividual(""); } } parsePredicateObjectList(ind) (<DOT>)?)? <CLOSE_SQUARE_BRACKET> { if (ind==null) { ind=getAnonymousIndividual(""); }}    
     |
     ind=parseCollection()) {
         return ind;
@@ -282,7 +293,7 @@ AnonymousIndividual parseNodeID() :
 }
 {
     t=<NODEID> {
-        return (AnonymousIndividual)getIRIFromQName(t.image);
+        return getAnonymousIndividual(t.image.substring(2));
     }
 }
 
@@ -349,15 +360,12 @@ void parseObject(Identifier subject, Identifier predicate) :
     Identifier resObject;
 }
 {
-    (parseLiteral(subject, predicate) 
-    |
-    ((resObject=parseResource()
-    |
-    resObject=parseBlankNode())
-    |
-    resObject=parseVariable()) {
+    ( 
+    parseLiteral(subject, predicate) | (resObject=parseResource() | resObject=parseBlankNode() | resObject=parseVariable()) 
+    {
         handler.handleStreaming(subject, predicate, resObject);
-    })
+    }
+    )
 }
 
 AnonymousIndividual parseCollection() :

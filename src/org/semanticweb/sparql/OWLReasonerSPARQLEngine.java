@@ -28,7 +28,10 @@ public class OWLReasonerSPARQLEngine {
 	    if (bgpEvaluationMonitor==null)
 	        bgpEvaluationMonitor=new MonitorAdapter();
 	    StageGenerator hermiTStageGenerator=new OWLReasonerStageGenerator(orig, bgpEvaluationMonitor);
-	    StageBuilder.setGenerator(ARQ.getContext(), hermiTStageGenerator) ;
+	    StageBuilder.setGenerator(ARQ.getContext(), hermiTStageGenerator);
+	    // ARQ's optimizations are not good for entailment, they can split BGPs and declarations might end up 
+	    // in the wrong part and they can replace joins with sequences, which our iterators cannot deal with (yet)
+	    ARQ.getContext().set(ARQ.optimization, false); 
     }
 	public ResultSet execQuery(String sparqlQueryString, OWLOntologyDataSet dataSet) {
 		Query query=QueryFactory.create(sparqlQueryString, Syntax.syntaxSPARQL_11); // create Jena query object

@@ -42,6 +42,7 @@ import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
@@ -362,13 +363,13 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
             unbound.addAll(vars);
             unbound.removeAll(existingBindings.keySet());
             
-            double[] currentEstimate=getDataPropertyAssertionCost((DataProperty)instantiated.getDataPropertyExpression(), instantiated.getIndividual(), instantiated.getLiteral(), unbound, dpVar, indVar, litVar);
+            double[] currentEstimate=getDataPropertyAssertionCost(instantiated.getDataPropertyExpression(), instantiated.getIndividual(), instantiated.getLiteral(), unbound, dpVar, indVar, litVar);
             estimate[0]+=currentEstimate[0];
             estimate[1]+=currentEstimate[1];
         }
         return estimate;
     }
-    protected double[] getDataPropertyAssertionCost(DataProperty dp, Individual ind, Literal lit, Set<Variable> unbound, Variable dpVar, Variable indVar, Variable litVar) {
+    protected double[] getDataPropertyAssertionCost(DataPropertyExpression dp, Individual ind, Literal lit, Set<Variable> unbound, Variable dpVar, Variable indVar, Variable litVar) {
         if (unbound.size()==0)
             return new double[] { COST_ENTAILMENT, 1 };
         else if (unbound.size()==1 && dpVar!=null) // ?x(i, lit)
