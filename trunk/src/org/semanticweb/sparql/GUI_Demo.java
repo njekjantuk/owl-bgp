@@ -27,6 +27,7 @@ public class GUI_Demo {
     + "PREFIX swrl: <http://www.w3.org/2003/11/swrl#> "+LB
     + "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#> "+LB
     + "PREFIX swrlx: <http://www.w3.org/2003/11/swrlx#> "+LB
+    + "PREFIX ex: <http://example.org/test#> "+LB
     + "PREFIX ruleml: <http://www.w3.org/2003/11/ruleml#> "+LB;
 	
 	protected final ConsoleTextArea consoleTextArea;

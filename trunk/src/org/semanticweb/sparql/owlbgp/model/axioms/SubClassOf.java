@@ -122,7 +122,7 @@ public class SubClassOf extends AbstractAxiom implements ClassAxiom {
     protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {
         return converter.visit(this);
     }
-    public Set<Variable> getUnboundVariablesInSignature(VarType varType) {
+    public Set<Variable> getVariablesInSignature(VarType varType) {
         Set<Variable> variables=new HashSet<Variable>();
         variables.addAll(m_subClass.getVariablesInSignature(varType));
         variables.addAll(m_superClass.getVariablesInSignature(varType));

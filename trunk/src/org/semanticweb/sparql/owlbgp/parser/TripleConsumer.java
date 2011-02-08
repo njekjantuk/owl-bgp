@@ -1353,7 +1353,10 @@ public class TripleConsumer {
             return null;
         ClassExpression ce=CE.get(identifier);
         if (ce==null && identifier instanceof IRI && CEExt.contains(identifier)) {
-            ce=Clazz.create((IRI)identifier);
+            ce=Clazz.create((IRI)identifier); // built-in or declared in queried ontology
+        } else if (ce==null && isVariable(identifier)) {
+            ce=ClassVariable.create(identifier.toString());
+            mapClassIdentifierToClassExpression(identifier, ce); // infer type
         }
         return ce;
     }

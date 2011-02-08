@@ -56,14 +56,14 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
             } else { 
                 return new double[] { COST_ENTAILMENT, 1 };
             }
-        else if (unbound.size()==1 && indVar!=null) {// C(?x)
+        else if (unbound.size()==1 && unbound.contains(indVar)) {// C(?x)
             if (ce instanceof Atomic) 
                 if (m_instanceManager!=null && m_instanceManager.areClassesInitialised()) { 
                     int[] estimate=m_instanceManager.getNumberOfInstances(AtomicConcept.create(((Clazz)ce).getIRIString()));
                     return new double[] { estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
                 } 
                 return new double[] { cost+m_indCount, m_indCount }; // needs refinement 
-        } else if (indVar==null && unbound.size()==1 && ce instanceof Atomic) {// ?x(:a)
+        } else if (unbound.size()==1 && !unbound.contains(indVar) && ce instanceof Atomic) {// ?x(:a)
             if (m_instanceManager!=null && m_instanceManager.areClassesInitialised()) {
                 int[] estimate=m_instanceManager.getNumberOfTypes(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()));
                 return new double[] { estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };

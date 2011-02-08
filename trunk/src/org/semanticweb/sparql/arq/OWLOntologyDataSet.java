@@ -18,13 +18,15 @@ import com.hp.hpl.jena.query.Dataset;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
+import com.hp.hpl.jena.sparql.core.Quad;
+import com.hp.hpl.jena.sparql.util.Context;
 
 public class OWLOntologyDataSet implements Dataset, DatasetGraph {
     protected static final String DEFAULT_IRI_PREFIX="http://sparql.org/defaultOntology";
 
     protected static int ontologyCounter=0;
     
-    protected final OWLOntologyGraph defaultGraph;
+    protected OWLOntologyGraph defaultGraph;
     protected final Map<String,OWLOntologyGraph> namedGraphURIsToGraphs;
     
     public OWLOntologyDataSet(File defaultGraphFile) throws OWLOntologyCreationException {
@@ -153,7 +155,58 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
         };
         return graphNameIterator;
     }
-    public int size() {
+    public long size() {
         return namedGraphURIsToGraphs.keySet().size()+1;
+    }
+    public void setDefaultGraph(Graph g) {
+        if (g instanceof OWLOntologyGraph)
+            defaultGraph=(OWLOntologyGraph)g;
+        else
+            throw new IllegalArgumentException("Could not set the default graph because only instances of OWLOntologyGraph are supported. ");
+    }
+    public void addGraph(Node graphName, Graph graph) {
+        if (graph instanceof OWLOntologyGraph)
+            namedGraphURIsToGraphs.put(graphName.getURI(), (OWLOntologyGraph)graph);
+        else
+            throw new IllegalArgumentException("Could not add the named graph because only instances of OWLOntologyGraph are supported. ");
+    }
+    public void removeGraph(Node graphName) {
+        if (graphName.isURI())
+            namedGraphURIsToGraphs.remove(graphName.getURI());
+        else 
+            throw new IllegalArgumentException("Could not add the named graph because the node for the graph name has to be a URI node, but graphName has not type URI: "+graphName);
+    }
+    public void add(Quad quad) {
+        throw new UnsupportedOperationException("The addition of triples and quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public void delete(Quad quad) {
+        throw new UnsupportedOperationException("The removal of triples and quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public void deleteAny(Node g, Node s, Node p, Node o) {
+        throw new UnsupportedOperationException("The removal of triples and quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public Iterator<Quad> find() {
+        throw new UnsupportedOperationException("Finding quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public Iterator<Quad> find(Quad quad) {
+        throw new UnsupportedOperationException("Finding quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public Iterator<Quad> find(Node g, Node s, Node p, Node o) {
+        throw new UnsupportedOperationException("Finding quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public Iterator<Quad> findNG(Node g, Node s, Node p, Node o) {
+        throw new UnsupportedOperationException("Finding quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public boolean contains(Node g, Node s, Node p, Node o) {
+        return false;
+    }
+    public boolean contains(Quad quad) {
+        return false;
+    }
+    public boolean isEmpty() {
+        return defaultGraph==null && namedGraphURIsToGraphs.isEmpty();
+    }
+    public Context getContext() {
+        return null;
     }
 }

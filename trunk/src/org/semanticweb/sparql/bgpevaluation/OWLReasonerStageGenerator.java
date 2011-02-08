@@ -3,6 +3,7 @@ package org.semanticweb.sparql.bgpevaluation;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.parser.OWLBGPParser;
 import org.semanticweb.sparql.owlbgp.parser.ParseException;
 
@@ -33,37 +35,30 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     
     protected final StageGenerator m_above;
     protected final Monitor m_monitor;
+    protected final Set<Variable> m_bnodes;
     
     public OWLReasonerStageGenerator(StageGenerator original, Monitor monitor){
         m_above=original;
         m_monitor=monitor;
+        m_bnodes=new HashSet<Variable>();
     }
     @Override
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         m_monitor.bgpEvaluationStarted();
         Graph activeGraph=execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
-        if (!(activeGraph instanceof OWLOntologyGraph))
+        if (!(activeGraph instanceof OWLOntologyGraph)) {
             // Not us - bounce up the StageGenerator chain
             return m_above.execute(pattern, input, execCxt);
-        
+        }
         OWLOntologyGraph ontologyGraph=(OWLOntologyGraph)activeGraph;
         OWLReasoner reasoner=ontologyGraph.getReasoner();
         List<List<Atomic[]>> bindingsPerComponent=new ArrayList<List<Atomic[]>>();
         List<Map<Variable,Integer>> bindingPositionsPerComponent=new ArrayList<Map<Variable,Integer>>();
         try {
             m_monitor.bgpParsingStarted();
-            StringBuffer buffer=new StringBuffer();
-            for (Triple triple : pattern) {
-                buffer.append(printNode(triple.getSubject()));
-                buffer.append(" ");
-                buffer.append(printNode(triple.getPredicate()));
-                buffer.append(" ");
-                buffer.append(printNode(triple.getObject()));
-                buffer.append(" . ");
-                buffer.append(LB);
-            }
-            OWLBGPParser parser=new OWLBGPParser(new StringReader(buffer.toString()));
+            String bgp=arqPatternToBGP(pattern);
+            OWLBGPParser parser=new OWLBGPParser(new StringReader(bgp));
             parser.loadDeclarations(ontologyGraph.getClassesInSignature(),ontologyGraph.getDatatypesInSignature(), ontologyGraph.getObjectPropertiesInSignature(), ontologyGraph.getDataPropertiesInSignature(), ontologyGraph.getAnnotationPropertiesInSignature(), ontologyGraph.getIndividualsInSignature());
             parser.parse();
             m_monitor.bgpParsingFinished();
@@ -107,17 +102,37 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 m_monitor.componentsEvaluationFinished(bindings.size());
             }
             m_monitor.bgpEvaluationFinished(resultSize);
-            return new OWLBGPQueryIterator(input,execCxt,bindingsPerComponent,bindingPositionsPerComponent);
+            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,m_bnodes);
         } catch (ParseException e) {
             System.err.println("ParseException: Probably types could not be disambuguated with this active graph. ");
             m_monitor.bgpEvaluationFinished(0);
-            return new OWLBGPQueryIterator(input,execCxt,bindingsPerComponent,bindingPositionsPerComponent);
+            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,m_bnodes);
         }
+    }
+    private String arqPatternToBGP(BasicPattern pattern) {
+        StringBuffer buffer=new StringBuffer();
+        for (Triple triple : pattern) {
+            buffer.append(printNode(triple.getSubject()));
+            buffer.append(" ");
+            buffer.append(printNode(triple.getPredicate()));
+            buffer.append(" ");
+            buffer.append(printNode(triple.getObject()));
+            buffer.append(" . ");
+            buffer.append(LB);
+        }
+        return buffer.toString();
     }
     protected String printNode(Node node) {
         if (node.isURI())
             return "<"+node+">";
-        else 
+        else if (node.isVariable()) {
+            String name=node.getName();
+            if (name.startsWith("?")) {
+                name=name.substring(1);
+                m_bnodes.add(IndividualVariable.create(name));
+            }
+            return "?"+name;
+        } else
             return node.toString();
     }
 }
