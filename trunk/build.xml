@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!-- Copyright 2011 by Oxford University Computing Laboratory; see lgpl-3.0.txt and gpl.txt for details -->
+
+<project name="OWL-BGP" default="combined" basedir=".">
+    <property name="version" value="0.1"/>
+
+    <!-- general info -->
+    <property name="homepage" value="http://code.google.com/p/owl-bgp/"/>
+
+    <!-- structure of output files -->
+    <property name="projectroot" value="."/>
+    <property name="builddir" value="${projectroot}/build"/>
+    <property name="classdir" value="${builddir}/classes"/>
+	<property name="licensedir" value="${builddir}/licenses"/>
+    
+    <!-- libraries -->
+    <property name="libdir" value="${projectroot}/lib"/>
+    <property name="owlapi" value="${libdir}/owlapi-3.2.1.jar"/>
+    <property name="hermit" value="${libdir}/HermiT-1.3.3.jar"/>
+    <property name="arq" value="${libdir}/arq-2.8.7.jar"/>
+    <property name="arq-test" value="${libdir}/arq-2.8.7-test.jar"/>
+    <property name="jena" value="${libdir}/jena-2.6.4.jar"/>
+    <property name="jena-test" value="${libdir}/jena-2.6.4-test.jar"/>
+    <property name="icu4j" value="${libdir}/icu4j-3.4.4.jar"/>
+    <property name="iri" value="${libdir}/iri-0.8.jar"/>
+	<property name="log4j" value="${libdir}/log4j-1.2.14.jar"/>
+	<property name="slf4j-api" value="${libdir}/slf4j-api-1.5.8.jar"/>
+	<property name="slf4j-log4j" value="${libdir}/slf4j-log4j12-1.5.8.jar"/>
+	<property name="xerces" value="${libdir}/xercesImpl-2.7.1.jar"/>
+	
+    <!-- to generate a debug version, use -Ddebug=on argument when running ant -->
+    <property name="debug" value="off"/>
+
+    <!-- SOURCE PATHS -->
+    <path id="sourcepath">
+        <pathelement path="${projectroot}/src"/>
+    </path>
+
+    <!-- CLASS PATHS -->
+    <path id="classpath">
+        <pathelement location="${owlapi}"/>
+        <pathelement location="${hermit}"/>
+        <pathelement location="${arq}"/>
+        <pathelement location="${arq-test}"/>
+        <pathelement location="${jena}"/>
+    	<pathelement location="${jena-test}"/>
+    	<pathelement location="${icu4j}"/>
+    	<pathelement location="${iri}"/>
+    	<pathelement location="${log4j}"/>
+    	<pathelement location="${slf4j-api}"/>
+    	<pathelement location="${slf4j-log4j}"/>
+    	<pathelement location="${xerces}"/>
+    </path>
+
+    <!-- RELEASE TARGETS  -->
+
+    <target name="clean">
+        <delete dir="${builddir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classdir}"/>
+        <javac includeantruntime="false" destdir="${classdir}" deprecation="yes" debug="${debug}" debuglevel="lines,vars,source" target="1.5" source="1.5">
+            <compilerarg value="-Xlint:all-path"/>
+            <src refid="sourcepath"/>
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <target name="setRevisionNumberProperty">
+        <exec executable="svnversion" outputproperty="revision.number"/>
+        <echo message="Current version number: ${version}.${revision.number}"/>
+    </target>
+	
+	<target name="unpack-libraries">
+	    <mkdir dir="${classdir}"/>
+	    <unjar src="${owlapi}" dest="${classdir}"/>
+        <unjar src="${hermit}" dest="${classdir}"/>
+        <unjar src="${arq}" dest="${classdir}"/>
+        <unjar src="${arq-test}" dest="${classdir}"/>
+        <unjar src="${jena}" dest="${classdir}"/>
+        <unjar src="${jena-test}" dest="${classdir}"/>
+        <unjar src="${icu4j}" dest="${classdir}"/>
+        <unjar src="${iri}" dest="${classdir}"/>
+        <unjar src="${log4j}" dest="${classdir}"/>
+        <unjar src="${slf4j-api}" dest="${classdir}"/>
+        <unjar src="${slf4j-log4j}" dest="${classdir}"/>
+        <unjar src="${xerces}" dest="${classdir}"/>
+    </target>
+    
+    <target name="licenses">
+        <mkdir dir="${licensedir}"/>
+        <copy file="gpl.txt" tofile="${licensedir}/OWLBGP-GPL.LICENSE"/>
+        <copy file="lgpl-3.0.txt" tofile="${licensedir}/OWLBGP-LGPL.LICENSE"/>
+        <copy todir="${licensedir}">
+            <fileset dir="${libdir}" includes="*.LICENSE"/>
+        </copy>
+    </target>
+    
+    <target name="combined" depends="clean,setRevisionNumberProperty,compile,unpack-libraries,licenses">
+    	<mkdir dir="${builddir}"/>
+    	<jar jarfile="${builddir}/${ant.project.name}-${version}.jar">
+            <manifest>
+                <attribute name="Implementation-Title" value="OWL-BGP"/>
+                <attribute name="Implementation-Vendor" value="Oxford University Computing Laboratory"/>
+                <attribute name="Implementation-Version" value="${version}.${revision.number}"/>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Main-Class" value="org.semanticweb.sparql.GUI_Demo"/>
+                <attribute name="Bundle-ManifestVersion" value="2"/>
+                <attribute name="Bundle-Name" value="OWL-BGP"/>
+                <attribute name="Bundle-SymbolicName" value="org.semanticweb.sparl;singleton:=true"/>
+                <attribute name="Bundle-Description" value="An SPARQL OWL Direct Semantics entailment regime implementation"/>
+                <attribute name="Bundle-DocURL" value="${homepage}"/>
+                <attribute name="Bundle-Vendor" value="Birte Glimm, Ilianna Kollia"/>
+                <attribute name="Bundle-Version" value="${version}"/>
+                <attribute name="Bundle-ClassPath" value="."/>
+            </manifest>
+            <fileset dir="${classdir}"/>
+            <zipfileset dir="${licensedir}" prefix="licenses"/>
+            <fileset file="${builddir}/readme.txt"/>
+            <fileset file="gpl.txt"/>
+            <fileset file="lgpl-3.0.txt"/>
+        </jar>
+    </target>
+</project>
