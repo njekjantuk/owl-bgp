@@ -1,17 +1,30 @@
-package org.semanticweb.sparql.hermit;
+/* Copyright 2011 by the Oxford University Computing Laboratory
+
+   This file is part of OWL-BGP.
+
+   OWL-BGP is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   OWL-BGP is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package  org.semanticweb.sparql.hermit;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyIRIMapper;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.InferenceType;
-import org.semanticweb.owlapi.util.AutoIRIMapper;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
@@ -19,280 +32,35 @@ import org.semanticweb.sparql.bgpevaluation.monitor.MinimalPrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.query.ResultSetFormatter;
 
-public class TestHermiTSPARQLEngine {
+public class TestLUBM {
 	public static final String LB = System.getProperty("line.separator") ; 
 
 	public static void main(String[] args) throws Exception {
-//	    String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//	       +"SELECT ?book WHERE "+LB
-//	       + "{ { { ?book ex:price ?price . FILTER (?price < 15) } OPTIONAL { ?book ex:title ?title . } } "+LB
-//           + "  {  { ?book ex:author ex:Shakespeare . } UNION "+LB
-//           + "     { ?book ex:author ex:Marlowe . } "+LB
-//           + "  } "
-//	       + "} ";
-//	   String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//           +"SELECT ?book WHERE "+LB
-//           + "{ ?book ex:price ?price . "+LB
-//           + "  OPTIONAL { ?book ex:title ?title . } "+LB
-//           + "  FILTER (?price < 15) "+LB
-//           + "  { ?book ex:author ex:Shakespeare . } UNION "+LB
-//           + "  { ?book ex:author ex:Marlowe . } "+LB
-//           + "} ";
-//       String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//           +"SELECT ?book WHERE "+LB
-//           + "{ { ?book ex:price ?price . "+LB
-//           + "    FILTER (?price < 15) } "+LB
-//           + "  OPTIONAL { ?book ex:title ?title . } "+LB
-//           + "  { ?book ex:author ex:Shakespeare . } UNION "+LB
-//           + "  { ?book ex:author ex:Marlowe . } "+LB
-//           + "} ";
-//        String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//           +"SELECT ?book WHERE "+LB
-//           + "{ { ?book ex:price ?price . } UNION "+LB
-//           + "  {  ?book ex:author ex:Shakespeare . } UNION "+LB
-//           + "  { ?book ex:author ex:Marlowe . } "+LB
-//           + "} ";
-//        String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//            +"SELECT ?book WHERE "+LB
-//            + "{ { { ?book ex:price ?price . } UNION "+LB
-//            + "    {  ?book ex:author ex:Shakespeare . } } UNION "+LB
-//            + "  { ?book ex:author ex:Marlowe . } "+LB
-//            + "} ";
-//        String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//            +"SELECT ?book WHERE "+LB
-//            + "{ ?book ex:price ?price . "+LB
-//            + "  FILTER (?book > 15) "+LB
-//            + "  FILTER (?nummSales > 100) "+LB
-//            + "  ?book ex:sales ?numSales . "+LB
-//            + "} ";
-//	       String sparqlQueryString="PREFIX ex: <http://example.org/test#> "+LB
-//           +"SELECT ?book WHERE "+LB
-//           + " {  { ?book ex:price ?price . } "+LB
-//           + "    { ?book ex:author ex:Shakespeare . } UNION "+LB
-//           + "    { ?book ex:author ex:Marlowe . } "+LB
-//           + " } ";
-//	    // Parse
-//        Query query = QueryFactory.create(sparqlQueryString) ;
-//        System.out.println(query) ;
-        
-        // Generate algebra
-//        Op op = Algebra.compile(query) ;
-        //op = Algebra.optimize(op) ;
-//        System.out.println(op) ;
-        
-//	    Query query=QueryFactory.create(sparqlQueryString, Syntax.syntaxSPARQL_11); // create Jena query object
-//	    Plan plan=QueryExecutionFactory.createPlan(query, ModelFactory.createDefaultModel().getGraph());
-//	    System.out.println(plan);
-//	    long t=System.currentTimeMillis();
-	    OWLOntologyDataSet dataset=getSamsungDataSet();
-//	    OWLOntologyDataSet dataset=getLUBMDataSet();
-//	    OWLOntologyDataSet dataset=getPizzaDataSet();
-//	    HermiTDataSet dataset=getPizzaTestDataSet();
-//	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
+	    long t=System.currentTimeMillis();
+	    OWLOntologyDataSet dataset=getLUBMDataSet();
+	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
-//	    t=System.currentTimeMillis();
-	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS);
-//	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
-//	    t=System.currentTimeMillis();
-//	    graph.getReasoner().precomputeInferences(InferenceType.OBJECT_PROPERTY_HIERARCHY);
-//        System.out.println("OP classification: "+(System.currentTimeMillis()-t));
-//        t=System.currentTimeMillis();
-//        graph.getReasoner().precomputeInferences(InferenceType.DATA_PROPERTY_HIERARCHY);
-//        System.out.println("DP classification: "+(System.currentTimeMillis()-t));
-//	    t=System.currentTimeMillis();
-//	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
-//	    System.out.println("Realisation: "+(System.currentTimeMillis()-t));
-//	    System.out.println("HermiT: "+(System.currentTimeMillis()-t));
-//	    t=System.currentTimeMillis();
+	    t=System.currentTimeMillis();
+	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
+	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
+	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-//	    getPizzaQ1(sparqlEngine, dataset);
-//	    getPizzaTestQ1(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ1(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ1(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ2(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ3(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ4(sparqlEngine, dataset);
-	    System.out.println();
-	    getSamsungQ5(sparqlEngine, dataset);
-//        getLUBMQ1(sparqlEngine, dataset);
-//        getLUBMQ2(sparqlEngine, dataset);
-//        getLUBMQ3(sparqlEngine, dataset);
-//        getLUBMQ4(sparqlEngine, dataset);
-//        getLUBMQ5(sparqlEngine, dataset);
-//        getLUBMQ6(sparqlEngine, dataset);
-//        getLUBMQ7(sparqlEngine, dataset);
-//        getLUBMQ8(sparqlEngine, dataset);
-//        getLUBMQ9(sparqlEngine, dataset);
-//        getLUBMQ10(sparqlEngine, dataset);
-//        getLUBMQ11(sparqlEngine, dataset);
-//        getLUBMQ12(sparqlEngine, dataset);
-//        getLUBMQ13(sparqlEngine, dataset);
-//        getLUBMQ14(sparqlEngine, dataset);
+        getLUBMQ1(sparqlEngine, dataset);
+        getLUBMQ2(sparqlEngine, dataset);
+        getLUBMQ3(sparqlEngine, dataset);
+        getLUBMQ4(sparqlEngine, dataset);
+        getLUBMQ5(sparqlEngine, dataset);
+        getLUBMQ6(sparqlEngine, dataset);
+        getLUBMQ7(sparqlEngine, dataset);
+        getLUBMQ8(sparqlEngine, dataset);
+        getLUBMQ9(sparqlEngine, dataset);
+        getLUBMQ10(sparqlEngine, dataset);
+        getLUBMQ11(sparqlEngine, dataset);
+        getLUBMQ12(sparqlEngine, dataset);
+        getLUBMQ13(sparqlEngine, dataset);
+        getLUBMQ14(sparqlEngine, dataset);
 	}
-	
-
-    public static OWLOntologyDataSet getSamsungDataSet() throws OWLOntologyCreationException {
-        OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-        OWLOntologyIRIMapper mapper=new AutoIRIMapper(new File("/Users/bglimm/Downloads/Samsung/"), false);
-        manager.addIRIMapper(mapper);
-        OWLOntology ont=manager.loadOntologyFromOntologyDocument(IRI.create("file:/Users/bglimm/Downloads/Samsung/ContextReasoning_full.owl"));
-        return new OWLOntologyDataSet(ont, null);
-    }
-    public static String getSamsungPrefix() {
-        String prefix="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
-             + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
-             + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
-             + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB
-             + "PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +LB
-             + "PREFIX g: <http://www.co-ode.org/ontologies/galen#> " +LB
-             + "PREFIX ContextReasoning: <http://sait.samsung.com/MS/IMP/2010/5/19/ContextReasoning.owl#> " +LB 
-             + "PREFIX common: <http://sait.samsung.com/MS/IMP/2010/5/18/environments.owl#>  " +LB
-             + "PREFIX location: <http://sait.samsung.com/MS/IMP/2010/5/13/Location.owl#>  " +LB
-             + "PREFIX datetime: <http://sait.samsung.com/MS/IMP/2010/5/17/DateTime.owl#>  " +LB
-             + "PREFIX smartphone: <http://sait.samsung.com/MS/IMP/2010/5/17/SmartPhone.owl#> " +LB;
-         return prefix;
-     } 
-    public static void getSamsungQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString=getSamsungPrefix()
-            + "SELECT ?class WHERE {"+LB
-            + "   ?ctx rdf:type owl:NamedIndividual."+LB
-            + "   ?class rdf:type owl:Class."+LB
-            + "   ?ctx rdf:type ContextReasoning:Context."+LB 
-            + "   ?class rdfs:subClassOf ContextReasoning:Context."+LB  
-            + "   ?ctx rdf:type ?class."+LB 
-            + "} "+LB;
-//        System.out.println("Query: "+queryString);
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-        //System.out.println("Query creation: "+(System.currentTimeMillis()-t) + "ms");
-        //t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result computation: "+(System.currentTimeMillis()-t) + "ms");
-    }
-    public static void getSamsungQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString=getSamsungPrefix()
-            + "SELECT ?class WHERE {"+LB
-            + "   ?ctx rdf:type owl:NamedIndividual."+LB
-            + "   ?class rdf:type owl:Class."+LB
-            + "   ?ctx rdf:type ContextReasoning:WhenContext."+LB 
-            + "   ?class rdfs:subClassOf ContextReasoning:Context."+LB  
-            + "   ?ctx rdf:type ?class."+LB 
-            + "} "+LB;
-//        System.out.println("Query: "+queryString);
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-//        System.out.println("Query creation: "+(System.currentTimeMillis()-t) + "ms");
-//        t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result computation: "+(System.currentTimeMillis()-t) + "ms");
-    } 
-    public static void getSamsungQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString=getSamsungPrefix()
-            + "SELECT ?class WHERE {"+LB
-            + "   ?ctx rdf:type owl:NamedIndividual."+LB
-            + "   ?class rdf:type owl:Class."+LB
-            + "   ?ctx rdf:type ContextReasoning:WhereContext."+LB 
-            + "   ?class rdfs:subClassOf ContextReasoning:Context."+LB  
-            + "   ?ctx rdf:type ?class."+LB 
-            + "} "+LB;
-//        System.out.println("Query: "+queryString);
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-//        System.out.println("Query: "+(System.currentTimeMillis()-t));
-//        t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result computation: "+(System.currentTimeMillis()-t) + "ms");
-    } 
-    public static void getSamsungQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString=getSamsungPrefix()
-            + "SELECT ?class WHERE {"+LB
-            + "   ?ctx rdf:type owl:NamedIndividual."+LB
-            + "   ?class rdf:type owl:Class."+LB
-            + "   ?ctx rdf:type ContextReasoning:WithWhomContext."+LB 
-            + "   ?class rdfs:subClassOf ContextReasoning:Context."+LB  
-            + "   ?ctx rdf:type ?class."+LB 
-            + "} "+LB;
-//        System.out.println("Query: "+queryString);
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-//        System.out.println("Query creation: "+(System.currentTimeMillis()-t) + "ms");
-//        t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result computation: "+(System.currentTimeMillis()-t) + "ms");
-    } 
-    public static void getSamsungQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString=getSamsungPrefix()
-            + "SELECT ?wp WHERE {"+LB
-            + "   ?wp rdf:type owl:NamedIndividual."+LB
-            + "   ?wp rdf:type smartphone:WithPerson."+LB 
-            + "} "+LB;
-//        System.out.println("Query: "+queryString);
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-//        System.out.println("Query creation: "+(System.currentTimeMillis()-t) + "ms");
-//        t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result computation: "+(System.currentTimeMillis()-t) + "ms");
-    } 
-	public static OWLOntologyDataSet getPizzaDataSet() throws OWLOntologyCreationException {
-	    return new OWLOntologyDataSet("http://www.co-ode.org/ontologies/pizza/pizza.owl#");
-	}
-	public static OWLOntologyDataSet getPizzaTestDataSet() throws OWLOntologyCreationException {
-        File inputOntologyFile = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/test.owl");
-        File inputNamed1File = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/pizza.owl");
-        File inputNamed2File = new File("/Users/bglimm/Documents/workspace/SPARQLingHermiT/src/ontologies/test2.owl");
-        List<File> named=new ArrayList<File>();
-        named.add(inputNamed1File);
-        named.add(inputNamed2File);
-        return new OWLOntologyDataSet(inputOntologyFile,named);
-    }
-	public static void getPizzaTestQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
-        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
-        + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
-        + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB
-        + "SELECT ?x ?y "+LB
-//      + "FROM <http://www.co-ode.org/ontologies/pizza/pizza.owl#> "+LB
-        + "FROM NAMED <http://www.co-ode.org/ontologies/pizza/pizzaTest2.owl> "+LB
-        + "WHERE { " +LB
-        + "  GRAPH ?g { ?x pizza:r ?y . } " +LB
-        + " } "+LB
-        + "ORDER BY ASC(?x) LIMIT 2";
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
-        ResultSet result=sparqlEngine.execQuery(query,dataset);
-        ResultSetFormatter.out(result) ;
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
-	}
-    public static void getPizzaQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        String queryString="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
-        + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
-        + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
-        + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB
-        + "SELECT ?x "+LB
-//      + "FROM <http://www.co-ode.org/ontologies/pizza/pizza.owl#> "+LB
-        + "WHERE { " +LB
-        + "?x a owl:Class . " +LB
-        + "?x rdfs:subClassOf owl:Nothing . " +LB
-        + " } "+LB
-        + "ORDER BY ASC(?x) LIMIT 2";
-        long t=System.currentTimeMillis();
-        Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
-        sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
-    }
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
 	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/bglimm/Documents/workspace/OWL-BGP/evaluation/ontologies/University0_0.owl"));
@@ -541,21 +309,6 @@ public class TestHermiTSPARQLEngine {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 }
-
-//PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>
-//	SELECT ?x WHERE { 
-//	  ?x rdfs:subClassOf pizza:CheeseyPizza .
-//	  ?x rdfs:subClassOf pizza:InterestingPizza . 
-//	} ORDER BY ASC(?x) LIMIT 2
-//
-//	PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>
-//	SELECT ?x WHERE { 
-//	  ?x rdf:type pizza:Country . 
-//	  ?y rdf:type pizza:Country . 
-//	  ?x owl:differentFrom ?y . 
-//	}
-
-
 //OWLOntology: 13654
 //Class classification: 6201
 //Realisation: 42420
