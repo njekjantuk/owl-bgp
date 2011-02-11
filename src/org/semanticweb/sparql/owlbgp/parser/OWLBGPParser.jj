@@ -416,25 +416,8 @@ void parseLiteral(Identifier subject, Identifier predicate) :
 {
     (lexicalForm=parseQuotedString() ((<DOUBLE_CARET> datatypeIdentifier=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}) | <AT>)?
         {
-      IRI plainLiteralIRI=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
-      boolean wasAbbreviated=false;
-      if (datatypeIdentifier==null) {
-          datatypeIdentifier=plainLiteralIRI;
-          wasAbbreviated=true;
-      }
-      if (datatypeIdentifier==plainLiteralIRI) {
-          int lastIndexOfAt=lexicalForm.lastIndexOf('@');
-          if (wasAbbreviated) 
-              lang="";
-          else if (lastIndexOfAt<0)
-            throw new IllegalArgumentException("The lexical forms of rdf:PlainLiteral data values must contain the @ symbol, but the lexical form "+lexicalForm+" does not contain the symbol. ");
-          else { 
-              if (lastIndexOfAt==0) lexicalForm="";
-              else lexicalForm=lexicalForm.substring(0,lastIndexOfAt);
-              if (lastIndexOfAt<lexicalForm.length()-1) lang=lexicalForm.substring(lastIndexOfAt+1);
-              else lang="";
-          }
-      }
+      if (datatypeIdentifier==null)
+          datatypeIdentifier=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
       dt=Datatype.create((IRI)datatypeIdentifier);
       if (lang==null) lang="";
       handler.handleStreaming(subject, predicate, TypedLiteral.create(lexicalForm, lang, dt));

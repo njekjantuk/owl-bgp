@@ -15,7 +15,25 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OWL-BGP.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.semanticweb.sparql.owlbgp.model.literals;
+/* Copyright 2011 by the Oxford University Computing Laboratory
+
+   This file is part of OWL-BGP.
+
+   OWL-BGP is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+
+   OWL-BGP is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public License
+   along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package  org.semanticweb.sparql.owlbgp.model.literals;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -41,10 +59,10 @@ public class TypedLiteral extends AbstractExtendedOWLObject implements Literal {
 
     protected static InterningManager<TypedLiteral> s_interningManager=new InterningManager<TypedLiteral>() {
         protected boolean equal(TypedLiteral object1,TypedLiteral object2) {
-            return object1.m_lexicalForm==object2.m_lexicalForm;
+            return object1.m_lexicalForm==object2.m_lexicalForm && object1.m_langTag==object2.m_langTag && object1.m_dataDatatype==object2.m_dataDatatype;
         }
         protected int getHashCode(TypedLiteral object) {
-            return object.m_lexicalForm.hashCode();
+            return object.m_lexicalForm.hashCode()+1017*object.m_langTag.hashCode()+2013*object.m_dataDatatype.hashCode();
         }
     };
     
