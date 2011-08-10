@@ -69,6 +69,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         for (int i=0;i<candidateBindings.size();i++)
             newBindings.addAll(addBindings(candidateBindings.get(i), bindingPositions));
+        System.out.println("result output size= "+newBindings.size());
         return newBindings;
     }
     protected abstract List<Atomic[]> addBindings(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions);
