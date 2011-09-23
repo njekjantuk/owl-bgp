@@ -43,7 +43,7 @@ public class TestLUBM {
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();
 //	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
-//	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
+	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
         getLUBMQ1(sparqlEngine, dataset);
@@ -63,9 +63,9 @@ public class TestLUBM {
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/ikollia/workspace/OWL-BGP/evaluation/ontologies/University0_0.owl"));
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_0.owl"));
 	    for (int i=1;i<15;i++) {
-	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/ikolliai/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
+	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }
         return new OWLOntologyDataSet(ont, null);

@@ -393,7 +393,7 @@ public class TripleConsumer {
         checkOnytologyIRIIsNeverObject(); // Table 4
         removeOWL1DoubleTypes(); // Table 5
         addReifiedDeclarations(); // Table 7
-        parseAnnotations(); // Table 10
+//        parseAnnotations(); // Table 10
         parseObjectProperties(); // Table 11
         parseOWL1DataRanges(); // Table 14
         parseOWL1ClassExpressions(); // Table 15

@@ -110,9 +110,7 @@ public class OWLOntologyGraph implements Graph {
         m_countingMonitor=new CountingMonitor();
         Configuration c=new Configuration();
         c.monitor=m_countingMonitor;
-        
-        c.monitor=m_countingMonitor;
-        c.tableauMonitorType=TableauMonitorType.TIMING;
+//        c.tableauMonitorType=TableauMonitorType.TIMING;
         c.ignoreUnsupportedDatatypes=true;
         m_reasoner=new Reasoner(c, skolomized);
         

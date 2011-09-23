@@ -46,7 +46,7 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
     }
     
     protected List<Atomic[]> addBindings(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions) {
-System.out.println("mpainei edw????");
+
     	Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
         // apply bindings that are already computed from previous steps
         for (Variable var : bindingPositions.keySet())

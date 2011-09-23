@@ -29,10 +29,10 @@ public class TestUOBM {
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
 	    getUOBMQ0(sparqlEngine, dataset);
-//	    getUOBMQ1(sparqlEngine, dataset);
-//        getUOBMQ2(sparqlEngine, dataset);
-//         getUOBMQ3(sparqlEngine, dataset);
-/*        getUOBMQ4(sparqlEngine, dataset);
+/*	    getUOBMQ1(sparqlEngine, dataset);
+        getUOBMQ2(sparqlEngine, dataset);
+        getUOBMQ3(sparqlEngine, dataset);
+        getUOBMQ4(sparqlEngine, dataset);
         getUOBMQ5(sparqlEngine, dataset);
         getUOBMQ6(sparqlEngine, dataset);
         getUOBMQ7(sparqlEngine, dataset);
@@ -47,7 +47,7 @@ public class TestUOBM {
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
 	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/univ-bench-dl.nonominals.owl"));
-	    for (int i=0;i<20;i++) {
+	    for (int i=0;i<1;i++) {
 	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/1-ub-dl-univ0-dept"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }
@@ -70,7 +70,8 @@ public class TestUOBM {
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:UndergraduateStudent. " +LB
         + "  ?x uob:takesCourse <http://www.Department0.University0.edu/Course0>. " +LB
-	    + " } "+LB;
+	    +" uob:takesCourse rdf:type owl:ObjectProperty."
+        + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
 	    System.out.println("Query: "+(System.currentTimeMillis()-t));
@@ -221,7 +222,7 @@ public class TestUOBM {
             + "  ?x rdf:type uob:Person. " +LB
             + "  ?x uob:like ?y. " +LB
             + "  ?z rdf:type uob:Chair. " +LB
-            + "  ?z uob:isHeadOf <http://www.Department0.University0.edu>"
+            + "  ?z uob:isHeadOf <http://www.Department0.University0.edu>."
             + "  ?z uob:like ?y. " +LB
             + "} "+LB;
         long t=System.currentTimeMillis();

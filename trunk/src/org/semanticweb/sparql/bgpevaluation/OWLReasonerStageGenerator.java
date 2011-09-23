@@ -103,9 +103,14 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     costEstimator=new HermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
                 else 
                     costEstimator=new CostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                //if StaticEstimation {
+                //costEstimator=new StaticCostEstimatorVisitor(ontologyGraph,positionInTuple,bindings);
+                //}
                 while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                     m_monitor.costEvaluationStarted();
+                    //if dynamic
                     QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
+                    //else if static
                     m_monitor.costEvaluationFinished(cheapest);
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
