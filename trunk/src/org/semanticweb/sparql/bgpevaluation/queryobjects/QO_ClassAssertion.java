@@ -52,6 +52,7 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
 		    bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
 		try {
     		ClassAssertion instantiated=(ClassAssertion)m_axiomTemplate.getBoundVersion(bindingMap);
+    		System.out.println(instantiated);
     		ClassExpression ce=instantiated.getClassExpression();
     		Set<Variable> ceVars=ce.getVariablesInSignature();
     		Individual ind=instantiated.getIndividual();

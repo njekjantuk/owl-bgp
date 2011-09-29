@@ -23,6 +23,9 @@
    This ontology are built on basis of Lehigh Benchmark Ontology, 
    http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl</rdfs:comment>
         <owl:versionInfo>benchmark-lite.owl, ver April 15, 2005</owl:versionInfo>
+        
+     
+        
     </owl:Ontology>
     
 
@@ -591,10 +594,84 @@
     
 
 
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballFan -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballFan">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#isCrazyAbout"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballLover -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballLover">
+        <rdfs:label>people who like baseball</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#like"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#BaseballClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
     <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallClass -->
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallClass">
         <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Sports"/>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallFan -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallFan">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#isCrazyAbout"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallLover -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallLover">
+        <rdfs:label>people who like basket ball</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#like"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#BasketBallClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 
@@ -874,6 +951,20 @@
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#GraduateStudent">
         <rdfs:label>graduate student</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#takesCourse"/>
+                        <owl:someValuesFrom rdf:resource="&owl;Thing"/>
+                    </owl:Restriction>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#takesCourse"/>
+                        <owl:allValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#GraduateCourse"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 
@@ -1297,6 +1388,43 @@
     
 
 
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#SportsFan -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#SportsFan">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#isCrazyAbout"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Sports"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#SportsLover -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#SportsLover">
+        <rdfs:label>People who like Sports</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#like"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Sports"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
     <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#StatisticsClass -->
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#StatisticsClass">
@@ -1337,6 +1465,43 @@
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingClass">
         <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Sports"/>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingFan -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingFan">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#isCrazyAbout"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingLover -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingLover">
+        <rdfs:label>people who like swimming</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#like"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#SwimmingClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 
@@ -1382,6 +1547,24 @@
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#TennisClass">
         <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Sports"/>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#TennisFan -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#TennisFan">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Person"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#isCrazyAbout"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#TennisClass"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 
@@ -1440,6 +1623,17 @@
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#WomanCollege">
         <rdfs:label>a college who only take female undergraduate students</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#College"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#hasStudent"/>
+                        <owl:allValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Woman"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 

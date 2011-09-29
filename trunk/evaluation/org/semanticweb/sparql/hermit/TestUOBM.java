@@ -28,8 +28,8 @@ public class TestUOBM {
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-	    getUOBMQ0(sparqlEngine, dataset);
-/*	    getUOBMQ1(sparqlEngine, dataset);
+/*	    getUOBMQ0(sparqlEngine, dataset);
+	    getUOBMQ1(sparqlEngine, dataset);
         getUOBMQ2(sparqlEngine, dataset);
         getUOBMQ3(sparqlEngine, dataset);
         getUOBMQ4(sparqlEngine, dataset);
@@ -40,9 +40,9 @@ public class TestUOBM {
         getUOBMQ9(sparqlEngine, dataset);
         getUOBMQ10(sparqlEngine, dataset);
         getUOBMQ11(sparqlEngine, dataset);
-        getUOBMQ12(sparqlEngine, dataset);
+        getUOBMQ12(sparqlEngine, dataset);*/
         getUOBMQ13(sparqlEngine, dataset);
-        getUOBMQ14(sparqlEngine, dataset);*/
+//        getUOBMQ14(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -264,8 +264,8 @@ public class TestUOBM {
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:Woman. " +LB
             + "  ?x rdf:type uob:Student. " +LB
-            + "  ?x uob:isMemberOf ?y. " +LB
-            + "  ?y uob:subOrganizationOf <http://www.University0.edu>." +LB
+//            + "  ?x uob:isMemberOf ?y. " +LB
+//            + "  ?y uob:subOrganizationOf <http://www.University0.edu>." +LB
             + "} "+LB;
         long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
