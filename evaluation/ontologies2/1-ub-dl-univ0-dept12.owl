@@ -11,7 +11,8 @@
 >
 
 	<owl:Ontology rdf:about="">
-			</owl:Ontology>
+	<owl:imports rdf:resource="univ-bench-dl.nonominals.owl"/>	
+	</owl:Ontology>
 
 	<benchmark-dl:Department rdf:about="http://www.Department12.University0.edu">
 		<benchmark-dl:name>Department12</benchmark-dl:name>
