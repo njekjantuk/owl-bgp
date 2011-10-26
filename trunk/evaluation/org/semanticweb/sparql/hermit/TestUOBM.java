@@ -47,7 +47,7 @@ public class TestUOBM {
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
 	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/univ-bench-dl.nonominals.owl"));
-	    for (int i=0;i<1;i++) {
+	    for (int i=0;i<8;i++) {
 	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/1-ub-dl-univ0-dept"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }

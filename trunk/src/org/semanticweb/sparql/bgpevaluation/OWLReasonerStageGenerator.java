@@ -233,13 +233,13 @@ System.out.println("intersection optimization: "+(System.currentTimeMillis()-f))
                     m_monitor.queryObjectEvaluationStarted(cheapest);
                     
               
-                    Set<Variable> indVar=cheapest.getAxiomTemplate().getVariablesInSignature();
+/*                    Set<Variable> indVar=cheapest.getAxiomTemplate().getVariablesInSignature();
                 	Axiom obj = (Axiom) cheapest.getAxiomTemplate();
                 	OWLDataFactory fact=null;
                 	if (reasoner instanceof Reasoner)
                 	fact =((Reasoner)reasoner).getDataFactory();
                 	List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-                	
+*/                	
  /*               	if (obj instanceof ClassAssertion){
                 		ClassAssertion assertion=((QO_ClassAssertion) obj).getAxiomTemplate();
                 		Individual ind=assertion.getIndividual();
