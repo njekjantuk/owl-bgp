@@ -82,6 +82,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     @Override
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         m_monitor.bgpEvaluationStarted();
+        int orderingMode=1;
         Graph activeGraph=execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
         if (!(activeGraph instanceof OWLOntologyGraph)) {
@@ -119,255 +120,37 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 bindings.add(initialBinding);
                 
                 CostEstimationVisitor costEstimator;
-                if (reasoner instanceof Reasoner)
+                if (orderingMode==1){
+                
+                 if (reasoner instanceof Reasoner)
                     costEstimator=new HermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
-                else 
+                 else 
                     costEstimator=new CostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
-                //if StaticEstimation {
-                //costEstimator=new StaticCostEstimatorVisitor(ontologyGraph,positionInTuple,bindings);
-                //}
-                
-long f=System.currentTimeMillis();                
-                //////////////////Intersection Optimization/////////////////////////////
-                /////////////////////////////////////////////////////////////////////////
-/*                HashMap<Variable,Set<OWLNamedIndividual>> varHash=new HashMap<Variable, Set<OWLNamedIndividual>>();
-                Set<Variable> variables=parser.getParsedOntology().getVariablesInSignature();
-                Set<OWLNamedIndividual> indSet=reasoner.getRootOntology().getIndividualsInSignature();
-                for (Variable i:variables) {
-                	varHash.put(i,indSet);
-                }
-                
-                for (QueryObject<? extends Axiom> queryAtom:connectedComponent){
-                	Set<Variable> indVar=queryAtom.getAxiomTemplate().getVariablesInSignature();
-                	Axiom obj = (Axiom) queryAtom.getAxiomTemplate();
-                	
-                	if (obj instanceof ClassAssertion){
-                		ClassAssertion assertion=(ClassAssertion) obj;
-                		ClassExpression expr=assertion.getClassExpression();
-                		if (!indVar.isEmpty() && expr instanceof Clazz){
-                			if (reasoner instanceof Reasoner) {
-                				OWLDataFactory factory=((Reasoner) reasoner).getDataFactory();
-                				Set<OWLNamedIndividual> knownInd =((Reasoner) reasoner).getKnownInstances((OWLClass)expr.asOWLAPIObject(factory));
-                				Set<OWLNamedIndividual> possibleInd=((Reasoner) reasoner).getPossibleInstances((OWLClass)expr.asOWLAPIObject(factory));
-                                int[] instanceno=((Reasoner) reasoner).getNumberOfInstances((OWLClass)expr.asOWLAPIObject(factory)); 
-                				Variable[] indVarArray= (Variable[])indVar.toArray();
-                				Set<OWLNamedIndividual> kpSet = varHash.get(indVarArray[0]);
-                				//Set<OWLNamedIndividual> knownInd1=kpList.get(0);
-                				//Set<OWLNamedIndividual> possibleInd1=kpList.get(1);
-                				knownInd.addAll(possibleInd);
-                				knownInd.retainAll(kpSet);
-                				
-                			} 	
-                		}
-                	}
-                	else if (obj instanceof ObjectPropertyAssertion) {
-                		ObjectPropertyAssertion assertion=(ObjectPropertyAssertion)obj;
-                		ObjectPropertyExpression expr=assertion.getObjectPropertyExpression();
-                		Individual ind1=assertion.getIndividual1();
-                        Individual ind2=assertion.getIndividual2();
-                		if (!indVar.isEmpty() && expr instanceof ObjectProperty){
-                			if (reasoner instanceof Reasoner) {
-                				OWLDataFactory factory=((Reasoner) reasoner).getDataFactory();
-                				Map<OWLNamedIndividual,Set<OWLNamedIndividual>> knownInd=new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>(); 
-                				knownInd =((Reasoner) reasoner).getKnownInstances((OWLObjectProperty)expr.asOWLAPIObject(factory));
-                				Map<OWLNamedIndividual,Set<OWLNamedIndividual>> possibleInd= new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>();
-                				possibleInd=((Reasoner) reasoner).getPossibleInstances((OWLObjectProperty)expr.asOWLAPIObject(factory));
-                				knownInd.putAll(possibleInd);
-                				
-                				Set<OWLNamedIndividual> keys=knownInd.keySet();
-                				
-                				if (ind1.isVariable() && ind2.isVariable()) {
-                		            Set<OWLNamedIndividual> ind1Set=varHash.get(ind1);
-                		            Set<OWLNamedIndividual> ind2Set=varHash.get(ind2);
-                		            ind1Set.retainAll(keys);
-                		            Set<OWLNamedIndividual> ind2Values=new HashSet<OWLNamedIndividual>();
-                		            for (OWLNamedIndividual ind:keys) {
-                		            	if (ind1Set.contains(ind)) {
-                		            		ind2Values.addAll(knownInd.get(ind));
-                		            	}
-                		            }	
-                		            	ind2Set.retainAll(ind2Values);
-                		            	varHash.put((Variable)ind2,ind2Set);          		            
-                				}
-                				else if (ind1.isVariable() && !ind2.isVariable()){
-                					Set<OWLNamedIndividual> ind1Set=varHash.get(ind1);
-                 		            ind1Set.retainAll(keys);
-                 		            Set<OWLNamedIndividual> ind1Values=new HashSet<OWLNamedIndividual>();
-                 		            for (OWLNamedIndividual ind:ind1Set) {
-                 		            	if ((knownInd.get(ind)).contains(ind2)) {
-                 		            		ind1Values.add(ind);
-                 		            	}
-                 		            }
-                 		            varHash.put((Variable)ind1,ind1Values);
-                				}
-                				else {
-                 		            Set<OWLNamedIndividual> ind2Set=varHash.get(ind2);
-                                    if (keys.contains((OWLNamedIndividual)ind1)){
-                                    	Set<OWLNamedIndividual> ind2Values=knownInd.get(ind1);
-                                    	ind2Values.retainAll(ind2Set);
-                                    	varHash.put((Variable)ind2, ind2Values);
-                                    }
-                                    else{
-                                      Set<OWLNamedIndividual> ind2Values=new HashSet<OWLNamedIndividual>();
-                   		              varHash.put((Variable)ind1,ind2Values);	
-                				    } 
-                				}               				
-                			} 	
-                		}
-                	}
-                	 
-                }*/
-                //////////////////////////////////////////////////////////////////////////////////////////////
-                ////////////////////////////////////////////////////////////////////////////////////////////////
-System.out.println("intersection optimization: "+(System.currentTimeMillis()-f));                
-                
-                while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
-                    m_monitor.costEvaluationStarted();
-                    //if dynamic
+                 while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
+                	//if dynamic
+                	m_monitor.costEvaluationStarted();
                     QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
-                    //else if static
-                    
-                    
                     m_monitor.costEvaluationFinished(cheapest);
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
-                    
-              
-/*                    Set<Variable> indVar=cheapest.getAxiomTemplate().getVariablesInSignature();
-                	Axiom obj = (Axiom) cheapest.getAxiomTemplate();
-                	OWLDataFactory fact=null;
-                	if (reasoner instanceof Reasoner)
-                	fact =((Reasoner)reasoner).getDataFactory();
-                	List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
-*/                	
- /*               	if (obj instanceof ClassAssertion){
-                		ClassAssertion assertion=((QO_ClassAssertion) obj).getAxiomTemplate();
-                		Individual ind=assertion.getIndividual();
-                		ClassExpression expr=assertion.getClassExpression();
-                		
-                	    if (ind.isVariable()){
-                	      Integer int1=positionInTuple.get(ind);
-                	      newBindings= new ArrayList<Atomic[]>();
-                	      if (!bindings.isEmpty()) {
-                		     if (bindings.get(1)[int1]==null) {
-                			   Set<OWLNamedIndividual> individuals=varHash.get(ind);
-                			   for (OWLNamedIndividual individ:individuals) {
-                				 Atomic at=NamedIndividual.create(individ.getIRI().toString());
-                       			 for (Atomic[] binding:bindings){
-                       				Atomic[] binding1=binding.clone();
-                       				binding1[int1]=at;
-                       				newBindings.add(binding1);
-                			     }
-                		       }
-                	         } 
-                	         else 
-                				newBindings.addAll(bindings);
-         			      }
-                 	      else { 
-                		    Set<OWLNamedIndividual> individuals=varHash.get(ind);
-         			        for (OWLNamedIndividual individ:individuals) {
-         				       Atomic at=NamedIndividual.create(individ.getIRI().toString());
-                			   Atomic[] binding1= new Atomic[positionInTuple.keySet().size()];
-                			   binding1[int1]=at;
-                			   newBindings.add(binding1);
-         		            }
-                	      }    
-                        }
-                    }
-                	else if (obj instanceof ObjectPropertyAssertion){
-                		ObjectPropertyAssertion assertion=((QO_ObjectPropertyAssertion) obj).getAxiomTemplate();
-                		Individual ind1=assertion.getIndividual1();
-                		Individual ind2=assertion.getIndividual2();
-                		ObjectPropertyExpression prop=assertion.getObjectPropertyExpression();
-                	    if (ind1.isVariable() && ind2.isVariable()){
-                	      Integer int1=positionInTuple.get(ind1);
-                	      Integer int2=positionInTuple.get(ind2);
-                	      newBindings= new ArrayList<Atomic[]>();
-                	      if (!bindings.isEmpty()) {
-                	    	  Set<OWLNamedIndividual> individuals1=varHash.get(ind1);
-               			      Set<OWLNamedIndividual> individuals2=varHash.get(ind2);
-               			  
-             				   Map<OWLNamedIndividual,Set<OWLNamedIndividual>> knownInd=new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>(); 
-              				   knownInd =((Reasoner) reasoner).getKnownInstances((OWLObjectProperty)prop.asOWLAPIObject(fact));
-              				   Map<OWLNamedIndividual,Set<OWLNamedIndividual>> possibleInd= new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>();
-              				   possibleInd=((Reasoner) reasoner).getPossibleInstances((OWLObjectProperty)prop.asOWLAPIObject(fact));
-              				   knownInd.putAll(possibleInd);
-              				   
-                		     if (bindings.get(1)[int1]==null && bindings.get(1)[int2]==null) {
-                			   
-                			   for (OWLNamedIndividual individ1:individuals1) {
-                				 Set<OWLNamedIndividual> indSet2=knownInd.get(individ1);
-                				 Set<OWLNamedIndividual> varIndSet=varHash.get(ind2);
-                				 indSet2.retainAll(varIndSet);
-                       			 for (OWLNamedIndividual individ2:indSet2) {
-                       				for (Atomic[] binding:bindings){
-                       				 Atomic at1=NamedIndividual.create(individ1.getIRI().toString());
-                       				 Atomic at2=NamedIndividual.create(individ2.getIRI().toString());
-                       				 Atomic[] binding1=binding.clone();
-                       				 binding1[int1]=at1;
-                       				 binding1[int2]=at2;
-                       				 newBindings.add(binding1);
-                       				}
-                       		     }
-                		       }
-                	         }
-                		     else if (bindings.get(1)[int1]==null && bindings.get(1)[int2]!=null){ 
-                		    	 for (Atomic[] binding:bindings){
-                		    		 Atomic at=binding[int2];
-                		    		 Set<OWLNamedIndividual> varIndSet=varHash.get(ind1);
-                		    		 
-                		    		 Atomic[] binding1=binding.clone();
-                		    		 
-                		    	 }
-                		     }
-                				newBindings.addAll(bindings);
-         			      }
-                 	      else { 
-//                		    Set<OWLNamedIndividual> individuals=varHash.get(ind1);
-//         			        for (OWLNamedIndividual individ:individuals) {
-//         				       Atomic at=NamedIndividual.create(individ.getIRI().toString());
-//                			   Atomic[] binding1=binding[int1];
-//                			   binding1[int1]=at;
-//                			   newBindings.add(binding1);
-//         		            }
-                	      }    
-                        }
-                    }
-*/                	Set<Variable> varSet=cheapest.getAxiomTemplate().getVariablesInSignature();
-                    Object[] vars=varSet.toArray();
-                    Set<Atomic> atomicSet=new HashSet<Atomic>();
-                	for (Atomic[] bind:bindings){
-	                    atomicSet.add(bind[positionInTuple.get((Variable)vars[0])]);
-	                }
-                	
-                	ClassAssertion assertion=(ClassAssertion) cheapest.getAxiomTemplate();
-            		ClassExpression expr=assertion.getClassExpression();
-            		
-            			if (reasoner instanceof Reasoner) {
-            				OWLDataFactory factory=((Reasoner) reasoner).getDataFactory();
-            				InstanceManager instanceman=((Reasoner) reasoner).m_instanceManager;
-            				Set<Individual> knownInd =instanceman.getKnownInstances(AtomicConcept.create(((Clazz)expr).getIRIString()));
-            				Set<Individual> possibleInd=instanceman.getPossibleInstances(AtomicConcept.create(((Clazz)expr).getIRIString()));
-             
-            				int[] indmatrix =instanceman.getNumberOfInstances(AtomicConcept.create(((Clazz)expr).getIRIString()));
-            				System.out.println(indmatrix);
-            				Set<Atomic> atomicAtomSet=new HashSet<Atomic>();
-            				for (Individual individ:possibleInd) {
-               				  Atomic at=NamedIndividual.create(individ.getIRI().toString());
-               				  if (atomicSet.contains(at))
-               				  {System.out.println("lala");}
-               				  atomicAtomSet.add(at);
-            				}
-            		 atomicAtomSet.retainAll(atomicSet);
-            		 System.out.println(atomicAtomSet);
-            			}
-               		 bindings=cheapest.computeBindings(bindings, positionInTuple);
-                    
-                    
-                    System.out.println("bindings size= " + bindings.size());
+                    bindings=cheapest.computeBindings(bindings, positionInTuple);
+                    System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
                     costEstimator.updateCandidateBindings(bindings);
+                 }
                 }
+                else {
+                 costEstimator=new StaticCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                 List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrder(costEstimator, connectedComponent, m_monitor);
+                 for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
+                	bindings=cheapest.computeBindings(bindings, positionInTuple);
+                	costEstimator.updateCandidateBindings(bindings);
+                 }
+                }
+                
+                
+                
+                
                 bindingsPerComponent.add(bindings);
                 if (resultSize==null)
                     resultSize=bindings.size();

@@ -126,7 +126,13 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
         }
         return newBindings;
     }
-    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
-        return visitor.visit(this);
+    public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+        return visitor.visit(this, bound);
     }
+
+	@Override
+	public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+		return visitor.visit(this);
+	}
+
 }

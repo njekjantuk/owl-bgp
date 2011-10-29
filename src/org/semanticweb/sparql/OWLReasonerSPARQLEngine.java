@@ -38,10 +38,12 @@ import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
 
 public class OWLReasonerSPARQLEngine {
 
+//	int orderingMode;
     public OWLReasonerSPARQLEngine() {
         this(null);
     }
 	public OWLReasonerSPARQLEngine(Monitor bgpEvaluationMonitor) {
+//		 this.orderingMode=type;
 	    StageGenerator orig=(StageGenerator)ARQ.getContext().get(ARQ.stageGenerator);
 	    if (bgpEvaluationMonitor==null)
 	        bgpEvaluationMonitor=new MonitorAdapter();
@@ -68,4 +70,7 @@ public class OWLReasonerSPARQLEngine {
         QueryExecution engine=QueryExecutionFactory.create(query,dataSet);
         return engine.execSelect();
     }
+//	public int getOrderingType() {
+//		return orderingMode;
+//	}
 }

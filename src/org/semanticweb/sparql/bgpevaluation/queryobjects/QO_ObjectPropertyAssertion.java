@@ -249,7 +249,12 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
         else
             return m_reasoner.getObjectPropertyValues(ind1, ope).containsEntity(ind2);
     }
+    
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    
+    public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+        return visitor.visit(this, bound);
     }
 }
