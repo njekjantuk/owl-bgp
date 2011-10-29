@@ -106,6 +106,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         }
         return results;
     }
+    public abstract <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound);
     public abstract <O> O accept(QueryObjectVisitorEx<O> visitor);
     public String toString() {
         return m_axiomTemplate.toString();

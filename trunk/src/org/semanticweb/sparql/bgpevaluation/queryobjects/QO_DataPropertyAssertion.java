@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -219,5 +220,8 @@ public class QO_DataPropertyAssertion  extends AbstractQueryObject<DataPropertyA
     }
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
+    }
+    public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+        return visitor.visit(this,bound);
     }
 }
