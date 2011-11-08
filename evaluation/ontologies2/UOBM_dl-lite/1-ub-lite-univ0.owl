@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE rdf:RDF [
+	<!ENTITY benchmark-lite "http://uob.iodt.ibm.com/univ-bench-lite.owl#">
+]>
+
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:benchmark-lite="http://uob.iodt.ibm.com/univ-bench-lite.owl#"
+>
+
+	<owl:Ontology rdf:about="">
+		<owl:imports rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl" />
+	</owl:Ontology>
+
+	<benchmark-lite:University rdf:about="http://www.University0.edu">
+		<benchmark-lite:name>University0</benchmark-lite:name>
+	</benchmark-lite:University>
+
+	<benchmark-lite:College rdf:about="http://www.College0.University0.edu">
+		<benchmark-lite:name>College0</benchmark-lite:name>
+		<benchmark-lite:subOrganizationOf rdf:resource="http://www.University0.edu" />
+	</benchmark-lite:College>
+
+	<benchmark-lite:College rdf:about="http://www.College1.University0.edu">
+		<benchmark-lite:name>College1</benchmark-lite:name>
+		<benchmark-lite:subOrganizationOf rdf:resource="http://www.University0.edu" />
+	</benchmark-lite:College>
+</rdf:RDF>

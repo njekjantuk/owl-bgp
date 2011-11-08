@@ -53,7 +53,7 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
             bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
         try {
             ObjectPropertyAssertion assertion=((ObjectPropertyAssertion)m_axiomTemplate.getBoundVersion(bindingMap));
-            System.out.println(assertion);
+//            System.out.println(assertion);
             Atomic ope=(Atomic)assertion.getObjectPropertyExpression();
             Individual ind1=assertion.getIndividual1();
             Individual ind2=assertion.getIndividual2();

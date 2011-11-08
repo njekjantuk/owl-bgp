@@ -41,33 +41,40 @@ public class TestLUBM {
 	    OWLOntologyDataSet dataset=getLUBMDataSet();
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
-	    t=System.currentTimeMillis();
-//	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
+	    t=System.currentTimeMillis();	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-        getLUBMQ1(sparqlEngine, dataset);
+//        getLUBMQ1(sparqlEngine, dataset);
         getLUBMQ2(sparqlEngine, dataset);
-        getLUBMQ3(sparqlEngine, dataset);
+/*        getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
         getLUBMQ5(sparqlEngine, dataset);
         getLUBMQ6(sparqlEngine, dataset);
         getLUBMQ7(sparqlEngine, dataset);
-        getLUBMQ8(sparqlEngine, dataset);
+        getLUBMQ8(sparqlEngine, dataset);*/
         getLUBMQ9(sparqlEngine, dataset);
-        getLUBMQ10(sparqlEngine, dataset);
+/*        getLUBMQ10(sparqlEngine, dataset);
         getLUBMQ11(sparqlEngine, dataset);
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
-        getLUBMQ14(sparqlEngine, dataset);
+        getLUBMQ14(sparqlEngine, dataset);*/
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_0.owl"));
-	    for (int i=1;i<15;i++) {
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies/univ-bench.owl"));
+	    File dir = new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies/LUBM-1");
+        String[] children = dir.list();
+        for (int i=0;i<children.length;i++){
+        	
+        	OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies/LUBM-1/"+children[i]));
+	        manager.addAxioms(ont, tmp.getAxioms());
+        }
+	    
+	    /*	    for (int i=1;i<15;i++) {
 	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
-	    }
+	    }*/
         return new OWLOntologyDataSet(ont, null);
     }
 	public static String getLUBMPrefix() {
