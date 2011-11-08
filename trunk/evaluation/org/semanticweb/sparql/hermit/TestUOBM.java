@@ -23,12 +23,12 @@ public class TestUOBM {
 	    OWLOntologyDataSet dataset=getUOBMDataSet();
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
-//	    t=System.currentTimeMillis();
+	    t=System.currentTimeMillis();
 //	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
-//	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
+	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-/*	    getUOBMQ0(sparqlEngine, dataset);
+	    getUOBMQ0(sparqlEngine, dataset);
 	    getUOBMQ1(sparqlEngine, dataset);
         getUOBMQ2(sparqlEngine, dataset);
         getUOBMQ3(sparqlEngine, dataset);
@@ -40,16 +40,16 @@ public class TestUOBM {
         getUOBMQ9(sparqlEngine, dataset);
         getUOBMQ10(sparqlEngine, dataset);
         getUOBMQ11(sparqlEngine, dataset);
-        getUOBMQ12(sparqlEngine, dataset);*/
+        getUOBMQ12(sparqlEngine, dataset);
         getUOBMQ13(sparqlEngine, dataset);
-//        getUOBMQ14(sparqlEngine, dataset);
+        getUOBMQ14(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
 
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/univ-bench-dl.nonominals.owl"));
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/UOBM_dl-lite/univ-bench-lite.owl"));
 	    for (int i=0;i<20;i++) {
-	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/1-ub-dl-univ0-dept"+i+".owl"));
+	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/UOBM_dl-lite/1-ub-lite-univ0-dept"+i+".owl"));
 
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }
@@ -63,7 +63,7 @@ public class TestUOBM {
 	        + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB
 	        + "PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +LB
 	        + "PREFIX g: <http://www.co-ode.org/ontologies/galen#>"
-	        + "PREFIX uob: <http://uob.iodt.ibm.com/univ-bench-dl.owl#> " +LB 
+	        + "PREFIX uob: <http://uob.iodt.ibm.com/univ-bench-lite.owl#> " +LB 
 	        + "SELECT * WHERE { " +LB;
 	    return prefix;
 	}
@@ -264,11 +264,11 @@ public class TestUOBM {
     public static void getUOBMQ13(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q13");
         String queryString=getUOBMPrefix()
-//            + "  ?x rdf:type uob:Woman. " +LB
-//            + "  ?x rdf:type uob:Student. " +LB
+            + "  ?x rdf:type uob:Woman. " +LB
+            + "  ?x rdf:type uob:Student. " +LB
 
             + "  ?x uob:isMemberOf ?y. " +LB
-//            + "  ?y uob:subOrganizationOf <http://www.University0.edu>." +LB
+            + "  ?y uob:subOrganizationOf <http://www.University0.edu>." +LB
 
             + "} "+LB;
         long t=System.currentTimeMillis();

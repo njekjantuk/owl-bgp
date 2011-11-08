@@ -469,4 +469,19 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         }
         return tests;
     }
+	@Override
+	public double[] visit(QO_ClassAssertion axiom, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public double[] visit(QO_ObjectPropertyAssertion axiom, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public double[] visit(QO_DataPropertyAssertion axiom, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -410,5 +410,23 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         }
         return tests;
     }
+
+	@Override
+	public double[] visit(QO_ClassAssertion axiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[] visit(QO_ObjectPropertyAssertion axiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public double[] visit(QO_DataPropertyAssertion axiom) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
 

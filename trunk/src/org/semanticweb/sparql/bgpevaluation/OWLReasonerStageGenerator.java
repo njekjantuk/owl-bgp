@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.hierarchy.InstanceManager;
 import org.semanticweb.HermiT.model.AtomicConcept;
 import org.semanticweb.HermiT.model.Individual;
@@ -44,6 +45,7 @@ import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
@@ -82,7 +84,9 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     @Override
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         m_monitor.bgpEvaluationStarted();
-        int orderingMode=1;
+        
+        int orderingMode=0;
+        
         Graph activeGraph=execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
         if (!(activeGraph instanceof OWLOntologyGraph)) {
@@ -119,9 +123,10 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 List<Atomic[]> bindings=new ArrayList<Atomic[]>();
                 bindings.add(initialBinding);
                 
-                CostEstimationVisitor costEstimator;
-                if (orderingMode==1){
                 
+                if (orderingMode==1){
+                 System.out.println("Dynamic");
+                 CostEstimationVisitor costEstimator;
                  if (reasoner instanceof Reasoner)
                     costEstimator=new HermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
                  else 
@@ -129,27 +134,28 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                  while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                 	//if dynamic
                 	m_monitor.costEvaluationStarted();
-                    QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
+                	QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
                     m_monitor.costEvaluationFinished(cheapest);
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
                     bindings=cheapest.computeBindings(bindings, positionInTuple);
+                    System.out.println(cheapest.getAxiomTemplate());
                     System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
                     costEstimator.updateCandidateBindings(bindings);
                  }
                 }
                 else {
-                 costEstimator=new StaticCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
-                 List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrder(costEstimator, connectedComponent, m_monitor);
+                 System.out.println("Static");	
+                 StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
+                 List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
                  for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
-                	bindings=cheapest.computeBindings(bindings, positionInTuple);
-                	costEstimator.updateCandidateBindings(bindings);
+                	if (!bindings.isEmpty()){
+                	  bindings=cheapest.computeBindings(bindings, positionInTuple);
+                	  System.out.println(cheapest.getAxiomTemplate());
+                	}
                  }
                 }
-                
-                
-                
                 
                 bindingsPerComponent.add(bindings);
                 if (resultSize==null)

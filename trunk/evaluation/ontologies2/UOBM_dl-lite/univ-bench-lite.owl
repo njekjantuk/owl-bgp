@@ -1,0 +1,1025 @@
+<?xml version="1.0"?>
+<!DOCTYPE owl [
+<!ENTITY dc "http://purl.org/dc/elements/1.1/">
+<!ENTITY xsd "http://www.w3.org/2001/XMLSchema#">
+<!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<!ENTITY owl "http://www.w3.org/2002/07/owl#">
+<!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#">
+<!ENTITY benchmark-lite "http://uob.iodt.ibm.com/univ-bench-lite.owl#">
+]>
+<rdf:RDF
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns:owl="http://www.w3.org/2002/07/owl#"
+ xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+ xmlns:benchmark-lite="http://uob.iodt.ibm.com/univ-bench-lite.owl#"
+ xml:base="http://uob.iodt.ibm.com/univ-bench-lite.owl#"
+>
+<owl:Ontology rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl">
+<owl:versionInfo>univ-bench-lite, ver April 15, 2005</owl:versionInfo>
+<rdfs:label>Univ-benchmark Ontology</rdfs:label>
+<rdfs:comment>An university ontology for benchmark tests. Language Level: OWL-lite SHIF(D).
+   This ontology are built on basis of Lehigh Benchmark Ontology,
+   http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl</rdfs:comment>
+</owl:Ontology>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Article">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>article</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#AssistantProfessor">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>assistant professor</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#AssociateProfessor">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>associate professor</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Book">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>book</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Chair">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isHeadOf" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Department">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>chair</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ClericalStaff">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SupportingStaff">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>clerical staff worker</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#College">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>school</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ConferencePaper">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Article">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>conference paper</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Work">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>teaching course</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Dean">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isHeadOf" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#College">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>dean</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Department">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>university department</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Director">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isHeadOf" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Program">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>director</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Employee">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#worksFor" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>Employee</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Employee">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>faculty member</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#FullProfessor">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>full professor</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#GraduateCourse">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>Graduate Level Courses</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#GraduateStudent">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#takesCourse" />
+          <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+        </owl:Restriction>
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#takesCourse" />
+          <owl:allValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#GraduateCourse">
+            </owl:Class>
+          </owl:allValuesFrom>
+        </owl:Restriction>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>graduate student</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Institute">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>institute</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#JournalArticle">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Article">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>journal article</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Lecturer">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>lecturer</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Man">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Manual">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>manual</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Music">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+  <rdfs:label>organization</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#PeopleWithHobby">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#like" />
+          <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+  <rdfs:label>person</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#PostDoc">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>post doctorate</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>professor</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Program">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>program</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+  <rdfs:label>publication</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Research">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Work">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>research work</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ResearchAssistant">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:subClassOf>
+    <owl:Restriction>
+      <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#worksFor" />
+      <owl:someValuesFrom>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ResearchGroup">
+        </owl:Class>
+      </owl:someValuesFrom>
+    </owl:Restriction>
+  </rdfs:subClassOf>
+  <rdfs:label>university research assistant</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ResearchGroup">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>research group</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Schedule">
+  <rdfs:label>schedule</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Software">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>software program</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Specification">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>published specification</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SportsFan">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isCrazyAbout" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SportsLover">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#like" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>People who like Sports</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Student">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isStudentOf" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>student</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SupportingStaff">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Employee">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>administrative staff worker</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SystemsStaff">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#SupportingStaff">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>systems staff worker</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#TeachingAssistant">
+  <owl:equivalentClass>
+    <owl:Class>
+      <owl:intersectionOf rdf:parseType="Collection">
+        <owl:Restriction>
+          <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#teachingAssistantOf" />
+          <owl:someValuesFrom>
+            <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+            </owl:Class>
+          </owl:someValuesFrom>
+        </owl:Restriction>
+        <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+        </owl:Class>
+      </owl:intersectionOf>
+    </owl:Class>
+  </owl:equivalentClass>
+  <rdfs:label>university teaching assistant</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#TechnicalReport">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Article">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>technical report</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#UndergraduateStudent">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Student">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>undergraduate student</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>university</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#UnofficialPublication">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>unnoficial publication</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#VisitingProfessor">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:subClassOf>
+  <rdfs:label>visiting professor</rdfs:label>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Woman">
+  <rdfs:subClassOf>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:subClassOf>
+</owl:Class>
+<owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Work">
+  <rdfs:label>Work</rdfs:label>
+</owl:Class>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#enrollIn">
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Department">
+    </owl:Class>
+  </rdfs:range>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasAlumnus">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDegreeFrom" />
+  <rdfs:label>has as an alumnus</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDegreeFrom">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasAlumnus" />
+  <rdfs:label>has a degree from</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDoctoralDegreeFrom">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>has a doctoral degree from</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasMasterDegreeFrom">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>has a masters degree from</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasMember">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isMemberOf" />
+  <rdfs:label>has as a member</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasSameHomeTownWith">
+  <rdf:type rdf:resource="&owl;TransitiveProperty" />
+  <rdf:type rdf:resource="&owl;SymmetricProperty" />
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasStudent">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Student">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#isStudentOf" />
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasUndergraduateDegreeFrom">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#University">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>has an undergraduate degree from</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isAdvisedBy">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is being advised by</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isAffiliateOf">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is affiliated with</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isAffiliatedOrganizationOf">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is affiliated with</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isCrazyAbout">
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isFriendOf">
+  <rdf:type rdf:resource="&owl;SymmetricProperty" />
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is a friend of</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isHeadOf">
+  <rdf:type rdf:resource="&owl;InverseFunctionalProperty" />
+  <rdfs:label>is the head of</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isMemberOf">
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasMember" />
+  <rdfs:label>member of</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isStudentOf">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Student">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasStudent" />
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isTaughtBy">
+  <rdf:type rdf:resource="&owl;FunctionalProperty" />
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+    </owl:Class>
+  </rdfs:range>
+  <owl:inverseOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-lite.owl#teacherOf" />
+  <rdfs:label>is taught by</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#like">
+  <rdfs:label>like</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#listedCourse">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Schedule">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>lists as a course</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#love">
+  <rdfs:label>same property with like</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#orgPublication">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>publishes</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#publicationAuthor">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>was written by</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#publicationDate">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:label>was written on</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#publicationResearch">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Research">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is about</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#researchProject">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#ResearchGroup">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Research">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>has as a research project</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#softwareDocumentation">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Software">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Publication">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is documented in</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#softwareVersion">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Software">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:label>is version</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#subOrganizationOf">
+  <rdf:type rdf:resource="&owl;TransitiveProperty" />
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Organization">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is part of</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#takesCourse">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Student">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:label>is taking</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#teacherOf">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Faculty">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>teaches</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#teachingAssistantOf">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#TeachingAssistant">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:range>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Course">
+    </owl:Class>
+  </rdfs:range>
+  <rdfs:label>is a teaching assistant for</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#tenured">
+  <rdfs:domain>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Professor">
+    </owl:Class>
+  </rdfs:domain>
+  <rdfs:label>is tenured:</rdfs:label>
+</owl:ObjectProperty>
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#worksFor">
+  <rdfs:label>Works For</rdfs:label>
+</owl:ObjectProperty>
+
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#age">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:label>is age</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#emailAddress">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:label>can be reached at</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#firstName">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:range>    <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+</rdfs:range>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#lastName">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:range>    <rdfs:Datatype rdf:about="http://www.w3.org/2001/XMLSchema#string"/>
+</rdfs:range>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#name">
+  <rdfs:label>name</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#officeNumber">
+  <rdfs:label>office room No.</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#researchInterest">
+  <rdfs:label>is researching</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#telephone">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:label>telephone number</rdfs:label>
+</owl:DatatypeProperty>
+<owl:DatatypeProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#title">
+  <rdfs:domain>    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Person">
+    </owl:Class>
+</rdfs:domain>
+  <rdfs:label>title</rdfs:label>
+</owl:DatatypeProperty>
+
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#AmericanFootball">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>AmericanFootball</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Baseball">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>Baseball</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#BasketBall">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>BasketBall</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Classic_Music">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Music">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Kickboxing">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>Kickboxing</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Movie">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#PC_Game">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Painting">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Pop_Music">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Music">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Reading">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Rock_and_Roll">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Music">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Shopping">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Soccer">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>Soccer</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#StampCollecting">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Swimming">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>Swimming</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Tennis">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Sports">
+    </owl:Class>
+  </rdf:type>
+  <rdfs:label>Tennis</rdfs:label>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Travelling">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+<rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Video_Game">
+  <rdf:type>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#Insterest">
+    </owl:Class>
+  </rdf:type>
+</rdf:Description>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#love">
+  <owl:equivalentProperty>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#like">
+  </owl:ObjectProperty>
+  </owl:equivalentProperty>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#enrollIn">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isStudentOf">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDoctoralDegreeFrom">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDegreeFrom">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isCrazyAbout">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#like">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#worksFor">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isMemberOf">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isHeadOf">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#worksFor">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isStudentOf">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#isMemberOf">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasMasterDegreeFrom">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDegreeFrom">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasUndergraduateDegreeFrom">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasDegreeFrom">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+<owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasStudent">
+  <rdfs:subPropertyOf>
+  <owl:ObjectProperty rdf:about="http://uob.iodt.ibm.com/univ-bench-lite.owl#hasMember">
+  </owl:ObjectProperty>
+  </rdfs:subPropertyOf>
+</owl:ObjectProperty>
+
+</rdf:RDF>
