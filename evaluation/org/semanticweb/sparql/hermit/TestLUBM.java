@@ -46,7 +46,7 @@ public class TestLUBM {
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
 //        getLUBMQ1(sparqlEngine, dataset);
-        getLUBMQ2(sparqlEngine, dataset);
+//        getLUBMQ2(sparqlEngine, dataset);
 /*        getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
         getLUBMQ5(sparqlEngine, dataset);

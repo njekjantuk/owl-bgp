@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.HermiT.DynamicHermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
@@ -134,28 +135,66 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                  while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                 	//if dynamic
                 	m_monitor.costEvaluationStarted();
+                	long t=System.currentTimeMillis();
                 	QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
-                    m_monitor.costEvaluationFinished(cheapest);
+                    System.out.println("the reordering time is "+(System.currentTimeMillis()-t)+" ms");
+                	m_monitor.costEvaluationFinished(cheapest);
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
                     bindings=cheapest.computeBindings(bindings, positionInTuple);
                     System.out.println(cheapest.getAxiomTemplate());
                     System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
-                    costEstimator.updateCandidateBindings(bindings);
+//                    int sampleSize=bindings.size()/10;
+//                    List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+//                    sampleBindings=bindings.subList(1, sampleSize);
+//                    costEstimator.updateCandidateBindings(sampleBindings);                    
+                      costEstimator.updateCandidateBindings(bindings);
+                      
                  }
                 }
-                else {
+                else /*if (orderingMode==0)*/{
                  System.out.println("Static");	
                  StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
+                 long t=System.currentTimeMillis();
                  List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
+                 System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
                  for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                 	if (!bindings.isEmpty()){
                 	  bindings=cheapest.computeBindings(bindings, positionInTuple);
                 	  System.out.println(cheapest.getAxiomTemplate());
+                	  System.out.println("bindings size= "+bindings.size());
                 	}
                  }
                 }
+/*                else {
+                  DynamicCostEstimationVisitor costEstimator;
+                  if (reasoner instanceof Reasoner)
+                     costEstimator=new DynamicHermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                  else 
+                     costEstimator=new CostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                  while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
+                    //if dynamic
+                    m_monitor.costEvaluationStarted();
+                    long t=System.currentTimeMillis();
+                    QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
+                    System.out.println("the reordering time is "+(System.currentTimeMillis()-t)+" ms");
+                    m_monitor.costEvaluationFinished(cheapest);
+                    
+                    connectedComponent.remove(cheapest);
+                    m_monitor.queryObjectEvaluationStarted(cheapest);
+                    bindings=cheapest.computeBindings(bindings, positionInTuple);
+                    System.out.println(cheapest.getAxiomTemplate());
+                    System.out.println("bindings size= "+bindings.size());
+                    m_monitor.queryObjectEvaluationFinished(bindings.size());
+//                        int sampleSize=bindings.size()/10;
+//                        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+//                        sampleBindings=bindings.subList(1, sampleSize);
+//                        costEstimator.updateCandidateBindings(sampleBindings);
+                    
+                    costEstimator.updateCandidateBindings(bindings,1);
+                  }
+                }*/
                 
                 bindingsPerComponent.add(bindings);
                 if (resultSize==null)
