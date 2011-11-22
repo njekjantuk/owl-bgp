@@ -45,16 +45,19 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     protected final double m_numDisjunctions;
     protected Integer m_classHierarchyDepth;
     protected Integer m_opHierarchyDepth;
-    
+    int r;
     public HermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         super(graph, bindingPositions, candidateBindings);
+        r=0;
         if (m_reasoner instanceof Reasoner) {
             m_hermit=(Reasoner)m_reasoner;
             m_instanceManager=m_hermit.m_instanceManager;
             double numDisjunctions=0;
             for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
-                if (clause.getHeadLength()>1)
+                if (clause.getHeadLength()>1) {
                     numDisjunctions+=clause.getHeadLength();
+                    System.out.println(clause);
+                }   
             m_numDisjunctions=numDisjunctions;
         } else 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
@@ -65,11 +68,19 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
             cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
         if (unbound.size()==0)
             if (ce instanceof Atomic) {
-                if (m_instanceManager!=null 
+/*            if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
+      		  {r++;    		  
+      		  System.out.println("r is "+r);}*/
+//            	if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
+            	//(!((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).getPossibleInstances()).contains((((Atomic)ind).getIdentifierString())));
+            	//isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()))
+//            	{r++;    		  
+//        		  System.out.println("r is "+r);}
+            	if (m_instanceManager!=null 
                         && m_instanceManager.areClassesInitialised() 
-                        && !m_instanceManager.hasType(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()), AtomicConcept.create(((Atomic)ce).getIdentifierString()), false))
-                    return new double[] { cost+COST_LOOKUP, 0 };
-                else 
+                        && !m_instanceManager.hasType(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()), AtomicConcept.create(((Atomic)ce).getIdentifierString()), false))            		
+            		return new double[] { cost+COST_LOOKUP, 0 };            	
+            	else 
                     return new double[] { cost+COST_LOOKUP, 1 }; // initialization required
             } else { 
                 return new double[] { COST_ENTAILMENT, 1 };

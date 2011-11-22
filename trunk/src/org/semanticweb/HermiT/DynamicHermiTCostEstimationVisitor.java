@@ -1,4 +1,4 @@
-	package  org.semanticweb.HermiT;
+package  org.semanticweb.HermiT;
 
 	import java.util.List;
 	import java.util.Map;
@@ -9,19 +9,21 @@
 	import org.semanticweb.HermiT.model.AtomicConcept;
 	import org.semanticweb.HermiT.model.AtomicRole;
 	import org.semanticweb.HermiT.model.DLClause;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
+    import org.semanticweb.owlapi.model.OWLObjectProperty;
 	import org.semanticweb.owlapi.reasoner.InferenceType;
 	import org.semanticweb.sparql.arq.OWLOntologyGraph;
 	import org.semanticweb.sparql.bgpevaluation.CostEstimationVisitor;
-import org.semanticweb.sparql.bgpevaluation.StaticCostEstimationVisitor;
+    import org.semanticweb.sparql.bgpevaluation.DynamicCostEstimationVisitor;
+    import org.semanticweb.sparql.bgpevaluation.StaticCostEstimationVisitor;
 	import org.semanticweb.sparql.owlbgp.model.Atomic;
 	import org.semanticweb.sparql.owlbgp.model.Variable;
+import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
 	import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 	import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 	import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 
-	public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisitor {
+	public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVisitor {
 
 	    protected double POSSIBLE_INSTANCE_SUCCESS=0.5;
 	    
@@ -31,7 +33,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	    protected Integer m_classHierarchyDepth;
 	    protected Integer m_opHierarchyDepth;
 	    
-	    public StaticHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions) {
+	    public DynamicHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions) {
 	        super(graph, bindingPositions);
 	        if (m_reasoner instanceof Reasoner) {
 	            m_hermit=(Reasoner)m_reasoner;
@@ -162,3 +164,4 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	    } 
 	
 }
+
