@@ -259,13 +259,16 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                 if (binding!=null)
                     existingBindings.put(var,binding);
             }
-            ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
-            unbound.addAll(vars);
-            unbound.removeAll(existingBindings.keySet());
             
-            double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
-            estimate[0]+=currentEstimate[0];
-            estimate[1]+=currentEstimate[1];
+//            if (!existingBindings.isEmpty()){
+             ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+             unbound.addAll(vars);
+             unbound.removeAll(existingBindings.keySet());
+            
+             double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+             estimate[0]+=currentEstimate[0];
+             estimate[1]+=currentEstimate[1];
+//           } 
         }
         return estimate;
     }

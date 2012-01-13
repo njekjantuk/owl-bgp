@@ -79,7 +79,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         m_bindingPositions=bindingPositions;
     }
    
-/*    public double[] visit(QO_SubClassOf queryObject) {
+    public double[] visit(QO_SubClassOf queryObject) {
         double[] result=new double[2];
         if (m_candidateBindings.isEmpty())
             return result; // no answers, no tests
@@ -99,7 +99,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         for (int i=0;i<unbound.size();i++)
             results*=m_classCount;
         return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
-    }*/
+    }
 //    public double[] visit(QO_EquivalentClasses queryObject) {
 //        return new double[] { 0, 0 };
 //    }
@@ -109,7 +109,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_DisjointUnion queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-/*    public double[] visit(QO_SubObjectPropertyOf queryObject) {
+    public double[] visit(QO_SubObjectPropertyOf queryObject) {
         double[] result=new double[2];
         if (m_candidateBindings.isEmpty())
             return result; // no answers, no tests
@@ -129,7 +129,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         for (int i=0;i<unbound.size();i++)
             results*=m_opCount;
         return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
-    }*/
+    }
 //    public double[] visit(QO_EquivalentObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
@@ -145,9 +145,9 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_ObjectPropertyRange queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-/*    public double[] visit(QO_FunctionalObjectProperty queryObject) {
+    public double[] visit(QO_FunctionalObjectProperty queryObject) {
         return getObjectPropertyAxiomCost(queryObject);
-    }*/
+    }
     protected double[] getObjectPropertyAxiomCost(QueryObject<? extends Axiom> queryObject) {
         double[] result=new double[2];
         if (m_candidateBindings.isEmpty())
@@ -172,7 +172,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         else
             return new double[] { m_dpCount*COST_ENTAILMENT, m_dpCount }; // better return told numbers
     }
-/*    public double[] visit(QO_InverseFunctionalObjectProperty queryObject) {
+    public double[] visit(QO_InverseFunctionalObjectProperty queryObject) {
         return getObjectPropertyAxiomCost(queryObject);
     }
     public double[] visit(QO_ReflexiveObjectProperty queryObject) {
@@ -189,7 +189,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
     }
     public double[] visit(QO_TransitiveObjectProperty queryObject) {
         return getObjectPropertyAxiomCost(queryObject);
-    }*/
+    }
 //    public double[] visit(QO_SubDataPropertyOf queryObject) {
 //        return new double[] { 0, 0 };
 //    }
@@ -205,9 +205,9 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_DataPropertyRange queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-/*    public double[] visit(QO_FunctionalDataProperty queryObject) {
+    public double[] visit(QO_FunctionalDataProperty queryObject) {
         return getDataPropertyAxiomCost(queryObject);
-    }*/
+    }
 //    public double[] visit(QO_DatatypeDefinition queryObject) {
 //        return new double[] { 0, 0 };
 //    }
@@ -278,7 +278,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             return new double[] { tests, tests }; // assume all tests succeed
         }
     }
-/*    public double[] visit(QO_NegativeObjectPropertyAssertion queryObject) {
+    public double[] visit(QO_NegativeObjectPropertyAssertion queryObject) {
         double[] estimate=new double[2];
         if (m_candidateBindings.isEmpty())
             return estimate; // no answers, no tests
@@ -304,7 +304,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             estimate[1]+=currentEstimate[1];
         }
         return estimate;
-    }*/
+    }
     public double[] visit(QO_DataPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
        
@@ -348,7 +348,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             return new double[] { tests, tests }; // assume all tests succeed
         }
     }
-/*    public double[] visit(QO_NegativeDataPropertyAssertion queryObject) {
+    public double[] visit(QO_NegativeDataPropertyAssertion queryObject) {
         double[] estimate=new double[2];
         if (m_candidateBindings.isEmpty())
             return estimate; // no answers, no tests
@@ -384,7 +384,7 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         }
         return estimate;
     }
-*/
+
     protected int complex(Set<Variable> unbound) {
         int tests=0;
         // complex

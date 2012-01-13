@@ -28,23 +28,25 @@ public class TestUOBM {
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-//	    getUOBMQ0(sparqlEngine, dataset);
-//	    getUOBMQ1(sparqlEngine, dataset);
-        getUOBMQ2(sparqlEngine, dataset);
-//        getUOBMQ3(sparqlEngine, dataset);
-//        getUOBMQ4(sparqlEngine, dataset);
+	    getUOBMQ1(sparqlEngine, dataset);
+//	    getUOBMQ2(sparqlEngine, dataset);
+//       getUOBMQ3(sparqlEngine, dataset);
+        getUOBMQ4(sparqlEngine, dataset);
 //        getUOBMQ5(sparqlEngine, dataset);
 //        getUOBMQ6(sparqlEngine, dataset);
-//        getUOBMQ7(sparqlEngine, dataset);
+//        getUOBMQ7(sparqlEngine, dataset);*/
+////        getUOBMQ8(sparqlEngine, dataset);
 
-        getUOBMQ8(sparqlEngine, dataset);
-//        getUOBMQ9(sparqlEngine, dataset);
-//        getUOBMQ10(sparqlEngine, dataset);
-
+        getUOBMQ9(sparqlEngine, dataset);
+        getUOBMQ10(sparqlEngine, dataset);
         getUOBMQ11(sparqlEngine, dataset);
-//         getUOBMQ12(sparqlEngine, dataset);
-        getUOBMQ13(sparqlEngine, dataset);
-//        getUOBMQ14(sparqlEngine, dataset);
+
+        getUOBMQ12(sparqlEngine, dataset);
+////         getUOBMQ13(sparqlEngine, dataset);
+
+        
+        getUOBMQ14(sparqlEngine, dataset);
+////        getUOBMQ15(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -55,7 +57,7 @@ public class TestUOBM {
 	    
 	    OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0"+".owl"));
 	    manager.addAxioms(ont, tmp.getAxioms());
-	    for (int i=1;i<5;i++) {
+	    for (int i=0;i<5;i++) {
 	        tmp=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0-dept"+i+".owl"));
 
 	        manager.addAxioms(ont, tmp.getAxioms());
@@ -75,8 +77,8 @@ public class TestUOBM {
 	        + "SELECT * WHERE { " +LB;
 	    return prefix;
 	}
-	public static void getUOBMQ0(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-	    System.out.println("Q0");
+	public static void getUOBMQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q1");
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:UndergraduateStudent. " +LB
         + "  ?x uob:takesCourse <http://www.Department0.University0.edu/Course0>. " +LB
@@ -90,8 +92,8 @@ public class TestUOBM {
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
 	}
-	public static void getUOBMQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-	    System.out.println("Q1");
+	public static void getUOBMQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q2");
 //	    OWLOntology: 6102
 //	    HermiT: 188608
 //	    Query: 727, 604
@@ -107,8 +109,8 @@ public class TestUOBM {
        System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
 	
-	public static void getUOBMQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-	    System.out.println("Q2");
+	public static void getUOBMQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q3");
 //	    OWLOntology: 5949
 //	    HermiT: 184355
 //	    Query: 867, 2
@@ -124,8 +126,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
-	public static void getUOBMQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-	    System.out.println("Q3");
+	public static void getUOBMQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q4");
 //	    Query: 2
 //	    Result: 45
         String queryString=getUOBMPrefix()
@@ -141,10 +143,10 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getUOBMQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	public static void getUOBMQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 2
 //	    Result: 16
-	    System.out.println("Q4");
+	    System.out.println("Q5");
         String queryString=getUOBMPrefix()
             + "?x rdf:type uob:ResearchGroup. " +LB
             + "?x uob:subOrganizationOf <http://www.University0.edu>. " +LB
@@ -156,10 +158,10 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getUOBMQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	public static void getUOBMQ6(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 1
 //	    Result: 100
-	    System.out.println("Q5");
+	    System.out.println("Q6");
         String queryString=getUOBMPrefix()
             + "?x rdf:type uob:Person. " +LB         
             + "<http://www.University0.edu> uob:hasAlumnus ?x. " +LB
@@ -171,10 +173,10 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getUOBMQ6(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	public static void getUOBMQ7(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 //	    Query: 1
 //	    Result: 161
-	    System.out.println("Q6");
+	    System.out.println("Q7");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:Person. " +LB
             + "  ?x uob:hasSameHomeTownWith <http://www.Department0.University0.edu/FullProfessor0>. " +LB
@@ -186,8 +188,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-	public static void getUOBMQ7(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-	    System.out.println("Q7");
+	public static void getUOBMQ8(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q8");
         String queryString=getUOBMPrefix()
             +"  ?x rdf:type uob:SportsLover. " +LB
             +"  <http://www.Department0.University0.edu> uob:hasMember ?x. " +LB
@@ -199,8 +201,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ8(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q8");
+    public static void getUOBMQ9(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q9");
         String queryString=getUOBMPrefix()
             +"  ?x rdf:type uob:GraduateCourse. " +LB
             +"  ?x uob:isTaughtBy ?y. " +LB
@@ -214,8 +216,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ9(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q9");
+    public static void getUOBMQ10(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q10");
         String queryString=getUOBMPrefix()
             +"  ?x uob:isFriendOf <http://www.Department0.University0.edu/FullProfessor0>. " +LB
             + "} "+LB;
@@ -226,8 +228,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ10(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q10");
+    public static void getUOBMQ11(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q11");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:Person. " +LB
             + "  ?x uob:like ?y. " +LB
@@ -242,8 +244,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ11(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q11");
+    public static void getUOBMQ12(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q12");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:Student. " +LB   
             + "  ?x uob:takesCourse ?y. " +LB   
@@ -256,8 +258,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ12(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q12");
+    public static void getUOBMQ13(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q13");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:PeopleWithHobby. " +LB
             + "  ?x uob:isMemberOf <http://www.Department0.University0.edu>. " +LB
@@ -269,8 +271,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ13(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q13");
+    public static void getUOBMQ14(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q14");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:Woman. " +LB
             + "  ?x rdf:type uob:Student. " +LB
@@ -286,8 +288,8 @@ public class TestUOBM {
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
-    public static void getUOBMQ14(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-        System.out.println("Q14");
+    public static void getUOBMQ15(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+        System.out.println("Q15");
         String queryString=getUOBMPrefix()
             + "  ?x rdf:type uob:PeopleWithManyHobbies. " +LB
             + "  ?x uob:isMemberOf <http://www.Department0.University0.edu>. " +LB

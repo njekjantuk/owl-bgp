@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
@@ -49,4 +50,10 @@ public class QO_NegativeObjectPropertyAssertion  extends AbstractQueryObject<Neg
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+	@Override
+	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.DynamicHermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
@@ -86,7 +85,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         m_monitor.bgpEvaluationStarted();
         
-        int orderingMode=0;
+        int orderingMode=1;
         
         Graph activeGraph=execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
@@ -142,7 +141,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
                     bindings=cheapest.computeBindings(bindings, positionInTuple);
-                    System.out.println(cheapest.getAxiomTemplate());
+//                    System.out.println(cheapest.getAxiomTemplate());
                     System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
 //                    int sampleSize=bindings.size()/10;
