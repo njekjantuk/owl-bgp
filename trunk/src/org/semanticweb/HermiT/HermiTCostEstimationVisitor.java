@@ -56,14 +56,15 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
             for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
                 if (clause.getHeadLength()>1) {
                     numDisjunctions+=clause.getHeadLength();
-                    System.out.println(clause);
+//                    System.out.println(clause);
                 }   
             m_numDisjunctions=numDisjunctions;
         } else 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
     }
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
-        double cost=0;
+//       r++;
+    	double cost=0;
         if (ce instanceof Atomic && (m_instanceManager==null || !m_instanceManager.areClassesInitialised()))
             cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
         if (unbound.size()==0)
@@ -71,7 +72,10 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
 /*            if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
       		  {r++;    		  
       		  System.out.println("r is "+r);}*/
-//            	if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
+            	if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
+            	{r++;                
+            	System.out.print(r+"  ");}
+            	
             	//(!((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).getPossibleInstances()).contains((((Atomic)ind).getIdentifierString())));
             	//isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()))
 //            	{r++;    		  

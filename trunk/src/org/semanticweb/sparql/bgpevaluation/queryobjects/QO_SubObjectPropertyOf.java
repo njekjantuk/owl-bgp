@@ -131,4 +131,10 @@ public class QO_SubObjectPropertyOf extends AbstractQueryObject<SubClassOf> {
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+
+	@Override
+	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

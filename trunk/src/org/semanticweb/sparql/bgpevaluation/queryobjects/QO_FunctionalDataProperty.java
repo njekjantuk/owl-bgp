@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
@@ -79,4 +80,10 @@ public class QO_FunctionalDataProperty extends AbstractQueryObject<FunctionalDat
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+
+	@Override
+	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

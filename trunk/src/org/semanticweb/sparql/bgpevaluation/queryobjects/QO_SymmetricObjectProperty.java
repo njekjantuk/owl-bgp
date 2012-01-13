@@ -18,9 +18,12 @@
 
 package  org.semanticweb.sparql.bgpevaluation.queryobjects;
 
+import java.util.Set;
+
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.SymmetricObjectProperty;
 
 public class QO_SymmetricObjectProperty extends QO_ObjectPropertyAxiom<SymmetricObjectProperty> {
@@ -34,4 +37,9 @@ public class QO_SymmetricObjectProperty extends QO_ObjectPropertyAxiom<Symmetric
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
+	@Override
+	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

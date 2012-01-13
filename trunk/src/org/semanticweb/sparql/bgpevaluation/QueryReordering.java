@@ -39,7 +39,8 @@ public class QueryReordering {
                 cheapestCost=totalCost;
                 cheapest=qo;
             }
-        } 
+        }
+        System.out.println(cheapest);
         return cheapest;
     }
 }
