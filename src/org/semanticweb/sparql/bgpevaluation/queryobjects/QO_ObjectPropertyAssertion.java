@@ -250,6 +250,50 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
             return m_reasoner.getObjectPropertyValues(ind1, ope).containsEntity(ind2);
     }
     
+/*    protected List<Atomic[]> filteringPass(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions){
+    	Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
+        // apply bindings that are already computed from previous steps
+        for (Variable var : bindingPositions.keySet())
+            bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
+        try {
+            ObjectPropertyAssertion assertion=((ObjectPropertyAssertion)m_axiomTemplate.getBoundVersion(bindingMap));
+//            System.out.println(assertion);
+            Atomic ope=(Atomic)assertion.getObjectPropertyExpression();
+            Individual ind1=assertion.getIndividual1();
+            Individual ind2=assertion.getIndividual2();
+
+            if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {//:r(?x,?y)
+                int[] positions=new int[2];
+                positions[0]=bindingPositions.get(ind1);
+                positions[1]=bindingPositions.get(ind2);
+                return [getKnownAndPossibleInstances]
+                //compute0Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),positions);
+            } else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {//:r(?x,:a)
+                int[] positions=new int[1];
+                positions[0]=bindingPositions.get(ind1);
+                return [getKnownAndPossiblePredecessors] 
+                //compute02Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
+            } else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {//:r(:a,?x)
+                int[] positions=new int[1];
+                positions[0]=bindingPositions.get(ind2);
+                return compute01Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
+            } else if (!ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {//:r(:a,:b)
+                if (ind1,ind2 isKnownOrPossibleInstance)
+                	return Collections.singletonList(currentBinding);
+                //(compute012Bound((OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter)))
+                //    return Collections.singletonList(currentBinding);
+                else 
+                    return new ArrayList<Atomic[]>();
+            } else {
+                return complex(currentBinding,assertion,bindingPositions);
+            }
+        } catch (IllegalArgumentException e) {
+            // current binding is incompatible will not add new bindings in newBindings
+            return new ArrayList<Atomic[]>();
+        }
+    	
+    }*/
+    
     public <O> O accept(QueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }

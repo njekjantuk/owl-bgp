@@ -18,6 +18,8 @@
 
 package  org.semanticweb.sparql.bgpevaluation;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -252,7 +254,16 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
-        for (Atomic[] testBinding : m_candidateBindings) {
+        
+        int sampleSize=m_candidateBindings.size()*5/10;
+        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+        shuffledBindings.addAll(m_candidateBindings);
+        Collections.shuffle(shuffledBindings);
+        sampleBindings=shuffledBindings.subList(0, sampleSize);
+          
+//        for (Atomic[] testBinding : m_candidateBindings) {
+          for (Atomic[] testBinding : sampleBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];
@@ -294,7 +305,16 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
-        for (Atomic[] testBinding : m_candidateBindings) {
+        
+        int sampleSize=m_candidateBindings.size()*5/10;
+        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+        shuffledBindings.addAll(m_candidateBindings);
+        Collections.shuffle(shuffledBindings);
+        sampleBindings=shuffledBindings.subList(0, sampleSize);
+          
+      for (Atomic[] testBinding : m_candidateBindings) {
+//        for (Atomic[] testBinding : sampleBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];
@@ -373,7 +393,16 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         }
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
-        for (Atomic[] testBinding : m_candidateBindings) {
+
+/*        int sampleSize=m_candidateBindings.size()*5/10;
+        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+        shuffledBindings.addAll(m_candidateBindings);
+        Collections.shuffle(shuffledBindings);
+        sampleBindings=shuffledBindings.subList(0, sampleSize);*/
+          
+      for (Atomic[] testBinding : m_candidateBindings) {
+//        for (Atomic[] testBinding : sampleBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];

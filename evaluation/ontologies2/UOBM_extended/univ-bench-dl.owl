@@ -706,11 +706,28 @@
     
 
 
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#Engineering -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Engineering">
+        <rdfs:label>Engineering</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#AcademicSubject"/>
+    </owl:Class>
+    
+
+
     <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#Faculty -->
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Faculty">
         <rdfs:label>faculty member</rdfs:label>
         <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Employee"/>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#FineArts -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#FineArts">
+        <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#AcademicSubject"/>
     </owl:Class>
     
 
@@ -751,6 +768,15 @@
                 </owl:intersectionOf>
             </owl:Class>
         </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#HumanitiesAndSocial -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#HumanitiesAndSocial">
+        <rdfs:label>HumanitiesAndSocial</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#AcademicSubject"/>
     </owl:Class>
     
 
@@ -804,9 +830,7 @@
 
     <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#Man -->
 
-    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Man">
-        <owl:disjointWith rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Woman"/>
-    </owl:Class>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Man"/>
     
 
 
@@ -831,6 +855,21 @@
 
     <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#NonScienceStudent">
         <rdfs:label>student whose major is not science</rdfs:label>
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Student"/>
+                    <owl:Class>
+                        <owl:complementOf>
+                            <owl:Restriction>
+                                <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#hasMajor"/>
+                                <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Science"/>
+                            </owl:Restriction>
+                        </owl:complementOf>
+                    </owl:Class>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
     </owl:Class>
     
 
@@ -967,9 +1006,30 @@
     
 
 
+    <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#Science -->
+
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Science">
+        <rdfs:label>Science</rdfs:label>
+        <rdfs:subClassOf rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#AcademicSubject"/>
+    </owl:Class>
+    
+
+
     <!-- http://uob.iodt.ibm.com/univ-bench-dl.owl#ScienceStudent -->
 
-    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#ScienceStudent"/>
+    <owl:Class rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#ScienceStudent">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="http://uob.iodt.ibm.com/univ-bench-dl.owl#Student"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#hasMajor"/>
+                        <owl:someValuesFrom rdf:resource="http://uob.iodt.ibm.com/univ-bench-dl.owl#Science"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
     
 
 

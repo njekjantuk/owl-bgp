@@ -41,41 +41,57 @@ public class TestLUBM {
 	    OWLOntologyDataSet dataset=getLUBMDataSet();
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
-	    t=System.currentTimeMillis();	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
+	    t=System.currentTimeMillis();	    
+//	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
+	    graph.getReasoner().precomputeInferences(InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-//        getLUBMQ1(sparqlEngine, dataset);
-//        getLUBMQ2(sparqlEngine, dataset);
-/*        getLUBMQ3(sparqlEngine, dataset);
+	    getLUBMQ0(sparqlEngine, dataset);
+	    getLUBMQ1(sparqlEngine, dataset);
+        getLUBMQ2(sparqlEngine, dataset);
+        getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
         getLUBMQ5(sparqlEngine, dataset);
         getLUBMQ6(sparqlEngine, dataset);
         getLUBMQ7(sparqlEngine, dataset);
-        getLUBMQ8(sparqlEngine, dataset);*/
+        getLUBMQ8(sparqlEngine, dataset);
         getLUBMQ9(sparqlEngine, dataset);
-/*        getLUBMQ10(sparqlEngine, dataset);
+        getLUBMQ10(sparqlEngine, dataset);
         getLUBMQ11(sparqlEngine, dataset);
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
-        getLUBMQ14(sparqlEngine, dataset);*/
+        getLUBMQ14(sparqlEngine, dataset);
+        System.out.println("The execution of the 15 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-        String prefix="/Users/bglimm/Documents/workspace/OWL-BGP/";
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/univ-bench.owl"));
+	    File dir = new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/LUBM-2");
+
+//        String prefix="/Users/bglimm/Documents/workspace/OWL-BGP/";
         //String prefix="//Server/Users/ilianna/workspace/OWL-BGP/";
-        OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File(prefix+"evaluation/ontologies/univ-bench.owl"));
-        File dir = new File(prefix+"evaluation/ontologies/LUBM-1");
+//        OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File(prefix+"evaluation/ontologies/univ-bench.owl"));
+//        File dir = new File(prefix+"evaluation/ontologies/LUBM-1");
+
         String[] children = dir.list();
-        for (int i=0;i<children.length;i++) {
+        for (int i=0;i<children.length;i++){
+            File file=new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/LUBM-2/"+children[i]); 
+            if (file.isFile()) {
+        	  OWLOntology tmp=manager.loadOntologyFromOntologyDocument(file);
+	          manager.addAxioms(ont, tmp.getAxioms());
+            }
+        }    
+/*        for (int i=0;i<children.length;i++) {
             File file=new File(prefix+"evaluation/ontologies/LUBM-1/"+children[i]);
             if (file.isFile()) {
                 OWLOntology tmp=manager.loadOntologyFromOntologyDocument(file);
                 manager.addAxioms(ont, tmp.getAxioms());
             }
-        }
+
+        }*/
 	    
-	    /*	    for (int i=1;i<15;i++) {
+/*	    for (int i=0;i<15;i++) {
 	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }*/
@@ -115,7 +131,7 @@ public class TestLUBM {
         + "  ?x rdf:type ub:GraduateStudent. " +LB
         + "  ?x ub:takesCourse <http://www.Department0.University0.edu/GraduateCourse0>. " +LB
         + " } "+LB;
-       long t=System.currentTimeMillis();
+        long t=System.currentTimeMillis();
        Query query=QueryFactory.create(queryString);
        System.out.println("Query: "+(System.currentTimeMillis()-t));
        t=System.currentTimeMillis();
@@ -262,6 +278,7 @@ public class TestLUBM {
         long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
         System.out.println("Query: "+(System.currentTimeMillis()-t));
+    
         t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
         System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -339,6 +356,7 @@ public class TestLUBM {
 //Query: 4, 2
 //Cost estimation time: 0, computation time: 4, results size: 34
 //Result: 33, 86
+
 //Q5
 //Query: 3, 1
 //Cost estimation time: 0, computation time: 259, results size: 719
