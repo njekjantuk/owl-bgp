@@ -63,36 +63,39 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
     }
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
-//       r++;
+//      r++;
     	double cost=0;
         if (ce instanceof Atomic && (m_instanceManager==null || !m_instanceManager.areClassesInitialised()))
             cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
-        if (unbound.size()==0)
-            if (ce instanceof Atomic) {
+        if (unbound.size()==0 && ce instanceof Atomic){
 /*            if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
       		  {r++;    		  
       		  System.out.println("r is "+r);}*/
-            	if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
-            	{r++;                
-            	System.out.print(r+"  ");}
+//            	if ((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString())));
+//            	{r++;                
+//            	System.out.print(r+"  ");}
             	
             	//(!((m_instanceManager.m_conceptToElement.get(AtomicConcept.create(((Atomic)ce).getIdentifierString()))).getPossibleInstances()).contains((((Atomic)ind).getIdentifierString())));
             	//isPossible(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()))
 //            	{r++;    		  
 //        		  System.out.println("r is "+r);}
             	if (m_instanceManager!=null 
-                        && m_instanceManager.areClassesInitialised() 
-                        && !m_instanceManager.hasType(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()), AtomicConcept.create(((Atomic)ce).getIdentifierString()), false))            		
-            		return new double[] { cost+COST_LOOKUP, 0 };            	
-            	else 
-                    return new double[] { cost+COST_LOOKUP, 1 }; // initialization required
-            } else { 
-                return new double[] { COST_ENTAILMENT, 1 };
-            }
-        else if (unbound.size()==1 && unbound.contains(indVar)) {// C(?x)
-            if (ce instanceof Atomic) 
+                        && m_instanceManager.areClassesInitialised()){ //C(:a)
+//                        && !m_instanceManager.hasType(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()), AtomicConcept.create(((Atomic)ce).getIdentifierString()), false))            		
+                    boolean[] result=m_instanceManager.isKnownOrPossibleInstance(org.semanticweb.HermiT.model.Individual.create(((Atomic)ind).getIdentifierString()), 
+                        		  AtomicConcept.create(((Atomic)ce).getIdentifierString())); 
+                    if (result[0])
+                        return new double[] { cost+COST_LOOKUP, 1 };
+                    else if (result[1])
+                        return new double[] { cost+((double)0.5*COST_ENTAILMENT*getClassHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
+                    else return new double[] { cost+COST_LOOKUP, 0};
+                    } else 
+                        return new double[] { cost+((double)0.5*COST_ENTAILMENT*getClassHierarchyDepth()), 1 }; // initialization required                  
+        }
+        else if (unbound.size()==1 && unbound.contains(indVar) && ce instanceof Atomic) {// C(?x) 
                 if (m_instanceManager!=null && m_instanceManager.areClassesInitialised()) { 
                     int[] estimate=m_instanceManager.getNumberOfInstances(AtomicConcept.create(((Clazz)ce).getIRIString()));
+ //                   System.out.println("known "+ ce.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
                     return new double[] { estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
                 } 
                 return new double[] { cost+m_indCount, m_indCount }; // needs refinement 
@@ -111,15 +114,17 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
         double cost=0;
         if (m_instanceManager==null || !m_instanceManager.arePropertiesInitialised())
             cost+=(m_opCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
-        if (unbound.size()==0)
+        if (unbound.size()==0) {//r(:a :b)
             if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) { 
                 boolean[] result=m_instanceManager.hasSuccessor(AtomicRole.create(((Atomic)op).getIdentifierString()), org.semanticweb.HermiT.model.Individual.create(((Atomic)ind1).getIdentifierString()), org.semanticweb.HermiT.model.Individual.create(((Atomic)ind2).getIdentifierString()));
                 if (result[0])
                     return new double[] { cost+COST_LOOKUP, 1 };
                 else if (result[1])
-                    return new double[] { cost+((double)0.5*COST_ENTAILMENT*getOPHierarchyDepth()), 1 };
+                    return new double[] { cost+((double)0.5*COST_ENTAILMENT*getOPHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
+                else return new double[] {cost+COST_LOOKUP, 0 }; 
             } else 
                 return new double[] { cost+((double)0.5*COST_ENTAILMENT*getOPHierarchyDepth()), 1 }; // initialization required
+        }    
         else if (unbound.size()==1 && opVar!=null) {// ?x(:a :b) 
             return new double[] { cost+m_opCount*COST_LOOKUP*(double)(0.5*COST_ENTAILMENT*getOPHierarchyDepth()), m_opCount};  
         } else if (unbound.size()==1 && opVar==null) {// op(:a ?x) or op(?x :a)
@@ -147,6 +152,7 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
         } else if (unbound.size()==2 && opVar==null) {// op(?x ?y)
             if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) {
                 int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create(op.getIRIString()));
+//                System.out.println("known "+ op.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
                 return new double[] { estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*getOPHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
             }
             return new double[] { cost+m_opCount*m_indCount*COST_LOOKUP*0.5*COST_ENTAILMENT*getOPHierarchyDepth(), m_indCount*m_indCount}; 

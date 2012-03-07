@@ -57,18 +57,18 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
     		ClassExpression ce=instantiated.getClassExpression();
     		Set<Variable> ceVars=ce.getVariablesInSignature();
     		Individual ind=instantiated.getIndividual();
-            if (ce.isVariable() && ind.isVariable()) {
+            if (ce.isVariable() && ind.isVariable()) {//?x(?y)
                 int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ce);
                 positions[1]=bindingPositions.get(ind);
                 return computeAllClassAssertions(currentBinding,positions);
-            } else if (ce.isVariable() && !ind.isVariable()) {
+            } else if (ce.isVariable() && !ind.isVariable()) {//?x(:a)
                 int position=bindingPositions.get(ce);
                 return computeTypes(currentBinding,(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory),position);
-            } else if (ceVars.isEmpty() && ind.isVariable()) {
+            } else if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
                 int position=bindingPositions.get(ind);
                 return computeInstances(currentBinding,(OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),position);
-            } else if (ceVars.isEmpty() && !ind.isVariable()) {
+            } else if (ceVars.isEmpty() && !ind.isVariable()) {//C(:a)
                 if (checkType((OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)))
                     return Collections.singletonList(currentBinding);
                 else 
@@ -81,7 +81,7 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
 		    return new ArrayList<Atomic[]>();
 		}
 	}
-    protected boolean checkType(OWLClassExpression classExpression, OWLNamedIndividual individual) {
+     protected boolean checkType(OWLClassExpression classExpression, OWLNamedIndividual individual) {
         // ClassAssertion(:C :a)
         if (m_reasoner instanceof Reasoner)
             return ((Reasoner)m_reasoner).hasType(individual, classExpression, false);
@@ -127,6 +127,46 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
         }
         return newBindings;
     }
+    
+/*    protected List<Atomic[]> filteringPass(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions){
+        Map<Variable,Atomic> bindingMap=new HashMap<Variable, Atomic>();
+		// apply bindings that are already computed from previous steps
+		for (Variable var : bindingPositions.keySet())
+		    bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
+		try {
+    		ClassAssertion instantiated=(ClassAssertion)m_axiomTemplate.getBoundVersion(bindingMap);
+//    		System.out.println(instantiated);
+    		ClassExpression ce=instantiated.getClassExpression();
+    		Set<Variable> ceVars=ce.getVariablesInSignature();
+    		Individual ind=instantiated.getIndividual();
+            if (ce.isVariable() && ind.isVariable()) {//?x(?y)
+                int[] positions=new int[2];
+                positions[0]=bindingPositions.get(ce);
+                positions[1]=bindingPositions.get(ind);
+                return computeAllClassAssertions(currentBinding,positions);
+            } else if (ce.isVariable() && !ind.isVariable()) {//?x(:a)
+                int position=bindingPositions.get(ce);
+                return computeTypes(currentBinding,(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory),position);
+            } else if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
+                int position=bindingPositions.get(ind);
+                return [getKnownInstances(),getPossibleInstances()]; 
+                //computeInstances(currentBinding,(OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),position);
+            } else if (ceVars.isEmpty() && !ind.isVariable()) {//C(:a)
+                if isKnownOrPossibleInstance()
+                   return Collections.singletonList(currentBinding);
+                //(checkType((OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)))
+                //    return Collections.singletonList(currentBinding);
+                else 
+                    return new ArrayList<Atomic[]>();
+            } else {
+                return complex(currentBinding, instantiated, bindingPositions);
+            }
+		} catch (IllegalArgumentException e) {
+		    // current binding is incompatible will not add new bindings in newBindings
+		    return new ArrayList<Atomic[]>();
+		}
+    }*/
+    
     public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
         return visitor.visit(this, bound);
     }

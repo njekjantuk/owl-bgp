@@ -20,6 +20,7 @@ package  org.semanticweb.sparql.bgpevaluation;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -85,7 +86,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
         m_monitor.bgpEvaluationStarted();
         
-        int orderingMode=1;
+        int orderingMode=0;
         
         Graph activeGraph=execCxt.getActiveGraph();
         // Test to see if this is a graph we support.  
@@ -144,21 +145,50 @@ public class OWLReasonerStageGenerator implements StageGenerator {
 //                    System.out.println(cheapest.getAxiomTemplate());
                     System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
-//                    int sampleSize=bindings.size()/10;
-//                    List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-//                    sampleBindings=bindings.subList(1, sampleSize);
-//                    costEstimator.updateCandidateBindings(sampleBindings);                    
+ /*                   int sampleSize=bindings.size()/10;
+                    List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+                    ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+                    shuffledBindings.addAll(bindings);
+                    Collections.shuffle(shuffledBindings);
+                    if (shuffledBindings.size()!=0)
+                     sampleBindings=shuffledBindings.subList(1, sampleSize);
+                    costEstimator.updateCandidateBindings(sampleBindings);                    */
                       costEstimator.updateCandidateBindings(bindings);
                       
                  }
                 }
+                
+                else if (orderingMode==2){
+                    System.out.println("Use of intersection optimization");
+                    StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
+                    long t=System.currentTimeMillis();
+                    List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
+                    System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
+                    BindingsIntersection optimization=new BindingsIntersection(ontologyGraph, positionInTuple);
+                    for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
+                   	    if (cheapest instanceof QO_ClassAssertion) 
+                   	      bindings=optimization.reduceClassBindings(bindings, (QO_ClassAssertion)cheapest);
+//                   	    else if (cheapest instanceof QO_ObjectPropertyAssertion)
+//                   	      bindings=optimization.reduceObjectPropertyBindings(bindings, (QO_ObjectPropertyAssertion)cheapest);
+                        else 
+                          System.out.println("We do not currently support other types of axioms for this optimization");
+                    }
+                    for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
+                       	if (!bindings.isEmpty()){
+                            bindings=cheapest.computeBindings(bindings, positionInTuple);
+//                          System.out.println(cheapest.getAxiomTemplate());
+                            System.out.println("bindings size= "+bindings.size());
+                        }   	
+                    }
+                }         
+                       
                 else /*if (orderingMode==0)*/{
-                 System.out.println("Static");	
-                 StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
-                 long t=System.currentTimeMillis();
-                 List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
-                 System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
-                 for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
+                  System.out.println("Static");	
+                  StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
+                  long t=System.currentTimeMillis();
+                  List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
+                  System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
+                  for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                 	if (!bindings.isEmpty()){
                 	  bindings=cheapest.computeBindings(bindings, positionInTuple);
                 	  System.out.println(cheapest.getAxiomTemplate());

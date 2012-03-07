@@ -49,22 +49,33 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	        double cost=0;
 	        if (ce instanceof Atomic && (m_instanceManager==null || !m_instanceManager.areClassesInitialised()))
 	            cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
-	        if (indVar!=null && !bound.contains(indVar)){
+	        if (indVar!=null && !bound.contains(indVar)){ //C(?x)
 	            if (ce instanceof Atomic) {
-	                if (m_instanceManager!=null && m_instanceManager.areClassesInitialised()){
 	                	int[] estimate=m_instanceManager.getNumberOfInstances(AtomicConcept.create(((Clazz)ce).getIRIString()));
-	                    return new double[] { estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
-	                }     
+	                    System.out.println("known: "+estimate[0]+"  possible: "+estimate[1]);
+	                	return new double[] { cost+estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
+	                    
 	            }    
 	            return new double[] { cost+m_indCount, m_indCount }; // needs refinement 
 	        }    
-	        else if (indVar!=null && bound.contains(indVar)) {
-	          if (ce instanceof Atomic) 
-	           return new double[] { COST_LOOKUP, 1};
+	        else if (indVar!=null && bound.contains(indVar)) {//C(a)<-C(x)
+	          if (ce instanceof Atomic) {
+	        	  int[] estimate=m_instanceManager.getNumberOfInstances(AtomicConcept.create(((Clazz)ce).getIRIString()));
+//	              int totalNumber=estimate[0]+estimate[1];
+//	        	  double ax=(double)estimate[0]/(double)m_indCount;
+//	        	  double axx=(double)estimate[1]/(double)m_indCount;
+//	        	  double axxx=(estimate[1]/(double)m_indCount)*COST_ENTAILMENT;
+//	        	  double axxxx=m_hermit.getClassHierarchyDepth();
+//	        	  double all=ax+axxx*axxxx;
+	        	  return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount};
+	          } 
 	          else return new double[] { COST_ENTAILMENT, 1};
 	        }
-	        else if (ce instanceof Atomic) 
-		           return new double[] { COST_LOOKUP, 1};
+	        else if (ce instanceof Atomic) {//C(a)
+	        	int[] estimate=m_instanceManager.getNumberOfInstances(AtomicConcept.create(((Clazz)ce).getIRIString()));
+	         //   int totalNumber=estimate[0]+estimate[1];
+	        	return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*m_hermit.getClassHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount};    
+	        }       
 	        else return new double[] { COST_ENTAILMENT, 1};
 	    }
 	    
@@ -74,57 +85,64 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	        if (m_instanceManager==null || !m_instanceManager.arePropertiesInitialised())
 	            cost+=(m_opCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
 	        if (opVar==null && ind1 instanceof Variable && ind2 instanceof Variable) {// op(?x ?y)
-	          if (!bound.contains(ind1) && !bound.contains(ind2)){
-	        	if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) {
+	          if (!bound.contains(ind1) && !bound.contains(ind2)){//op(?x ?y)
+//	        	if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) {
 	                int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create(op.getIRIString()));
-	                return new double[] { estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*getOPHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
-	            }
-	            return new double[] { cost+m_opCount*m_indCount*COST_LOOKUP*0.5*COST_ENTAILMENT*getOPHierarchyDepth(), m_indCount*m_indCount}; 
+	                System.out.println("known "+ op.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
+	                return new double[] { cost+estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*getOPHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
+//	            }
+//	            return new double[] { cost+m_opCount*m_indCount*COST_LOOKUP*0.5*COST_ENTAILMENT*getOPHierarchyDepth(), m_indCount*m_indCount}; 
 	          }
-	          else if (bound.contains(ind1) && !bound.contains(ind2)) {
+	          else if (bound.contains(ind1) && !bound.contains(ind2)) {//op(a ?y)
 	        	int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create(op.getIRIString()));
 	            if (estimate[2]!=0 && estimate[3]!=0) 
-	               return new double[] { (estimate[0]/estimate[2])*COST_LOOKUP+ (estimate[1]/estimate[3])*COST_ENTAILMENT*0/5*getOPHierarchyDepth(), (estimate[0]/estimate[2])+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[3]) };   
+	               return new double[] { cost+(estimate[0]/estimate[2])*COST_LOOKUP+ (estimate[1]/estimate[3])*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]/estimate[2])+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[3]) };   
 	            else if (estimate[3]!=0)  
-	            	return new double[] {(estimate[1]/estimate[3])*COST_ENTAILMENT*0/5*getOPHierarchyDepth(), POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[3]) };
+	            	return new double[] {cost+(estimate[1]/estimate[3])*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[3]) };
 	            else if (estimate[2]!=0)
-	            	return new double[] {(estimate[0]/estimate[2])*COST_LOOKUP, (estimate[0]/estimate[2])};
-	            else return new double[] {0, 0};
+	            	return new double[] {cost+(estimate[0]/estimate[2])*COST_LOOKUP, (estimate[0]/estimate[2])};
+	            else return new double[] {cost+0, 0};
 	          }	
 //	            Random rndNumbers = new Random();
 //	            int    rndNumber  = rndNumbers.nextInt();
 //	            return new double[]
-	          else if (!bound.contains(ind1) && bound.contains(ind2)){
+	          else if (!bound.contains(ind1) && bound.contains(ind2)){//op(?x a)
 	        	int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create(op.getIRIString()));
 	            if (estimate[4]!=0 && estimate[5]!=0) 
-	               return new double[] { (estimate[0]/estimate[4])*COST_LOOKUP+ (estimate[1]/estimate[5])*COST_ENTAILMENT*0/5*getOPHierarchyDepth(), (estimate[0]/estimate[4])+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[5]) };   
+	               return new double[] { cost+(estimate[0]/estimate[4])*COST_LOOKUP+ (estimate[1]/estimate[5])*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]/estimate[4])+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[5]) };   
 	            else if (estimate[4]!=0)
-	            	return new double[] {(estimate[0]/estimate[4])*COST_LOOKUP, (estimate[0]/estimate[4])};
+	            	return new double[] {cost+(estimate[0]/estimate[4])*COST_LOOKUP, (estimate[0]/estimate[4])};
 	            else if (estimate[5]!=0)
-	                return new double[] {(estimate[1]/estimate[5])*COST_ENTAILMENT*0/5*getOPHierarchyDepth(), POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[5]) };
-	            else return new double[] {0, 0};  
+	                return new double[] {cost+(estimate[1]/estimate[5])*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/estimate[5]) };
+	            else return new double[] {cost+0, 0};  
 	          }
 	          else {
-	        	Random rndNumbers = new Random();
-		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
-		        int rndNum2=rndNumbers.nextBoolean()?1:0;
-		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0/5*getOPHierarchyDepth(),rndNum2};
+//	        	Random rndNumbers = new Random();
+//		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
+//		        int rndNum2=rndNumbers.nextBoolean()?1:0;
+//		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(),rndNum2};
+	        	int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create((op.getIRIString())));
+//	            int totalNumber=estimate[0]+estimate[1];
+	            return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
 	          }
 	        }  
 	        else if (opVar==null && ind1 instanceof Variable) {// op(?x :a)
-	            if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) {
+	            //if (m_instanceManager!=null && m_instanceManager.arePropertiesInitialised()) {
 	                int[] estimate;
 	                if (!bound.contains(ind1)) {
 	                    estimate=m_instanceManager.getNumberOfPredecessors(AtomicRole.create(op.getIRIString()), org.semanticweb.HermiT.model.Individual.create(ind2.getIdentifierString()));
 	                    return new double[] { estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*getOPHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
 	                }
 	                else {
-	                	Random rndNumbers = new Random();
-	    		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
-	    		        int rndNum2=rndNumbers.nextBoolean()?1:0;
-	    		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0/5*getOPHierarchyDepth(),rndNum2};
-	                }
-	            }
+//	                	Random rndNumbers = new Random();
+//	    		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
+//	    		        int rndNum2=rndNumbers.nextBoolean()?1:0;
+//	    		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(),rndNum2};
+	                	estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create((op.getIRIString())));
+//	    	            int totalNumber=estimate[0]+estimate[1];
+	    	            return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
+	               }
+	            //}
 //	            return new double[] { cost+m_indCount*COST_LOOKUP, m_indCount }; // needs refinement 
 	        } 
             else if (opVar==null && ind2 instanceof Variable) {// op(:a ?x)
@@ -135,16 +153,20 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	                  return new double[] { estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*getOPHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
 	                }
 	                else {
-	                	Random rndNumbers = new Random();
-	    		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
-	    		        int rndNum2=rndNumbers.nextBoolean()?1:0;
-	    		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0/5*getOPHierarchyDepth(),rndNum2};
+//	                	Random rndNumbers = new Random();
+//	    		        int rndNum1  = rndNumbers.nextBoolean()?1:0;
+//	    		        int rndNum2=rndNumbers.nextBoolean()?1:0;
+//	    		        return new double[] {rndNum1*COST_LOOKUP+(1-rndNum1)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(),rndNum2};
+	                	estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create((op.getIRIString())));
+//	    	            int totalNumber=estimate[0]+estimate[1];
+	    	            return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
 	                }	                
 //	            return new double[] { cost+m_indCount*COST_LOOKUP, m_indCount }; // needs refinement 
 	            } 
             }
-            return new double[] { 1,1 };
-			
+            int[] estimate=m_instanceManager.getNumberOfPropertyInstances(AtomicRole.create((op.getIRIString())));
+//	        int totalNumber=estimate[0]+estimate[1];
+	        return new double[] { cost+(estimate[0]/(double)m_indCount)*COST_LOOKUP + (estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*getOPHierarchyDepth(), (estimate[0]+estimate[1]*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
 	    }
 	    protected double getClassHierarchyDepth() {
 	        if (m_classHierarchyDepth==null && m_hermit.isPrecomputed(InferenceType.CLASS_HIERARCHY))
