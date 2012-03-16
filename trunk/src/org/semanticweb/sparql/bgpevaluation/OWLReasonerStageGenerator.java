@@ -175,7 +175,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 else if ((orderingMode==null) || orderingMode.equals("Static")){
 //                  System.out.println("Static");	
                   StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
-                  long t=System.currentTimeMillis();
+//                  long t=System.currentTimeMillis();
                   List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
 //                  System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
                   for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
