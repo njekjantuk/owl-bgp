@@ -33,17 +33,19 @@ import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
+import com.hp.hpl.jena.sparql.ARQConstants;
 import com.hp.hpl.jena.sparql.engine.main.StageBuilder;
 import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
+import com.hp.hpl.jena.sparql.util.Symbol;
 
 public class OWLReasonerSPARQLEngine {
-
-//	int orderingMode;
+	public static Symbol BGP_EXEC_TIME=ARQConstants.allocSymbol("bgpExecTime");
+	
     public OWLReasonerSPARQLEngine() {
         this(null);
     }
 	public OWLReasonerSPARQLEngine(Monitor bgpEvaluationMonitor) {
-//		 this.orderingMode=type;
+
 	    StageGenerator orig=(StageGenerator)ARQ.getContext().get(ARQ.stageGenerator);
 	    if (bgpEvaluationMonitor==null)
 	        bgpEvaluationMonitor=new MonitorAdapter();
@@ -68,7 +70,11 @@ public class OWLReasonerSPARQLEngine {
             }
         } 
         QueryExecution engine=QueryExecutionFactory.create(query,dataSet);
-        return engine.execSelect();
+        long t=System.currentTimeMillis();
+        ResultSet results=engine.execSelect();
+        long evalTime=System.currentTimeMillis()-t;
+        ARQ.getContext().put(BGP_EXEC_TIME, evalTime);
+        return results;
     }
 //	public int getOrderingType() {
 //		return orderingMode;

@@ -33,6 +33,6 @@ public class MinimalPrintingMonitor extends TimingMonitor {
     
     public void bgpEvaluationFinished(int resultSize) {
         super.bgpEvaluationFinished(resultSize);
-        m_out.println("BGP Evalation finished in: "+getLastBGPEvaluationTime()+" ms with "+resultSize+" results. ");
+        m_out.println("BGP Evaluation finished in: "+getLastBGPEvaluationTime()+" ms with "+resultSize+" results. ");
     }
 }

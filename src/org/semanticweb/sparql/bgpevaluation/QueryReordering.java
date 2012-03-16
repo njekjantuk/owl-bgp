@@ -40,7 +40,7 @@ public class QueryReordering {
                 cheapest=qo;
             }
         }
-        System.out.println(cheapest);
+//        System.out.println(cheapest);
         return cheapest;
     }
 }
