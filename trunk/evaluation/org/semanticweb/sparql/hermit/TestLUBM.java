@@ -66,17 +66,11 @@ public class TestLUBM {
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/univ-bench.owl"));
-	    File dir = new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/LUBM-2");
-
-//        String prefix="/Users/bglimm/Documents/workspace/OWL-BGP/";
-        //String prefix="//Server/Users/ilianna/workspace/OWL-BGP/";
-//        OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File(prefix+"evaluation/ontologies/univ-bench.owl"));
-//        File dir = new File(prefix+"evaluation/ontologies/LUBM-1");
-
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/univ-bench.owl"));
+	    File dir = new File("evaluation/ontologies/LUBM-1");
         String[] children = dir.list();
         for (int i=0;i<children.length;i++){
-            File file=new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/LUBM-2/"+children[i]); 
+            File file=new File("evaluation/ontologies/LUBM-1/"+children[i]); 
             if (file.isFile()) {
         	  OWLOntology tmp=manager.loadOntologyFromOntologyDocument(file);
 	          manager.addAxioms(ont, tmp.getAxioms());
@@ -92,7 +86,7 @@ public class TestLUBM {
         }*/
 	    
 /*	    for (int i=0;i<15;i++) {
-	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("/Users/skollias/workspace/OWL-BGP/evaluation/ontologies/University0_"+i+".owl"));
+	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/University0_"+i+".owl"));
 	        manager.addAxioms(ont, tmp.getAxioms());
 	    }*/
         return new OWLOntologyDataSet(ont, null);

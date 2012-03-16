@@ -18,10 +18,8 @@ public class StaticQueryReordering {
 	public static List<QueryObject<? extends Axiom>> getCheapestOrdering(StaticCostEstimationVisitor estimator, List<QueryObject<? extends Axiom>> atoms, Monitor monitor) {
         List<QueryObject<? extends Axiom>> cheapestOrder=new ArrayList<QueryObject<? extends Axiom>>();
         Set<Variable> bound=new HashSet<Variable>();
-        int size=atoms.size();
         double cheapestCost=0;
         boolean first=true;
-//        boolean firstagain=true;
 /*        for (int y=0;y<size;y++) {
           cheapestCost=0;
           first=true;
@@ -43,38 +41,35 @@ public class StaticQueryReordering {
           
         }*/
         int atomsize=atoms.size();
-        while (!atoms.isEmpty()) {
-        
-        cheapestCost=0;
-        first=true;
-        Set<Variable> vars=new HashSet<Variable>();
-        Set<Variable> varscheck=new HashSet<Variable>();
-        for (QueryObject<? extends Axiom> at:atoms)
-        	varscheck.addAll(at.getAxiomTemplate().getVariablesInSignature());
-        QueryObject<? extends Axiom> cheapestAtom=null;
-        //bound=atoms.get(0).getAxiomTemplate().getVariablesInSignature();
-        for (QueryObject<? extends Axiom> qo : atoms) {
-          vars=qo.getAxiomTemplate().getVariablesInSignature();
-          if (atoms.size()==atomsize)
-            vars.retainAll(varscheck);
-          else vars.retainAll(bound);
-          if (!vars.isEmpty()) {
-            monitor.costEvaluationStarted(qo);
-            double[] costs=qo.accept(estimator,bound);
-            monitor.costEvaluationFinished(costs[0], costs[1]);
-            double totalCost=costs[0]+costs[1];
-            if (first || totalCost<cheapestCost) {
-              first=false;
-          	  cheapestCost=totalCost;
-              cheapestAtom=qo;
-            }
-          } 
+        while (!atoms.isEmpty()) {         
+          cheapestCost=0;
+          first=true;
+          Set<Variable> vars=new HashSet<Variable>();
+          Set<Variable> varscheck=new HashSet<Variable>();
+          for (QueryObject<? extends Axiom> at:atoms)
+        	 varscheck.addAll(at.getAxiomTemplate().getVariablesInSignature());
+          QueryObject<? extends Axiom> cheapestAtom=null;
+          for (QueryObject<? extends Axiom> qo : atoms) {
+            vars=qo.getAxiomTemplate().getVariablesInSignature();
+            if (atoms.size()==atomsize)
+              vars.retainAll(varscheck);
+            else vars.retainAll(bound);
+            if (!vars.isEmpty()) {
+              monitor.costEvaluationStarted(qo);
+              double[] costs=qo.accept(estimator,bound);
+              monitor.costEvaluationFinished(costs[0], costs[1]);
+              double totalCost=costs[0]+costs[1];
+              if (first || totalCost<cheapestCost) {
+                first=false;
+          	    cheapestCost=totalCost;
+                cheapestAtom=qo;
+              }
+            } 
+          }
+          cheapestOrder.add(cheapestAtom);          
+          bound.addAll(cheapestAtom.getAxiomTemplate().getVariablesInSignature());
+          atoms.remove(cheapestAtom);
         }
-        cheapestOrder.add(cheapestAtom);          
-        bound.addAll(cheapestAtom.getAxiomTemplate().getVariablesInSignature());
-        atoms.remove(cheapestAtom);
-        
-      }
         return cheapestOrder;
     }
 }

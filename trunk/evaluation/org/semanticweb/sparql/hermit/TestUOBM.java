@@ -33,7 +33,7 @@ public class TestUOBM {
 //	    getUOBMQ1(sparqlEngine, dataset);
 //	    getUOBMQ2(sparqlEngine, dataset);
 //       getUOBMQ3(sparqlEngine, dataset);
-        getUOBMQ4(sparqlEngine, dataset);
+//        getUOBMQ4(sparqlEngine, dataset);
 //        getUOBMQ5(sparqlEngine, dataset);
 //        getUOBMQ6(sparqlEngine, dataset);
 //        getUOBMQ7(sparqlEngine, dataset);*/
@@ -47,23 +47,18 @@ public class TestUOBM {
 //         getUOBMQ13(sparqlEngine, dataset);
 
         
-//       getUOBMQ14(sparqlEngine, dataset);
+//          getUOBMQ14(sparqlEngine, dataset);
 //        getUOBMQ15(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/univ-bench-dl.owl"));
-	    
-//	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("//Server/Users/ilianna/workspace/OWL-BGP/evaluation/ontologies2/UOBM_dl-lite/univ-bench-lite.owl"));
-	    
-	    OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0"+".owl"));
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/univ-bench-dl.owl"));
+	    OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0"+".owl"));
 	    manager.addAxioms(ont, tmp.getAxioms());
 	    for (int i=0;i<3;i++) {
-	        tmp=manager.loadOntologyFromOntologyDocument(new File("C:/Users/skollias/workspace/OWL-BGP/evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0-dept"+i+".owl"));
+	    	tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0-dept"+i+".owl"));
             manager.addAxioms(ont, tmp.getAxioms());
 	    }
-//	    System.out.println(manager.getOWLDataFactory().)
         return new OWLOntologyDataSet(ont, null);
     }
 	public static String getUOBMPrefix() {

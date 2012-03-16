@@ -82,9 +82,10 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     protected final int m_datatypeCount;
     protected final int m_indCount;
     protected final int m_litCount;
-    
+    protected final String sampl;
     protected Map<Variable,Integer> m_bindingPositions;
     protected List<Atomic[]> m_candidateBindings;
+    
     
     public CostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         m_reasoner=graph.getReasoner();
@@ -99,6 +100,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         m_litCount=graph.getLiteralsInSignature().size();
         m_bindingPositions=bindingPositions;
         m_candidateBindings=candidateBindings;
+        sampl = System.getProperty("sampling");
     }
     public void updateCandidateBindings(List<Atomic[]> newCandidateBindings) {
         m_candidateBindings=newCandidateBindings;
@@ -255,30 +257,31 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
         
-        int sampleSize=m_candidateBindings.size()*5/10;
-        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-        shuffledBindings.addAll(m_candidateBindings);
-        Collections.shuffle(shuffledBindings);
-        sampleBindings=shuffledBindings.subList(0, sampleSize);
-          
-//        for (Atomic[] testBinding : m_candidateBindings) {
-          for (Atomic[] testBinding : sampleBindings) {
-            existingBindings.clear();
-            for (Variable var : vars) {
-                Atomic binding=testBinding[m_bindingPositions.get(var)];
-                if (binding!=null)
-                    existingBindings.put(var,binding);
-            }
-            
+        if (sampl!=null && sampl.equals("Sampling")) { 
+          int sampleSize=m_candidateBindings.size()*5/10;
+          List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+          ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+          shuffledBindings.addAll(m_candidateBindings);
+          Collections.shuffle(shuffledBindings);
+          sampleBindings=shuffledBindings.subList(0, sampleSize);
+          m_candidateBindings=new ArrayList<Atomic[]>();
+          m_candidateBindings=sampleBindings;
+        }  
+        for (Atomic[] testBinding : m_candidateBindings) {
+           existingBindings.clear();
+           for (Variable var : vars) {
+              Atomic binding=testBinding[m_bindingPositions.get(var)];
+              if (binding!=null)
+                 existingBindings.put(var,binding);
+           }
 //            if (!existingBindings.isEmpty()){
-             ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
-             unbound.addAll(vars);
-             unbound.removeAll(existingBindings.keySet());
+           ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+           unbound.addAll(vars);
+           unbound.removeAll(existingBindings.keySet());
             
-             double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
-             estimate[0]+=currentEstimate[0];
-             estimate[1]+=currentEstimate[1];
+           double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+           estimate[0]+=currentEstimate[0];
+           estimate[1]+=currentEstimate[1];
 //           } 
         }
         return estimate;
@@ -306,15 +309,18 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
         
-        int sampleSize=m_candidateBindings.size()*5/10;
-        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-        shuffledBindings.addAll(m_candidateBindings);
-        Collections.shuffle(shuffledBindings);
-        sampleBindings=shuffledBindings.subList(0, sampleSize);
+        if (sampl!=null && sampl.equals("Sampling")) { 
+          int sampleSize=m_candidateBindings.size()*5/10;
+          List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+          ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+          shuffledBindings.addAll(m_candidateBindings);
+          Collections.shuffle(shuffledBindings);
+          sampleBindings=shuffledBindings.subList(0, sampleSize);
+          m_candidateBindings=new ArrayList<Atomic[]>();
+          m_candidateBindings=sampleBindings;
+        }  
           
-      for (Atomic[] testBinding : m_candidateBindings) {
-//        for (Atomic[] testBinding : sampleBindings) {
+        for (Atomic[] testBinding : m_candidateBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];
@@ -394,15 +400,18 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
 
-/*        int sampleSize=m_candidateBindings.size()*5/10;
-        List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-        ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-        shuffledBindings.addAll(m_candidateBindings);
-        Collections.shuffle(shuffledBindings);
-        sampleBindings=shuffledBindings.subList(0, sampleSize);*/
+        if (sampl!=null && sampl.equals("Sampling")) { 
+          int sampleSize=m_candidateBindings.size()*5/10;
+          List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+          ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+          shuffledBindings.addAll(m_candidateBindings);
+          Collections.shuffle(shuffledBindings);
+          sampleBindings=shuffledBindings.subList(0, sampleSize);
+          m_candidateBindings=new ArrayList<Atomic[]>();
+          m_candidateBindings=sampleBindings;
+        }  
           
-      for (Atomic[] testBinding : m_candidateBindings) {
-//        for (Atomic[] testBinding : sampleBindings) {
+        for (Atomic[] testBinding : m_candidateBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];
