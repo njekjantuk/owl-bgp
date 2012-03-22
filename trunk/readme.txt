@@ -1,13 +1,22 @@
 OWL-BGP is a SPARQL implementation based on ARQ 
 (http://jena.sourceforge.net/ARQ/) where basic graph patterns are 
 evaluated with OWL 2 Direct Semantics. Thus, OWL-BGP implements the 
-SPARQL OWL Direct Semantics entailment regime. Internally, OWL 2 DL 
+SPARQL OWL Direct Semantics entailment regime. Internally, any OWL 2 DL 
 reasoner that implements the OWLReasoner interface of the OWL API 
 (http://owlapi.sourceforge.net/) can be used although the default 
 reasoner for OWL-BGP is HermiT (http://hermit-reasoner.com).    
 For HermiT a special cost-based query atom ordering is performed, 
 otherwise only limited cost-based ordering for query atoms is 
 available. 
+
+The main class of the implementation is GUI_Demo in the package 
+org.semanticweb.sparql which the user can run using eclipse or 
+some other editor. The location where the queried ontology has 
+been saved should be given as a program argument and whether the
+user wants static or dynamic ordering to be performed on the atoms
+of the queries should be given as a VM argument in the form 
+-Dordering="Dynamic" (for dynamic ordering) or -Dordering="Static"
+(for static ordering). The default is static ordering. 
 
 OWL-BGP is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by

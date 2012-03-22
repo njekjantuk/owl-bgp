@@ -1,33 +1,22 @@
 package org.semanticweb.sparql.bgpevaluation;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.HermiT.hierarchy.InstanceManager;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
-import org.semanticweb.HermiT.model.AtomicConcept;
-import org.semanticweb.HermiT.model.AtomicRole;
-import org.semanticweb.HermiT.model.DLClause;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
-import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
-import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
@@ -41,62 +30,58 @@ public class BindingsIntersection {
     protected final InstanceStatistics m_instanceStatistics;
     Map<Variable,Integer> bindingPosition;
 	
-	 public BindingsIntersection(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions ) {
-		    m_reasoner=graph.getReasoner();
-	        m_dataFactory=graph.getOntology().getOWLOntologyManager().getOWLDataFactory();
-	        m_graph=graph;
-	        bindingPosition=bindingPositions;
-		    if (m_reasoner instanceof Reasoner) {
-	            m_hermit=(Reasoner)m_reasoner;
-	        } else 
-	            throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
+	public BindingsIntersection(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions ) {
+		m_reasoner=graph.getReasoner();
+	    m_dataFactory=graph.getOntology().getOWLOntologyManager().getOWLDataFactory();
+	    m_graph=graph;
+	    bindingPosition=bindingPositions;
+		if (m_reasoner instanceof Reasoner) {
+			m_hermit=(Reasoner)m_reasoner;
+	    } else 
+	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
 		    m_instanceStatistics=m_hermit.getInstanceStatistics();
-	 }
-	 public List<Atomic[]> reduceClassBindings(List<Atomic[]> candidateBindings, QO_ClassAssertion queryObject) {
-	        
-		    if (candidateBindings.size()==0)
-	            return candidateBindings;
-	        
+	}
+	public List<Atomic[]> reduceClassBindings(List<Atomic[]> candidateBindings, QO_ClassAssertion queryObject) {
+		if (candidateBindings.size()==0)
+			return candidateBindings;	        
 //	        List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
 		 
-	        ClassAssertion axiomTemplate=(ClassAssertion)queryObject.getAxiomTemplate();
+	    ClassAssertion axiomTemplate=(ClassAssertion)queryObject.getAxiomTemplate();
 //	        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
 //	        Set<Variable> indVars=axiomTemplate.getIndividual().getVariablesInSignature();
 //	        Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
 	        
-	        ClassExpression ce=axiomTemplate.getClassExpression();
-    		Set<Variable> ceVars=ce.getVariablesInSignature();
-    		Individual ind=axiomTemplate.getIndividual();
-    		List<Atomic[]> newBindings=new ArrayList<Atomic[]> ();
-    		if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
-                int position=bindingPosition.get(ind);
-                Set<OWLNamedIndividual> known=new HashSet<OWLNamedIndividual>();
-                Set<OWLNamedIndividual> possible=new HashSet<OWLNamedIndividual>();
-                m_instanceStatistics.getKnownAndPossibleInstances((OWLClass)ce.asOWLAPIObject(m_dataFactory),known,possible);
-                Set<Atomic> knownAndPossibleSet=new HashSet<Atomic>();
-                for (OWLNamedIndividual knownInd:known) {
-                	knownAndPossibleSet.add(NamedIndividual.create(knownInd.getIRI().toString()));
-                }
-                for (OWLNamedIndividual possibleInd:possible) {
-                	knownAndPossibleSet.add(NamedIndividual.create(possibleInd.getIRI().toString()));
-                }
-                
-                Atomic[] binding;
-               
-                for (Atomic[] bind:candidateBindings) {
-                  if (bind[position]==null){
-                	  for (Atomic at:knownAndPossibleSet){
-                		 binding=bind.clone();
-                	     binding[position]=at;
-                	     newBindings.add(binding);
-                      }
-                  }  
-                  else if (knownAndPossibleSet.contains(bind[position]))
-                	 newBindings.add(bind);
-                }
+	    ClassExpression ce=axiomTemplate.getClassExpression();
+    	Set<Variable> ceVars=ce.getVariablesInSignature();
+    	Individual ind=axiomTemplate.getIndividual();
+    	List<Atomic[]> newBindings=new ArrayList<Atomic[]> ();
+    	if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
+    		int position=bindingPosition.get(ind);
+            Set<OWLNamedIndividual> known=new HashSet<OWLNamedIndividual>();
+            Set<OWLNamedIndividual> possible=new HashSet<OWLNamedIndividual>();
+            m_instanceStatistics.getKnownAndPossibleInstances((OWLClass)ce.asOWLAPIObject(m_dataFactory),known,possible);
+            Set<Atomic> knownAndPossibleSet=new HashSet<Atomic>();
+            for (OWLNamedIndividual knownInd:known) {
+            	knownAndPossibleSet.add(NamedIndividual.create(knownInd.getIRI().toString()));
             }
-    		return newBindings;
-	 }
+            for (OWLNamedIndividual possibleInd:possible) {
+            	knownAndPossibleSet.add(NamedIndividual.create(possibleInd.getIRI().toString()));
+            }
+            Atomic[] binding;
+            for (Atomic[] bind:candidateBindings) {
+            	if (bind[position]==null){
+            		for (Atomic at:knownAndPossibleSet){
+            			binding=bind.clone();
+                	    binding[position]=at;
+                	    newBindings.add(binding);
+                    }
+                }  
+                else if (knownAndPossibleSet.contains(bind[position]))
+                	newBindings.add(bind);
+            }
+        }
+    	return newBindings;
+	}
 /*	 
 	 public List<Atomic[]> reduceObjectPropertyBindings(List<Atomic[]> candidateBindings, QO_ObjectPropertyAssertion queryObject) {
 		  if (candidateBindings.size()==0)

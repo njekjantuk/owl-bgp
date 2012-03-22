@@ -45,8 +45,9 @@ public class GUI_Demo {
     + "PREFIX swrl: <http://www.w3.org/2003/11/swrl#> "+LB
     + "PREFIX swrlb: <http://www.w3.org/2003/11/swrlb#> "+LB
     + "PREFIX swrlx: <http://www.w3.org/2003/11/swrlx#> "+LB
+    + "PREFIX ruleml: <http://www.w3.org/2003/11/ruleml#> "+LB
     + "PREFIX ex: <http://example.org/test#> "+LB
-    + "PREFIX ruleml: <http://www.w3.org/2003/11/ruleml#> "+LB;
+	+ "PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#> " +LB;
 	
 	protected final ConsoleTextArea consoleTextArea;
 	protected final PrintWriter output;
@@ -76,7 +77,7 @@ public class GUI_Demo {
         mainFrame.setLocation((screenSize.width-preferredSize.width)/2,screenSize.height-100-preferredSize.height);
         commandStringBuffer=new StringBuffer();
         mainFrame.setVisible(true);
-        output.println("Loading and preparing the default ontlogy...");
+        output.println("Loading and preparing the default ontology...");
         ds=new OWLOntologyDataSet(defaultOntologyFile);
         sparqlEngine=new OWLReasonerSPARQLEngine();
         output.println("The ontology "+ds.getDefaultGraph().getReasoner().getRootOntology()+" is set-up as default graph. ");
@@ -89,7 +90,7 @@ public class GUI_Demo {
 		if (args.length>0 && args[0]!=null) {
 			defaultOntologyFile=new File(args[0]);
 		} else {
-			defaultOntologyFile=new File("src/ontologies/pizza.owl");
+			defaultOntologyFile=new File("evaluation/ontologies/LUBM-1/University0_0.owl");
 		}
 		GUI_Demo demo=new GUI_Demo(defaultOntologyFile);
 		demo.mainLoop();
@@ -113,7 +114,7 @@ public class GUI_Demo {
 			commandStringBuffer.append(commandLine.substring(0, commandLine.length()-2));
 			try {
 				ResultSet results=sparqlEngine.execQuery(STD_PROLOG+commandStringBuffer.toString(),ds);
-		        // new we have a plan, all iterators are arranged in the required order to go over 
+		        // n0w we have a plan, all iterators are arranged in the required order to go over 
 				// the results until we have what we were asked for
 				// the real computation starts when we ask for the first result (below)
 		        while (results.hasNext()) {

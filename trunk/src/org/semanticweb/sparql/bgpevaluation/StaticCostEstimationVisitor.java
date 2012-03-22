@@ -223,12 +223,8 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
     public double[] visit(QO_ClassAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
         ClassAssertion axiomTemplate=queryObject.getAxiomTemplate();
-        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Set<Variable> indVars=axiomTemplate.getIndividual().getVariablesInSignature();
         Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-        Set<Variable> unbound=new HashSet<Variable>();
-        
         double[] currentEstimate=getClassAssertionCost(axiomTemplate.getClassExpression(), axiomTemplate.getIndividual(), boundVar, indVar);
         estimate[0]+=currentEstimate[0];
         estimate[1]+=currentEstimate[1];
@@ -251,15 +247,11 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         double[] estimate=new double[2];
         
         ObjectPropertyAssertion axiomTemplate=queryObject.getAxiomTemplate();
-        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Set<Variable> opVars=axiomTemplate.getObjectPropertyExpression().getVariablesInSignature();
-        Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-            
+        Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();        
         double[] currentEstimate=getObjectPropertyAssertionCost((ObjectProperty)axiomTemplate.getObjectPropertyExpression(), axiomTemplate.getIndividual1(), axiomTemplate.getIndividual2(), boundVar, opVar);
         estimate[0]+=currentEstimate[0];
         estimate[1]+=currentEstimate[1];
-        
         return estimate;
     }
     protected double[] getObjectPropertyAssertionCost(ObjectProperty op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
