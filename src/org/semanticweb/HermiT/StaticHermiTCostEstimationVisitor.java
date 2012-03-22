@@ -83,11 +83,8 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	        if (opVar==null && ind1 instanceof Variable && ind2 instanceof Variable) {// op(?x ?y)
 	          if (!bound.contains(ind1) && !bound.contains(ind2)){//op(?x ?y)
 	        	  RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
-//	        	if (m_instanceStatistics!=null && m_instanceStatistics.arePropertiesInitialised()) {
 //	                System.out.println("known "+ op.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
 	                return new double[] { cost+roleStatistics.getNumberOfKnownInstances()*COST_LOOKUP+(roleStatistics.getNumberOfPossibleInstances()*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), roleStatistics.getNumberOfKnownInstances()+(POSSIBLE_INSTANCE_SUCCESS*roleStatistics.getNumberOfPossibleInstances()) };
-//	            }
-//	            return new double[] { cost+m_opCount*m_indCount*COST_LOOKUP*0.5*COST_ENTAILMENT*m_instanceStatistics.getObjectPropertyHierarchyDepth(), m_indCount*m_indCount}; 
 	          }
 	          else if (bound.contains(ind1) && !bound.contains(ind2)) {//op(a ?y)
 	        	//int[] estimate=m_instanceStatistics.getNumberOfPropertyInstances(AtomicRole.create(op.getIRIString()));
@@ -115,9 +112,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	            return new double[] { cost+(roleStatistics.getNumberOfKnownInstances()/(double)m_indCount)*COST_LOOKUP + (roleStatistics.getNumberOfPossibleInstances()/(double)m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth(), (roleStatistics.getNumberOfKnownInstances()+roleStatistics.getNumberOfPossibleInstances()*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
 	          }  
 	          }
-	        else if (opVar==null && ind1 instanceof Variable) {// op(?x :a)
-	            //if (m_instanceStatistics!=null && m_instanceStatistics.arePropertiesInitialised()) {
-	                
+	        else if (opVar==null && ind1 instanceof Variable) {// op(?x :a)    
 	                if (!bound.contains(ind1)) {
 	                	int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
 	                    return new double[] { cost+estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
@@ -125,12 +120,10 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	                else {
 	                	RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
 	    	            return new double[] { cost+(roleStatistics.getNumberOfKnownInstances()/(double)m_indCount)*COST_LOOKUP + (roleStatistics.getNumberOfPossibleInstances()/(double)m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth(), (roleStatistics.getNumberOfKnownInstances()+roleStatistics.getNumberOfPossibleInstances()*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};  
-	               }
-	            //}
-//	            return new double[] { cost+m_indCount*COST_LOOKUP, m_indCount }; // needs refinement 
+	               } 
 	        } 
             else if (opVar==null && ind2 instanceof Variable) {// op(:a ?x)
-	            if (m_instanceStatistics!=null && m_instanceStatistics.arePropertiesInitialised()) {
+
 	                if (!bound.contains(ind2)) {
 	                	int[] estimate=m_instanceStatistics.getNumberOfSuccessors((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory));
 	                  return new double[] { cost+estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
@@ -140,7 +133,6 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 	                	return new double[] { cost+(roleStatistics.getNumberOfKnownInstances()/(double)m_indCount)*COST_LOOKUP + (roleStatistics.getNumberOfPossibleInstances()/(double)m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth(), (roleStatistics.getNumberOfKnownInstances()+roleStatistics.getNumberOfPossibleInstances()*POSSIBLE_INSTANCE_SUCCESS)/(double)m_indCount*(double)m_indCount};
 	                }	                
 //	            return new double[] { cost+m_indCount*COST_LOOKUP, m_indCount }; // needs refinement 
-	            } 
             }
 	        boolean[] result=m_instanceStatistics.hasSuccessor((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
             if (result[0])

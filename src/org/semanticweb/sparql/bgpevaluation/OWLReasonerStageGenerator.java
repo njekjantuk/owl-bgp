@@ -140,8 +140,8 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     connectedComponent.remove(cheapest);
                     m_monitor.queryObjectEvaluationStarted(cheapest);
                     bindings=cheapest.computeBindings(bindings, positionInTuple);
-//                  System.out.println(cheapest.getAxiomTemplate());
-//                  System.out.println("bindings size= "+bindings.size());
+                  System.out.println(cheapest.getAxiomTemplate());
+                  System.out.println("bindings size= "+bindings.size());
                     m_monitor.queryObjectEvaluationFinished(bindings.size());
                     costEstimator.updateCandidateBindings(bindings);
                       
@@ -181,8 +181,8 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                   for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                 	if (!bindings.isEmpty()){
                 	  bindings=cheapest.computeBindings(bindings, positionInTuple);
-//                	  System.out.println(cheapest.getAxiomTemplate());
-//                	  System.out.println("bindings size= "+bindings.size());
+                	  System.out.println(cheapest.getAxiomTemplate());
+                	  System.out.println("bindings size= "+bindings.size());
                 	}
                  }
                 }

@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -41,7 +42,8 @@ public class BenchmarkOWLBGP {
     
     public static void main(String[] args) throws Throwable {
         if (args == null || args.length==0 || args[0].equals("-h") || args[0].equals("--help") || args[0].equals("")) {
-            System.out.println("usage BenchmarkSPARQLOWL -LUBM(1,0) -Dordering='Static' (Dordering='Dynamic' (Dsampling='Sampling')) or   BenchmarkSPARQLOWL -LUBM(2,0) -Dordering='Static' (Dordering='Dynamic' (Dsampling='Sampling')) or BenchmarkSPARQLOWL -UOBM -Dordering='Static' (Dordering='Dynamic') Dquery='Query 4'" );
+            System.out.println("usage BenchmarkSPARQLOWL -LUBM(1,0) -Dordering='Static'/'Dynamic' -Dsampling='Sampling' or   BenchmarkSPARQLOWL -LUBM(2,0) -Dordering='Static'/'Dynamic' Dsampling='Sampling' or BenchmarkSPARQLOWL -UOBM -Dordering='Static'/'Dynamic' Dquery='Query queryNo'" );
+            System.out.println("Sampling is only applied with dynamic ordering and queryNo is one of the following {4,9,11,12,14,q1,q2}");
             System.out.println();
             System.out.println("LUBM(1,0)   (performs the LUBM benchmark with 1 university)");
             System.out.println("LUBM(2,0)  (performs the LUBM benchmark with 2 universities)");
@@ -57,7 +59,6 @@ public class BenchmarkOWLBGP {
         	testUOBM();
         }
     } 
-    
     
     public static void testLUBM(int univsize) throws Exception { 
         Map<String,String> queryID2query=new HashMap<String,String>();
@@ -237,8 +238,10 @@ public class BenchmarkOWLBGP {
 //                for (String queryID : queryID2query.keySet()) {
             	  String queryID=System.getProperty("query");
                 	System.out.println(queryID+" started");
+                	
 //                	 execution=new BenchmarkOWLBGP(3);
                     long[] timings=execution.evaluate(queryID, queryID2query.get(queryID));
+                    
                     Long storedTime=results.get(queryID);
                     Long storedBGPTime=resultsBGPEval.get(queryID);
                     if (run == 1) {
@@ -246,7 +249,6 @@ public class BenchmarkOWLBGP {
                         if (storedTime==null) {
                             storedTime=timings[0];
                             results.put(queryID, storedTime);
-                            System.out.println("time of query is "+storedTime+" ms");
                             storedBGPTime=timings[1];
                             resultsBGPEval.put(queryID, storedBGPTime);
                         } else {
@@ -313,7 +315,11 @@ public class BenchmarkOWLBGP {
             try {
                 timer.start();
                 t=System.currentTimeMillis();
-                graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
+                OWLReasoner reasoner=graph.getReasoner();
+                reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
+                if (reasoner instanceof Reasoner) {
+                	((Reasoner)graph.getReasoner()).getInstanceStatistics();
+                }
                 System.out.println("The precomputation time (classification and initialization of known and possible instances) is "+(System.currentTimeMillis()-t)+" ms.");
                 t=System.currentTimeMillis()-t;
                 timer.stopTiming();
