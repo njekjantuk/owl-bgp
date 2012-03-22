@@ -10,10 +10,12 @@ import java.util.Set;
 
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.hierarchy.InstanceManager;
+import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.model.AtomicConcept;
 import org.semanticweb.HermiT.model.AtomicRole;
 import org.semanticweb.HermiT.model.DLClause;
 import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
@@ -36,6 +38,7 @@ public class BindingsIntersection {
 	protected final Reasoner m_hermit;
 	protected final OWLDataFactory m_dataFactory;
     protected final OWLOntologyGraph m_graph;
+    protected final InstanceStatistics m_instanceStatistics;
     Map<Variable,Integer> bindingPosition;
 	
 	 public BindingsIntersection(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions ) {
@@ -47,6 +50,7 @@ public class BindingsIntersection {
 	            m_hermit=(Reasoner)m_reasoner;
 	        } else 
 	            throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
+		    m_instanceStatistics=m_hermit.getInstanceStatistics();
 	 }
 	 public List<Atomic[]> reduceClassBindings(List<Atomic[]> candidateBindings, QO_ClassAssertion queryObject) {
 	        
@@ -66,29 +70,28 @@ public class BindingsIntersection {
     		List<Atomic[]> newBindings=new ArrayList<Atomic[]> ();
     		if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
                 int position=bindingPosition.get(ind);
-                List<Set<OWLNamedIndividual>> instances = m_hermit.getKnownAndPossibleClassInstances(AtomicConcept.create(((Atomic)ce).getIdentifierString()));
-                List<Set<Atomic>> iset= new ArrayList<Set<Atomic>>();
-                for (int i=0; i<instances.size();i++) {
-                  Set<Atomic> indSet =new HashSet<Atomic>(); 
-                  for (OWLNamedIndividual instance : instances.get(i)) 
-                    indSet.add(NamedIndividual.create(instance.getIRI().toString()));
-                  iset.add(i,indSet);
+                Set<OWLNamedIndividual> known=new HashSet<OWLNamedIndividual>();
+                Set<OWLNamedIndividual> possible=new HashSet<OWLNamedIndividual>();
+                m_instanceStatistics.getKnownAndPossibleInstances((OWLClass)ce.asOWLAPIObject(m_dataFactory),known,possible);
+                Set<Atomic> knownAndPossibleSet=new HashSet<Atomic>();
+                for (OWLNamedIndividual knownInd:known) {
+                	knownAndPossibleSet.add(NamedIndividual.create(knownInd.getIRI().toString()));
                 }
-                Set<Atomic> wholeSet= new HashSet<Atomic>();
-                for (int i=0; i<instances.size();i++) {
-                	wholeSet.addAll(iset.get(i));
+                for (OWLNamedIndividual possibleInd:possible) {
+                	knownAndPossibleSet.add(NamedIndividual.create(possibleInd.getIRI().toString()));
                 }
+                
                 Atomic[] binding;
                
                 for (Atomic[] bind:candidateBindings) {
                   if (bind[position]==null){
-                	  for (Atomic at:wholeSet){
+                	  for (Atomic at:knownAndPossibleSet){
                 		 binding=bind.clone();
                 	     binding[position]=at;
                 	     newBindings.add(binding);
                       }
                   }  
-                  else if (wholeSet.contains(bind[position]))
+                  else if (knownAndPossibleSet.contains(bind[position]))
                 	 newBindings.add(bind);
                 }
             }
