@@ -28,11 +28,11 @@ public class TestUOBM {
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-//       getUOBMQ01(sparqlEngine, dataset);
+//        getUOBMQ01(sparqlEngine, dataset);
 //        getUOBMQ02(sparqlEngine, dataset);
-//	    getUOBMQ1(sparqlEngine, dataset);
-//	    getUOBMQ2(sparqlEngine, dataset);
-//       getUOBMQ3(sparqlEngine, dataset);
+	    getUOBMQ1(sparqlEngine, dataset);
+//	      getUOBMQ2(sparqlEngine, dataset);
+//        getUOBMQ3(sparqlEngine, dataset);
 //        getUOBMQ4(sparqlEngine, dataset);
 //        getUOBMQ5(sparqlEngine, dataset);
 //        getUOBMQ6(sparqlEngine, dataset);
@@ -44,10 +44,10 @@ public class TestUOBM {
 //        getUOBMQ11(sparqlEngine, dataset);
 
 //        getUOBMQ12(sparqlEngine, dataset);
-//         getUOBMQ13(sparqlEngine, dataset);
+//        getUOBMQ13(sparqlEngine, dataset);
 
         
-//          getUOBMQ14(sparqlEngine, dataset);
+//        getUOBMQ14(sparqlEngine, dataset);
 //        getUOBMQ15(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {

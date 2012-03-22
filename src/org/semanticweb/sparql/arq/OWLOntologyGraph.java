@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.HermiT.Configuration;
-import org.semanticweb.HermiT.Configuration.TableauMonitorType;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.monitor.CountingMonitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
