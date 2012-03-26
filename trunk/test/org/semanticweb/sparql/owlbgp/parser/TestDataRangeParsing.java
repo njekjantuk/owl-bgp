@@ -62,7 +62,7 @@ public class TestDataRangeParsing extends AbstractTest {
         TripleConsumer consumer=parser.handler;
         parser.parse();
         DataRange oneOf=DataOneOf.create(TL("1", "", Datatype.XSD_INT), TL("abc", "", Datatype.RDF_PLAIN_LITERAL), TL("abc", "en", Datatype.RDF_PLAIN_LITERAL));
-        Identifier oneOfIRI=parser.string2AnonymousIndividual.get("x");
+        Identifier oneOfIRI=parser.string2AnonymousIndividual.get("x");        
         assertTrue(consumer.getDR(oneOfIRI)==oneOf);
         assertNoTriplesLeft(consumer);
     }

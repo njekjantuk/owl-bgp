@@ -88,6 +88,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.PropertyExpression;
 public class TestAxiomWithVarParsing extends AbstractTest {
     public static final String LB = System.getProperty("line.separator") ;
 
+
     public void testDatatypeDefinition() throws Exception {
         Declaration apv1=Declaration.create(APV("label"));
         Declaration apv2=Declaration.create(APV("comment"));

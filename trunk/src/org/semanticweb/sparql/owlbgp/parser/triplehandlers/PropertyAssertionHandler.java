@@ -25,7 +25,9 @@ import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
@@ -41,12 +43,22 @@ public class PropertyAssertionHandler extends TripleHandler {
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         Individual individual=consumer.getIND(subject);
+        if (individual instanceof AnonymousIndividual) {
+            IndividualVariable variableForAnonymousIndividual=IndividualVariable.create(individual.getIdentifierString());
+            consumer.addVariableForAnonymousIndividual(variableForAnonymousIndividual);
+            individual=variableForAnonymousIndividual;
+        }
         ObjectPropertyExpression ope=consumer.getOPE(predicate);
         if (ope!=null) {
             Individual individual2=consumer.getIND(object);
-            if (individual2!=null)
+            if (individual2!=null) {
+                if (individual2 instanceof AnonymousIndividual) {
+                    IndividualVariable variableForAnonymousIndividual=IndividualVariable.create(individual2.getIdentifierString());
+                    consumer.addVariableForAnonymousIndividual(variableForAnonymousIndividual);
+                    individual2=variableForAnonymousIndividual;
+                }
                 consumer.addAxiom(ObjectPropertyAssertion.create(ope,individual,individual2,annotations));
-            else 
+            } else 
                 throw new RuntimeException("Could not find an individual for the object in the triple "+subject+" "+predicate+" "+object+", but "+predicate+" is an object property. ");
         } else {
             DataPropertyExpression dpe=consumer.getDPE(predicate);
