@@ -167,6 +167,31 @@ public class TestAxiomParsingWithDeclFromOnt extends AbstractTest {
         manager.addAxiom(queriedOntology, factory.getOWLDeclarationAxiom(factory.getOWLClass(org.semanticweb.owlapi.model.IRI.create("http://example.org/F3"))));
     }
     
+    public void testSubClassOfExistsTypeGuessing() throws Exception {
+        Declaration ax1=Declaration.create(CV("o"));
+        ClassExpression superCls=ObjectSomeValuesFrom.create(OP("http://example.org/r"), CV("o"));
+        Axiom ax3=SubClassOf.create(CV("x"), superCls);
+        String s=ax1.toTurtleString()+ax3.toTurtleString();
+        Ontology qo=ParserManager.parseBGP(s, queriedOntology);
+        Set<Axiom> axioms=new HashSet<Axiom>(qo.getAxioms());
+        assertTrue(axioms.remove(ax1));
+        assertTrue(axioms.remove(ax3));
+        assertTrue(axioms.isEmpty());
+    }
+    public void testSubClassOfExists() throws Exception {
+        Declaration ax1=Declaration.create(CV("o"));
+        Declaration ax2=Declaration.create(CV("x"));
+        ClassExpression superCls=ObjectSomeValuesFrom.create(OP("http://example.org/r"), CV("o"));
+        Axiom ax3=SubClassOf.create(CV("x"), superCls);
+        String s=ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
+        System.out.println(s);
+        Ontology qo=ParserManager.parseBGP(s, queriedOntology);
+        Set<Axiom> axioms=new HashSet<Axiom>(qo.getAxioms());
+        assertTrue(axioms.remove(ax1));
+        assertTrue(axioms.remove(ax2));
+        assertTrue(axioms.remove(ax3));
+        assertTrue(axioms.isEmpty());
+    }
     public void testDatatypeDefinition() throws Exception {
         Axiom ax1=DatatypeDefinition.create(DT("<http://example.org/dt1>"),DataIntersectionOf.create(DT("xsd:int"), DataComplementOf.create(DT("xsd:string"))));
         Axiom ax2=DatatypeDefinition.create(

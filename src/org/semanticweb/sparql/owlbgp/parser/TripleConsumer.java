@@ -137,6 +137,7 @@ public class TripleConsumer {
     protected final Set<Identifier> INDExt=new HashSet<Identifier>();
     protected final Set<Identifier> DRExt=new HashSet<Identifier>();
     
+    protected final Set<IndividualVariable>                      variablesForAnonymousIndividuals=new HashSet<IndividualVariable>();
     protected final Set<Identifier>                              RIND=new HashSet<Identifier>();
     protected final Map<Identifier,ClassExpression>              CE=new HashMap<Identifier,ClassExpression>(); 
     protected final Map<Identifier,DataRange>                    DR=new HashMap<Identifier,DataRange>();
@@ -280,7 +281,7 @@ public class TripleConsumer {
         // Table 6, add additional declaration triples
         if (!isAnonymous(subject) && (object==Vocabulary.OWL_INVERSE_FUNCTIONAL_PROPERTY || object==Vocabulary.OWL_TRANSITIVE_PROPERTY || object==Vocabulary.OWL_SYMMETRIC_PROPERTY) && predicate==Vocabulary.RDF_TYPE)
             handleStreaming(subject, predicate, Vocabulary.OWL_OBJECT_PROPERTY);
-        if (!isAnonymous(subject) && object==Vocabulary.OWL_ONTOLOGY_PROPERTY&&predicate==Vocabulary.RDF_TYPE)
+        if (!isAnonymous(subject) && object==Vocabulary.OWL_ONTOLOGY_PROPERTY && predicate==Vocabulary.RDF_TYPE)
             // Table 6, correct declaration triples
             handleStreaming(subject, predicate, Vocabulary.OWL_ANNOTATION_PROPERTY);
         else {
@@ -393,7 +394,7 @@ public class TripleConsumer {
         checkOnytologyIRIIsNeverObject(); // Table 4
         removeOWL1DoubleTypes(); // Table 5
         addReifiedDeclarations(); // Table 7
-//        parseAnnotations(); // Table 10
+        parseAnnotations(); // Table 10
         parseObjectProperties(); // Table 11
         parseOWL1DataRanges(); // Table 14
         parseOWL1ClassExpressions(); // Table 15
@@ -1372,7 +1373,7 @@ public class TripleConsumer {
         ClassExpression ce=CE.get(identifier);
         if (ce==null && identifier instanceof IRI && CEExt.contains(identifier)) {
             ce=Clazz.create((IRI)identifier); // built-in or declared in queried ontology
-        } else if (ce==null && isVariable(identifier)) {
+        } else if (ce==null && isVariable(identifier) && !DR.containsKey(identifier) && !DRExt.contains(identifier)) {
             ce=ClassVariable.create(identifier.toString());
             mapClassIdentifierToClassExpression(identifier, ce); // infer type
         }
@@ -1471,6 +1472,12 @@ public class TripleConsumer {
     }
     public void mapDataRangeIdentifierToDataRange(Identifier id, DataRange datatype) {
         DR.put(id, datatype);
+    }
+    public void addVariableForAnonymousIndividual(IndividualVariable variableForAnonymousIndividual) {
+        variablesForAnonymousIndividuals.add(variableForAnonymousIndividual);
+    }
+    public Set<IndividualVariable> getVariablesForAnonymousIndividual() {
+        return variablesForAnonymousIndividuals;
     }
     public NamedIndividual getNamedIndividual(Identifier id) {
         if (id instanceof IRI) return NamedIndividual.create((IRI)id);

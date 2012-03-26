@@ -25,6 +25,7 @@ import java.util.Set;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
@@ -47,12 +48,12 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
     protected final Set<String> m_skolemConstants;
     protected QueryIterator input;
     protected List<List<Atomic[]>> resultsPerComponent;
-    protected final Set<Variable> bnodes;
+    protected final Set<IndividualVariable> bnodes;
     protected int currentRow;
     protected int[] m_currentBindingIndexes;
     protected final int numRows;
     
-    public OWLBGPQueryIterator(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt, List<List<Atomic[]>> results, List<Map<Variable,Integer>> bindingPositionsPerComponent, Set<Variable> bnodes) {
+    public OWLBGPQueryIterator(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt, List<List<Atomic[]>> results, List<Map<Variable,Integer>> bindingPositionsPerComponent, Set<IndividualVariable> bnodes) {
         super(input, execCxt) ;
         this.pattern=pattern;
         m_skolemConstants=((OWLOntologyGraph)execCxt.getActiveGraph()).getSkolemConstants();

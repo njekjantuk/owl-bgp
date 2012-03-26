@@ -54,12 +54,10 @@ public class OWLReasonerStageGenerator implements StageGenerator {
     
     protected final StageGenerator m_above;
     protected final Monitor m_monitor;
-    protected final Set<Variable> m_bnodes;
     
     public OWLReasonerStageGenerator(StageGenerator original, Monitor monitor){
         m_above=original;
         m_monitor=monitor;
-        m_bnodes=new HashSet<Variable>();
     }
     @Override
     public QueryIterator execute(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt) {
@@ -86,6 +84,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             m_monitor.bgpParsingFinished();
             m_monitor.connectedComponentsComputationStarted();
             Set<Axiom> queryAxiomTemplates=parser.getParsedAxioms();
+            Set<IndividualVariable> bnodes=parser.getVariablesForAnonymousIndividual();
             RewriterAndSplitter rewriteAndSplitter=new RewriterAndSplitter(ontologyGraph, queryAxiomTemplates);
             Set<List<QueryObject<? extends Axiom>>> connectedComponents=rewriteAndSplitter.rewriteAndSplit();
             m_monitor.connectedComponentsComputationFinished(connectedComponents.size());
@@ -169,11 +168,11 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 m_monitor.componentsEvaluationFinished(bindings.size());
             }
             m_monitor.bgpEvaluationFinished(resultSize);
-            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,m_bnodes);
+            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,bnodes);
         } catch (ParseException e) {
             System.err.println("ParseException: Probably types could not be disambuguated with this active graph. ");
             m_monitor.bgpEvaluationFinished(0);
-            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,m_bnodes);
+            return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,new HashSet<IndividualVariable>());
         }
     }
     private String arqPatternToBGP(BasicPattern pattern) {
@@ -196,7 +195,9 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             String name=node.getName();
             if (name.startsWith("?")) {
                 name=name.substring(1);
-                m_bnodes.add(IndividualVariable.create(name));
+                return "_:"+name;
+                //m_bnodes.add(IndividualVariable.create(name));
+                //TODO: check how we get the bnodes (without also taking the auxiliary ones)
             }
             return "?"+name;
         } else

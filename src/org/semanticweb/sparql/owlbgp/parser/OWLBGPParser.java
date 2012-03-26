@@ -36,6 +36,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
+import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
@@ -150,6 +151,9 @@ public class OWLBGPParser implements OWLBGPParserConstants {
     }
     public Set<Axiom> getParsedAxioms() {
         return handler.getAxioms();
+    }
+    public Set<IndividualVariable> getVariablesForAnonymousIndividual() {
+        return handler.getVariablesForAnonymousIndividual();
     }
     public Ontology getParsedOntology() {
         return handler.getOntology();
@@ -437,6 +441,11 @@ public class OWLBGPParser implements OWLBGPParserConstants {
         }
       } else {
         ;
+      }
+      if (datatypeIdentifier==IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral")) {
+          int atLocation=lexicalForm.lastIndexOf("@");
+          lang=lexicalForm.substring(atLocation+1);
+          lexicalForm=lexicalForm.substring(0, atLocation);
       }
       if (datatypeIdentifier==null)
           datatypeIdentifier=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
