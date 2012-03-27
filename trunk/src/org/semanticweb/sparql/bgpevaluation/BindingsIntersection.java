@@ -1,6 +1,7 @@
 package org.semanticweb.sparql.bgpevaluation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +12,15 @@ import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
@@ -79,94 +83,130 @@ public class BindingsIntersection {
                 else if (knownAndPossibleSet.contains(bind[position]))
                 	newBindings.add(bind);
             }
-        }
-    	return newBindings;
+        candidateBindings=newBindings;
+    	}
+    	return candidateBindings;
 	}
-/*	 
-	 public List<Atomic[]> reduceObjectPropertyBindings(List<Atomic[]> candidateBindings, QO_ObjectPropertyAssertion queryObject) {
-		  if (candidateBindings.size()==0)
-	            return candidateBindings;
+	public List<Atomic[]> reduceObjectPropertyBindings(List<Atomic[]> candidateBindings, QO_ObjectPropertyAssertion queryObject) {
+		if (candidateBindings.size()==0)
+			return candidateBindings;
 		 
-	        ObjectPropertyAssertion axiomTemplate=(ObjectPropertyAssertion)queryObject.getAxiomTemplate();
-
-	        Atomic ope=(Atomic)axiomTemplate.getObjectPropertyExpression();
-	        Individual ind1=axiomTemplate.getIndividual1();
-	        Individual ind2=axiomTemplate.getIndividual2();
-	        
-	        List<Atomic[]> bindingList=new ArrayList<Atomic[]>();
-	        
-	        if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
-	        	int[] positions=new int[2];
-                positions[0]=bindingPosition.get(ind1);
-                positions[1]=bindingPosition.get(ind2);
-                Map<OWLNamedIndividual,Set<OWLNamedIndividual>>[] instances = m_hermit.getKnownAndPossiblePropertyInstances(AtomicRole.create(((Atomic)ope).getIdentifierString()));
-                Map<Atomic,Set<Atomic>>[] individualMap=new HashMap[2];
-                for (int i=0; i<instances.length;i++) {
-                	Map<Atomic, Set<Atomic>> indHash=new HashMap<Atomic, Set<Atomic>>();
-                	for (OWLNamedIndividual ind:instances[i].keySet()) {
-                    	Set<Atomic> indSet=new HashSet<Atomic>();
-                    	for (OWLNamedIndividual individual:instances[i].get(ind))        	
-                    	  indSet.add(NamedIndividual.create(individual.getIRI().toString()));
-                     	indHash.put(NamedIndividual.create((ind.getIRI()).toString()), indSet);
-                    }
-                	individualMap[i]=indHash;
-                }
-                for (Atomic[] bind:candidateBindings) {
-//                  if (!candidateBindings.isEmpty()) {
-                	Atomic[] binding;
-                    if (bind[positions[0]]==null && bind[positions[1]]==null){
-                    	for (int i=0; i<instances.length;i++) {
-                    	  binding=bind.clone();
-                    	  binding[positions[0]]=;
-                    	  binding[positions[1]]=
-                          newBindings.add(binding);
+	    ObjectPropertyAssertion axiomTemplate=(ObjectPropertyAssertion)queryObject.getAxiomTemplate();
+	    Atomic ope=(Atomic)axiomTemplate.getObjectPropertyExpression();
+	    Individual ind1=axiomTemplate.getIndividual1();
+	    Individual ind2=axiomTemplate.getIndividual2();
+	    List<Atomic[]> newBindings=new ArrayList<Atomic[]> ();
+	    
+	    if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
+	    	int[] positions=new int[2];
+            positions[0]=bindingPosition.get(ind1);
+            positions[1]=bindingPosition.get(ind2);
+            Map<OWLNamedIndividual,Set<OWLNamedIndividual>> known=new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>();
+            Map<OWLNamedIndividual,Set<OWLNamedIndividual>> possible=new HashMap<OWLNamedIndividual,Set<OWLNamedIndividual>>();
+            m_instanceStatistics.getKnownAndPossibleInstances((OWLObjectProperty)ope.asOWLAPIObject(m_dataFactory),known,possible);
+            Map<Atomic,Set<Atomic>> knownAndPossibleMap=new HashMap<Atomic,Set<Atomic>>();
+            for (OWLNamedIndividual individual:known.keySet()) {
+            	Set<Atomic> indSet=new HashSet<Atomic>();
+            	for (OWLNamedIndividual ind:known.get(individual)) 
+                	indSet.add(NamedIndividual.create(ind.getIRI().toString()));
+                knownAndPossibleMap.put(NamedIndividual.create((individual.getIRI()).toString()), indSet);
+            }
+            for (OWLNamedIndividual individual:possible.keySet()) {
+            	Set<Atomic> indSet=new HashSet<Atomic>();
+            	for (OWLNamedIndividual ind:possible.get(individual)) 
+                	indSet.add(NamedIndividual.create(ind.getIRI().toString()));
+                knownAndPossibleMap.put(NamedIndividual.create((individual.getIRI()).toString()), indSet);
+            }
+            for (Atomic[] bind:candidateBindings) {
+            	//if (!candidateBindings.isEmpty()) {
+                Atomic[] binding;
+                if (bind[positions[0]]==null && bind[positions[1]]==null) {
+                	for (Atomic individual:knownAndPossibleMap.keySet()) {
+                		for (Atomic ind:knownAndPossibleMap.get(individual)) {
+                			binding=bind.clone();
+                		    binding[positions[0]]=individual;
+                    	    binding[positions[1]]=ind;
+                            newBindings.add(binding);
                     	}
                     }
-                     if ((!individualMap[0].containsKey(bind[positions[0]])) && (!individualMap[1].containsKey(bind[positions[1]])))
-                  	   candidateBindings.remove(bind);
-                     else if (individualMap[0].containsKey(bind[positions[0]])) {
-                    	if (!(individualMap[0].get(bind[positions[0]]).contains(bind[positions[1]])))
-                    		candidateBindings.remove(bind);
-                     }
-                     else if (individualMap[1].containsKey(bind[positions[1]])) {
-                    	 if (!(individualMap[1].get(bind[positions[0]]).contains(bind[positions[1]])))
-                     		candidateBindings.remove(bind); 
-                     }
-                  }
-  //              }  
-	        }  
-	        else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
-	        	int position;
-                position=bindingPosition.get(ind2);
-                Set<OWLNamedIndividual>[] instances = m_hermit.getKnownAndPossibleSuccessors(AtomicRole.create(((Atomic)ope).getIdentifierString()),
-                		org.semanticweb.HermiT.model.Individual.create(((Atomic)ind1).getIdentifierString()));
-                Set<Atomic>[] individualSet=new HashSet[2];
-                for (int i=0; i<instances.length;i++) {
-                    for (OWLNamedIndividual instance : instances[i]) {
-                      individualSet[i].add(NamedIndividual.create(instance.getIRI().toString()));
+                }	
+                else if (bind[positions[0]]!=null && bind[positions[1]]==null) {
+                	Set<Atomic> sucSet=knownAndPossibleMap.get(bind[positions[0]]);
+                	for (Atomic ind:sucSet) {
+                		binding=bind.clone();
+                	    binding[positions[1]]=ind;
+                        newBindings.add(binding);
+                	}
+                }
+                else if (bind[positions[0]]==null && bind[positions[1]]!=null) {
+                	Set<OWLNamedIndividual> knownPredecessors=new HashSet<OWLNamedIndividual>();
+                	Set<OWLNamedIndividual> possiblePredecessors=new HashSet<OWLNamedIndividual>();	
+                	m_instanceStatistics.getKnownAndPossiblePredeccessors((OWLObjectProperty)ope.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)bind[positions[1]].asOWLAPIObject(m_dataFactory), knownPredecessors, possiblePredecessors);
+                	for (OWLNamedIndividual indK:knownPredecessors) {
+                		binding=bind.clone();
+                	    binding[positions[0]]=NamedIndividual.create(indK.getIRI().toString());
+                        newBindings.add(binding);
+                	}
+                }
+                else for (Atomic individual:knownAndPossibleMap.keySet()) {
+                	Set<Atomic> indSet=knownAndPossibleMap.get(individual); 
+                    if (bind[positions[0]]==individual) {
+                    	if (indSet.contains(bind[positions[1]])) {
+                    		newBindings.add(bind);
+                    	}
                     }
-                  }
-                  for (Atomic[] bind:candidateBindings) {
-                     if (!individualSet[0].contains(bind[position]) && !individualSet[1].contains(bind[position]))
-                  	   candidateBindings.remove(bind);
-                  }
-            }   
-	        else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
-	        	int position;
-                position=bindingPosition.get(ind1); 
-                Set<OWLNamedIndividual>[] instances = m_hermit.getKnownAndPossiblePredeccessors(AtomicRole.create(((Atomic)ope).getIdentifierString()),
-                		org.semanticweb.HermiT.model.Individual.create(((Atomic)ind2).getIdentifierString()));
-                Set<Atomic>[] individualSet=new HashSet[2];
-                for (int i=0; i<instances.length;i++) {
-                    for (OWLNamedIndividual instance : instances[i]) {
-                      individualSet[i].add(NamedIndividual.create(instance.getIRI().toString()));
-                    }
-                  }
-                  for (Atomic[] bind:candidateBindings) {
-                     if (!individualSet[0].contains(bind[position]) && !individualSet[1].contains(bind[position]))
-                  	   candidateBindings.remove(bind);
-                  }
-	        } 
-	        return candidateBindings;
-    }*/
+                }
+            }
+            candidateBindings=newBindings;
+	    }        	
+        else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
+        	int position;
+            position=bindingPosition.get(ind2);
+            Set<OWLNamedIndividual> knownSuccessors=new HashSet<OWLNamedIndividual>();
+            Set<OWLNamedIndividual> possibleSuccessors=new HashSet<OWLNamedIndividual>();
+            m_instanceStatistics.getKnownAndPossibleSuccessors((OWLObjectProperty)ope.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory),knownSuccessors,possibleSuccessors);
+            Set<OWLNamedIndividual> knownAndPossibleSuccessors=new HashSet<OWLNamedIndividual>();
+            knownAndPossibleSuccessors.addAll(knownSuccessors);
+            knownAndPossibleSuccessors.addAll(possibleSuccessors);
+            for (Atomic[] bind:candidateBindings) {
+            	Atomic[] binding;
+                if (bind[position]==null) {
+                	for (OWLNamedIndividual ind:knownAndPossibleSuccessors) {
+                		binding=bind.clone();
+                	    binding[position]=NamedIndividual.create(ind.getIRI().toString());
+                        newBindings.add(binding);
+            	    }
+                }
+                else if (knownAndPossibleSuccessors.contains((OWLNamedIndividual)bind[position].asOWLAPIObject(m_dataFactory))) {
+            		newBindings.add(bind);
+            	}
+            }
+            candidateBindings=newBindings;
+        }    
+	    else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
+	    	int position;
+            position=bindingPosition.get(ind1);
+            Set<OWLNamedIndividual> knownPredecessors=new HashSet<OWLNamedIndividual>();
+            Set<OWLNamedIndividual> possiblePredecessors=new HashSet<OWLNamedIndividual>();
+            m_instanceStatistics.getKnownAndPossiblePredeccessors((OWLObjectProperty)ope.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory),knownPredecessors,possiblePredecessors);
+            Set<OWLNamedIndividual> knownAndPossiblePredecessors=new HashSet<OWLNamedIndividual>();
+            knownAndPossiblePredecessors.addAll(knownPredecessors);
+            knownAndPossiblePredecessors.addAll(possiblePredecessors);
+            for (Atomic[] bind:candidateBindings) {
+            	Atomic[] binding;
+                if (bind[position]==null) {
+                	for (OWLNamedIndividual ind:knownAndPossiblePredecessors) {
+                		binding=bind.clone();
+                	    binding[position]=NamedIndividual.create(ind.getIRI().toString());
+                        newBindings.add(binding);
+            	    }
+                }
+                else if (knownAndPossiblePredecessors.contains((OWLNamedIndividual)bind[position].asOWLAPIObject(m_dataFactory))) {
+            		newBindings.add(bind);
+            	}
+            }
+            candidateBindings=newBindings;
+        }
+	    return candidateBindings;
+    }
 }	 

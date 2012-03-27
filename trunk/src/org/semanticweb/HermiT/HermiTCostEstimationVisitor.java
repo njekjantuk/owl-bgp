@@ -15,7 +15,6 @@
    You should have received a copy of the GNU Lesser General Public License
    along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package  org.semanticweb.HermiT;
 
 import java.util.List;
@@ -78,6 +77,7 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
         	int[] estimate=m_instanceStatistics.getNumberOfInstances((OWLClass)ce.asOWLAPIObject(m_dataFactory));
  //             System.out.println("known "+ ce.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
             return new double[] { cost + estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
+
         } else if (unbound.size()==1 && !unbound.contains(indVar) && ce instanceof Atomic) {// ?x(:a)
             int[] estimate=m_instanceStatistics.getNumberOfTypes((OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory));
             return new double[] { cost + estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };

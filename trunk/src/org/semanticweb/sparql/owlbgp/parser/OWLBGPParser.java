@@ -114,6 +114,7 @@ public class OWLBGPParser implements OWLBGPParserConstants {
             + "?prop a owl:IrreflexiveProperty . "+LB
             + "?prop rdfs:subPropertyOf <http://www.co-ode.org/ontologies/galen#FeatureStateAttribute> . ";
 //        s+="<http://example.org/Person> rdf:type owl:Class . ?x rdf:type <http://example.org/Person> .";
+    	
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         try {
             parser.parse();

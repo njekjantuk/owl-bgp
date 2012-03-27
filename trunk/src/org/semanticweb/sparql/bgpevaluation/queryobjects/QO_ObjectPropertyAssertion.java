@@ -57,44 +57,46 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
             Atomic ope=(Atomic)assertion.getObjectPropertyExpression();
             Individual ind1=assertion.getIndividual1();
             Individual ind2=assertion.getIndividual2();
-            if (ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
-                int[] positions=new int[3];
-                positions[0]=bindingPositions.get(ope);
-                positions[1]=bindingPositions.get(ind1);
-                positions[2]=bindingPositions.get(ind2);
-                return compute012UnBound(currentBinding,positions);
-            } else if (ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(ope);
-                positions[1]=bindingPositions.get(ind1);
-                return compute2Bound(currentBinding,(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(ope);
-                positions[1]=bindingPositions.get(ind2);
-                return compute1Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
-                int[] positions=new int[1];
-                positions[0]=bindingPositions.get(ope);
-                return compute12Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(ind1);
-                positions[1]=bindingPositions.get(ind2);
-                return compute0Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
-                int[] positions=new int[1];
-                positions[0]=bindingPositions.get(ind1);
-                return compute02Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
-                int[] positions=new int[1];
-                positions[0]=bindingPositions.get(ind2);
-                return compute01Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
-            } else if (!ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
-                if (compute012Bound((OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter)))
-                    return Collections.singletonList(currentBinding);
-                else 
-                    return new ArrayList<Atomic[]>();
+            if (ope.isVariable() || ope instanceof Atomic) {
+            	if (ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
+            		int[] positions=new int[3];
+            	    positions[0]=bindingPositions.get(ope);
+                    positions[1]=bindingPositions.get(ind1);
+                    positions[2]=bindingPositions.get(ind2);
+                    return compute012UnBound(currentBinding,positions);
+                } else if (ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
+                    int[] positions=new int[2];
+                    positions[0]=bindingPositions.get(ope);
+                    positions[1]=bindingPositions.get(ind1);
+                    return compute2Bound(currentBinding,(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
+                    int[] positions=new int[2];
+                    positions[0]=bindingPositions.get(ope);
+                    positions[1]=bindingPositions.get(ind2);
+                    return compute1Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
+                    int[] positions=new int[1];
+                    positions[0]=bindingPositions.get(ope);
+                    return compute12Bound(currentBinding,(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (!ope.isVariable() && ind1.isVariable() && ind2.isVariable()) {
+                    int[] positions=new int[2];
+                    positions[0]=bindingPositions.get(ind1);
+                    positions[1]=bindingPositions.get(ind2);
+                    return compute0Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (!ope.isVariable() && ind1.isVariable() && !ind2.isVariable()) {
+                    int[] positions=new int[1];
+                    positions[0]=bindingPositions.get(ind1);
+                    return compute02Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (!ope.isVariable() && !ind1.isVariable() && ind2.isVariable()) {
+                    int[] positions=new int[1];
+                    positions[0]=bindingPositions.get(ind2);
+                    return compute01Bound(currentBinding,(OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),positions);
+                } else if (!ope.isVariable() && !ind1.isVariable() && !ind2.isVariable()) {
+                    if (compute012Bound((OWLObjectProperty)ope.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind1.asOWLAPIObject(m_toOWLAPIConverter),(OWLNamedIndividual)ind2.asOWLAPIObject(m_toOWLAPIConverter)))
+                    	return Collections.singletonList(currentBinding);
+                    else 
+                        return new ArrayList<Atomic[]>();
+                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here"); 
             } else {
                 return complex(currentBinding,assertion,bindingPositions);
             }
