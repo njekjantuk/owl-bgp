@@ -48,7 +48,7 @@ public class TestLUBM {
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
 	    getLUBMQ0(sparqlEngine, dataset);
-	    getLUBMQ1(sparqlEngine, dataset);
+/*	    getLUBMQ1(sparqlEngine, dataset);
         getLUBMQ2(sparqlEngine, dataset);
         getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
@@ -61,7 +61,7 @@ public class TestLUBM {
         getLUBMQ11(sparqlEngine, dataset);
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
-        getLUBMQ14(sparqlEngine, dataset);
+        getLUBMQ14(sparqlEngine, dataset);*/
         System.out.println("The execution of the 15 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
@@ -104,8 +104,11 @@ public class TestLUBM {
 	public static void getLUBMQ0(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q0");
 	    String queryString=getLUBMPrefix()
-	        + "  ?x a owl:Class."
-	        + "  ?x rdf:type ub:FullProfessor. " +LB
+	    +" ?y rdf:type ub:GraduateStudent."
+//	        + "   ?x rdfs:subClassOf ["+LB
+//            + "   a owl:Restriction ; "+LB
+//            + "   owl:onProperty ub:takesCourse ; "+LB
+//            + "   owl:someValuesFrom ?o]. " +LB
 	        + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);

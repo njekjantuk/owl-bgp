@@ -49,20 +49,23 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             SubClassOf axiom=(SubClassOf)m_axiomTemplate.getBoundVersion(bindingMap);
             ClassExpression subClass=axiom.getSubClassExpression();
             ClassExpression superClass=axiom.getSuperClassExpression();
-            if (subClass.isVariable() && superClass.isVariable()) {
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(subClass);
-                positions[1]=bindingPositions.get(superClass);
-                return computeAllSubClassOfRelations(currentBinding,positions);
-            } else if (subClass.isVariable() && !superClass.isVariable()) {
-                int position=bindingPositions.get(subClass);
-                return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (!subClass.isVariable() && superClass.isVariable()) {
-                int position=bindingPositions.get(superClass);
-                return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (!subClass.isVariable() && !superClass.isVariable()) {
-                return checkSubsumption(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter));
-            } else {
+            if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())) {
+            	if (subClass.isVariable() && superClass.isVariable()) {
+            		int[] positions=new int[2];
+                    positions[0]=bindingPositions.get(subClass);
+                    positions[1]=bindingPositions.get(superClass);
+                    return computeAllSubClassOfRelations(currentBinding,positions);
+                } else if (subClass.isVariable() && !superClass.isVariable()) {
+                    int position=bindingPositions.get(subClass);
+                    return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+                } else if (!subClass.isVariable() && superClass.isVariable()) {
+                    int position=bindingPositions.get(superClass);
+                    return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+                } else if (!subClass.isVariable() && !superClass.isVariable()) {
+                    return checkSubsumption(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter));
+                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here");
+            } 
+            else {
                 return complex(currentBinding,axiom,bindingPositions);
             }
         } catch (IllegalArgumentException e) {

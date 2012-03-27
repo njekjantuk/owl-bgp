@@ -52,27 +52,30 @@ public class QO_ClassAssertion extends AbstractQueryObject<ClassAssertion> {
 		    bindingMap.put(var, currentBinding[bindingPositions.get(var)]);
 		try {
     		ClassAssertion instantiated=(ClassAssertion)m_axiomTemplate.getBoundVersion(bindingMap);
-//    		System.out.println(instantiated);
+            //System.out.println(instantiated);
     		ClassExpression ce=instantiated.getClassExpression();
     		Set<Variable> ceVars=ce.getVariablesInSignature();
     		Individual ind=instantiated.getIndividual();
-            if (ce.isVariable() && ind.isVariable()) {//?x(?y)
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(ce);
-                positions[1]=bindingPositions.get(ind);
-                return computeAllClassAssertions(currentBinding,positions);
-            } else if (ce.isVariable() && !ind.isVariable()) {//?x(:a)
-                int position=bindingPositions.get(ce);
-                return computeTypes(currentBinding,(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory),position);
-            } else if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
-                int position=bindingPositions.get(ind);
-                return computeInstances(currentBinding,(OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),position);
-            } else if (ceVars.isEmpty() && !ind.isVariable()) {//C(:a)
-                if (checkType((OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)))
-                    return Collections.singletonList(currentBinding);
-                else 
-                    return new ArrayList<Atomic[]>();
-            } else {
+            if (ce instanceof Atomic || ce.isVariable()) {
+            	if (ce.isVariable() && ind.isVariable()) {//?x(?y)
+            		int[] positions=new int[2];
+                    positions[0]=bindingPositions.get(ce);
+                    positions[1]=bindingPositions.get(ind);
+                    return computeAllClassAssertions(currentBinding,positions);
+                } else if (ce.isVariable() && !ind.isVariable()) {//?x(:a)
+                	int position=bindingPositions.get(ce);
+                    return computeTypes(currentBinding,(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory),position);
+                } else if (ceVars.isEmpty() && ind.isVariable()) {//C(?x)
+                    int position=bindingPositions.get(ind);
+                    return computeInstances(currentBinding,(OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),position);
+                } else if (ceVars.isEmpty() && !ind.isVariable()) {//C(:a)
+                	if (checkType((OWLClassExpression)ce.asOWLAPIObject(m_dataFactory),(OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)))
+                		return Collections.singletonList(currentBinding);
+                    else 
+                        return new ArrayList<Atomic[]>();
+                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here");
+            }
+            else {
                 return complex(currentBinding, instantiated, bindingPositions);
             }
 		} catch (IllegalArgumentException e) {

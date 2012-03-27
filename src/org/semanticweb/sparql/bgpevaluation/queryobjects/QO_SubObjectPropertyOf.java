@@ -51,23 +51,26 @@ public class QO_SubObjectPropertyOf extends AbstractQueryObject<SubClassOf> {
             SubObjectPropertyOf axiom=(SubObjectPropertyOf)m_axiomTemplate.getBoundVersion(bindingMap);
             ObjectPropertyExpression subOPE=axiom.getSubObjectPropertyExpression();
             ObjectPropertyExpression superOPE=axiom.getSuperObjectPropertyExpression();
-            if (subOPE.isVariable() && superOPE.isVariable()) {
-                int[] positions=new int[2];
-                positions[0]=bindingPositions.get(subOPE);
-                positions[1]=bindingPositions.get(superOPE);
-                return computeAllSubObjectPropertyOfRelations(currentBinding,positions);
-            } else if (subOPE.isVariable() && !superOPE.isVariable()) {
-                int position=bindingPositions.get(subOPE);
-                return computeSubObjectProperties(currentBinding,(OWLObjectProperty)superOPE.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (!subOPE.isVariable() && superOPE.isVariable()) {
-                int position=bindingPositions.get(superOPE);
-                return computeSuperObjectProperties(currentBinding,(OWLObjectProperty)subOPE.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (!subOPE.isVariable() && !superOPE.isVariable()) {
-                if (checkSubsumption(currentBinding,(OWLObjectProperty)subOPE.asOWLAPIObject(m_toOWLAPIConverter),(OWLObjectProperty)superOPE.asOWLAPIObject(m_toOWLAPIConverter)))
-                    return Collections.singletonList(currentBinding);
-                else 
-                    return new ArrayList<Atomic[]>();
-            } else {
+            if ((subOPE instanceof Atomic || subOPE.isVariable()) && (superOPE instanceof Atomic || superOPE.isVariable())) {
+            	if (subOPE.isVariable() && superOPE.isVariable()) {
+            		int[] positions=new int[2];
+            	    positions[0]=bindingPositions.get(subOPE);
+                    positions[1]=bindingPositions.get(superOPE);
+                    return computeAllSubObjectPropertyOfRelations(currentBinding,positions);
+                } else if (subOPE.isVariable() && !superOPE.isVariable()) {
+                    int position=bindingPositions.get(subOPE);
+                    return computeSubObjectProperties(currentBinding,(OWLObjectProperty)superOPE.asOWLAPIObject(m_toOWLAPIConverter),position);
+                } else if (!subOPE.isVariable() && superOPE.isVariable()) {
+                    int position=bindingPositions.get(superOPE);
+                    return computeSuperObjectProperties(currentBinding,(OWLObjectProperty)subOPE.asOWLAPIObject(m_toOWLAPIConverter),position);
+                } else if (!subOPE.isVariable() && !superOPE.isVariable()) {
+                    if (checkSubsumption(currentBinding,(OWLObjectProperty)subOPE.asOWLAPIObject(m_toOWLAPIConverter),(OWLObjectProperty)superOPE.asOWLAPIObject(m_toOWLAPIConverter)))
+                    	return Collections.singletonList(currentBinding);
+                    else 
+                        return new ArrayList<Atomic[]>();
+                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here");       
+            } 
+            else {
                 return complex(currentBinding,axiom,bindingPositions);
             }
         } catch (IllegalArgumentException e) {
