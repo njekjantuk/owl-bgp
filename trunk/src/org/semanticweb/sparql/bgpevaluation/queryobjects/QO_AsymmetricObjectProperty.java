@@ -39,8 +39,7 @@ public class QO_AsymmetricObjectProperty extends QO_ObjectPropertyAxiom<Asymmetr
     }
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		return visitor.visit(this, bound);
 	}
 	
 }

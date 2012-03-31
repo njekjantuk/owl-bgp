@@ -32,8 +32,10 @@ import org.semanticweb.sparql.bgpevaluation.CostEstimationVisitor;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
 
@@ -65,28 +67,31 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     	double cost=0;
 //        if (ce instanceof Atomic && (m_instanceStatistics==null || !m_instanceStatistics.areClassesInitialised()))
 //            cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
-        if (unbound.size()==0 && ce instanceof Atomic){       		
+        if (unbound.size()==0 && ce instanceof Atomic){//C(a)       		
         	boolean[] result=m_instanceStatistics.isKnownOrPossibleInstance((OWLClass)ce.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)); 
             if (result[0])
             	return new double[] { cost+COST_LOOKUP, 1 };
             else if (result[1])
                 return new double[] { cost+((double)0.5*COST_ENTAILMENT*m_instanceStatistics.getClassHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
             else return new double[] { cost+COST_LOOKUP, 0};                 
-        }
-        else if (unbound.size()==1 && unbound.contains(indVar) && ce instanceof Atomic) {// C(?x) 
+        } else if (unbound.size()==1 && unbound.contains(indVar) && ce instanceof Atomic) {// C(?x) 
         	int[] estimate=m_instanceStatistics.getNumberOfInstances((OWLClass)ce.asOWLAPIObject(m_dataFactory));
  //             System.out.println("known "+ ce.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);
             return new double[] { cost + estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
-
-        } else if (unbound.size()==1 && !unbound.contains(indVar) && ce instanceof Atomic) {// ?x(:a)
+        } else if (unbound.size()==1 && ce instanceof Variable && !unbound.contains(ce)) {// ?x(:a)
             int[] estimate=m_instanceStatistics.getNumberOfTypes((OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory));
             return new double[] { cost + estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
-        } else {
-        	double tests=complex(unbound);
-            return new double[] { cost + tests, (double)(POSSIBLE_INSTANCE_SUCCESS*tests) }; // assume all tests succeed
+        } else {//?x(?y)
+        	double[] costMatrix={0.0,0.0};
+        	for (Clazz clas : m_graph.getClassesInSignature()) {
+        		int[] estimate=m_instanceStatistics.getNumberOfInstances((OWLClass)clas.asOWLAPIObject(m_dataFactory));
+        		costMatrix[0]+=estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth();
+                costMatrix[1]+=estimate[0]+POSSIBLE_INSTANCE_SUCCESS*estimate[1];
+            }
+        	return costMatrix;
         }
     }
-    protected double[] getObjectPropertyAssertionCost(ObjectProperty op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
+    protected double[] getObjectPropertyAssertionCost(ObjectPropertyExpression op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
         double cost=0;
         if (unbound.size()==0) {//r(:a :b)
         	boolean[] result=m_instanceStatistics.hasSuccessor((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
@@ -96,8 +101,23 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
                 return new double[] { cost+((double)0.5*COST_ENTAILMENT*m_instanceStatistics.getObjectPropertyHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
             else return new double[] {cost+COST_LOOKUP, 0 }; 
         } else if (unbound.size()==1 && opVar!=null) {// ?x(:a :b) 
-        	//TODO check and reimplement if necessary
-            return new double[] { cost+m_opCount*COST_LOOKUP*(double)(0.5*COST_ENTAILMENT*m_instanceStatistics.getObjectPropertyHierarchyDepth()), m_opCount};  
+        	double[] costMatrix={0.0,0.0};
+        	for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+        		boolean[] result=m_instanceStatistics.hasSuccessor((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
+                if (result[0]) {
+                	costMatrix[1]+=COST_LOOKUP;
+                	costMatrix[2]++;
+                }	
+                else if (result[1]) {
+                	costMatrix[1]+=(double)0.5*COST_ENTAILMENT*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+                	costMatrix[2]=1*POSSIBLE_INSTANCE_SUCCESS; 
+                }
+                else {
+                	costMatrix[1]+=COST_LOOKUP;
+                	costMatrix[2]=0;
+                }
+        	}
+            return costMatrix;
         } else if (unbound.size()==1 && opVar==null) {// op(:a ?x) or op(?x :a)
         	int[] estimate;
             if (ind2 instanceof Variable)
@@ -107,17 +127,20 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
                 //double[] estimate=m_instanceStatistics.getAverageNumberOfSuccessors(AtomicRole.create(op.getIRIString()));
             return new double[] { cost + estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) }; 
         } else if (unbound.size()==2 && opVar!=null) {// ?x(:a ?y) or ?x(?y :a)
-        	  //TODO: Implement this
-        	throw new UnsupportedOperationException("Internal error: Method not yet implemented");
-/*                double[] estimate=new double[2];
-                for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-                	RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
-                    //int[] thisEstimate=m_instanceStatistics.getNumberOfPropertyInstances((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory));
-                    estimate[0]+=((double)roleStatistics.getNumberOfKnownInstances()/(double)thisEstimate[2]);
-                    estimate[1]+=((double)thisEstimate[1]/(double)thisEstimate[2]);
-          }
-                return new double[] { cost + m_opCount*COST_LOOKUP+(estimate[0]*COST_LOOKUP)+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
-*/  
+        	int[] estimate;
+        	double[] costMatrix={0.0,0.0};
+            for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+            	if (ind2 instanceof Variable) {
+                	estimate=m_instanceStatistics.getNumberOfSuccessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory));
+            	}
+            	else {
+                    estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
+            	}
+                costMatrix[0]+=estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth());
+                costMatrix[1]+=estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]);
+            }
+            return costMatrix;
+            
         } else if (unbound.size()==2 && opVar==null) {// op(?x ?y)
         	RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
                 //int[] estimate=m_instanceStatistics.getNumberOfPropertyInstances((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
@@ -126,17 +149,13 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
         }
         // ?x(?y ?z)
         else {
-        	//TODO: Implement this
-      	  throw new UnsupportedOperationException("Internal error: Method not yet implemented");
-/*
-        	double[] estimate=new double[2];
-            for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-                int[] thisEstimate=m_instanceStatistics.getNumberOfPropertyInstances((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory));
-                estimate[0]+=thisEstimate[0];
-                estimate[1]+=thisEstimate[1];
+            double[] costMatrix={0.0,0.0};
+        	for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+            	RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory));
+                costMatrix[0]+=roleStatistics.getNumberOfKnownInstances()*COST_LOOKUP+roleStatistics.getNumberOfPossibleInstances()*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+                costMatrix[1]+=roleStatistics.getNumberOfKnownInstances()+POSSIBLE_INSTANCE_SUCCESS*roleStatistics.getNumberOfPossibleInstances();
             }
-            return new double[] { cost + m_opCount*COST_LOOKUP+estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*(double)(0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+POSSIBLE_INSTANCE_SUCCESS*(double)estimate[1] };
-*/
+            return costMatrix;
         }
     }
 }

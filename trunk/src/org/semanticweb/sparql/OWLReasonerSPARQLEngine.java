@@ -72,6 +72,10 @@ public class OWLReasonerSPARQLEngine {
         QueryExecution engine=QueryExecutionFactory.create(query,dataSet);
         long t=System.currentTimeMillis();
         ResultSet results=engine.execSelect();
+        //while (results.hasNext()) {
+        //	QuerySolution rb=results.nextSolution();
+		//	System.out.println(rb);
+        //}
         long evalTime=System.currentTimeMillis()-t;
         ARQ.getContext().put(BGP_EXEC_TIME, evalTime);
         return results;

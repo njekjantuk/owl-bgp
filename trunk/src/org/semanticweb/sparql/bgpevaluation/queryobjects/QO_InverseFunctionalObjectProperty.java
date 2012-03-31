@@ -41,7 +41,6 @@ public class QO_InverseFunctionalObjectProperty extends QO_ObjectPropertyAxiom<I
 
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		 return visitor.visit(this, bound);
 	}
 }

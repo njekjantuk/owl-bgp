@@ -29,20 +29,17 @@ import java.util.Set;
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLBGPQueryIterator;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
-import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.ObjectSomeValuesFrom;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
-import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.parser.OWLBGPParser;
 import org.semanticweb.sparql.owlbgp.parser.ParseException;
 
@@ -90,12 +87,12 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             m_monitor.connectedComponentsComputationStarted();
             Set<Axiom> queryAxiomTemplates=parser.getParsedAxioms();
             
-            ObjectProperty prop = ObjectProperty.create(IRI.create("http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#takesCourse").toString());
-            ClassVariable varX = ClassVariable.create("?x");
-            ClassVariable varO = ClassVariable.create("?y");
-            ObjectSomeValuesFrom supCls = ObjectSomeValuesFrom.create(prop, varO);
-            SubClassOf sco = SubClassOf.create(varX, supCls);
-            queryAxiomTemplates.add(sco);
+//            ObjectProperty prop = ObjectProperty.create(IRI.create("http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#takesCourse").toString());
+//            ClassVariable varX = ClassVariable.create("?x");
+//            ClassVariable varO = ClassVariable.create("?y");
+//            ObjectSomeValuesFrom supCls = ObjectSomeValuesFrom.create(prop, varO);
+//            SubClassOf sco = SubClassOf.create(varX, supCls);
+//            queryAxiomTemplates.add(sco);
             
             Set<IndividualVariable> bnodes=parser.getVariablesForAnonymousIndividual();
 
@@ -147,24 +144,30 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                     	m_monitor.costEvaluationStarted();
                 	    long t=System.currentTimeMillis();
-                	    QueryObject<? extends Axiom> cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
-                        System.out.println("the reordering time is "+(System.currentTimeMillis()-t)+" ms");
+                	    QueryObject<? extends Axiom> cheapest;
+                	    if (connectedComponent.size()==1)
+                	    	cheapest=connectedComponent.iterator().next();
+                	    else 
+                	        cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, m_monitor);
+                        //System.out.println("the reordering time is "+(System.currentTimeMillis()-t)+" ms");
                 	    m_monitor.costEvaluationFinished(cheapest);
                         connectedComponent.remove(cheapest);
                         m_monitor.queryObjectEvaluationStarted(cheapest);
+                        t=System.currentTimeMillis();
                         bindings=cheapest.computeBindings(bindings, positionInTuple);
-                        System.out.println(cheapest.getAxiomTemplate());
-                        System.out.println("bindings size= "+bindings.size());
+                        //System.out.println("the running time is "+(System.currentTimeMillis()-t)+" ms");
+                        //System.out.println(cheapest.getAxiomTemplate());
+                        //System.out.println("bindings size= "+bindings.size());
                         m_monitor.queryObjectEvaluationFinished(bindings.size());
                         costEstimator.updateCandidateBindings(bindings);
                     }
                 }
-/*                else if (orderingMode.equals("Intersection")){
-                	System.out.println("Use of intersection optimization");
+                else if (orderingMode.equals("Intersection")){
+                	//System.out.println("Use of intersection optimization");
                     StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
                     long t=System.currentTimeMillis();
                     List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
-                    System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
+                    //System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
                     BindingsIntersection optimization=new BindingsIntersection(ontologyGraph, positionInTuple);
                     for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                     	//System.out.println(cheapest.getAxiomTemplate());
@@ -178,11 +181,11 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                   for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                      if (!bindings.isEmpty()){
                          bindings=cheapest.computeBindings(bindings, positionInTuple);
-                         System.out.println(cheapest.getAxiomTemplate());
-                         System.out.println("bindings size= "+bindings.size());
+                         //System.out.println(cheapest.getAxiomTemplate());
+                         //System.out.println("bindings size= "+bindings.size());
                      }   	
                   }
-                }*/         
+                }         
                 else if ((orderingMode==null) || orderingMode.equals("Static")){
                 	//System.out.println("Static");	
                     StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
@@ -192,7 +195,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                     	if (!bindings.isEmpty()){
                     		bindings=cheapest.computeBindings(bindings, positionInTuple);
-                	        System.out.println(cheapest.getAxiomTemplate());
+                	        //System.out.println(cheapest.getAxiomTemplate());
                 	        //System.out.println("bindings size= "+bindings.size());
                 	    }
                     }
