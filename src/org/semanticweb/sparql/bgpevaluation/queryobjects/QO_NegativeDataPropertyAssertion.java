@@ -54,8 +54,7 @@ public class QO_NegativeDataPropertyAssertion  extends AbstractQueryObject<Negat
 
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		 return visitor.visit(this, bound);
 	}
 
 }

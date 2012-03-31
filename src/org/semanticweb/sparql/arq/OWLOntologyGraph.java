@@ -113,7 +113,7 @@ public class OWLOntologyGraph implements Graph {
         c.ignoreUnsupportedDatatypes=true;
         m_reasoner=new Reasoner(c, skolomized);
         
-        System.out.println(((Reasoner)m_reasoner).getDLOntology().getStatistics());
+        //System.out.println(((Reasoner)m_reasoner).getDLOntology().getStatistics());
 	}
 	public Set<String>  getSkolemConstants() {
         return this.m_skolemConstants;

@@ -1,5 +1,4 @@
 package org.semanticweb.sparql.bgpevaluation;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
@@ -44,6 +44,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
@@ -79,26 +80,20 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         m_bindingPositions=bindingPositions;
     }
    
-    public double[] visit(QO_SubClassOf queryObject) {
-        double[] result=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return result; // no answers, no tests
-        // check just one binding
-        Atomic[] testBinding=m_candidateBindings.get(0);
-        Axiom template=queryObject.getAxiomTemplate();
+    public double[] visit(QO_SubClassOf queryObject, Set<Variable> boundVar) {
+        SubClassOf template=(SubClassOf)queryObject.getAxiomTemplate();
         Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-        for (Variable var : vars) {
-            Atomic binding=testBinding[m_bindingPositions.get(var)];
-            if (binding!=null)
-                existingBindings.put(var,binding);
-        }
-        Axiom instantiated=(Axiom)template.getBoundVersion(existingBindings);
-        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        ClassExpression subClass=template.getSubClassExpression();
+        ClassExpression superClass=template.getSuperClassExpression();
         int results=1;
-        for (int i=0;i<unbound.size();i++)
-            results*=m_classCount;
-        return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
+        if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())){
+        	for (int i=0;i<unbound.size();i++)
+        		results*=m_classCount;	
+            return new double[] { results*COST_LOOKUP, results };
+        }
+        else return complex(unbound);
     }
 //    public double[] visit(QO_EquivalentClasses queryObject) {
 //        return new double[] { 0, 0 };
@@ -109,26 +104,15 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_DisjointUnion queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-    public double[] visit(QO_SubObjectPropertyOf queryObject) {
-        double[] result=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return result; // no answers, no tests
-        // check just one binding
-        Atomic[] testBinding=m_candidateBindings.get(0);
+    public double[] visit(QO_SubObjectPropertyOf queryObject, Set<Variable> boundVar) {
         Axiom template=queryObject.getAxiomTemplate();
-        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-        for (Variable var : vars) {
-            Atomic binding=testBinding[m_bindingPositions.get(var)];
-            if (binding!=null)
-                existingBindings.put(var,binding);
-        }
-        Axiom instantiated=(Axiom)template.getBoundVersion(existingBindings);
-        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
         int results=1;
         for (int i=0;i<unbound.size();i++)
             results*=m_opCount;
-        return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
+        return new double[] { results*COST_LOOKUP, results };
     }
 //    public double[] visit(QO_EquivalentObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
@@ -145,50 +129,44 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_ObjectPropertyRange queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-    public double[] visit(QO_FunctionalObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_FunctionalObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    protected double[] getObjectPropertyAxiomCost(QueryObject<? extends Axiom> queryObject) {
-        double[] result=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return result; // no answers, no tests
-        // check just one binding
-        Atomic[] testBinding=m_candidateBindings.get(0);
+    protected double[] getObjectPropertyAxiomCost(QueryObject<? extends Axiom> queryObject,Set<Variable> boundVar) {
         Set<Variable> opeVar=queryObject.getAxiomTemplate().getVariablesInSignature();
-        if (opeVar.isEmpty() || testBinding[m_bindingPositions.get(opeVar.iterator().next())]!=null)
+        Set<Variable> unbound=opeVar;
+        unbound.removeAll(opeVar);
+        if (unbound.isEmpty()) 
             return new double[] { COST_ENTAILMENT, 1 };
         else
             return new double[] { m_opCount*COST_ENTAILMENT, m_opCount }; // better return told numbers
     }
-    protected double[] getDataPropertyAxiomCost(QueryObject<? extends Axiom> queryObject) {
-        double[] result=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return result; // no answers, no tests
-        // check just one binding
-        Atomic[] testBinding=m_candidateBindings.get(0);
+    protected double[] getDataPropertyAxiomCost(QueryObject<? extends Axiom> queryObject, Set<Variable> boundVar) {
         Set<Variable> dpeVar=queryObject.getAxiomTemplate().getVariablesInSignature();
-        if (dpeVar.isEmpty() || testBinding[m_bindingPositions.get(dpeVar.iterator().next())]!=null)
+        Set<Variable> unbound=dpeVar;
+        unbound.removeAll(dpeVar);
+        if (unbound.isEmpty())
             return new double[] { COST_ENTAILMENT, 1 };
         else
             return new double[] { m_dpCount*COST_ENTAILMENT, m_dpCount }; // better return told numbers
     }
-    public double[] visit(QO_InverseFunctionalObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_InverseFunctionalObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    public double[] visit(QO_ReflexiveObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_ReflexiveObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    public double[] visit(QO_IrreflexiveObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_IrreflexiveObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    public double[] visit(QO_SymmetricObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_SymmetricObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    public double[] visit(QO_AsymmetricObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_AsymmetricObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
-    public double[] visit(QO_TransitiveObjectProperty queryObject) {
-        return getObjectPropertyAxiomCost(queryObject);
+    public double[] visit(QO_TransitiveObjectProperty queryObject, Set<Variable> boundVar) {
+        return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
 //    public double[] visit(QO_SubDataPropertyOf queryObject) {
 //        return new double[] { 0, 0 };
@@ -205,8 +183,8 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
 //    public double[] visit(QO_DataPropertyRange queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-    public double[] visit(QO_FunctionalDataProperty queryObject) {
-        return getDataPropertyAxiomCost(queryObject);
+    public double[] visit(QO_FunctionalDataProperty queryObject, Set<Variable> boundVar) {
+        return getDataPropertyAxiomCost(queryObject, boundVar);
     }
 //    public double[] visit(QO_DatatypeDefinition queryObject) {
 //        return new double[] { 0, 0 };
@@ -223,41 +201,67 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
     public double[] visit(QO_ClassAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
         ClassAssertion axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Set<Variable> indVars=axiomTemplate.getIndividual().getVariablesInSignature();
         Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
-        double[] currentEstimate=getClassAssertionCost(axiomTemplate.getClassExpression(), axiomTemplate.getIndividual(), boundVar, indVar);
-        estimate[0]+=currentEstimate[0];
-        estimate[1]+=currentEstimate[1];
-        
-        return estimate;
-    }
-    protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
-        if (unbound.size()==0)
-            return new double[] { COST_ENTAILMENT, 1 };
-        else if (unbound.size()==1 && indVar!=null) // C(?x)
-            return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
-        else if (indVar==null && unbound.size()==1 && ce instanceof Atomic) // ?x(:a)
-            return new double[] { m_classCount * COST_ENTAILMENT, m_classCount };
-        else {
-            double tests=complex(unbound);
-            return new double[] { tests, tests }; // assume all tests succeed
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        ClassExpression expression= axiomTemplate.getClassExpression();
+        if ((expression instanceof Atomic || expression.isVariable())){
+        	double[] currentEstimate=getClassAssertionCost(axiomTemplate.getClassExpression(), axiomTemplate.getIndividual(), boundVar, indVar);
+            estimate[0]+=currentEstimate[0];
+            estimate[1]+=currentEstimate[1];
+            return estimate;
         }
+        else return complex(unbound);
+    }
+    protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> boundVar, Variable indVar) {
+    	if (indVar!=null && !boundVar.contains(indVar)){
+    		if (ce instanceof Atomic) { //C(?x)
+    			return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
+    		}
+    		else //?x(?y)
+    			return new double[] { m_indCount * m_classCount * COST_ENTAILMENT, m_indCount * m_classCount};
+    	}	
+    	else if (indVar!=null && boundVar.contains(indVar)) {//C(a)<-C(x)
+	    	if (ce instanceof Atomic) {
+	    		return new double[] {COST_ENTAILMENT, 1};
+	    	}
+	    	else //?x(a)<-?x(?y)
+	    		return new double[] { m_classCount * COST_ENTAILMENT, m_classCount};
+	    }
+    	else //C(a)
+    		return new double[] {COST_ENTAILMENT, 1};
     }
     public double[] visit(QO_ObjectPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
-        
         ObjectPropertyAssertion axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Set<Variable> opVars=axiomTemplate.getObjectPropertyExpression().getVariablesInSignature();
-        Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();        
-        double[] currentEstimate=getObjectPropertyAssertionCost((ObjectProperty)axiomTemplate.getObjectPropertyExpression(), axiomTemplate.getIndividual1(), axiomTemplate.getIndividual2(), boundVar, opVar);
-        estimate[0]+=currentEstimate[0];
-        estimate[1]+=currentEstimate[1];
-        return estimate;
+        Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();
+        ObjectPropertyExpression ope=axiomTemplate.getObjectPropertyExpression();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        if (ope instanceof Atomic || opVar.isVariable()) {
+        	double[] currentEstimate=getObjectPropertyAssertionCost(axiomTemplate.getObjectPropertyExpression(), axiomTemplate.getIndividual1(), axiomTemplate.getIndividual2(), boundVar, opVar);
+            estimate[0]+=currentEstimate[0];
+            estimate[1]+=currentEstimate[1];
+            return estimate;
+        }
+        else return complex(unbound);
     }
-    protected double[] getObjectPropertyAssertionCost(ObjectProperty op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
-        if (unbound.size()==0)
+    protected double[] getObjectPropertyAssertionCost(ObjectPropertyExpression op, Individual ind1, Individual ind2, Set<Variable> boundVar, Variable opVar) {
+    	Set<Variable> unbound=new HashSet<Variable>(); 
+    	if (opVar!=null && !boundVar.contains(op)) 
+    		unbound.add(opVar);
+    	if (ind1 instanceof Variable && !boundVar.contains(ind1))
+    		unbound.add((Variable) ind1);
+    	if (ind2 instanceof Variable && !boundVar.contains(ind2))	
+    		unbound.add((Variable) ind2);
+    	
+        if (unbound.size()==0) //r(a,b)
             return new double[] { COST_ENTAILMENT, 1 };
-        else if (unbound.size()==1 && opVar!=null) // ?x(i1, i2)
+        else if (unbound.size()==1 && opVar!=null) // ?x(a, b)
             return new double[] { m_opCount * COST_ENTAILMENT, m_opCount };
         else if (unbound.size()==1 && opVar==null) // op(:a ?x) or op(?x :a)  
             return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
@@ -265,37 +269,23 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             return new double[] { m_opCount * m_indCount * COST_ENTAILMENT, m_indCount * m_opCount };
         else if (unbound.size()==2 && opVar==null) // op(?x ?y)
             return new double[] { m_indCount * m_indCount * COST_ENTAILMENT, m_indCount * m_indCount };
-        else {
-            int tests=complex(unbound);
-            return new double[] { tests, tests }; // assume all tests succeed
-        }
+        else return new double[] { m_indCount * m_indCount * m_opCount * COST_ENTAILMENT, m_indCount * m_indCount * m_opCount};
     }
-    public double[] visit(QO_NegativeObjectPropertyAssertion queryObject) {
+    public double[] visit(QO_NegativeObjectPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return estimate; // no answers, no tests
         NegativeObjectPropertyAssertion axiomTemplate=queryObject.getAxiomTemplate();
         Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Set<Variable> opVars=axiomTemplate.getObjectPropertyExpression().getVariablesInSignature();
         Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-        Set<Variable> unbound=new HashSet<Variable>();
-        for (Atomic[] testBinding : m_candidateBindings) {
-            existingBindings.clear();
-            for (Variable var : vars) {
-                Atomic binding=testBinding[m_bindingPositions.get(var)];
-                if (binding!=null)
-                    existingBindings.put(var,binding);
-            }
-            NegativeObjectPropertyAssertion instantiated=(NegativeObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
-            unbound.addAll(vars);
-            unbound.removeAll(existingBindings.keySet());
-            
-            double[] currentEstimate=getObjectPropertyAssertionCost((ObjectProperty)instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        if (opVar instanceof Atomic || opVar.isVariable()) {
+        	double[] currentEstimate=getObjectPropertyAssertionCost((ObjectProperty)axiomTemplate.getObjectPropertyExpression(), axiomTemplate.getIndividual1(), axiomTemplate.getIndividual2(), boundVar, opVar);
             estimate[0]+=currentEstimate[0];
             estimate[1]+=currentEstimate[1];
+            return estimate;
         }
-        return estimate;
+        else return complex(unbound);
     }
     public double[] visit(QO_DataPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
@@ -320,8 +310,16 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         
         return estimate;
     }
-    protected double[] getDataPropertyAssertionCost(DataPropertyExpression dp, Individual ind, Literal lit, Set<Variable> unbound, Variable dpVar, Variable indVar, Variable litVar) {
-        if (unbound.size()==0)
+    protected double[] getDataPropertyAssertionCost(DataPropertyExpression dp, Individual ind, Literal lit, Set<Variable> boundVar, Variable dpVar, Variable indVar, Variable litVar) {
+    	Set<Variable> unbound=new HashSet<Variable>(); 
+    	if (dpVar!=null && !boundVar.contains(dpVar)) 
+    		unbound.add(dpVar);
+    	if (indVar!=null && !boundVar.contains(indVar))
+    		unbound.add((Variable) indVar);
+    	if (litVar!=null && !boundVar.contains(litVar))	
+    		unbound.add((Variable) litVar);
+    	
+    	if (unbound.size()==0)
             return new double[] { COST_ENTAILMENT, 1 };
         else if (unbound.size()==1 && dpVar!=null) // ?x(i, lit)
             return new double[] { m_dpCount * COST_ENTAILMENT, m_dpCount };
@@ -335,15 +333,11 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             return new double[] { m_dpCount * m_litCount * COST_ENTAILMENT, m_litCount * m_dpCount };
         else if (unbound.size()==2 && dpVar==null) // dp(?x ?y)
             return new double[] { m_indCount * m_litCount * COST_ENTAILMENT, m_indCount * m_litCount };
-        else {
-            int tests=complex(unbound);
-            return new double[] { tests, tests }; // assume all tests succeed
-        }
+        else  //?x(?y ?z)
+        	return new double[] { m_indCount * m_litCount * m_opCount * COST_ENTAILMENT, m_indCount * m_litCount * m_opCount};    
     }
-    public double[] visit(QO_NegativeDataPropertyAssertion queryObject) {
+    public double[] visit(QO_NegativeDataPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
-        if (m_candidateBindings.isEmpty())
-            return estimate; // no answers, no tests
         NegativeDataPropertyAssertion axiomTemplate=queryObject.getAxiomTemplate();
         Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         Variable indVar=null;
@@ -357,27 +351,12 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
             else 
                 litVar=var;
         }
-        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
-        Set<Variable> unbound=new HashSet<Variable>();
-        for (Atomic[] testBinding : m_candidateBindings) {
-            existingBindings.clear();
-            for (Variable var : vars) {
-                Atomic binding=testBinding[m_bindingPositions.get(var)];
-                if (binding!=null)
-                    existingBindings.put(var,binding);
-            }
-            NegativeDataPropertyAssertion instantiated=(NegativeDataPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
-            unbound.addAll(vars);
-            unbound.removeAll(existingBindings.keySet());
-            
-            double[] currentEstimate=getDataPropertyAssertionCost((DataProperty)instantiated.getDataPropertyExpression(), instantiated.getIndividual(), instantiated.getLiteral(), unbound, dpVar, indVar, litVar);
-            estimate[0]+=currentEstimate[0];
-            estimate[1]+=currentEstimate[1];
-        }
+        double[] currentEstimate=getDataPropertyAssertionCost((DataProperty)axiomTemplate.getDataPropertyExpression(), axiomTemplate.getIndividual(), axiomTemplate.getLiteral(), boundVar, dpVar, indVar, litVar);
+        estimate[0]+=currentEstimate[0];
+        estimate[1]+=currentEstimate[1];
         return estimate;
     }
-
-    protected int complex(Set<Variable> unbound) {
+    protected double[] complex(Set<Variable> unbound) {
         int tests=0;
         // complex
         boolean first=true;
@@ -395,30 +374,59 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
                 signatureSize=m_apCount;
             else if (var instanceof IndividualVariable)
                 signatureSize=m_indCount;
-            if (first)
+            if (first) {
                 tests+=signatureSize;
+                first=false;
+            }
             else 
                 tests*=signatureSize;
         }
-        return tests;
+        return new double[] { tests*COST_ENTAILMENT, tests };
     }
 
-	@Override
 	public double[] visit(QO_ClassAssertion axiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
 	}
-
-	@Override
 	public double[] visit(QO_ObjectPropertyAssertion axiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
 	}
-
-	@Override
 	public double[] visit(QO_DataPropertyAssertion axiom) {
-		// TODO Auto-generated method stub
-		return null;
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_SubClassOf axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_SubObjectPropertyOf axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_FunctionalObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");	}
+	public double[] visit(QO_InverseFunctionalObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_ReflexiveObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_IrreflexiveObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_SymmetricObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_AsymmetricObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_TransitiveObjectProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_FunctionalDataProperty axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_NegativeObjectPropertyAssertion axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
+	}
+	public double[] visit(QO_NegativeDataPropertyAssertion axiom) {
+		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
 	}
 }
 

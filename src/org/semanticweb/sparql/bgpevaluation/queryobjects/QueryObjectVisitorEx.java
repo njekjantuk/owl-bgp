@@ -25,10 +25,12 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public interface QueryObjectVisitorEx<O> {  
     O visit(QO_SubClassOf axiom);
+    O visit(QO_SubClassOf axiom, Set<Variable> bound);
 //    O visit(QO_EquivalentClasses axiom);
 //    O visit(QO_DisjointClasses axiom);
 
     O visit(QO_SubObjectPropertyOf axiom);
+    O visit(QO_SubObjectPropertyOf axiom, Set<Variable> bound);
 //    O visit(QO_EquivalentObjectProperties axiom);
 //    O visit(QO_DisjointObjectProperties axiom);
 //    O visit(QO_InverseObjectProperties axiom);
@@ -41,6 +43,13 @@ public interface QueryObjectVisitorEx<O> {
     O visit(QO_SymmetricObjectProperty axiom);
     O visit(QO_AsymmetricObjectProperty axiom);
     O visit(QO_TransitiveObjectProperty axiom);
+    O visit(QO_FunctionalObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_InverseFunctionalObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_ReflexiveObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_IrreflexiveObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_SymmetricObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_AsymmetricObjectProperty axiom, Set<Variable> bound);
+    O visit(QO_TransitiveObjectProperty axiom, Set<Variable> bound);
     
 //    O visit(QO_SubDataPropertyOf axiom);
 //    O visit(QO_EquivalentDataProperties axiom);
@@ -48,6 +57,7 @@ public interface QueryObjectVisitorEx<O> {
 //    O visit(QO_DataPropertyDomain axiom);
 //    O visit(QO_DataPropertyRange axiom);
     O visit(QO_FunctionalDataProperty axiom);
+    O visit(QO_FunctionalDataProperty axiom, Set<Variable> bound);
 //    
 //    O visit(QO_DatatypeDefinition axiom);
 //    
@@ -60,7 +70,9 @@ public interface QueryObjectVisitorEx<O> {
     O visit(QO_ClassAssertion axiom);
     O visit(QO_ObjectPropertyAssertion axiom);
     O visit(QO_NegativeObjectPropertyAssertion axiom); 
+    O visit(QO_NegativeObjectPropertyAssertion axiom, Set<Variable> bound); 
     O visit(QO_DataPropertyAssertion axiom, Set<Variable> bound);
     O visit(QO_DataPropertyAssertion axiom);
+    O visit(QO_NegativeDataPropertyAssertion axiom, Set<Variable> bound);
     O visit(QO_NegativeDataPropertyAssertion axiom);
 }

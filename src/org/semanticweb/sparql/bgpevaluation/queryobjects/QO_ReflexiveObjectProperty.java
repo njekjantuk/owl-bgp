@@ -41,7 +41,6 @@ public class QO_ReflexiveObjectProperty extends QO_ObjectPropertyAxiom<Reflexive
 
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		 return visitor.visit(this, bound);
 	}
 }

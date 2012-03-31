@@ -39,16 +39,17 @@ public class TestLUBM {
 	public static void main(String[] args) throws Exception {
 	    long t=System.currentTimeMillis();
 	    OWLOntologyDataSet dataset=getLUBMDataSet();
-	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
+	    System.out.println("OWLOntology loaded in: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();	    
 //	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
 	    graph.getReasoner().precomputeInferences(InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
-	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
+	    System.out.println("Precomputation lasted: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
+	    getLUBMQTest(sparqlEngine, dataset);
 	    getLUBMQ0(sparqlEngine, dataset);
-/*	    getLUBMQ1(sparqlEngine, dataset);
+	    getLUBMQ1(sparqlEngine, dataset);
         getLUBMQ2(sparqlEngine, dataset);
         getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
@@ -61,8 +62,8 @@ public class TestLUBM {
         getLUBMQ11(sparqlEngine, dataset);
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
-        getLUBMQ14(sparqlEngine, dataset);*/
-        System.out.println("The execution of the 15 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
+        getLUBMQ14(sparqlEngine, dataset);
+        //System.out.println("The execution of the 15 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -76,19 +77,6 @@ public class TestLUBM {
 	          manager.addAxioms(ont, tmp.getAxioms());
             }
         }    
-/*        for (int i=0;i<children.length;i++) {
-            File file=new File(prefix+"evaluation/ontologies/LUBM-1/"+children[i]);
-            if (file.isFile()) {
-                OWLOntology tmp=manager.loadOntologyFromOntologyDocument(file);
-                manager.addAxioms(ont, tmp.getAxioms());
-            }
-
-        }*/
-	    
-/*	    for (int i=0;i<15;i++) {
-	        OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/University0_"+i+".owl"));
-	        manager.addAxioms(ont, tmp.getAxioms());
-	    }*/
         return new OWLOntologyDataSet(ont, null);
     }
 	public static String getLUBMPrefix() {
@@ -101,14 +89,35 @@ public class TestLUBM {
 	        + "SELECT * WHERE { " +LB;
 	    return prefix;
 	}
+	public static void getLUBMQTest(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	    System.out.println("Q0");
+	    String queryString=getLUBMPrefix() 
+        //+"?x rdf:type ?a." +LB
+       // +"?y rdf:type ?b." +LB
+	    +"?x ?z ?y." +LB
+	    +"?z rdf:type owl:ObjectProperty." +LB
+	    //+"?x rdfs:subClassOf ub:GraduateStudent."
+	    + "ub:Student rdfs:subClassOf ["+LB
+        + "   a owl:Restriction ; "+LB
+        + "   owl:onProperty ?z ; "+LB
+        + "   owl:someValuesFrom ub:Course]. " +LB
+	    + " } "+LB;
+	    long t=System.currentTimeMillis();
+	    Query query=QueryFactory.create(queryString);
+	    System.out.println("Query: "+(System.currentTimeMillis()-t));
+	    t=System.currentTimeMillis();
+	    sparqlEngine.execQuery(query,dataset);
+	    System.out.println("Result: "+(System.currentTimeMillis()-t));
+//	    ResultSetFormatter.asText(result);
+	}
 	public static void getLUBMQ0(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q0");
 	    String queryString=getLUBMPrefix()
-	    +" ?y rdf:type ub:GraduateStudent."
-//	        + "   ?x rdfs:subClassOf ["+LB
-//            + "   a owl:Restriction ; "+LB
-//            + "   owl:onProperty ub:takesCourse ; "+LB
-//            + "   owl:someValuesFrom ?o]. " +LB
+	        + " ?o rdfs:subClassOf ub:GraduateStudent."
+	        + "   ?o rdfs:subClassOf ["+LB
+            + "   a owl:Restriction ; "+LB
+            + "   owl:onProperty ub:takesCourse ; "+LB
+            + "   owl:someValuesFrom ?y]. " +LB
 	        + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
@@ -120,10 +129,6 @@ public class TestLUBM {
 	}
 	public static void getLUBMQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q1");
-//	    OWLOntology: 6102
-//	    HermiT: 188608
-//	    Query: 727, 604
-//	    Result: 289, 382
        String queryString=getLUBMPrefix()
         + "  ?x rdf:type ub:GraduateStudent. " +LB
         + "  ?x ub:takesCourse <http://www.Department0.University0.edu/GraduateCourse0>. " +LB
@@ -137,10 +142,6 @@ public class TestLUBM {
 	}
 	public static void getLUBMQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q2");
-//	    OWLOntology: 5949
-//	    HermiT: 184355
-//	    Query: 867, 2
-//	    Result: 323911, 256837
 	    String queryString=getLUBMPrefix()
         	+ "  ?x rdf:type ub:GraduateStudent. " +LB
             + "  ?y rdf:type ub:University. " +LB
@@ -158,8 +159,6 @@ public class TestLUBM {
 	}
 	public static void getLUBMQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q3");
-//	    Query: 2
-//	    Result: 45
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Publication. " +LB
             + "  ?x ub:publicationAuthor <http://www.Department0.University0.edu/AssistantProfessor0>. " +LB
@@ -172,8 +171,6 @@ public class TestLUBM {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-//	    Query: 2
-//	    Result: 16
 	    System.out.println("Q4");
         String queryString=getLUBMPrefix()
             + "?x rdf:type ub:Professor. " +LB
@@ -190,8 +187,6 @@ public class TestLUBM {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-//	    Query: 1
-//	    Result: 100
 	    System.out.println("Q5");
         String queryString=getLUBMPrefix()
             + "?x rdf:type ub:Person. " +LB         
@@ -205,8 +200,6 @@ public class TestLUBM {
         System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ6(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
-//	    Query: 1
-//	    Result: 161
 	    System.out.println("Q6");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Student. " +LB

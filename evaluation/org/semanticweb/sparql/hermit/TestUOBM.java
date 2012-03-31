@@ -24,13 +24,13 @@ public class TestUOBM {
 	    System.out.println("OWLOntology: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();
-	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS);
+	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
 	    System.out.println("Precompute: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-//        getUOBMQ01(sparqlEngine, dataset);
+       getUOBMQ01(sparqlEngine, dataset);
 //        getUOBMQ02(sparqlEngine, dataset);
-	    getUOBMQ1(sparqlEngine, dataset);
+//	      getUOBMQ1(sparqlEngine, dataset);
 //	      getUOBMQ2(sparqlEngine, dataset);
 //        getUOBMQ3(sparqlEngine, dataset);
 //        getUOBMQ4(sparqlEngine, dataset);

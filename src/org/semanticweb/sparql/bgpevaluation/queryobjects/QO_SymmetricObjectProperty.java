@@ -39,7 +39,6 @@ public class QO_SymmetricObjectProperty extends QO_ObjectPropertyAxiom<Symmetric
     }
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		 return visitor.visit(this);
 	}
 }

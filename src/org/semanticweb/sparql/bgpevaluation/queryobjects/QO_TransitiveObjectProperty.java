@@ -39,8 +39,7 @@ public class QO_TransitiveObjectProperty extends QO_ObjectPropertyAxiom<Transiti
     }
 	@Override
 	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
-		// TODO Auto-generated method stub
-		return null;
+		 return visitor.visit(this);
 	}
 	
 }
