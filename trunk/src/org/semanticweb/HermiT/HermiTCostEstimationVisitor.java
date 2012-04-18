@@ -41,7 +41,7 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
 
     protected double POSSIBLE_INSTANCE_SUCCESS=0.5;
     
-    protected final Reasoner m_hermit;
+    protected final OWLBGPHermiT m_hermit;
     protected final InstanceStatistics m_instanceStatistics;
     protected final double m_numDisjunctions;
     protected Integer m_classHierarchyDepth;
@@ -50,8 +50,8 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     public HermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         super(graph, bindingPositions, candidateBindings);
         r=0;
-        if (m_reasoner instanceof Reasoner) {
-            m_hermit=(Reasoner)m_reasoner;
+        if (m_reasoner instanceof OWLBGPHermiT) {
+            m_hermit=(OWLBGPHermiT)m_reasoner;
             m_instanceStatistics=m_hermit.getInstanceStatistics();
             double numDisjunctions=0;
             for (DLClause clause : m_hermit.getDLOntology().getDLClauses())

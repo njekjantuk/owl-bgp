@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
-import org.semanticweb.HermiT.Reasoner;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLBGPQueryIterator;
@@ -46,6 +45,7 @@ import org.semanticweb.sparql.owlbgp.parser.ParseException;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.reasoner.Reasoner;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;

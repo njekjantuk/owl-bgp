@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -28,7 +28,7 @@ import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 public class BindingsIntersection {
 	
 	protected final OWLReasoner m_reasoner;
-	protected final Reasoner m_hermit;
+	protected final OWLBGPHermiT m_hermit;
 	protected final OWLDataFactory m_dataFactory;
     protected final OWLOntologyGraph m_graph;
     protected final InstanceStatistics m_instanceStatistics;
@@ -39,8 +39,8 @@ public class BindingsIntersection {
 	    m_dataFactory=graph.getOntology().getOWLOntologyManager().getOWLDataFactory();
 	    m_graph=graph;
 	    bindingPosition=bindingPositions;
-		if (m_reasoner instanceof Reasoner) {
-			m_hermit=(Reasoner)m_reasoner;
+		if (m_reasoner instanceof OWLBGPHermiT) {
+			m_hermit=(OWLBGPHermiT)m_reasoner;
 	    } else 
 	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
 		    m_instanceStatistics=m_hermit.getInstanceStatistics();
