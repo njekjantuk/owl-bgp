@@ -26,10 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
@@ -63,6 +62,7 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
@@ -78,11 +78,11 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     protected double COST_CLASS_HIERARCHY_INSERTION=10*COST_ENTAILMENT;
     
     protected final OWLReasoner m_reasoner;
-    protected final Reasoner m_hermit;
+    protected final OWLBGPHermiT m_hermit;
     protected final OWLDataFactory m_dataFactory;
     protected final OWLOntologyGraph m_graph;
     protected final InstanceStatistics m_instanceStatistics;
-    protected final Map<Integer,Set<OWLNamedIndividual>> m_clusterMap;
+    protected final Map<NamedIndividual,Set<NamedIndividual>> m_individualToPartition;
     protected final int m_classCount;
     protected final int m_opCount;
     protected final int m_dpCount;
@@ -97,10 +97,10 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     
     public CostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         m_reasoner=graph.getReasoner();
-        if (m_reasoner instanceof Reasoner){ 
-            m_hermit=(Reasoner)m_reasoner;
+        if (m_reasoner instanceof OWLBGPHermiT){ 
+            m_hermit=(OWLBGPHermiT)m_reasoner;
             m_instanceStatistics=m_hermit.getInstanceStatistics();
-            m_clusterMap=m_instanceStatistics.getPartitioningMap();
+            m_individualToPartition=m_instanceStatistics.getPartitioning();
         }
         else 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");

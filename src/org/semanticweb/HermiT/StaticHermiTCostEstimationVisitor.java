@@ -20,7 +20,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisitor {
 	protected double POSSIBLE_INSTANCE_SUCCESS=0.5;
-	protected final Reasoner m_hermit;
+	protected final OWLBGPHermiT m_hermit;
 	protected final InstanceStatistics m_instanceStatistics;
 	protected final double m_numDisjunctions;
 	protected Integer m_classHierarchyDepth;
@@ -28,8 +28,8 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	    
 	public StaticHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions) {
 		super(graph, bindingPositions);
-	    if (m_reasoner instanceof Reasoner) {
-	    	m_hermit=(Reasoner)m_reasoner;
+	    if (m_reasoner instanceof OWLBGPHermiT) {
+	    	m_hermit=(OWLBGPHermiT)m_reasoner;
 	        m_instanceStatistics=m_hermit.getInstanceStatistics();
 	        double numDisjunctions=0;
 	        for (DLClause clause : m_hermit.getDLOntology().getDLClauses())

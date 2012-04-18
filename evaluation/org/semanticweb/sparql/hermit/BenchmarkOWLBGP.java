@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.semanticweb.HermiT.Reasoner;
+import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -317,8 +317,8 @@ public class BenchmarkOWLBGP {
                 t=System.currentTimeMillis();
                 OWLReasoner reasoner=graph.getReasoner();
                 reasoner.precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
-                if (reasoner instanceof Reasoner) {
-                	((Reasoner)graph.getReasoner()).getInstanceStatistics();
+                if (reasoner instanceof OWLBGPHermiT) {
+                	((OWLBGPHermiT)graph.getReasoner()).getInstanceStatistics();
                 }
                 System.out.println("The precomputation time (classification and initialization of known and possible instances) is "+(System.currentTimeMillis()-t)+" ms.");
                 t=System.currentTimeMillis()-t;
