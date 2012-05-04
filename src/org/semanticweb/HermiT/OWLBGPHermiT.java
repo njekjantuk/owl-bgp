@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.model.DescriptionGraph;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 
 public class OWLBGPHermiT extends Reasoner {
@@ -44,6 +46,12 @@ public class OWLBGPHermiT extends Reasoner {
     	super(configuration, rootOntology, descriptionGraphs);
     }
 
+    public boolean hasType(OWLNamedIndividual namedIndividual,OWLClassExpression type,boolean direct) {
+        // start measuring
+        boolean result=super.hasType(namedIndividual, type, direct);
+        // stop measuring
+        return result;
+    }
     
     // statistics for cost-based query axiom ordering
 
