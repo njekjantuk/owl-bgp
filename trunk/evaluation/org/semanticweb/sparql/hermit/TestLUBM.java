@@ -21,9 +21,11 @@ package  org.semanticweb.sparql.hermit;
 import java.io.File;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
 import org.semanticweb.owlapi.reasoner.InferenceType;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
@@ -43,12 +45,16 @@ public class TestLUBM {
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();	    
 //	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
-	    graph.getReasoner().precomputeInferences(InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
+	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
 	    System.out.println("Precomputation lasted: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
-	    getLUBMQTest(sparqlEngine, dataset);
-	    getLUBMQ0(sparqlEngine, dataset);
+//	    getLUBMQTest(sparqlEngine, dataset);
+//	    getLUBMQ0(sparqlEngine, dataset);
+	    t=System.currentTimeMillis();
+	    
+	    
+	    
 	    getLUBMQ1(sparqlEngine, dataset);
         getLUBMQ2(sparqlEngine, dataset);
         getLUBMQ3(sparqlEngine, dataset);
@@ -63,20 +69,29 @@ public class TestLUBM {
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
         getLUBMQ14(sparqlEngine, dataset);
-        //System.out.println("The execution of the 15 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
+        System.out.println("The execution of the 14 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/univ-bench.owl"));
+	    /*OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/univ-bench.owl"));
 	    File dir = new File("evaluation/ontologies/LUBM-1");
-        String[] children = dir.list();
+       String[] children = dir.list();
         for (int i=0;i<children.length;i++){
             File file=new File("evaluation/ontologies/LUBM-1/"+children[i]); 
             if (file.isFile()) {
         	  OWLOntology tmp=manager.loadOntologyFromOntologyDocument(file);
 	          manager.addAxioms(ont, tmp.getAxioms());
             }
-        }    
+        }
+	    */
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/LUBMwDep.owl"));
+        /*try {
+        	 File file = new File("evaluation/ontologies/LUBMwDep.owl");
+        	 manager.saveOntology(ont, IRI.create(file.toURI()));
+		} catch (OWLOntologyStorageException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
         return new OWLOntologyDataSet(ont, null);
     }
 	public static String getLUBMPrefix() {

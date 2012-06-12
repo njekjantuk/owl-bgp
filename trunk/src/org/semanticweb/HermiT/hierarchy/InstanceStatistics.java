@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +35,9 @@ public class InstanceStatistics {
     protected final RoleElement m_topRoleElement;
     protected final RoleElement m_bottomRoleElement;
     protected Map<NamedIndividual,Set<NamedIndividual>> m_individualToPartitions;
+    protected Map<Integer,Set<List<NamedIndividual>>> m_pairsOfIndividualsToPartitions;
+    protected Map<Integer,Set<NamedIndividual>> m_pairsFirstIndividualToPartitions;
+    protected Map<Integer,Set<NamedIndividual>> m_pairsSecondIndividualToPartitions;
     
     public InstanceStatistics(InstanceManager instanceManger, Reasoner reasoner) {
         m_instanceManager=instanceManger;
@@ -42,6 +46,16 @@ public class InstanceStatistics {
         m_bottomConcept=AtomicConcept.NOTHING;
         m_topRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.TOP_OBJECT_ROLE);
         m_bottomRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.BOTTOM_OBJECT_ROLE);
+        Set<OWLClass> atomicConcepts=reasoner.getRootOntology().getClassesInSignature();
+	    for (OWLClass con:atomicConcepts) {
+	    	int[] estimate=getNumberOfInstances(con);
+	    	//System.out.println(con.toString()+" known instances= "+estimate[0] +" possible instances= "+estimate[1]);
+	    }
+	    Set<OWLObjectProperty> atomicRoles=reasoner.getRootOntology().getObjectPropertiesInSignature();
+	    for (OWLObjectProperty op:atomicRoles) {
+	    	RoleInstanceStatistics roleStatistics=getRoleInstanceStatistics(op);
+	    	//System.out.println(op.toString()+" known instances= "+roleStatistics.getNumberOfKnownInstances() +" possible instances= "+roleStatistics.getNumberOfPossibleInstances());
+	    }
     }
     
     // *************************************    
@@ -577,20 +591,89 @@ public class InstanceStatistics {
     
     public Map<NamedIndividual,Set<NamedIndividual>> getPartitioning() {
     	if (m_individualToPartitions==null) {
-    		Partitioning partition=new Partitioning();
+    		m_individualToPartitions=new HashMap<NamedIndividual,Set<NamedIndividual>>();
+    	
+    	    Partitioning partition=new Partitioning();
 	        Map<Integer,Set<Individual>> partitionsSet=partition.computePartitions(m_reasoner);
 	        for (Set<Individual> individualCluster : partitionsSet.values()) {
 	        	Set<NamedIndividual> namedIndividualCluster=new HashSet<NamedIndividual>();
 	        	for (Individual ind : individualCluster) {
 	        		NamedIndividual namedInd=NamedIndividual.create(ind.getIRI());
-	        		namedIndividualCluster.add(namedInd);
-	        		m_individualToPartitions.put(namedInd,namedIndividualCluster);
-	        	}
+	        	    namedIndividualCluster.add(namedInd);
+	        	    m_individualToPartitions.put(namedInd,namedIndividualCluster);
+	            }
 	        }
-    	}
+        }
         return m_individualToPartitions;
     }
+    public Map<Integer,Set<List<NamedIndividual>>> getPairIndsPartitioning() {
+    	if (m_pairsOfIndividualsToPartitions==null) {
+    		m_pairsOfIndividualsToPartitions=new HashMap<Integer,Set<List<NamedIndividual>>>();
+            Partitioning partition=new Partitioning();
+    		Map<Integer, Set<List<Individual>>> partitionsPairSet=partition.computePropertyPartitions(m_reasoner);
+    		int hashSize=0;
+    		for (int k:partitionsPairSet.keySet()) {
+    			Set<List<Individual>> indSet=partitionsPairSet.get(k);
+    			hashSize=hashSize+indSet.size();
+    			Set<List<NamedIndividual>> setForHash=new HashSet<List<NamedIndividual>>();
+    			for (List<Individual> indList:indSet) {
+    				List<NamedIndividual> namedIndividualCluster=new ArrayList<NamedIndividual>();
+    				for (int g=0;g<indList.size();g++) {
+    			    	namedIndividualCluster.add(NamedIndividual.create(indList.get(g).getIRI()));
+    			    }
+    				setForHash.add(namedIndividualCluster);
+    			}
+    			m_pairsOfIndividualsToPartitions.put(k, setForHash);
+    		}
+    		//System.out.println("The size is "+ hashSize);
+    		/*for (Set<List<Individual>> individualCluster : partitionsPairSet.values()) {
+	        	Set<List<NamedIndividual>> namedIndividualCluster=new HashSet<List<NamedIndividual>>();
+	            for (List<Individual> ind : individualCluster) {
+	            	NamedIndividual namedInd=NamedIndividual.create(ind.getIRI());
+	        	    namedIndividualCluster.add(namedInd);
+	        	    m_pairsOfIndividualsToPartitions.put(namedInd,namedIndividualCluster);
+	            }
+	        }
+            return m_pairsOfIndividualsToPartitions*/
+    	}	
+    	
+    	return m_pairsOfIndividualsToPartitions;
+    }	
     
+    public Map<Integer,Set<NamedIndividual>> getPairFirstIndPartitioning() {
+    	if (m_pairsFirstIndividualToPartitions==null) {
+    		m_pairsFirstIndividualToPartitions=new HashMap<Integer,Set<NamedIndividual>>();
+    		Partitioning partition=new Partitioning();
+    		Map<Integer, Set<Individual>> partitionsPairSet=partition.computesucIndPartitions(m_reasoner);
+    		for (int k:partitionsPairSet.keySet()) {
+    			Set<NamedIndividual> clusterSet=new HashSet<NamedIndividual>();
+    			Set<Individual> individualSet=partitionsPairSet.get(k);	
+    			for (Individual ind:individualSet) {
+    			    clusterSet.add(NamedIndividual.create(ind.getIRI()));
+    			}
+    			m_pairsFirstIndividualToPartitions.put(k, clusterSet);
+    		}	
+    	}	
+    	return m_pairsFirstIndividualToPartitions;
+    }
+    
+    public Map<Integer,Set<NamedIndividual>> getPairSecondIndPartitioning() {
+    	if (m_pairsSecondIndividualToPartitions==null) {
+    		m_pairsSecondIndividualToPartitions=new HashMap<Integer,Set<NamedIndividual>>();
+    		Partitioning partition=new Partitioning();
+    		Map<Integer, Set<Individual>> partitionsPairSet=partition.computepreIndPartitions(m_reasoner);
+    		for (int k:partitionsPairSet.keySet()) {
+    			Set<NamedIndividual> clusterSet=new HashSet<NamedIndividual>();
+    			Set<Individual> individualSet=partitionsPairSet.get(k);	
+    			for (Individual ind:individualSet) {
+    			    clusterSet.add(NamedIndividual.create(ind.getIRI()));
+    			}
+    			m_pairsSecondIndividualToPartitions.put(k, clusterSet);
+    		}	
+    	}	
+    	return m_pairsSecondIndividualToPartitions;
+    }
+    		
     // helper classes
     
     final class DFS<T> {

@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.HermiT.EntailmentLookUpCostEstimation;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+//import org.semanticweb.sparql.arq.countingMonitor;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
@@ -78,6 +80,11 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         m_indCount=graph.getIndividualsInSignature().size();
         m_litCount=graph.getLiteralsInSignature().size();
         m_bindingPositions=bindingPositions;
+//        System.out.println("HermiT did "+countingMonitor.getOverallNumberOfTests()+" tests. ");
+//	    System.out.println("This took "+countingMonitor.getOverallTime()+" ms. ");
+//	    System.out.println("The last test took "+countingMonitor.getTime()+" ms. ");
+//	    System.out.println("The last model contained "+countingMonitor.getNumberOfNodes()+" nodes/individuals. ");
+//       System.out.println("The 2 hardest satisfiability tests were:");
     }
    
     public double[] visit(QO_SubClassOf queryObject, Set<Variable> boundVar) {
