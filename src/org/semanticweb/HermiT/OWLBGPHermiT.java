@@ -1,14 +1,27 @@
 package org.semanticweb.HermiT;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.model.DescriptionGraph;
+import org.semanticweb.HermiT.monitor.CountingMonitor;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.reasoner.NodeSet;
+import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 
-public class OWLBGPHermiT extends Reasoner {
+import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
+
+    public class OWLBGPHermiT extends Reasoner {
+    	protected final InstanceStatistics m_instanceStatistics;
 
     /**
      * Creates a new reasoner object with standard parameters for blocking, expansion strategy etc. Then the given manager is used to find all required imports for the given ontology and the ontology with the imports is loaded into the reasoner and the data factory of the manager is used to create fresh concepts during the preprocessing phase if necessary.
@@ -18,6 +31,7 @@ public class OWLBGPHermiT extends Reasoner {
      */
     public OWLBGPHermiT(OWLOntology rootOntology) {
         super(rootOntology);
+        m_instanceStatistics=createInstanceStatistics();
     }
 
     /**
@@ -30,6 +44,7 @@ public class OWLBGPHermiT extends Reasoner {
      */
     public OWLBGPHermiT(Configuration configuration,OWLOntology rootOntology) {
         super(configuration,rootOntology);
+        m_instanceStatistics=createInstanceStatistics();
     }
 
     /**
@@ -44,21 +59,161 @@ public class OWLBGPHermiT extends Reasoner {
      */
     public OWLBGPHermiT(Configuration configuration,OWLOntology rootOntology,Collection<DescriptionGraph> descriptionGraphs) {
     	super(configuration, rootOntology, descriptionGraphs);
+    	m_instanceStatistics=getInstanceStatistics();
     }
 
+    public InstanceStatistics getInstanceStatistics() {
+    	return m_instanceStatistics;
+    }
+    
     public boolean hasType(OWLNamedIndividual namedIndividual,OWLClassExpression type,boolean direct) {
-        // start measuring
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
         boolean result=super.hasType(namedIndividual, type, direct);
-        // stop measuring
+        int currentCost=(int)(System.currentTimeMillis()-t);
+        if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+        }
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        
+        }*/
         return result;
+    }
+    
+    public NodeSet<OWLNamedIndividual> getInstances(OWLClassExpression classExpression,boolean direct) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+    	NodeSet<OWLNamedIndividual> indSet=super.getInstances(classExpression, direct);
+    	int currentCost=(int)(System.currentTimeMillis()-t);
+    	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    	}
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+    	return indSet;
+    }
+
+    public NodeSet<OWLClass> getTypes(OWLNamedIndividual namedIndividual,boolean direct) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+    	NodeSet<OWLClass> clSet=super.getTypes(namedIndividual, direct);
+    	int currentCost=(int)(System.currentTimeMillis()-t);
+    	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    	}
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+    	return clSet;
+    }
+    
+    public Map<OWLNamedIndividual,Set<OWLNamedIndividual>> getObjectPropertyInstances(OWLObjectProperty property) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+    	Map<OWLNamedIndividual, Set<OWLNamedIndividual>> indSet=super.getObjectPropertyInstances(property);
+    	int currentCost=(int)(System.currentTimeMillis()-t);
+    	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+    		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    	}
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+    	return indSet;
+    }
+    
+    public NodeSet<OWLNamedIndividual> getObjectPropertyValues(OWLNamedIndividual namedIndividual,OWLObjectPropertyExpression propertyExpression) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+    	NodeSet<OWLNamedIndividual> indSet=super.getObjectPropertyValues(namedIndividual, propertyExpression);
+    	long l=System.currentTimeMillis();
+    	//int currentCost=(int)(System.currentTimeMillis()-t);
+    	long currentCost1=l-t;
+        int currentCost=(int)currentCost1;
+    	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+    		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    	}
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+    	return indSet;
+    }
+    
+    public boolean hasObjectPropertyRelationship(OWLNamedIndividual subject,OWLObjectPropertyExpression propertyExpression,OWLNamedIndividual object) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+        boolean result=super.hasObjectPropertyRelationship(subject, propertyExpression, object);
+        int currentCost=(int)(System.currentTimeMillis()-t);
+        if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+        }
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+        return result;
+    }
+    
+    public Set<OWLLiteral> getDataPropertyValues(OWLNamedIndividual namedIndividual,OWLDataProperty property) {
+    	int testsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    	long t=System.currentTimeMillis();
+    	Set<OWLLiteral> litSet=super.getDataPropertyValues(namedIndividual, property);
+    	int currentCost=(int)(System.currentTimeMillis()-t);
+    	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
+        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    	}
+/*        else {
+        	EntailmentLookUpCostEstimation.lookUpCostTotal=EntailmentLookUpCostEstimation.lookUpCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.lookUpTestsno++;
+        	EntailmentLookUpCostEstimation.lookUpCost=(int)(EntailmentLookUpCostEstimation.lookUpCostTotal/EntailmentLookUpCostEstimation.lookUpTestsno);
+        }*/
+    	return litSet;
     }
     
     // statistics for cost-based query axiom ordering
 
-    public InstanceStatistics getInstanceStatistics() {
+    public InstanceStatistics createInstanceStatistics() {
     	if (m_instanceManager==null) {
+    		long t=System.currentTimeMillis();
     		initialiseClassInstanceManager(); 
     		initialisePropertiesInstanceManager();
+    		int currentCost=(int)(System.currentTimeMillis()-t);
+    		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	} else {
     		
     	}

@@ -33,11 +33,15 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	        m_instanceStatistics=m_hermit.getInstanceStatistics();
 	        double numDisjunctions=0;
 	        for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
-	        	if (clause.getHeadLength()>1)
+	        	if (clause.getHeadLength()>1) {
 	        		numDisjunctions+=clause.getHeadLength();
+	        		//System.out.println(clause);
+	        	}	
 	            m_numDisjunctions=numDisjunctions;
 	    } else 
 	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
+	    COST_ENTAILMENT=(double)EntailmentLookUpCostEstimation.entailmentCost;
+        COST_LOOKUP=(double)EntailmentLookUpCostEstimation.lookUpCost;
 	}
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> bound, Variable indVar) {
     	double cost=0;	        

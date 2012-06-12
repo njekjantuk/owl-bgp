@@ -24,6 +24,7 @@ import java.util.Set;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics.RoleInstanceStatistics;
 import org.semanticweb.HermiT.model.DLClause;
+import org.semanticweb.HermiT.monitor.CountingMonitor;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
@@ -48,7 +49,7 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     protected Integer m_opHierarchyDepth;
     int r;
     public HermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
-        super(graph, bindingPositions, candidateBindings);
+        super(graph, bindingPositions, candidateBindings);	
         r=0;
         if (m_reasoner instanceof OWLBGPHermiT) {
             m_hermit=(OWLBGPHermiT)m_reasoner;
@@ -65,6 +66,8 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     }
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
     	double cost=0;
+    	//COST_ENTAILMENT=(double)EntailmentLookUpCostEstimation.entailmentCost;
+        //COST_LOOKUP=(double)EntailmentLookUpCostEstimation.lookUpCost;
 //        if (ce instanceof Atomic && (m_instanceStatistics==null || !m_instanceStatistics.areClassesInitialised()))
 //            cost+=(m_classCount*m_indCount*COST_LOOKUP+COST_ENTAILMENT); // initialization required
         if (unbound.size()==0 && ce instanceof Atomic){//C(a)       		
@@ -93,6 +96,8 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     }
     protected double[] getObjectPropertyAssertionCost(ObjectPropertyExpression op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
         double cost=0;
+        //COST_ENTAILMENT=(double)EntailmentLookUpCostEstimation.entailmentCost;
+        //COST_LOOKUP=(double)EntailmentLookUpCostEstimation.lookUpCost;
         if (unbound.size()==0) {//r(:a :b)
         	boolean[] result=m_instanceStatistics.hasSuccessor((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
             if (result[0])

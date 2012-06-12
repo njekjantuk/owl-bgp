@@ -22,13 +22,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
@@ -83,6 +87,9 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     protected final OWLOntologyGraph m_graph;
     protected final InstanceStatistics m_instanceStatistics;
     protected final Map<NamedIndividual,Set<NamedIndividual>> m_individualToPartition;
+    //protected final Map<Integer,Set<List<NamedIndividual>>> m_pairIndToPartition;
+    protected final Map<Integer,Set<NamedIndividual>> m_sucIndToPartition;
+    protected final Map<Integer,Set<NamedIndividual>> m_preIndToPartition;
     protected final int m_classCount;
     protected final int m_opCount;
     protected final int m_dpCount;
@@ -99,8 +106,17 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         m_reasoner=graph.getReasoner();
         if (m_reasoner instanceof OWLBGPHermiT){ 
             m_hermit=(OWLBGPHermiT)m_reasoner;
+            //m_instanceStatistics=null;
             m_instanceStatistics=m_hermit.getInstanceStatistics();
+            //m_individualToPartition=null;
+            long t=System.currentTimeMillis();
             m_individualToPartition=m_instanceStatistics.getPartitioning();
+            //System.out.println("The class partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains " +m_individualToPartition.keySet().size()+ " clusters.");
+            //m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
+            t=System.currentTimeMillis();
+            m_sucIndToPartition=m_instanceStatistics.getPairFirstIndPartitioning();
+            m_preIndToPartition=m_instanceStatistics.getPairSecondIndPartitioning();
+            //System.out.println("The partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains "+m_sucIndToPartition.keySet().size()+ " first ind clusters and "+m_preIndToPartition.keySet().size()+" second ind clusters");
         }
         else 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
@@ -277,27 +293,87 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         ClassExpression expression=axiomTemplate.getClassExpression();
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
+        
+        
+        //boolean[] result=m_instanceStatistics.isKnownOrPossibleInstance((OWLClass)ce.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory)); 
+        //estimate=m_instanceStatistics.getNumberOfSuccessors((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory));
+        
         if (expression instanceof Atomic || expression.isVariable()) {  
-        /*Map<Integer, Set<OWLNamedIndividual>> candidateMap=new HashMap<Integer,Set<OWLNamedIndividual>>();
-        if (sampl!=null && sampl.equals("Sampling")) { 
-        	//int sampleSize=m_candidateBindings.size()*5/10;
-            //List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-            //ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-            //shuffledBindings.addAll(m_candidateBindings);
-            //Collections.shuffle(shuffledBindings);
-            //sampleBindings=shuffledBindings.subList(0, sampleSize);
-            //m_candidateBindings=new ArrayList<Atomic[]>();
-            //m_candidateBindings=sampleBindings;
-        	//Set<OWLNamedIndividual> candidateIndSet=new HashSet<OWLNamedIndividual>();
-        	int flag=0;
+        //Map<Integer, Set<OWLNamedIndividual>> candidateMap=new HashMap<Integer,Set<OWLNamedIndividual>>();
+       
+        	if (sampl!=null && sampl.equals("Sampling")) { 
+        	/*int sampleSize=m_candidateBindings.size()*5/10;
+            List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+            ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+            shuffledBindings.addAll(m_candidateBindings);
+            Collections.shuffle(shuffledBindings);
+            sampleBindings=shuffledBindings.subList(0, sampleSize);
+            m_candidateBindings=new ArrayList<Atomic[]>();
+            m_candidateBindings=sampleBindings;*/
+        	Set<NamedIndividual> candidateIndSet=new HashSet<NamedIndividual>();
+        	
          
         	for (Atomic[] testBinding : m_candidateBindings) {
         		Atomic binding=testBinding[m_bindingPositions.get(indVar)];
         		if (binding==null) break;
-        		candidateIndSet.add((OWLNamedIndividual)binding.asOWLAPIObject(m_dataFactory));
+        		candidateIndSet.add((NamedIndividual)binding);
         	}
+        	if (candidateIndSet.isEmpty()) {
+                existingBindings.clear();
+                ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                unbound.addAll(vars);
+                unbound.removeAll(existingBindings.keySet());
+                     
+                double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+                estimate[0]+=currentEstimate[0];
+                estimate[1]+=currentEstimate[1];
+                //estimate[0]=estimate[0]*m_candidateBindings.size();
+                //estimate[1]=estimate[1]*m_candidateBindings.size();
+            }
+        	else {
+        		long h=System.currentTimeMillis();
+        		while (!candidateIndSet.isEmpty()) {
+        			Set<NamedIndividual> holdIndSet=candidateIndSet;
+        			Iterator<NamedIndividual> itr = candidateIndSet.iterator(); 
+        		    NamedIndividual element = itr.next();
+        		    Set<NamedIndividual> indSet=m_individualToPartition.get(element);
+        		    holdIndSet.retainAll(indSet);
+        		    existingBindings.put(indVar, element);	
+        		    ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                    unbound.addAll(vars);
+                    unbound.removeAll(existingBindings.keySet());
+             
+                    double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+                    estimate[0]+=currentEstimate[0];
+                    estimate[1]+=currentEstimate[1];
+                    estimate[0]=estimate[0]*holdIndSet.size();
+                    estimate[1]=estimate[1]*holdIndSet.size();         		
+                    candidateIndSet.removeAll(holdIndSet);
+                }
+        		//System.out.println("The sampling time is" +(System.currentTimeMillis()-h)+ "ms.");
+        	}
+          }
+          else for (Atomic[] testBinding : m_candidateBindings) {
+        	  existingBindings.clear();
+              for (Variable var : vars) {
+            	  Atomic binding=testBinding[m_bindingPositions.get(var)];
+                  if (binding!=null)
+                	  existingBindings.put(var,binding);
+              }
+              ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+              unbound.addAll(vars);
+              unbound.removeAll(existingBindings.keySet()); 
+              double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+              estimate[0]+=currentEstimate[0];
+              estimate[1]+=currentEstimate[1]; 
+         }
+//}          
+         return estimate;
+       }	   
+       else return complex(unbound, m_candidateBindings);
+        	
         	//HashMap<Integer,Atomic> candidateClusterMap=new HashMap<Integer,Atomic>();
-        	if (!candidateIndSet.isEmpty()){
+        	/*if (!candidateIndSet.isEmpty()){
         	for (Integer code:m_clusterMap.keySet()) {
         		Set<OWLNamedIndividual> indSet=candidateIndSet;
         		Set<OWLNamedIndividual> clusterSet=m_clusterMap.get(code);
@@ -339,8 +415,8 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                 if (flag==1) break;    
 //                } 
            }
-           }
-           else*/ for (Atomic[] testBinding : m_candidateBindings) {
+           }*/
+           /*else for (Atomic[] testBinding : m_candidateBindings) {
            existingBindings.clear();
            for (Variable var : vars) {
               Atomic binding=testBinding[m_bindingPositions.get(var)];
@@ -353,10 +429,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
            double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
            estimate[0]+=currentEstimate[0];
            estimate[1]+=currentEstimate[1]; 
-           }
-           return estimate;
-        }   
-        else return complex(unbound, m_candidateBindings);
+           }*/
     }
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
         if (unbound.size()==0)
@@ -380,10 +453,15 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         ObjectPropertyExpression ope=axiomTemplate.getObjectPropertyExpression();
         Set<Variable> opVars=ope.getVariablesInSignature();
         Variable opVar=opVars.isEmpty()?null:opVars.iterator().next();
+        Set<Variable> ind1Vars=axiomTemplate.getIndividual1().getVariablesInSignature();
+        Variable ind1Var=ind1Vars.isEmpty()?null:ind1Vars.iterator().next();
+        Set<Variable> ind2Vars=axiomTemplate.getIndividual2().getVariablesInSignature();
+        Variable ind2Var=ind2Vars.isEmpty()?null:ind2Vars.iterator().next();
+        
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
         if (ope instanceof Atomic || ope.isVariable()) {
-        if (sampl!=null && sampl.equals("Sampling")) { 
+         if (sampl!=null && sampl.equals("Sampling")) { 
         	/*int sampleSize=m_candidateBindings.size()*5/10;
             List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
             ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
@@ -392,9 +470,140 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
             sampleBindings=shuffledBindings.subList(0, sampleSize);
             m_candidateBindings=new ArrayList<Atomic[]>();
             m_candidateBindings=sampleBindings;*/
-        	
-        }         
-        for (Atomic[] testBinding : m_candidateBindings) {
+        	int flag=0;
+        	//Set<NamedIndividual> candidateIndSucOrPre=new HashSet<NamedIndividual>();
+        	Set<List<NamedIndividual>> pairInds=new HashSet<List<NamedIndividual>>();      
+        	Set<NamedIndividual> candidateIndSet=new HashSet<NamedIndividual>();
+        	for (Atomic[] testBinding : m_candidateBindings) {
+        		if (ind1Var!=null && ind2Var!=null) {
+        			Atomic binding1=testBinding[m_bindingPositions.get(ind1Var)];
+        		    Atomic binding2=testBinding[m_bindingPositions.get(ind2Var)];
+        		    if (binding1!=null && binding2!=null) {
+        		    	List<NamedIndividual> indList=new ArrayList<NamedIndividual>();
+        		        indList.add((NamedIndividual)binding1);
+         		        indList.add((NamedIndividual)binding2);
+         		        pairInds.add(indList);
+         		        flag=1;
+        		    }
+        		    else if (binding1!=null && binding2==null) {
+        		        candidateIndSet.add((NamedIndividual)binding1);
+         		        flag=2;
+        		    	
+        		    }
+        		    else if (binding1==null && binding2!=null) {
+        		        candidateIndSet.add((NamedIndividual)binding2);
+         		        flag=3;
+        		    }
+        		    else break;
+        	    }
+        	}	
+        	if (flag==0) {
+        		for (Atomic[] testBinding : m_candidateBindings) {
+                    existingBindings.clear();
+                    for (Variable var : vars) {
+                        Atomic binding=testBinding[m_bindingPositions.get(var)];
+                        if (binding!=null)
+                            existingBindings.put(var,binding);
+                    }
+                    ObjectPropertyAssertion instantiated=(ObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                    unbound.addAll(vars);
+                    unbound.removeAll(existingBindings.keySet());
+                    
+                    double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+                    estimate[0]+=currentEstimate[0];
+                    estimate[1]+=currentEstimate[1];
+                }
+                return estimate;
+        	}
+        	/*else if (flag==1) {
+        		for (int f:m_pairIndToPartition.keySet()) {
+        			if (!pairInds.isEmpty()) {
+        				Set<List<NamedIndividual>> keyValues=m_pairIndToPartition.get(f);
+        				Set<List<NamedIndividual>> holdIndSet=new HashSet<List<NamedIndividual>>();
+        				holdIndSet.addAll(pairInds);
+        				for (List<NamedIndividual> ind1List:holdIndSet) {
+        					for (List<NamedIndividual> ind2List:keyValues) {
+        						if (ind1List.get(0)==ind2List.get(0) && ind1List.get(1)==ind2List.get(1)) {
+        							System.out.println("one found");
+        						}
+        					}
+        				}
+        				holdIndSet.retainAll(keyValues);
+        				
+        				if (!holdIndSet.isEmpty()) {
+        					System.out.println("with intersection found with size "+holdIndSet.size());
+        					Iterator<List<NamedIndividual>> itr = holdIndSet.iterator(); 
+                		    List<NamedIndividual> element = itr.next();
+                		    existingBindings.put(ind1Var, element.get(0));
+                		    existingBindings.put(ind2Var, element.get(1));
+                		    
+                		    ObjectPropertyAssertion instantiated=(ObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                            unbound.addAll(vars);
+                            unbound.removeAll(existingBindings.keySet());
+                            
+                            double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+                            estimate[0]+=currentEstimate[0];
+                            estimate[1]+=currentEstimate[1];
+                            estimate[0]=estimate[0]*holdIndSet.size();
+                            estimate[1]=estimate[1]*holdIndSet.size();         		
+                            pairInds.removeAll(holdIndSet);
+        				}
+        				
+        			}
+        		}
+        	}*/
+        	else if (flag==2){
+            	if (!candidateIndSet.isEmpty()){
+            	for (Integer code:m_preIndToPartition.keySet()) {
+            		Set<NamedIndividual> individualSet=new HashSet<NamedIndividual>();
+            		individualSet.addAll(candidateIndSet);
+            		Set<NamedIndividual> clusterSet=m_preIndToPartition.get(code);
+            		individualSet.retainAll(clusterSet);
+            		if (!individualSet.isEmpty()){        		
+            			NamedIndividual binding=individualSet.iterator().next();
+            	        existingBindings.put(ind1Var,binding);
+                        ObjectPropertyAssertion instantiated=(ObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                        unbound.addAll(vars);
+                        unbound.removeAll(existingBindings.keySet());
+                     
+                        double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+                        estimate[0]+=currentEstimate[0];
+                        estimate[1]+=currentEstimate[1];
+                        estimate[0]=estimate[0]*individualSet.size();
+                        estimate[1]=estimate[1]*individualSet.size(); 
+            		    candidateIndSet.removeAll(individualSet);
+            		}
+            		
+                }
+                }
+        	}
+        	else {//flag==3
+            	if (!candidateIndSet.isEmpty()){
+            	for (Integer code:m_sucIndToPartition.keySet()) {
+            		Set<NamedIndividual> individualSet=new HashSet<NamedIndividual>();
+            		individualSet.addAll(candidateIndSet);
+            		Set<NamedIndividual> clusterSet=m_sucIndToPartition.get(code);
+            		individualSet.retainAll(clusterSet);
+            		if (!individualSet.isEmpty()){        		
+            			NamedIndividual binding=individualSet.iterator().next();
+            	        existingBindings.put(ind2Var,binding);
+                        ObjectPropertyAssertion instantiated=(ObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                        unbound.addAll(vars);
+                        unbound.removeAll(existingBindings.keySet());
+                     
+                        double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+                        estimate[0]+=currentEstimate[0];
+                        estimate[1]+=currentEstimate[1];
+                        estimate[0]=estimate[0]*individualSet.size();
+                        estimate[1]=estimate[1]*individualSet.size(); 
+            		    candidateIndSet.removeAll(individualSet);
+            		}
+            		
+                }
+                }
+        	}
+        }
+        else for (Atomic[] testBinding : m_candidateBindings) {
             existingBindings.clear();
             for (Variable var : vars) {
                 Atomic binding=testBinding[m_bindingPositions.get(var)];
@@ -409,9 +618,10 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
             estimate[0]+=currentEstimate[0];
             estimate[1]+=currentEstimate[1];
         }
+//}
         return estimate;
-        }
-        else return complex(unbound, m_candidateBindings);
+      }
+      else return complex(unbound, m_candidateBindings);
     }
     protected double[] getObjectPropertyAssertionCost(ObjectPropertyExpression op, Individual ind1, Individual ind2, Set<Variable> unbound, Variable opVar) {
         if (unbound.size()==0) //r(a,b)
@@ -477,7 +687,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
 
-        if (sampl!=null && sampl.equals("Sampling")) { 
+        /*if (sampl!=null && sampl.equals("Sampling")) { 
           int sampleSize=m_candidateBindings.size()*5/10;
           List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
           ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
@@ -486,7 +696,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
           sampleBindings=shuffledBindings.subList(0, sampleSize);
           m_candidateBindings=new ArrayList<Atomic[]>();
           m_candidateBindings=sampleBindings;
-        }  
+        }*/ 
           
         for (Atomic[] testBinding : m_candidateBindings) {
             existingBindings.clear();
