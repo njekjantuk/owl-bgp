@@ -34,7 +34,7 @@ import org.semanticweb.HermiT.tableau.Node;
 import org.semanticweb.HermiT.tableau.NodeType;
 import org.semanticweb.HermiT.tableau.ReasoningTaskDescription;
 import org.semanticweb.HermiT.tableau.Tableau;
-import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+
 
 public class Partitioning implements Serializable {
     private static final long serialVersionUID=-2959900333817197464L;
@@ -94,14 +94,10 @@ public class Partitioning implements Serializable {
         
         Node node1=tableau.getFirstTableauNode();
         
-        int g=0;
-        int beforeif=0;
         while (node1!=null) {
         	Node node2=tableau.getFirstTableauNode();
         	while (node2!=null) {
-        		beforeif++;
         		if (node1.isActive() && node2.isActive() && node1.getNodeType()==NodeType.NAMED_NODE && node2.getNodeType()==NodeType.NAMED_NODE) {       			
-        			g++;
         			int hashCode=getPropsHashCode(node1, node2)+getLabelHashCode(node1)+getLabelHashCode(node2);
         	        Set<List<Individual>> indPairsForThatHash = m_hashToIndividualsPairs.get(hashCode);
            	        if (indPairsForThatHash==null) {

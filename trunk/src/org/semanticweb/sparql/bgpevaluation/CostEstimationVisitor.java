@@ -19,7 +19,6 @@
 package  org.semanticweb.sparql.bgpevaluation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,10 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
@@ -109,11 +105,11 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
             //m_instanceStatistics=null;
             m_instanceStatistics=m_hermit.getInstanceStatistics();
             //m_individualToPartition=null;
-            long t=System.currentTimeMillis();
+            //long t=System.currentTimeMillis();
             m_individualToPartition=m_instanceStatistics.getPartitioning();
             //System.out.println("The class partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains " +m_individualToPartition.keySet().size()+ " clusters.");
             //m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
-            t=System.currentTimeMillis();
+            //t=System.currentTimeMillis();
             m_sucIndToPartition=m_instanceStatistics.getPairFirstIndPartitioning();
             m_preIndToPartition=m_instanceStatistics.getPairSecondIndPartitioning();
             //System.out.println("The partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains "+m_sucIndToPartition.keySet().size()+ " first ind clusters and "+m_preIndToPartition.keySet().size()+" second ind clusters");
@@ -331,7 +327,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                 //estimate[1]=estimate[1]*m_candidateBindings.size();
             }
         	else {
-        		long h=System.currentTimeMillis();
+        		//long h=System.currentTimeMillis();
         		while (!candidateIndSet.isEmpty()) {
         			Set<NamedIndividual> holdIndSet=candidateIndSet;
         			Iterator<NamedIndividual> itr = candidateIndSet.iterator(); 

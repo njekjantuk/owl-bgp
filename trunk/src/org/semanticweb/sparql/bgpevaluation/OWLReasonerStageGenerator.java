@@ -24,7 +24,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +50,6 @@ import org.semanticweb.sparql.owlbgp.parser.ParseException;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.reasoner.Reasoner;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;
@@ -225,7 +223,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     Set<Variable> boundVar=new HashSet<Variable>();
                     while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                     	m_monitor.costEvaluationStarted();
-                    	long t=System.currentTimeMillis();
+                    	//long t=System.currentTimeMillis();
                 	    QueryObject<? extends Axiom> cheapest;
                 	    if (connectedComponent.size()==1)
                 	    	cheapest=connectedComponent.iterator().next();
@@ -239,7 +237,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                         boundVar.addAll(varsss);
                         //boundVar.addAll(cheapest.getAxiomTemplate().getVariablesInSignature());
                         m_monitor.queryObjectEvaluationStarted(cheapest);
-                        t=System.currentTimeMillis();
+                        //t=System.currentTimeMillis();
                         bindings=cheapest.computeBindings(bindings, positionInTuple);
                         //System.out.println("the running time is "+(System.currentTimeMillis()-t)+" ms");
                         //System.out.println(cheapest.getAxiomTemplate());
@@ -278,10 +276,10 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     //long t=System.currentTimeMillis();
                     List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
                     //System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
-                    long f=System.currentTimeMillis();
+                    //long f=System.currentTimeMillis();
                     for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                     	if (!bindings.isEmpty()){
-                    		long d=System.currentTimeMillis();
+                    		//long d=System.currentTimeMillis();
                     		System.out.println(cheapest.getAxiomTemplate());
                     		bindings=cheapest.computeBindings(bindings, positionInTuple);
                 	        //System.out.println("The running time of the atom is "+ (System.currentTimeMillis()-d));
