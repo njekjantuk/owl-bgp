@@ -17,7 +17,6 @@
 	<classpathentry kind="lib" path="lib/arq-2.8.7-test.jar" sourcepath="lib/arq-2.8.7-test-src.jar"/>
 	<classpathentry kind="lib" path="lib/jena-2.6.4-test.jar" sourcepath="lib/jena-2.6.4-test-src.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/HermiT"/>
-	<classpathentry kind="lib" path="/Users/ilianna/Documents/workspace/uncommons-maths-1.2.2.jar"/>
 	<classpathentry kind="lib" path="lib/uncommons-maths-1.2.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
