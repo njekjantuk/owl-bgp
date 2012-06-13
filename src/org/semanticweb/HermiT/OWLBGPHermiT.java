@@ -16,9 +16,7 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.reasoner.NodeSet;
-import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 
-import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
 
     public class OWLBGPHermiT extends Reasoner {
     	protected final InstanceStatistics m_instanceStatistics;

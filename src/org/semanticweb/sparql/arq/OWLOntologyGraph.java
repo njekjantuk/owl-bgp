@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.HermiT.OWLBGPHermiT;
-import org.semanticweb.HermiT.Reasoner;
 //import org.semanticweb.HermiT.examples.countingMonitor;
 import org.semanticweb.HermiT.monitor.CountingMonitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;

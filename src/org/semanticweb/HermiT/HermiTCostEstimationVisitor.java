@@ -24,7 +24,6 @@ import java.util.Set;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics.RoleInstanceStatistics;
 import org.semanticweb.HermiT.model.DLClause;
-import org.semanticweb.HermiT.monitor.CountingMonitor;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;

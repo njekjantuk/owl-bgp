@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,16 +45,16 @@ public class InstanceStatistics {
         m_bottomConcept=AtomicConcept.NOTHING;
         m_topRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.TOP_OBJECT_ROLE);
         m_bottomRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.BOTTOM_OBJECT_ROLE);
-        Set<OWLClass> atomicConcepts=reasoner.getRootOntology().getClassesInSignature();
+        /*Set<OWLClass> atomicConcepts=reasoner.getRootOntology().getClassesInSignature();
 	    for (OWLClass con:atomicConcepts) {
 	    	int[] estimate=getNumberOfInstances(con);
-	    	//System.out.println(con.toString()+" known instances= "+estimate[0] +" possible instances= "+estimate[1]);
+	    	System.out.println(con.toString()+" known instances= "+estimate[0] +" possible instances= "+estimate[1]);
 	    }
 	    Set<OWLObjectProperty> atomicRoles=reasoner.getRootOntology().getObjectPropertiesInSignature();
 	    for (OWLObjectProperty op:atomicRoles) {
 	    	RoleInstanceStatistics roleStatistics=getRoleInstanceStatistics(op);
-	    	//System.out.println(op.toString()+" known instances= "+roleStatistics.getNumberOfKnownInstances() +" possible instances= "+roleStatistics.getNumberOfPossibleInstances());
-	    }
+	    	System.out.println(op.toString()+" known instances= "+roleStatistics.getNumberOfKnownInstances() +" possible instances= "+roleStatistics.getNumberOfPossibleInstances());
+	    }*/
     }
     
     // *************************************    
