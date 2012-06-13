@@ -19,6 +19,7 @@
 package  org.semanticweb.sparql.bgpevaluation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -297,74 +298,90 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         if (expression instanceof Atomic || expression.isVariable()) {  
         //Map<Integer, Set<OWLNamedIndividual>> candidateMap=new HashMap<Integer,Set<OWLNamedIndividual>>();
        
-        	if (sampl!=null && sampl.equals("Sampling")) { 
-        	/*int sampleSize=m_candidateBindings.size()*5/10;
-            List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-            ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-            shuffledBindings.addAll(m_candidateBindings);
-            Collections.shuffle(shuffledBindings);
-            sampleBindings=shuffledBindings.subList(0, sampleSize);
-            m_candidateBindings=new ArrayList<Atomic[]>();
-            m_candidateBindings=sampleBindings;*/
-        	Set<NamedIndividual> candidateIndSet=new HashSet<NamedIndividual>();
-        	
-         
-        	for (Atomic[] testBinding : m_candidateBindings) {
-        		Atomic binding=testBinding[m_bindingPositions.get(indVar)];
-        		if (binding==null) break;
-        		candidateIndSet.add((NamedIndividual)binding);
-        	}
-        	if (candidateIndSet.isEmpty()) {
-                existingBindings.clear();
-                ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
-                unbound.addAll(vars);
-                unbound.removeAll(existingBindings.keySet());
-                     
-                double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
-                estimate[0]+=currentEstimate[0];
-                estimate[1]+=currentEstimate[1];
-                //estimate[0]=estimate[0]*m_candidateBindings.size();
-                //estimate[1]=estimate[1]*m_candidateBindings.size();
-            }
-        	else {
-        		//long h=System.currentTimeMillis();
-        		while (!candidateIndSet.isEmpty()) {
-        			Set<NamedIndividual> holdIndSet=candidateIndSet;
-        			Iterator<NamedIndividual> itr = candidateIndSet.iterator(); 
-        		    NamedIndividual element = itr.next();
-        		    Set<NamedIndividual> indSet=m_individualToPartition.get(element);
-        		    holdIndSet.retainAll(indSet);
-        		    existingBindings.put(indVar, element);	
-        		    ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+        	if (sampl!=null && sampl.equals("RSampling")) {
+        		int sampleSize=m_candidateBindings.size()*5/10;
+                List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+                ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+                shuffledBindings.addAll(m_candidateBindings);
+                Collections.shuffle(shuffledBindings);
+                sampleBindings=shuffledBindings.subList(0, sampleSize);
+                m_candidateBindings=new ArrayList<Atomic[]>();
+                m_candidateBindings.addAll(sampleBindings);
+                
+                for (Atomic[] testBinding : m_candidateBindings) {
+              	  existingBindings.clear();
+                    for (Variable var : vars) {
+                  	  Atomic binding=testBinding[m_bindingPositions.get(var)];
+                        if (binding!=null)
+                      	  existingBindings.put(var,binding);
+                    }
+                    ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
                     unbound.addAll(vars);
-                    unbound.removeAll(existingBindings.keySet());
-             
+                    unbound.removeAll(existingBindings.keySet()); 
                     double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
                     estimate[0]+=currentEstimate[0];
-                    estimate[1]+=currentEstimate[1];
-                    estimate[0]=estimate[0]*holdIndSet.size();
-                    estimate[1]=estimate[1]*holdIndSet.size();         		
-                    candidateIndSet.removeAll(holdIndSet);
+                    estimate[1]+=currentEstimate[1]; 
                 }
-        		//System.out.println("The sampling time is" +(System.currentTimeMillis()-h)+ "ms.");
+                
         	}
-          }
-          else for (Atomic[] testBinding : m_candidateBindings) {
-        	  existingBindings.clear();
-              for (Variable var : vars) {
-            	  Atomic binding=testBinding[m_bindingPositions.get(var)];
-                  if (binding!=null)
-                	  existingBindings.put(var,binding);
-              }
-              ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
-              unbound.addAll(vars);
-              unbound.removeAll(existingBindings.keySet()); 
-              double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
-              estimate[0]+=currentEstimate[0];
-              estimate[1]+=currentEstimate[1]; 
-         }
-//}          
-         return estimate;
+        	else if (sampl!=null && sampl.equals("CSampling")) { 
+        	   Set<NamedIndividual> candidateIndSet=new HashSet<NamedIndividual>();
+               for (Atomic[] testBinding : m_candidateBindings) {
+            	   Atomic binding=testBinding[m_bindingPositions.get(indVar)];
+        		   if (binding==null) break;
+        		   candidateIndSet.add((NamedIndividual)binding);
+        	   }
+        	   if (candidateIndSet.isEmpty()) {
+        		   existingBindings.clear();
+                   ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                   unbound.addAll(vars);
+                   unbound.removeAll(existingBindings.keySet());
+                     
+                   double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+                   estimate[0]+=currentEstimate[0];
+                   estimate[1]+=currentEstimate[1];
+                //estimate[0]=estimate[0]*m_candidateBindings.size();
+                //estimate[1]=estimate[1]*m_candidateBindings.size();
+               }
+        	   else {
+        		   //long h=System.currentTimeMillis();
+        		   while (!candidateIndSet.isEmpty()) {
+        			   Set<NamedIndividual> holdIndSet=candidateIndSet;
+        			   Iterator<NamedIndividual> itr = candidateIndSet.iterator(); 
+        		       NamedIndividual element = itr.next();
+        		       Set<NamedIndividual> indSet=m_individualToPartition.get(element);
+        		       holdIndSet.retainAll(indSet);
+        		       existingBindings.put(indVar, element);	
+        		       ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                       unbound.addAll(vars);
+                       unbound.removeAll(existingBindings.keySet());
+             
+                       double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+                       estimate[0]+=currentEstimate[0];
+                       estimate[1]+=currentEstimate[1];
+                       estimate[0]=estimate[0]*holdIndSet.size();
+                       estimate[1]=estimate[1]*holdIndSet.size();         		
+                       candidateIndSet.removeAll(holdIndSet);
+                   }
+        		//System.out.println("The sampling time is" +(System.currentTimeMillis()-h)+ "ms.");
+        	   }
+             }
+             else for (Atomic[] testBinding : m_candidateBindings) {
+            	 existingBindings.clear();
+                 for (Variable var : vars) {
+                	 Atomic binding=testBinding[m_bindingPositions.get(var)];
+                     if (binding!=null)
+                    	 existingBindings.put(var,binding);
+                 }
+                 ClassAssertion instantiated=(ClassAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                 unbound.addAll(vars);
+                 unbound.removeAll(existingBindings.keySet()); 
+                 double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
+                 estimate[0]+=currentEstimate[0];
+                 estimate[1]+=currentEstimate[1]; 
+             }
+//}           
+             return estimate;
        }	   
        else return complex(unbound, m_candidateBindings);
         	
@@ -457,15 +474,33 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
         Set<Variable> unbound=new HashSet<Variable>();
         if (ope instanceof Atomic || ope.isVariable()) {
-         if (sampl!=null && sampl.equals("Sampling")) { 
-        	/*int sampleSize=m_candidateBindings.size()*5/10;
-            List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
-            ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
-            shuffledBindings.addAll(m_candidateBindings);
-            Collections.shuffle(shuffledBindings);
-            sampleBindings=shuffledBindings.subList(0, sampleSize);
-            m_candidateBindings=new ArrayList<Atomic[]>();
-            m_candidateBindings=sampleBindings;*/
+        	if (sampl!=null && sampl.equals("RSampling")) {
+        		int sampleSize=m_candidateBindings.size()*5/10;
+                List<Atomic[]> sampleBindings= new ArrayList<Atomic[]>();
+                ArrayList<Atomic[]> shuffledBindings=new ArrayList<Atomic[]>();
+                shuffledBindings.addAll(m_candidateBindings);
+                Collections.shuffle(shuffledBindings);
+                sampleBindings=shuffledBindings.subList(0, sampleSize);
+                m_candidateBindings=new ArrayList<Atomic[]>();
+                m_candidateBindings=sampleBindings;
+                
+                for (Atomic[] testBinding : m_candidateBindings) {
+                    existingBindings.clear();
+                    for (Variable var : vars) {
+                        Atomic binding=testBinding[m_bindingPositions.get(var)];
+                        if (binding!=null)
+                            existingBindings.put(var,binding);
+                    }
+                    ObjectPropertyAssertion instantiated=(ObjectPropertyAssertion)axiomTemplate.getBoundVersion(existingBindings);
+                    unbound.addAll(vars);
+                    unbound.removeAll(existingBindings.keySet());
+                    
+                    double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
+                    estimate[0]+=currentEstimate[0];
+                    estimate[1]+=currentEstimate[1];
+                }
+        	}    
+        	if (sampl!=null && sampl.equals("CSampling")) { 
         	int flag=0;
         	//Set<NamedIndividual> candidateIndSucOrPre=new HashSet<NamedIndividual>();
         	Set<List<NamedIndividual>> pairInds=new HashSet<List<NamedIndividual>>();      
