@@ -84,7 +84,7 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     protected final OWLOntologyGraph m_graph;
     protected final InstanceStatistics m_instanceStatistics;
     protected final Map<NamedIndividual,Set<NamedIndividual>> m_individualToPartition;
-    //protected final Map<Integer,Set<List<NamedIndividual>>> m_pairIndToPartition;
+    protected final Map<Integer,Set<List<NamedIndividual>>> m_pairIndToPartition;
     protected final Map<Integer,Set<NamedIndividual>> m_sucIndToPartition;
     protected final Map<Integer,Set<NamedIndividual>> m_preIndToPartition;
     protected final int m_classCount;
@@ -108,11 +108,18 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
             //m_individualToPartition=null;
             //long t=System.currentTimeMillis();
             m_individualToPartition=m_instanceStatistics.getPartitioning();
+            //m_individualToPartition=null;
             //System.out.println("The class partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains " +m_individualToPartition.keySet().size()+ " clusters.");
-            //m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
+            //System.out.println("partitioning started");
+            m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
+            //m_pairIndToPartition=null;
+            //System.out.println("partitioning ended");
             //t=System.currentTimeMillis();
+            //System.out.println("partitioning started");
             m_sucIndToPartition=m_instanceStatistics.getPairFirstIndPartitioning();
+            //m_sucIndToPartition=null;
             m_preIndToPartition=m_instanceStatistics.getPairSecondIndPartitioning();
+            //m_preIndToPartition=null;
             //System.out.println("The partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains "+m_sucIndToPartition.keySet().size()+ " first ind clusters and "+m_preIndToPartition.keySet().size()+" second ind clusters");
         }
         else 
@@ -359,8 +366,8 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                        double[] currentEstimate=getClassAssertionCost(instantiated.getClassExpression(), instantiated.getIndividual(), unbound, indVar);
                        estimate[0]+=currentEstimate[0];
                        estimate[1]+=currentEstimate[1];
-                       estimate[0]=estimate[0]*holdIndSet.size();
-                       estimate[1]=estimate[1]*holdIndSet.size();         		
+                       estimate[0]+=currentEstimate[0]*holdIndSet.size();
+                       estimate[1]+=currentEstimate[1]*holdIndSet.size();         		
                        candidateIndSet.removeAll(holdIndSet);
                    }
         		//System.out.println("The sampling time is" +(System.currentTimeMillis()-h)+ "ms.");
@@ -546,23 +553,23 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                 }
                 return estimate;
         	}
-        	/*else if (flag==1) {
+        	else if (flag==1) {
         		for (int f:m_pairIndToPartition.keySet()) {
         			if (!pairInds.isEmpty()) {
         				Set<List<NamedIndividual>> keyValues=m_pairIndToPartition.get(f);
         				Set<List<NamedIndividual>> holdIndSet=new HashSet<List<NamedIndividual>>();
         				holdIndSet.addAll(pairInds);
-        				for (List<NamedIndividual> ind1List:holdIndSet) {
-        					for (List<NamedIndividual> ind2List:keyValues) {
-        						if (ind1List.get(0)==ind2List.get(0) && ind1List.get(1)==ind2List.get(1)) {
-        							System.out.println("one found");
-        						}
-        					}
-        				}
+        				//for (List<NamedIndividual> ind1List:holdIndSet) {
+        				//	for (List<NamedIndividual> ind2List:keyValues) {
+        				//		if (ind1List.get(0)==ind2List.get(0) && ind1List.get(1)==ind2List.get(1)) {
+        				//			System.out.println("one found");
+        				//		}
+        				//	}
+        				//}
         				holdIndSet.retainAll(keyValues);
         				
         				if (!holdIndSet.isEmpty()) {
-        					System.out.println("with intersection found with size "+holdIndSet.size());
+        					//System.out.println("with intersection found with size "+holdIndSet.size());
         					Iterator<List<NamedIndividual>> itr = holdIndSet.iterator(); 
                 		    List<NamedIndividual> element = itr.next();
                 		    existingBindings.put(ind1Var, element.get(0));
@@ -575,14 +582,14 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                             double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
                             estimate[0]+=currentEstimate[0];
                             estimate[1]+=currentEstimate[1];
-                            estimate[0]=estimate[0]*holdIndSet.size();
-                            estimate[1]=estimate[1]*holdIndSet.size();         		
+                            estimate[0]+=currentEstimate[0]*holdIndSet.size();
+                            estimate[1]+=currentEstimate[1]*holdIndSet.size();         		
                             pairInds.removeAll(holdIndSet);
         				}
         				
         			}
         		}
-        	}*/
+        	}
         	else if (flag==2){
             	if (!candidateIndSet.isEmpty()){
             	for (Integer code:m_preIndToPartition.keySet()) {
@@ -600,8 +607,8 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                         double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
                         estimate[0]+=currentEstimate[0];
                         estimate[1]+=currentEstimate[1];
-                        estimate[0]=estimate[0]*individualSet.size();
-                        estimate[1]=estimate[1]*individualSet.size(); 
+                        estimate[0]+=currentEstimate[0]*individualSet.size();
+                        estimate[1]+=currentEstimate[1]*individualSet.size(); 
             		    candidateIndSet.removeAll(individualSet);
             		}
             		
@@ -625,8 +632,8 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
                         double[] currentEstimate=getObjectPropertyAssertionCost(instantiated.getObjectPropertyExpression(), instantiated.getIndividual1(), instantiated.getIndividual2(), unbound, opVar);
                         estimate[0]+=currentEstimate[0];
                         estimate[1]+=currentEstimate[1];
-                        estimate[0]=estimate[0]*individualSet.size();
-                        estimate[1]=estimate[1]*individualSet.size(); 
+                        estimate[0]+=currentEstimate[0]*individualSet.size();
+                        estimate[1]+=currentEstimate[1]*individualSet.size(); 
             		    candidateIndSet.removeAll(individualSet);
             		}
             		
