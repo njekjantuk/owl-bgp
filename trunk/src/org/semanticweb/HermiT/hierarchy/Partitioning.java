@@ -41,6 +41,7 @@ public class Partitioning implements Serializable {
 
     protected ExtensionTable.Retrieval m_binaryTableSearch1Bound;
     protected ExtensionTable.Retrieval m_ternaryTableSearch12Bound;
+    protected ExtensionTable.Retrieval m_ternaryTableSearch012Bound;
     protected ExtensionTable.Retrieval m_ternaryTableSearch1Bound;
     protected ExtensionTable.Retrieval m_ternaryTableSearch2Bound;
     protected final Map<Individual,Node> m_individualToNode;
@@ -89,17 +90,44 @@ public class Partitioning implements Serializable {
         
     	Map<Integer,Set<List<Individual>>> m_hashToIndividualsPairs=new HashMap<Integer, Set<List<Individual>>>();
     	// true means bound, so we have to specify the value for this column/array position before opening the retrieval
-        m_ternaryTableSearch12Bound=tableau.getExtensionManager().getTernaryExtensionTable().createRetrieval(new boolean[] { false,true,true },ExtensionTable.View.TOTAL);
+        m_ternaryTableSearch012Bound=tableau.getExtensionManager().getTernaryExtensionTable().createRetrieval(new boolean[] { false,false,false },ExtensionTable.View.TOTAL);
+        m_ternaryTableSearch12Bound=tableau.getExtensionManager().getTernaryExtensionTable().createRetrieval(new boolean[] { false,true,true },ExtensionTable.View.TOTAL); 
         m_binaryTableSearch1Bound=tableau.getExtensionManager().getBinaryExtensionTable().createRetrieval(new boolean[] { false,true },ExtensionTable.View.TOTAL);
         
-        Node node1=tableau.getFirstTableauNode();
+        //m_ternaryTableSearch012Bound.getBindingsBuffer();
+        m_ternaryTableSearch012Bound.open();
+        Object[] tupleBuffer=m_ternaryTableSearch012Bound.getTupleBuffer();
+        while (!m_ternaryTableSearch012Bound.afterLast()) {
+        	 //Object role=tupleBuffer[0];
+        	 Node node1=(Node)tupleBuffer[1];
+        	 Node node2=(Node)tupleBuffer[2];
+        	 //if (ind1 instanceof Individual && ind2 instanceof Individual) {
+        		 //Node node1=m_individualToNode.get(ind1);
+        	     //Node node2=m_individualToNode.get(ind2);
+                 if (node1.isActive() && node2.isActive() && node1.getNodeType()==NodeType.NAMED_NODE && node2.getNodeType()==NodeType.NAMED_NODE) {
+                	 int hashCode=getPropsHashCode(node1, node2)+getLabelHashCode(node1)+getLabelHashCode(node2); 
+                	 Set<List<Individual>> indPairsForThatHash = m_hashToIndividualsPairs.get(hashCode);
+            	     if (indPairsForThatHash==null) {
+            	        indPairsForThatHash=new HashSet<List<Individual>>();
+            	        m_hashToIndividualsPairs.put(hashCode, indPairsForThatHash);
+                     }
+            	     List<Individual> indList=new ArrayList<Individual>();
+            	     indList.add(m_nodeToIndividual.get(node1));
+            	     indList.add(m_nodeToIndividual.get(node2));
+            	     indPairsForThatHash.add(indList);
+                 }
+             //}
+             m_ternaryTableSearch012Bound.next();
+        }
+        
+        /*Node node1=tableau.getFirstTableauNode();
         
         while (node1!=null) {
         	Node node2=tableau.getFirstTableauNode();
         	while (node2!=null) {
         		if (node1.isActive() && node2.isActive() && node1.getNodeType()==NodeType.NAMED_NODE && node2.getNodeType()==NodeType.NAMED_NODE) {       			
         			int hashCode=getPropsHashCode(node1, node2)+getLabelHashCode(node1)+getLabelHashCode(node2);
-        	        Set<List<Individual>> indPairsForThatHash = m_hashToIndividualsPairs.get(hashCode);
+        			Set<List<Individual>> indPairsForThatHash = m_hashToIndividualsPairs.get(hashCode);
            	        if (indPairsForThatHash==null) {
            	        	indPairsForThatHash=new HashSet<List<Individual>>();
            	            m_hashToIndividualsPairs.put(hashCode, indPairsForThatHash);
@@ -112,7 +140,7 @@ public class Partitioning implements Serializable {
         		node2=node2.getNextTableauNode();
         	}
         	node1=node1.getNextTableauNode();
-        }
+        }*/	
         // TODO: do something with the partitions
         int hashSize=0;
         for (int k:m_hashToIndividualsPairs.keySet()) {
