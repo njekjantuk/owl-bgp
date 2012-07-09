@@ -54,4 +54,6 @@ public class MonitorAdapter implements Monitor {
     }
     public void queryObjectEvaluationFinished(int resultSize) {
     }
+    public void parsingFinished(String parsedQuery) {
+    }
 }
