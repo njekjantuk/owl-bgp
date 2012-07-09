@@ -38,4 +38,5 @@ public interface Monitor {
     void costEvaluationFinished(QueryObject<? extends Axiom> cheapest);
     void queryObjectEvaluationStarted(QueryObject<? extends Axiom> queryObject);
     void queryObjectEvaluationFinished(int resultSize);
+    void parsingFinished(String parsedQuery);
 }

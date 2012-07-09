@@ -58,4 +58,8 @@ public class PrintingMonitor extends TimingMonitor {
         super.costEvaluationFinished(cheapest);
         m_out.println("Cost evaluation finished in "+getLastCostEstimationTime()+" ms.");
     }
+    public void parsingFinished(String parsedQuery) {
+        super.parsingFinished(parsedQuery);
+        m_out.println(parsedQuery);
+    }
 }

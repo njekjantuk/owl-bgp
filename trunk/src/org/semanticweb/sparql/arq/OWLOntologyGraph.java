@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.semanticweb.HermiT.Configuration;
 import org.semanticweb.HermiT.OWLBGPHermiT;
-//import org.semanticweb.HermiT.examples.countingMonitor;
 import org.semanticweb.HermiT.monitor.CountingMonitor;
 import org.semanticweb.owlapi.model.OWLAnnotationProperty;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -110,10 +109,8 @@ public class OWLOntologyGraph implements Graph {
         m_countingMonitor=new CountingMonitor();
         Configuration c=new Configuration();
         c.monitor=m_countingMonitor;
-//        c.tableauMonitorType=TableauMonitorType.TIMING;
         c.ignoreUnsupportedDatatypes=true;
         m_reasoner=new OWLBGPHermiT(c, skolomized);
-        //System.out.println(((Reasoner)m_reasoner).getDLOntology().getStatistics());
 	}
 	public Set<String>  getSkolemConstants() {
         return this.m_skolemConstants;

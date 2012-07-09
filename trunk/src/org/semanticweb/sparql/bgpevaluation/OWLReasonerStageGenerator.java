@@ -27,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.uncommons.maths.combinatorics.*;
-
 
 import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.OWLBGPHermiT;
@@ -46,6 +44,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.parser.OWLBGPParser;
 import org.semanticweb.sparql.owlbgp.parser.ParseException;
+import org.uncommons.maths.combinatorics.PermutationGenerator;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
@@ -90,14 +89,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             m_monitor.bgpParsingFinished();
             m_monitor.connectedComponentsComputationStarted();
             Set<Axiom> queryAxiomTemplates=parser.getParsedAxioms();
-            
-//            ObjectProperty prop = ObjectProperty.create(IRI.create("http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#takesCourse").toString());
-//            ClassVariable varX = ClassVariable.create("?x");
-//            ClassVariable varO = ClassVariable.create("?y");
-//            ObjectSomeValuesFrom supCls = ObjectSomeValuesFrom.create(prop, varO);
-//            SubClassOf sco = SubClassOf.create(varX, supCls);
-//            queryAxiomTemplates.add(sco);
-            
+             
             Set<IndividualVariable> bnodes=parser.getVariablesForAnonymousIndividual();
 
             RewriterAndSplitter rewriteAndSplitter=new RewriterAndSplitter(ontologyGraph, queryAxiomTemplates);
@@ -117,16 +109,12 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 List<Atomic[]> bindings=new ArrayList<Atomic[]>();
                 bindings.add(initialBinding);
                 
-                
                 if (orderingMode!=null && orderingMode.equals("PlanChecking")) {
-                	//Set<QueryObject<? extends Axiom>> atomSet=new HashSet<QueryObject<? extends Axiom>>();
-                    //atomSet.addAll(connectedComponent);
                     try {
                     	// Create file 
                 		FileWriter fstream = new FileWriter("output.txt");
                 		BufferedWriter out = new BufferedWriter(fstream);
-                		PermutationGenerator generator=new PermutationGenerator(connectedComponent);
-                        //Iterator<ArrayList<QueryObject<? extends Axiom>>> iter=generator.iterator();
+                		PermutationGenerator<QueryObject<? extends Axiom>> generator=new PermutationGenerator<QueryObject<? extends Axiom>>(connectedComponent);
                 		List<QueryObject<? extends Axiom>> cheapestOrder=new ArrayList<QueryObject<? extends Axiom>>();
                         long minTime=9999999;
                 		int permNum=0;
@@ -153,14 +141,9 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                             if (valid!=0) {
                             	permNum++;
                             	long t=System.currentTimeMillis();
-                            	for (QueryObject<? extends Axiom> cheapest:atomList){
-                            		if (!bindings.isEmpty()){
+                            	for (QueryObject<? extends Axiom> cheapest:atomList)
+                            		if (!bindings.isEmpty())
                             			bindings=cheapest.computeBindings(bindings, positionInTuple);
-                                            //System.out.println(cheapest.getAxiomTemplate());
-                                            //System.out.println("bindings size= "+bindings.size());
-                                    }   	
-                                }
-                            	//System.out.println("other query");
                             	out.write("Ordering:  ");
                             	out.newLine();
                             	for (QueryObject<? extends Axiom> cheapest:atomList) {
@@ -191,30 +174,20 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 	}
 				}
                 
-                
-                /*List<QueryObject<? extends Axiom>> ABoxQueryAtoms=new ArrayList<QueryObject<? extends Axiom>>();
-                List<QueryObject<? extends Axiom>> simpleQueryAtomsApartfromABox=new ArrayList<QueryObject<? extends Axiom>>();
-                List<QueryObject<? extends Axiom>> complexQueryAtoms=new ArrayList<QueryObject<? extends Axiom>>();
-                
-                for (QueryObject<? extends Axiom> queryObject:connectedComponent) {
-                	Axiom axiomTemplate=queryObject.getAxiomTemplate();
-                	if (axiomTemplate instanceof QO_ClassAssertion) {
-                		Set<Variable> vars=axiomTemplate.getVariablesInSignature();
-                        //Set<Variable> indVars=axiomTemplate.getIndividual().getVariablesInSignature();
-                        //Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
-                        ABoxQueryAtoms.add(queryObject);
-                	}
-                	else if (axiomTemplate instanceof QO_ObjectPropertyAssertion) {
-                		Set<Variable> vars=axiomTemplate.getVariablesInSignature();
-                        //Set<Variable> indVars=axiomTemplate.getIndividual().getVariablesInSignature();
-                        //Variable indVar=indVars.isEmpty()?null:indVars.iterator().next();
-                        ABoxQueryAtoms.add(queryObject);
-                	}
-                    else complexQueryAtoms.add(queryObject);
-                }*/
-                
-                if (orderingMode!=null && orderingMode.equals("Dynamic")){
-                	//System.out.println("Dynamic");
+                if ((orderingMode==null) || orderingMode.equals("Static")){
+                    StaticCostEstimationVisitor costEstimator;
+                    if (ontologyGraph.getReasoner() instanceof OWLBGPHermiT) 
+                        costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
+                    else 
+                        costEstimator=new StaticCostEstimationVisitor(ontologyGraph,positionInTuple);
+                    List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
+                    for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
+                        if (!bindings.isEmpty()){
+                            bindings=cheapest.computeBindings(bindings, positionInTuple);
+                        }
+                    }
+                }
+                else if (orderingMode.equals("Dynamic")){
                     CostEstimationVisitor costEstimator;
                     if (reasoner instanceof OWLBGPHermiT)
                     	costEstimator=new HermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
@@ -223,71 +196,37 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     Set<Variable> boundVar=new HashSet<Variable>();
                     while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                     	m_monitor.costEvaluationStarted();
-                    	//long t=System.currentTimeMillis();
                 	    QueryObject<? extends Axiom> cheapest;
                 	    if (connectedComponent.size()==1)
                 	    	cheapest=connectedComponent.iterator().next();
                 	    else 
                 	        cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, boundVar, m_monitor);
-                        //System.out.println("the reordering time is "+(System.currentTimeMillis()-t)+" ms");
                 	    m_monitor.costEvaluationFinished(cheapest);
                         connectedComponent.remove(cheapest);   
                         Axiom ax=cheapest.getAxiomTemplate();
                         Set<Variable> varsss=ax.getVariablesInSignature();
                         boundVar.addAll(varsss);
-                        //boundVar.addAll(cheapest.getAxiomTemplate().getVariablesInSignature());
                         m_monitor.queryObjectEvaluationStarted(cheapest);
-                        //t=System.currentTimeMillis();
                         bindings=cheapest.computeBindings(bindings, positionInTuple);
-                        //System.out.println("the running time is "+(System.currentTimeMillis()-t)+" ms");
-                        //System.out.println(cheapest.getAxiomTemplate());
-                        //System.out.println("bindings size= "+bindings.size());
                         m_monitor.queryObjectEvaluationFinished(bindings.size());
                         costEstimator.updateCandidateBindings(bindings);
                     }
                 }
-                else if (orderingMode!=null && orderingMode.equals("Intersection")){
-                	//System.out.println("Use of intersection optimization");
+                else if (orderingMode.equals("Intersection")){
                     StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
-                    
                     List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
-                    //System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
                     BindingsIntersection optimization=new BindingsIntersection(ontologyGraph, positionInTuple);
                     for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
-                    	//System.out.println(cheapest.getAxiomTemplate());
                    	    if (cheapest instanceof QO_ClassAssertion) 
                    	    	bindings=optimization.reduceClassBindings(bindings, (QO_ClassAssertion)cheapest);
                         else if (cheapest instanceof QO_ObjectPropertyAssertion)
                         	bindings=optimization.reduceObjectPropertyBindings(bindings, (QO_ObjectPropertyAssertion)cheapest);
-//                        else 
-//                        	System.out.println("We do not currently support other types of axioms for this optimization");
                   }
                   for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
                      if (!bindings.isEmpty()){
                          bindings=cheapest.computeBindings(bindings, positionInTuple);
-                         //System.out.println(cheapest.getAxiomTemplate());
-                         //System.out.println("bindings size= "+bindings.size());
                      }   	
                   }
-                }         
-                else if ((orderingMode==null) || orderingMode.equals("Static")){
-                	//System.out.println("Static");	
-                    StaticHermiTCostEstimationVisitor costEstimator=new StaticHermiTCostEstimationVisitor(ontologyGraph,positionInTuple);
-                    //long t=System.currentTimeMillis();
-                    List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(costEstimator, connectedComponent, m_monitor);
-                    //System.out.println("The reordering lasted "+(System.currentTimeMillis()-t)+" ms");
-                    //long f=System.currentTimeMillis();
-                    for (QueryObject<? extends Axiom> cheapest:staticAxiomOrder){
-                    	if (!bindings.isEmpty()){
-                    		//long d=System.currentTimeMillis();
-                    		System.out.println(cheapest.getAxiomTemplate());
-                    		bindings=cheapest.computeBindings(bindings, positionInTuple);
-                	        //System.out.println("The running time of the atom is "+ (System.currentTimeMillis()-d));
-                    		//System.out.println(cheapest.getAxiomTemplate());
-                	        //System.out.println("bindings size= "+bindings.size());
-                	    }
-                    }
-                    //System.out.println("The query answering time is "+(System.currentTimeMillis()-f) +" ms.");
                 }
                 bindingsPerComponent.add(bindings);
                 if (resultSize==null)
