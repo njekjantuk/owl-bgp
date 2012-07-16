@@ -22,11 +22,19 @@ import java.util.HashMap;
 
 import junit.framework.TestCase;
 
+import org.semanticweb.HermiT.Configuration;
+import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLSubClassOfAxiom;
 import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
@@ -35,6 +43,8 @@ import org.semanticweb.sparql.bgpevaluation.monitor.PrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.ResultSet;
 
 public class TestPizzaQueries extends TestCase {
     public static final String LB = System.getProperty("line.separator") ;
@@ -73,7 +83,8 @@ public class TestPizzaQueries extends TestCase {
                 + "}";
         OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new PrintingMonitor());//new MinimalPrintingMonitor()
         Query query=QueryFactory.create(s);
-        sparqlEngine.execQuery(query,dataset);
+        ResultSet result=sparqlEngine.execQuery(query,dataset);
+        assertTrue(!result.hasNext());
     }
     public void testPizzaComplexClassVar() throws Exception {
         String s="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
@@ -87,6 +98,26 @@ public class TestPizzaQueries extends TestCase {
                 + "}";
         OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
         Query query=QueryFactory.create(s);
-        sparqlEngine.execQuery(query,dataset);
+        ResultSet result=sparqlEngine.execQuery(query,dataset);
+        Configuration c=new Configuration();
+        c.ignoreUnsupportedDatatypes=true;
+        OWLReasoner hermit=new OWLBGPHermiT(c, dataset.getDefaultGraph().getOntology());
+        OWLDataFactory factory=manager.getOWLDataFactory();
+        OWLClass subClass;
+        OWLClass qualification;
+        OWLClassExpression superClass;
+        OWLSubClassOfAxiom subClassOf;
+        OWLObjectProperty hasTopping=factory.getOWLObjectProperty(IRI.create("http://www.co-ode.org/ontologies/pizza/pizza.owl#hasTopping"));
+        int noResults=0;
+        while (result.hasNext()) {
+            QuerySolution solution=result.next();
+            noResults++;
+            subClass=factory.getOWLClass(IRI.create(solution.get("?x").asResource().getURI()));
+            qualification=factory.getOWLClass(IRI.create(solution.get("?o").asResource().getURI()));
+            superClass=factory.getOWLObjectSomeValuesFrom(hasTopping, qualification);
+            subClassOf=factory.getOWLSubClassOfAxiom(subClass, superClass);
+            assertTrue(hermit.isEntailed(subClassOf));
+        }
+        assertTrue(noResults==503);
     }
 }

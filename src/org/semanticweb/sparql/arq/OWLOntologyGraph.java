@@ -111,6 +111,7 @@ public class OWLOntologyGraph implements Graph {
         c.monitor=m_countingMonitor;
         c.ignoreUnsupportedDatatypes=true;
         m_reasoner=new OWLBGPHermiT(c, skolomized);
+        //m_reasoner=new PelletReasonerFactory().createReasoner(skolomized);
 	}
 	public Set<String>  getSkolemConstants() {
         return this.m_skolemConstants;
