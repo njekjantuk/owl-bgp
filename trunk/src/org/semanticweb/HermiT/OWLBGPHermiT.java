@@ -7,6 +7,7 @@ import java.util.Set;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.model.DescriptionGraph;
 import org.semanticweb.HermiT.monitor.CountingMonitor;
+import org.semanticweb.HermiT.monitor.TableauMonitor;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
@@ -210,8 +211,14 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     		initialisePropertiesInstanceManager();
     		int currentCost=(int)(System.currentTimeMillis()-t);
     		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
-        	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
-        	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    		TableauMonitor monitor=m_configuration.monitor;
+    		if (monitor != null && monitor instanceof CountingMonitor) {
+        	   EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    		}
+    		if (EntailmentLookUpCostEstimation.entailmentTestsno > 0)
+        	   EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
+    		else 
+    		   EntailmentLookUpCostEstimation.entailmentCost=1; // random value, but better then division by zero error
     	} else {
     		
     	}
