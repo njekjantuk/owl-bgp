@@ -28,7 +28,7 @@ import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
-import org.semanticweb.sparql.bgpevaluation.CostEstimationVisitor;
+import org.semanticweb.sparql.bgpevaluation.DynamicCostEstimationVisitor;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
@@ -37,7 +37,7 @@ import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
-public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
+public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVisitor {
 
     protected double POSSIBLE_INSTANCE_SUCCESS=0.5;
     
@@ -46,22 +46,18 @@ public class HermiTCostEstimationVisitor extends CostEstimationVisitor {
     protected final double m_numDisjunctions;
     protected Integer m_classHierarchyDepth;
     protected Integer m_opHierarchyDepth;
-    int r;
-    public HermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
+    
+    public DynamicHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         super(graph, bindingPositions, candidateBindings);	
-        r=0;
-        if (m_reasoner instanceof OWLBGPHermiT) {
-            m_hermit=(OWLBGPHermiT)m_reasoner;
-            m_instanceStatistics=m_hermit.getInstanceStatistics();
-            double numDisjunctions=0;
-            for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
-                if (clause.getHeadLength()>1) {
-                    numDisjunctions+=clause.getHeadLength();
-//                  System.out.println(clause);
-                }   
-            m_numDisjunctions=numDisjunctions;
-        } else 
+        if (!(m_reasoner instanceof OWLBGPHermiT))
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
+        m_hermit=(OWLBGPHermiT)m_reasoner;
+        m_instanceStatistics=m_hermit.getInstanceStatistics();
+        double numDisjunctions=0;
+        for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
+            if (clause.getHeadLength()>1)
+                numDisjunctions+=clause.getHeadLength();
+        m_numDisjunctions=numDisjunctions;            
     }
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> unbound, Variable indVar) {
     	double cost=0;

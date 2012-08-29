@@ -43,7 +43,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_TransitiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
-import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObjectVisitorEx;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.StaticQueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
@@ -67,7 +67,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
-public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
+public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<double[]> {
     protected double COST_ENTAILMENT=100;
     protected double COST_LOOKUP=1;
     protected double COST_CLASS_HIERARCHY_INSERTION=10*COST_ENTAILMENT;
@@ -408,50 +408,5 @@ public class StaticCostEstimationVisitor implements QueryObjectVisitorEx<double[
         }
         return new double[] { tests*COST_ENTAILMENT, tests };
     }
-
-	public double[] visit(QO_ClassAssertion axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_ObjectPropertyAssertion axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_DataPropertyAssertion axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_SubClassOf axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_SubObjectPropertyOf axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_FunctionalObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");	}
-	public double[] visit(QO_InverseFunctionalObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_ReflexiveObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_IrreflexiveObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_SymmetricObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_AsymmetricObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_TransitiveObjectProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_FunctionalDataProperty axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_NegativeObjectPropertyAssertion axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
-	public double[] visit(QO_NegativeDataPropertyAssertion axiom) {
-		throw new RuntimeException("This class is used in Dynamic ordering mode. Now static ordering mode is activated");
-	}
 }
 

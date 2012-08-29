@@ -27,8 +27,8 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 
-public class QueryReordering {
-    public static QueryObject<? extends Axiom> getCheapest(CostEstimationVisitor estimator, List<QueryObject<? extends Axiom>> atoms, Set<Variable> boundVar, Monitor monitor) {
+public class DynamicQueryReordering {
+    public static QueryObject<? extends Axiom> getCheapest(DynamicCostEstimationVisitor estimator, List<QueryObject<? extends Axiom>> atoms, Set<Variable> boundVar, Monitor monitor) {
         QueryObject<? extends Axiom> cheapest=null;
         double cheapestCost=0;
         boolean first=true;
