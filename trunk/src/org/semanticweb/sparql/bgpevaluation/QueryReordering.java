@@ -1,6 +1,6 @@
-/* Copyright 2011 by the Oxford University Computing Laboratory
+/* Copyright 2010-2012 by the developers of the OWL-BGP project. 
 
-   This file is part of OWL-BGP.
+   This file is part of the OWL-BGP project.
 
    OWL-BGP is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -13,8 +13,9 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
- */
+   along with OWL-BGP.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 
 package  org.semanticweb.sparql.bgpevaluation;
 
@@ -23,8 +24,8 @@ import java.util.Set;
 
 import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
-import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.Variable;
+import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 
 public class QueryReordering {
     public static QueryObject<? extends Axiom> getCheapest(CostEstimationVisitor estimator, List<QueryObject<? extends Axiom>> atoms, Set<Variable> boundVar, Monitor monitor) {

@@ -178,7 +178,6 @@ public class QueryTestRunner extends CmdARQ {
         model.setNsPrefix("dawg", TestManifest.getURI());
 //        // Update the EARL report. 
 //        Resource hermit=model.createResource().addProperty(FOAF.homepage, model.createResource("http://hermit-reasoner.com"));
-//        // SPARQLing HermiT is part of HermiT.
 //        Resource arq=report.getSystem().addProperty(DCTerms.isPartOf, hermit);
         // Andy wrote the test software (updates the thing being tested as well as they are the same). 
         // Birte adapted to run the entailment tests 

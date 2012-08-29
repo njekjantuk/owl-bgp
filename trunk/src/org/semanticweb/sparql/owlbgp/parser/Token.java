@@ -2,7 +2,7 @@
 /* JavaCCOptions:TOKEN_EXTENDS=,KEEP_LINE_COL=null,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 // generated with Javacc 5.0: ./javacc -OUTPUT_DIRECTORY=/Users/bglimm/Documents/workspace/OWL-BGP/src/org/semanticweb/sparql/owlbgp/parser/  ~/Documents/workspace/OWL-BGP/src/org/semanticweb/sparql/owlbgp/parser/OWLBGPParser.jj  
 
-/* Copyright 2011 by the Oxford University Computing Laboratory
+/* Copyright 2010-2012 by the developers of the OWL-BGP project. 
 
    This file is part of OWL-BGP.
 
