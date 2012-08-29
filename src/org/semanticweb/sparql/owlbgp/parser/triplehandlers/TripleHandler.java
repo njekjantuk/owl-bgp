@@ -1,4 +1,4 @@
-/* Copyright 2011 by the Oxford University Computing Laboratory
+/* Copyright 2010-2012 by the developers of the OWL-BGP project. 
 
    This file is part of OWL-BGP.
 

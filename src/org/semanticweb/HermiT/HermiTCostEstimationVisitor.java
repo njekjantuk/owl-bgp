@@ -1,6 +1,6 @@
-/* Copyright 2011 by the Oxford University Computing Laboratory
+/* Copyright 2010-2012 by the developers of the OWL-BGP project. 
 
-   This file is part of OWL-BGP.
+   This file is part of the OWL-BGP project.
 
    OWL-BGP is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -13,8 +13,8 @@
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
-   along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
- */
+   along with OWL-BGP.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package  org.semanticweb.HermiT;
 
 import java.util.List;
