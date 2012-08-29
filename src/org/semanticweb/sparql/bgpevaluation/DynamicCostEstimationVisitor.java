@@ -33,6 +33,7 @@ import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.DynamicQueryObjectVisitorEx;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
@@ -49,7 +50,6 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_TransitiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
-import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
@@ -74,7 +74,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
-public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
+public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx<double[]> {
     protected double COST_ENTAILMENT=100;
     protected double COST_LOOKUP=1;
     protected double COST_CLASS_HIERARCHY_INSERTION=10*COST_ENTAILMENT;
@@ -100,31 +100,29 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
     protected List<Atomic[]> m_candidateBindings;
     
     
-    public CostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
+    public DynamicCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
         m_reasoner=graph.getReasoner();
-        if (m_reasoner instanceof OWLBGPHermiT){ 
-            m_hermit=(OWLBGPHermiT)m_reasoner;
-            //m_instanceStatistics=null;
-            m_instanceStatistics=m_hermit.getInstanceStatistics();
-            //m_individualToPartition=null;
-            //long t=System.currentTimeMillis();
-            m_individualToPartition=m_instanceStatistics.getPartitioning();
-            //m_individualToPartition=null;
-            //System.out.println("The class partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains " +m_individualToPartition.keySet().size()+ " clusters.");
-            //System.out.println("partitioning started");
-            m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
-            //m_pairIndToPartition=null;
-            //System.out.println("partitioning ended");
-            //t=System.currentTimeMillis();
-            //System.out.println("partitioning started");
-            m_sucIndToPartition=m_instanceStatistics.getPairFirstIndPartitioning();
-            //m_sucIndToPartition=null;
-            m_preIndToPartition=m_instanceStatistics.getPairSecondIndPartitioning();
-            //m_preIndToPartition=null;
-            //System.out.println("The partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains "+m_sucIndToPartition.keySet().size()+ " first ind clusters and "+m_preIndToPartition.keySet().size()+" second ind clusters");
-        }
-        else 
+        if (!(m_reasoner instanceof OWLBGPHermiT)) 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
+        m_hermit=(OWLBGPHermiT)m_reasoner;
+        //m_instanceStatistics=null;
+        m_instanceStatistics=m_hermit.getInstanceStatistics();
+        //m_individualToPartition=null;
+        //long t=System.currentTimeMillis();
+        m_individualToPartition=m_instanceStatistics.getPartitioning();
+        //m_individualToPartition=null;
+        //System.out.println("The class partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains " +m_individualToPartition.keySet().size()+ " clusters.");
+        //System.out.println("partitioning started");
+        m_pairIndToPartition=m_instanceStatistics.getPairIndsPartitioning();
+        //m_pairIndToPartition=null;
+        //System.out.println("partitioning ended");
+        //t=System.currentTimeMillis();
+        //System.out.println("partitioning started");
+        m_sucIndToPartition=m_instanceStatistics.getPairFirstIndPartitioning();
+        //m_sucIndToPartition=null;
+        m_preIndToPartition=m_instanceStatistics.getPairSecondIndPartitioning();
+        //m_preIndToPartition=null;
+        //System.out.println("The partitioning lasted "+(System.currentTimeMillis()-t) +" msec and contains "+m_sucIndToPartition.keySet().size()+ " first ind clusters and "+m_preIndToPartition.keySet().size()+" second ind clusters");
         m_dataFactory=graph.getOntology().getOWLOntologyManager().getOWLDataFactory();
         m_graph=graph;
         m_classCount=graph.getClassesInSignature().size();
@@ -839,55 +837,4 @@ public class CostEstimationVisitor implements QueryObjectVisitorEx<double[]> {
         }
         return new double[] { m_candidateBindings.size()*tests*COST_ENTAILMENT, m_candidateBindings.size()*tests };
     }
-	public double[] visit(QO_ClassAssertion axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_ObjectPropertyAssertion axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_DataPropertyAssertion axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_SubClassOf axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_SubObjectPropertyOf axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_FunctionalObjectProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_InverseFunctionalObjectProperty axiom,
-			Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}	
-	public double[] visit(QO_ReflexiveObjectProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_IrreflexiveObjectProperty axiom,
-			Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_SymmetricObjectProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_AsymmetricObjectProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_TransitiveObjectProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	public double[] visit(QO_FunctionalDataProperty axiom, Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	@Override
-	public double[] visit(QO_NegativeObjectPropertyAssertion axiom,
-			Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
-	@Override
-	public double[] visit(QO_NegativeDataPropertyAssertion axiom,
-			Set<Variable> bound) {
-		throw new RuntimeException("This class is used by static ordering mode. Now dynamic ordering mode is activated");
-	}
 }

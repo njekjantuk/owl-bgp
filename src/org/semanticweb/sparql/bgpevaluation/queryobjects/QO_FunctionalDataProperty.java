@@ -78,12 +78,12 @@ public class QO_FunctionalDataProperty extends AbstractQueryObject<FunctionalDat
         }
         return newBindings;
     }
-    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+    public <O> O accept(DynamicQueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
 
 	@Override
-	public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+	public <O> O accept(StaticQueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
 		 return visitor.visit(this, bound);
 	}
 }

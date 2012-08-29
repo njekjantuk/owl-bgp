@@ -297,11 +297,11 @@ public class QO_ObjectPropertyAssertion  extends AbstractQueryObject<ObjectPrope
     	
     }*/
     
-    public <O> O accept(QueryObjectVisitorEx<O> visitor) {
+    public <O> O accept(DynamicQueryObjectVisitorEx<O> visitor) {
         return visitor.visit(this);
     }
     
-    public <O> O accept(QueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
+    public <O> O accept(StaticQueryObjectVisitorEx<O> visitor, Set<Variable> bound) {
         return visitor.visit(this, bound);
     }
 }

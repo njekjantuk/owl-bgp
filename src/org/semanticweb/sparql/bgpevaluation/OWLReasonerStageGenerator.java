@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.HermiTCostEstimationVisitor;
+import org.semanticweb.HermiT.DynamicHermiTCostEstimationVisitor;
 import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
@@ -117,7 +117,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 		BufferedWriter out = new BufferedWriter(fstream);
                 		PermutationGenerator<QueryObject<? extends Axiom>> generator=new PermutationGenerator<QueryObject<? extends Axiom>>(connectedComponent);
                 		List<QueryObject<? extends Axiom>> cheapestOrder=new ArrayList<QueryObject<? extends Axiom>>();
-                        long minTime=9999999;
+                        long minTime=Long.MAX_VALUE;
                 		int permNum=0;
                         while (generator.hasMore()) {//new permutation of query atoms
                         	bindings=new ArrayList<Atomic[]>();
@@ -189,11 +189,11 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                     }
                 }
                 else if (orderingMode.equals("Dynamic")){
-                    CostEstimationVisitor costEstimator;
+                    DynamicCostEstimationVisitor costEstimator;
                     if (reasoner instanceof OWLBGPHermiT)
-                    	costEstimator=new HermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                    	costEstimator=new DynamicHermiTCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
                     else 
-                        costEstimator=new CostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
+                        costEstimator=new DynamicCostEstimationVisitor(ontologyGraph,positionInTuple,bindings);
                     Set<Variable> boundVar=new HashSet<Variable>();
                     while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
                     	m_monitor.costEvaluationStarted();
@@ -201,7 +201,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 	    if (connectedComponent.size()==1)
                 	    	cheapest=connectedComponent.iterator().next();
                 	    else 
-                	        cheapest=QueryReordering.getCheapest(costEstimator, connectedComponent, boundVar, m_monitor);
+                	        cheapest=DynamicQueryReordering.getCheapest(costEstimator, connectedComponent, boundVar, m_monitor);
                 	    m_monitor.costEvaluationFinished(cheapest);
                         connectedComponent.remove(cheapest);   
                         Axiom ax=cheapest.getAxiomTemplate();
