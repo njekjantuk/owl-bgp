@@ -21,7 +21,6 @@ package org.semanticweb.sparql.bgpevaluation;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLDataFactory;
@@ -83,10 +82,9 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
     protected final int m_indCount;
     protected final int m_litCount;
     
-    protected Map<Variable,Integer> m_bindingPositions;
     protected List<Atomic[]> m_candidateBindings;
     
-    public StaticCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions) {
+    public StaticCostEstimationVisitor(OWLOntologyGraph graph) {
         m_reasoner=graph.getReasoner();
         m_dataFactory=graph.getOntology().getOWLOntologyManager().getOWLDataFactory();
         m_graph=graph;
@@ -97,7 +95,6 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         m_datatypeCount=graph.getDatatypesInSignature().size();
         m_indCount=graph.getIndividualsInSignature().size();
         m_litCount=graph.getLiteralsInSignature().size();
-        m_bindingPositions=bindingPositions;
 //        System.out.println("HermiT did "+countingMonitor.getOverallNumberOfTests()+" tests. ");
 //	    System.out.println("This took "+countingMonitor.getOverallTime()+" ms. ");
 //	    System.out.println("The last test took "+countingMonitor.getTime()+" ms. ");

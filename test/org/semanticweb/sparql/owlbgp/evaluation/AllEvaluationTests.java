@@ -16,24 +16,19 @@
    along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package  org.semanticweb.sparql.owlbgp;
+package  org.semanticweb.sparql.owlbgp.evaluation;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.semanticweb.sparql.owlbgp.evaluation.AllEvaluationTests;
-import org.semanticweb.sparql.owlbgp.model.AllModelTests;
-import org.semanticweb.sparql.owlbgp.parser.AllParserTests;
-
-public class AllTests extends TestCase {
+public class AllEvaluationTests extends TestCase {
 
     public static Test suite() {
-        TestSuite suite = new TestSuite("All unit tests for the OWL BGP project.");
+        TestSuite suite = new TestSuite("Unit tests for the query evaluation.");
         // $JUnit-BEGIN$
-        suite.addTest(AllParserTests.suite());
-        suite.addTest(AllModelTests.suite());
-        suite.addTest(AllEvaluationTests.suite());
+        suite.addTestSuite(TestPizzaQueries.class);
+        suite.addTestSuite(TestSeveralComponents.class);
         // $JUnit-END$
         return suite;
     }

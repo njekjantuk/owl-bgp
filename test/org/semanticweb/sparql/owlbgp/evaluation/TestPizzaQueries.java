@@ -39,7 +39,6 @@ import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.monitor.MinimalPrintingMonitor;
-import org.semanticweb.sparql.bgpevaluation.monitor.PrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -81,7 +80,7 @@ public class TestPizzaQueries extends TestCase {
                 + "SELECT ?x WHERE {"+LB
                 + "?x :hasTopping _:bnode"+LB
                 + "}";
-        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new PrintingMonitor());//new MinimalPrintingMonitor()
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,dataset);
         assertTrue(!result.hasNext());
