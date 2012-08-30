@@ -100,7 +100,7 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
     protected List<Atomic[]> m_candidateBindings;
     
     
-    public DynamicCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
+    public DynamicCostEstimationVisitor(OWLOntologyGraph graph) {
         m_reasoner=graph.getReasoner();
         if (!(m_reasoner instanceof OWLBGPHermiT)) 
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
@@ -132,12 +132,13 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
         m_datatypeCount=graph.getDatatypesInSignature().size();
         m_indCount=graph.getIndividualsInSignature().size();
         m_litCount=graph.getLiteralsInSignature().size();
-        m_bindingPositions=bindingPositions;
-        m_candidateBindings=candidateBindings;
         sampl = System.getProperty("sampling");
     }
-    public void updateCandidateBindings(List<Atomic[]> newCandidateBindings) {
+    public void setCandidateBindings(List<Atomic[]> newCandidateBindings) {
         m_candidateBindings=newCandidateBindings;
+    }
+    public void setBindingPositions(Map<Variable,Integer> bindingPositions) {
+        m_bindingPositions=bindingPositions;
     }
     public double[] visit(QO_SubClassOf queryObject) {
         double[] result=new double[2];

@@ -51,13 +51,19 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
 
 public class AbstractTest extends TestCase {
+    protected static final IRI ONTOLOGY_IRI=IRI.create("http://example.org/");
+    protected static final String NS="http://example.org/";
     public static final String LB=System.getProperty("line.separator");
-    public static final String NS="http://example.org/";
     
+    public AbstractTest() {
+        super();
+    }
+    public AbstractTest(String name) {
+        super(name);
+    }
     protected void assertNoTriplesLeft(TripleConsumer consumer) {
         assertTrue(consumer.allTriplesConsumed());
     }
-    
     public static UntypedVariable V(String variableName) {
         return UntypedVariable.create(variableName);
     }

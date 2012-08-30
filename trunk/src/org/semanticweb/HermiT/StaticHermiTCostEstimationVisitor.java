@@ -17,7 +17,6 @@
 */
 package  org.semanticweb.HermiT;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
@@ -43,8 +42,8 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	protected Integer m_classHierarchyDepth;
 	protected Integer m_opHierarchyDepth;
 	    
-	public StaticHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions) {
-		super(graph, bindingPositions);
+	public StaticHermiTCostEstimationVisitor(OWLOntologyGraph graph) {
+		super(graph);
 	    if (m_reasoner instanceof OWLBGPHermiT) {
 	    	m_hermit=(OWLBGPHermiT)m_reasoner;
 	        m_instanceStatistics=m_hermit.getInstanceStatistics();

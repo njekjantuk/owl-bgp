@@ -17,8 +17,6 @@
 */
 package  org.semanticweb.HermiT;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
@@ -47,8 +45,8 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
     protected Integer m_classHierarchyDepth;
     protected Integer m_opHierarchyDepth;
     
-    public DynamicHermiTCostEstimationVisitor(OWLOntologyGraph graph, Map<Variable,Integer> bindingPositions, List<Atomic[]> candidateBindings) {
-        super(graph, bindingPositions, candidateBindings);	
+    public DynamicHermiTCostEstimationVisitor(OWLOntologyGraph graph) {
+        super(graph);	
         if (!(m_reasoner instanceof OWLBGPHermiT))
             throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
         m_hermit=(OWLBGPHermiT)m_reasoner;
