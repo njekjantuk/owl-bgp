@@ -38,7 +38,6 @@ import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
-import org.semanticweb.sparql.bgpevaluation.monitor.MinimalPrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -80,7 +79,7 @@ public class TestPizzaQueries extends TestCase {
                 + "SELECT ?x WHERE {"+LB
                 + "?x :hasTopping _:bnode"+LB
                 + "}";
-        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,dataset);
         assertTrue(!result.hasNext());
@@ -95,7 +94,7 @@ public class TestPizzaQueries extends TestCase {
                 + "?o rdf:type owl:Class . "+LB
                 + "?x rdfs:subClassOf [rdf:type owl:Restriction; owl:onProperty :hasTopping; owl:someValuesFrom ?o]"+LB
                 + "}";
-        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,dataset);
         Configuration c=new Configuration();
