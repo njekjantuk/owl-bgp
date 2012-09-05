@@ -19,12 +19,9 @@
 package  org.semanticweb.sparql.hermit;
 
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.sparql.algebra.Algebra;
 import com.hp.hpl.jena.sparql.algebra.Op;
-import com.hp.hpl.jena.sparql.engine.Plan;
 
 public class AlgebraTranslation {
 	public static final String LB = System.getProperty("line.separator") ; 
@@ -93,8 +90,8 @@ public class AlgebraTranslation {
             System.out.println(op);
             System.out.println("--------------------");
             // Plan
-            Plan plan=QueryExecutionFactory.createPlan(query, ModelFactory.createDefaultModel().getGraph());
-    	    System.out.println(plan);
+//            Plan plan=QueryExecutionFactory.createPlan(query, ModelFactory.createDefaultModel().getGraph());
+//    	    System.out.println(plan);
     	    System.out.println("====================");
 	    }
 	}
