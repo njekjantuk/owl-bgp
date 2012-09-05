@@ -19,7 +19,6 @@
 package  org.semanticweb.sparql.owlbgp.evaluation;
 
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
-import org.semanticweb.sparql.bgpevaluation.monitor.MinimalPrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -58,7 +57,7 @@ public class TestSeveralComponents extends AbstractQueryTest {
                 + "  ?y rdf:type :B . "+LB
                 + "}";
         
-        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
         int noResults=0;

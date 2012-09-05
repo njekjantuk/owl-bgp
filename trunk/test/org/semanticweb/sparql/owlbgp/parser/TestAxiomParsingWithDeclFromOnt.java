@@ -184,7 +184,6 @@ public class TestAxiomParsingWithDeclFromOnt extends AbstractTest {
         ClassExpression superCls=ObjectSomeValuesFrom.create(OP("http://example.org/r"), CV("o"));
         Axiom ax3=SubClassOf.create(CV("x"), superCls);
         String s=ax1.toTurtleString()+ax2.toTurtleString()+ax3.toTurtleString();
-        System.out.println(s);
         Ontology qo=ParserManager.parseBGP(s, queriedOntology);
         Set<Axiom> axioms=new HashSet<Axiom>(qo.getAxioms());
         assertTrue(axioms.remove(ax1));
