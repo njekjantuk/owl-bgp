@@ -36,6 +36,7 @@ import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
+import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
 import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
 import com.hp.hpl.jena.sparql.engine.iterator.QueryIter1;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
@@ -86,11 +87,11 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
     }
     protected Binding moveToNextBinding() {
         if (hasNextBinding()) {
-            Binding bindingMap=null;
+            BindingMap bindingMap=null;
             if (input!=null && input.hasNext())
-                bindingMap=new BindingMap(input.next());
+                bindingMap=BindingFactory.create(input.next());
             else 
-                bindingMap=new BindingMap();
+                bindingMap=BindingFactory.create();
             boolean flip=false;
             for (int index=resultsPerComponent.size()-1;index>=0;index--) {
                 if (index==resultsPerComponent.size()-1) {
@@ -158,5 +159,10 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
             } else 
                 return Node.createURI(iri);
         } 
+    }
+    @Override
+    protected void requestSubCancel() {
+        // TODO Auto-generated method stub
+        
     }
 }

@@ -33,6 +33,8 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.Dataset;
+import com.hp.hpl.jena.query.LabelExistsException;
+import com.hp.hpl.jena.query.ReadWrite;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.shared.Lock;
 import com.hp.hpl.jena.sparql.core.DatasetGraph;
@@ -137,6 +139,8 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
     }
 	public void close() {
 	}
+    public void end() {        
+    }
 	public boolean containsNamedModel(String uri) {
 		return namedGraphURIsToGraphs.containsKey(uri);
 	}
@@ -149,6 +153,15 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
 	public Model getNamedModel(String uri) {
 		return null;
 	}
+    public void addNamedModel(String uri, Model model) throws LabelExistsException {
+        throw new UnsupportedOperationException("Named models are not supported. ");
+    }
+    public void removeNamedModel(String uri) {
+        throw new UnsupportedOperationException("Named models are not supported. ");
+    }
+    public void replaceNamedModel(String uri, Model model) {
+        throw new UnsupportedOperationException("Named models are not supported. ");
+    }
 	public Iterator<String> listNames() {
 		return namedGraphURIsToGraphs.keySet().iterator();
 	}
@@ -182,6 +195,9 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
         else
             throw new IllegalArgumentException("Could not set the default graph because only instances of OWLOntologyGraph are supported. ");
     }
+    public void setDefaultModel(Model model) {
+        throw new IllegalArgumentException("Setting of default models is not supported. ");
+    }
     public void addGraph(Node graphName, Graph graph) {
         if (graph instanceof OWLOntologyGraph)
             namedGraphURIsToGraphs.put(graphName.getURI(), (OWLOntologyGraph)graph);
@@ -194,10 +210,16 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
         else 
             throw new IllegalArgumentException("Could not add the named graph because the node for the graph name has to be a URI node, but graphName has not type URI: "+graphName);
     }
+    public void add(Node g, Node s, Node p, Node o) {
+        throw new UnsupportedOperationException("The addition of triples and quads is not supported for instances of OWLOntologyGraph. ");
+    }
     public void add(Quad quad) {
         throw new UnsupportedOperationException("The addition of triples and quads is not supported for instances of OWLOntologyGraph. ");
     }
     public void delete(Quad quad) {
+        throw new UnsupportedOperationException("The removal of triples and quads is not supported for instances of OWLOntologyGraph. ");
+    }
+    public void delete(Node g, Node s, Node p, Node o) {
         throw new UnsupportedOperationException("The removal of triples and quads is not supported for instances of OWLOntologyGraph. ");
     }
     public void deleteAny(Node g, Node s, Node p, Node o) {
@@ -226,5 +248,17 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
     }
     public Context getContext() {
         return null;
+    }
+    public boolean supportsTransactions() {
+        return false;
+    }
+    public void begin(ReadWrite readWrite) {        
+    }
+    public void commit() {
+    }
+    public void abort() {
+    }
+    public boolean isInTransaction() {
+        return false;
     }
 }
