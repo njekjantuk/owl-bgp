@@ -29,6 +29,8 @@ public class DynamicEvaluator extends QueryEvaluator {
     @Override
     public List<Atomic[]> execute(List<QueryObject<? extends Axiom>> connectedComponent, Map<Variable, Integer> positionInTuple, List<Atomic[]> bindings) {
         
+    	m_costEstimator.setCandidateBindings(bindings);
+        m_costEstimator.setBindingPositions(positionInTuple);
         Set<Variable> boundVar=new HashSet<Variable>();
         while (!connectedComponent.isEmpty() && !bindings.isEmpty()) {
             m_monitor.costEvaluationStarted();

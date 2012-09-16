@@ -33,8 +33,8 @@ public interface StaticQueryObjectVisitorEx<O> {
 //    O visit(QO_EquivalentObjectProperties axiom, Set<Variable> bound);
 //    O visit(QO_DisjointObjectProperties axiom, Set<Variable> bound);
 //    O visit(QO_InverseObjectProperties axiom, Set<Variable> bound);
-//    O visit(QO_ObjectPropertyDomain axiom, Set<Variable> bound);
-//    O visit(QO_ObjectPropertyRange axiom, Set<Variable> bound);
+    O visit(QO_ObjectPropertyDomain axiom, Set<Variable> bound);
+    O visit(QO_ObjectPropertyRange axiom, Set<Variable> bound);
     O visit(QO_FunctionalObjectProperty axiom, Set<Variable> bound);
     O visit(QO_InverseFunctionalObjectProperty axiom, Set<Variable> bound);
     O visit(QO_ReflexiveObjectProperty axiom, Set<Variable> bound);
@@ -46,8 +46,8 @@ public interface StaticQueryObjectVisitorEx<O> {
 //    O visit(QO_SubDataPropertyOf axiom, Set<Variable> bound);
 //    O visit(QO_EquivalentDataProperties axiom, Set<Variable> bound);
 //    O visit(QO_DisjointDataProperties axiom, Set<Variable> bound);
-//    O visit(QO_DataPropertyDomain axiom, Set<Variable> bound);
-//    O visit(QO_DataPropertyRange axiom, Set<Variable> bound);
+    O visit(QO_DataPropertyDomain axiom, Set<Variable> bound);
+    O visit(QO_DataPropertyRange axiom, Set<Variable> bound);
     O visit(QO_FunctionalDataProperty axiom, Set<Variable> bound);
 //    
 //    O visit(QO_DatatypeDefinition axiom, Set<Variable> bound);
