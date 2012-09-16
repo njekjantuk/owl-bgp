@@ -37,6 +37,8 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.DynamicQueryObjectVisit
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyDomain;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
@@ -44,6 +46,8 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_IrreflexiveObjectPro
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyDomain;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ReflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubClassOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
@@ -55,9 +59,13 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
+import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
@@ -159,7 +167,7 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
         ClassExpression subClass=instantiated.getSubClassExpression();
         ClassExpression superClass=instantiated.getSuperClassExpression();
         int results=1;
-        if ((subClass instanceof Atomic || subClass.isVariable()) &&(superClass instanceof Atomic || superClass.isVariable())){
+        if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())){
         	for (int i=0;i<unbound.size();i++)
         		results*=m_classCount;	
             return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
@@ -205,12 +213,42 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
 //    public double[] visit(QO_InverseObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_ObjectPropertyDomain queryObject) {
-//        return new double[] { 0, 0 };
-//    }
-//    public double[] visit(QO_ObjectPropertyRange queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_ObjectPropertyDomain queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+            Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+                existingBindings.put(var,binding);
+        }
+        ObjectPropertyDomain instantiated=(ObjectPropertyDomain)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        return complex(unbound, m_candidateBindings);
+    }
+    public double[] visit(QO_ObjectPropertyRange queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+            Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+                existingBindings.put(var,binding);
+        }
+        ObjectPropertyRange instantiated=(ObjectPropertyRange)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        return complex(unbound, m_candidateBindings);
+    }
     public double[] visit(QO_FunctionalObjectProperty queryObject) {
         return getObjectPropertyAxiomCost(queryObject);
     }
@@ -265,12 +303,42 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
 //    public double[] visit(QO_DisjointDataProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_DataPropertyDomain queryObject) {
-//        return new double[] { 0, 0 };
-//    }
-//    public double[] visit(QO_DataPropertyRange queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_DataPropertyDomain queryObject) {
+        double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+        	return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+        	Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+            	existingBindings.put(var,binding);
+        }
+        DataPropertyDomain instantiated=(DataPropertyDomain)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        return complex(unbound, m_candidateBindings);
+    }
+    public double[] visit(QO_DataPropertyRange queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+        	return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+        	Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+            	existingBindings.put(var,binding);
+        }
+        DataPropertyRange instantiated=(DataPropertyRange)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        return complex(unbound, m_candidateBindings);
+    }
     public double[] visit(QO_FunctionalDataProperty queryObject) {
         return getDataPropertyAxiomCost(queryObject);
     }
@@ -812,7 +880,7 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
     }
 
     protected double[] complex(Set<Variable> unbound, List<Atomic[]> candidateBindings) {
-        int tests=0;
+        int tests=1;
         // complex
         boolean first=true;
         for (Variable var : unbound) {
@@ -830,7 +898,7 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
             else if (var instanceof IndividualVariable)
                 signatureSize=m_indCount;
             if (first) {
-                tests+=signatureSize;
+                tests+=signatureSize-1;
                 first=false;
             }   
             else 

@@ -48,10 +48,11 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	    	m_hermit=(OWLBGPHermiT)m_reasoner;
 	        m_instanceStatistics=m_hermit.getInstanceStatistics();
 	        double numDisjunctions=0;
+	        
 	        for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
 	        	if (clause.getHeadLength()>1) {
 	        		numDisjunctions+=clause.getHeadLength();
-	        		//System.out.println(clause);
+	        		System.out.println(clause);
 	        	}	
 	            m_numDisjunctions=numDisjunctions;
 	    } else 

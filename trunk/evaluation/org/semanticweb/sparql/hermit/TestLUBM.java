@@ -71,7 +71,7 @@ public class TestLUBM {
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
-	    /*OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/univ-bench.owl"));
+	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/univ-bench.owl"));
 	    File dir = new File("evaluation/ontologies/LUBM-1");
        String[] children = dir.list();
         for (int i=0;i<children.length;i++){
@@ -81,8 +81,8 @@ public class TestLUBM {
 	          manager.addAxioms(ont, tmp.getAxioms());
             }
         }
-	    */
-	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/LUBMwDep.owl"));
+	    
+	    //OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies/LUBMwDep.owl"));
         /*try {
         	 File file = new File("evaluation/ontologies/LUBMwDep.owl");
         	 manager.saveOntology(ont, IRI.create(file.toURI()));

@@ -116,12 +116,16 @@ public class OWLReasonerStageGenerator implements StageGenerator {
         	m_monitor.componentsEvaluationStarted(connectedComponent);
             Map<Variable,Integer> positionInTuple=new HashMap<Variable,Integer>();
             int position=0;
-            for (QueryObject<? extends Axiom> ax : connectedComponent) {
-                for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
-                    positionInTuple.put(var, position);
-                    position++;
-                }
-            }
+            for (Variable var : parser.getParsedOntology().getVariablesInSignature()) {
+                positionInTuple.put(var, position);
+                position++;
+            } 
+            //for (QueryObject<? extends Axiom> ax : connectedComponent) {
+            //    for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
+            //        positionInTuple.put(var, position);
+            //        position++;
+            //    }
+            //}
             bindingPositionsPerComponent.add(positionInTuple);
             Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
             List<Atomic[]> bindings=new ArrayList<Atomic[]>();

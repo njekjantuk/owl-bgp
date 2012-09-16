@@ -29,6 +29,8 @@ import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyDomain;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
@@ -36,6 +38,8 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_IrreflexiveObjectPro
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyDomain;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ReflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubClassOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
@@ -145,12 +149,20 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
 //    public double[] visit(QO_InverseObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_ObjectPropertyDomain queryObject) {
-//        return new double[] { 0, 0 };
-//    }
-//    public double[] visit(QO_ObjectPropertyRange queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_ObjectPropertyDomain queryObject, Set<Variable> boundVar) {
+    	Axiom template=queryObject.getAxiomTemplate(); 
+    	Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        return complex(unbound);
+    }
+    public double[] visit(QO_ObjectPropertyRange queryObject, Set<Variable> boundVar) {
+    	Axiom template=queryObject.getAxiomTemplate(); 
+    	Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        return complex(unbound);
+    }
     public double[] visit(QO_FunctionalObjectProperty queryObject, Set<Variable> boundVar) {
         return getObjectPropertyAxiomCost(queryObject, boundVar);
     }
@@ -199,12 +211,20 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
 //    public double[] visit(QO_DisjointDataProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_DataPropertyDomain queryObject) {
-//        return new double[] { 0, 0 };
-//    }
-//    public double[] visit(QO_DataPropertyRange queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_DataPropertyDomain queryObject, Set<Variable> boundVar) {
+    	Axiom template=queryObject.getAxiomTemplate(); 
+    	Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        return complex(unbound);
+    }
+    public double[] visit(QO_DataPropertyRange queryObject, Set<Variable> boundVar) {
+    	Axiom template=queryObject.getAxiomTemplate(); 
+    	Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        return complex(unbound);
+    }
     public double[] visit(QO_FunctionalDataProperty queryObject, Set<Variable> boundVar) {
         return getDataPropertyAxiomCost(queryObject, boundVar);
     }
