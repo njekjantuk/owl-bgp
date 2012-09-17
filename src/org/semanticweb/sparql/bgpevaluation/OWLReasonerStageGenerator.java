@@ -81,6 +81,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             m_monitor.bgpParsingFinished(queryAxiomTemplates.toString());
         } catch (Exception e) { //Parse
             System.err.println("ParseException: Probably types could not be disambuguated with this active graph. ");
+            e.printStackTrace();
             m_monitor.bgpEvaluationFinished(0);
             return new OWLBGPQueryIterator(pattern,input,execCxt,new ArrayList<List<Atomic[]>>(),new ArrayList<Map<Variable,Integer>>(),new HashSet<IndividualVariable>());
         } 

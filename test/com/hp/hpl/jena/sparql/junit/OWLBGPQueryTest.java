@@ -13,9 +13,6 @@ import com.hp.hpl.jena.query.QueryException;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.shared.JenaException;
-import com.hp.hpl.jena.sparql.junit.EarlReport;
-import com.hp.hpl.jena.sparql.junit.QueryTest;
-import com.hp.hpl.jena.sparql.junit.TestItem;
 import com.hp.hpl.jena.util.FileManager;
 
 public class OWLBGPQueryTest extends QueryTest {
@@ -30,6 +27,7 @@ public class OWLBGPQueryTest extends QueryTest {
         try {
             return new OWLOntologyDataSet(defaultGraphURIs, namedGraphURIs);
         } catch (OWLOntologyCreationException e) {
+            e.printStackTrace();
             fail("Could not parse the dataset into OWL ontologies.");
             return null;
         }
