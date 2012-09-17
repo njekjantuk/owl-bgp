@@ -27,7 +27,9 @@ import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.parser.TripleConsumer;
+import org.semanticweb.sparql.owlbgp.parser.Vocabulary;
 import org.semanticweb.sparql.owlbgp.parser.triplehandlers.TripleHandler;
 
 public class TPTypeHandler extends TripleHandler {
@@ -35,7 +37,19 @@ public class TPTypeHandler extends TripleHandler {
     public TPTypeHandler(TripleConsumer consumer) {
         super(consumer);
     }
-    
+    public void handleStreaming(Identifier subject, Identifier predicate, Identifier object) {
+        if (!Vocabulary.BUILT_IN_VOCABULARY_IRIS.contains(object) && consumer.isAnonymous(object)) { 
+            // the object is a class or class expression and the subject an individual (the instance of the class)
+            super.handleStreaming(object, predicate, Vocabulary.OWL_CLASS, false);  
+            if (consumer.isVariable(subject))
+                consumer.mapIndividualIdentifierToindividual(subject, IndividualVariable.create(subject.toString()));
+            else if (consumer.isAnonymous(subject))
+                consumer.mapIndividualIdentifierToindividual(subject, AnonymousIndividual.create(subject.toString()));
+            else 
+                consumer.mapIndividualIdentifierToindividual(subject, NamedIndividual.create(subject.toString()));
+        }
+        super.handleStreaming(subject, predicate, object, false);
+    }
     @Override
     public void handleTriple(Identifier subject, Identifier predicate, Identifier object, Set<Annotation> annotations) {
         ClassExpression classexpression=consumer.getCE(object);

@@ -72,7 +72,7 @@ public class PropertyAssertionHandler extends TripleHandler {
                     throw new RuntimeException("It seems "+object+" is not a literal although the triple "+subject+" "+predicate+" "+object+" seems to be a data property assertion since "+predicate+" is a data property. ");
                 consumer.addAxiom(DataPropertyAssertion.create(dpe,individual,literal,annotations));
             } else {
-                throw new RuntimeException("Could not find neither a data nor an object property for the predicate in the triple "+subject+" "+predicate+" "+object+". ");
+                throw new RuntimeException("Could find neither a data nor an object property for the predicate in the triple "+subject+" "+predicate+" "+object+". ");
             }
         }
     }

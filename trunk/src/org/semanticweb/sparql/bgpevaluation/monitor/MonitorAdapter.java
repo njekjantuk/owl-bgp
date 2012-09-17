@@ -32,7 +32,7 @@ public class MonitorAdapter implements Monitor {
     }
     public void bgpParsingStarted() {
     }
-    public void bgpParsingFinished() {
+    public void bgpParsingFinished(String parsedAxioms) {
     }
     public void connectedComponentsComputationStarted() {
     }

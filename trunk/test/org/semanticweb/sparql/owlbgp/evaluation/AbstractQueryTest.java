@@ -75,4 +75,10 @@ public class AbstractQueryTest extends AbstractTest {
         OWLOntologyGraph graph=m_dataSet.getDefaultGraph();
         graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY);
     }
+    protected void loadDataSetFromOntology(OWLOntology ontology) throws Exception {
+        m_ontology=ontology;
+        m_dataSet=new OWLOntologyDataSet(m_ontology, new HashMap<String, OWLOntology>());
+        OWLOntologyGraph graph=m_dataSet.getDefaultGraph();
+        graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY);
+    }
 }

@@ -197,7 +197,7 @@ public class TripleConsumer {
         typeHandlers.put(Vocabulary.OWL_CLASS, new ClassHandler(this));
         typeHandlers.put(Vocabulary.RDFS_DATATYPE, new DatatypeHandler(this));
         typeHandlers.put(Vocabulary.OWL_OBJECT_PROPERTY, new ObjectPropertyHandler(this));
-        typeHandlers.put(Vocabulary.OWL_DATA_PROPERTY, new DatatypePropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_DATATYPE_PROPERTY, new DatatypePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_ANNOTATION_PROPERTY, new AnnotationPropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_NAMED_INDIVIDUAL, new NamedIndividualHandler(this));
         typeHandlers.put(Vocabulary.OWL_ONTOLOGY, new OntologyHandler(this));
@@ -259,7 +259,7 @@ public class TripleConsumer {
         typeHandlers.put(Vocabulary.OWL_REFLEXIVE_PROPERTY,new ReflexivePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_IRREFLEXIVE_PROPERTY,new IrreflexivePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_TRANSITIVE_PROPERTY,new TransitivePropertyHandler(this));
-        typeHandlers.put(Vocabulary.OWL_DATA_PROPERTY, new DatatypePropertyHandler(this));
+        typeHandlers.put(Vocabulary.OWL_DATATYPE_PROPERTY, new DatatypePropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_ANNOTATION_PROPERTY, new AnnotationPropertyHandler(this));
         typeHandlers.put(Vocabulary.OWL_NAMED_INDIVIDUAL, new NamedIndividualHandler(this));
         typeHandlers.put(Vocabulary.OWL_ALL_DISJOINT_CLASSES, new AllDisjointClassesHandler(this));
@@ -293,10 +293,13 @@ public class TripleConsumer {
                 Map<Identifier,TripleHandler> handlerMap=streamingByPredicateAndObjectHandlers.get(predicate);
                 if (handlerMap!=null) 
                     handler=handlerMap.get(object);
+                if (handler==null && predicate.equals(Vocabulary.RDF_TYPE) && isAnonymous(object))
+                    handler=classAssertionHandler;
             }
             if (handler!=null) 
                 handler.handleStreaming(subject, predicate, object);
-            else addTriple(subject,predicate,object);
+            else 
+                addTriple(subject,predicate,object);
         }
     }
     public void addTriple(Identifier subject, Identifier predicate, Identifier object) {
@@ -1410,14 +1413,15 @@ public class TripleConsumer {
         if (identifier==null) 
             return null;
         Individual ind=IND.get(identifier);
-        if (ind==null && identifier instanceof IRI && INDExt.contains(identifier))
-            ind=NamedIndividual.create((IRI)identifier);
-        if (ind==null && isAnonymous(identifier))
-            ind=AnonymousIndividual.create(identifier.toString());
-        if (ind==null && isVariable(identifier))
-            ind=IndividualVariable.create(identifier.toString());
         if (ind==null)
-            ind=NamedIndividual.create(identifier.toString());    
+            if (identifier instanceof IRI && INDExt.contains(identifier))
+                ind=NamedIndividual.create((IRI)identifier);
+            else if (isAnonymous(identifier))
+                ind=AnonymousIndividual.create(identifier.toString());
+            else if (isVariable(identifier))
+                ind=IndividualVariable.create(identifier.toString());
+            else
+                ind=NamedIndividual.create(identifier.toString());    
         return ind;
     }
     public DataRange getDR(Identifier identifier) {

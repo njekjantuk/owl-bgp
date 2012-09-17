@@ -49,7 +49,7 @@ public class TimingMonitor extends MonitorAdapter {
     public void bgpParsingStarted() {
         tParsing=System.currentTimeMillis();
     }
-    public void bgpParsingFinished() {
+    public void bgpParsingFinished(String parsedAxioms) {
         tParsing=System.currentTimeMillis()-tParsing;
     }
     public long getLastBGPParsingTime() {
