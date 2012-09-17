@@ -20,41 +20,19 @@
 package  org.semanticweb.sparql.bgpevaluation.queryobjects;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.semanticweb.HermiT.Reasoner;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataRange;
-import org.semanticweb.owlapi.model.OWLNamedIndividual;
-import org.semanticweb.owlapi.model.OWLObjectInverseOf;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
-import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
-import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Variable;
-import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
-import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
-import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
-import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
-import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DataRange;
-import org.semanticweb.sparql.owlbgp.model.individuals.Individual;
-import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
-import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyExpression;
-import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
-import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
-import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
 public class QO_DataPropertyRange extends AbstractQueryObject<DataPropertyRange> {
 
