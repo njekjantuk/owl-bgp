@@ -117,8 +117,10 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             int position=0;
             for (QueryObject<? extends Axiom> ax : connectedComponent) {
                 for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
-                    positionInTuple.put(var, position);
-                    position++;
+                    if (!positionInTuple.containsKey(var)) {
+                        positionInTuple.put(var, position);
+                        position++;
+                    }
                 }
             }
             bindingPositionsPerComponent.add(positionInTuple);

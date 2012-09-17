@@ -50,10 +50,8 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	        double numDisjunctions=0;
 	        
 	        for (DLClause clause : m_hermit.getDLOntology().getDLClauses())
-	        	if (clause.getHeadLength()>1) {
-	        		numDisjunctions+=clause.getHeadLength();
-	        		System.out.println(clause);
-	        	}	
+	        	if (clause.getHeadLength()>1) 
+	        		numDisjunctions+=clause.getHeadLength();	
 	            m_numDisjunctions=numDisjunctions;
 	    } else 
 	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
