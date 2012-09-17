@@ -34,7 +34,7 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
             System.out.println("Null action: "+entry);
             return null;
         } 
-//        if (testName.startsWith("paper-sparqldl-Q2")) {
+        if (testName.startsWith("sparqldl-04")) {
             // Defaults
             Syntax querySyntax=TestQueryUtils.getQuerySyntax(manifest);
             if (querySyntax!=null && !querySyntax.equals(Syntax.syntaxARQ) && !querySyntax.equals(Syntax.syntaxSPARQL_10) && !querySyntax.equals(Syntax.syntaxSPARQL_11))
@@ -54,7 +54,7 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
                 if (action.hasProperty(entRegime) && TestUtils.getResource(action, entRegime).equals(owlds))
                     return new OWLBGPQueryTest(testName,results,fileManager,item);
             }
-//        }
+        }
         return null;
     }
 
