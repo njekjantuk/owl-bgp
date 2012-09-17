@@ -27,7 +27,7 @@ public interface Monitor {
     void bgpEvaluationStarted();
     void bgpEvaluationFinished(int resultSize);
     void bgpParsingStarted();
-    void bgpParsingFinished();
+    void bgpParsingFinished(String parsedAxioms);
     void connectedComponentsComputationStarted();
     void connectedComponentsComputationFinished(int numComponents);
     void componentsEvaluationStarted(List<QueryObject<? extends Axiom>> queryObjectsInComponent);

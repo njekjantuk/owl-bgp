@@ -36,7 +36,6 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.parser.OWLBGPParser;
-import org.semanticweb.sparql.owlbgp.parser.ParseException;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
@@ -79,12 +78,12 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             parser.parse();
             queryAxiomTemplates=parser.getParsedAxioms();
             bnodes=parser.getVariablesForAnonymousIndividual();
-            m_monitor.bgpParsingFinished();
-        } catch (ParseException e) {
+            m_monitor.bgpParsingFinished(queryAxiomTemplates.toString());
+        } catch (Exception e) { //Parse
             System.err.println("ParseException: Probably types could not be disambuguated with this active graph. ");
             m_monitor.bgpEvaluationFinished(0);
             return new OWLBGPQueryIterator(pattern,input,execCxt,new ArrayList<List<Atomic[]>>(),new ArrayList<Map<Variable,Integer>>(),new HashSet<IndividualVariable>());
-        }
+        } 
         
         // splitting into weakly connected components
         m_monitor.connectedComponentsComputationStarted();
@@ -116,16 +115,12 @@ public class OWLReasonerStageGenerator implements StageGenerator {
         	m_monitor.componentsEvaluationStarted(connectedComponent);
             Map<Variable,Integer> positionInTuple=new HashMap<Variable,Integer>();
             int position=0;
-            for (Variable var : parser.getParsedOntology().getVariablesInSignature()) {
-                positionInTuple.put(var, position);
-                position++;
-            } 
-            //for (QueryObject<? extends Axiom> ax : connectedComponent) {
-            //    for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
-            //        positionInTuple.put(var, position);
-            //        position++;
-            //    }
-            //}
+            for (QueryObject<? extends Axiom> ax : connectedComponent) {
+                for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
+                    positionInTuple.put(var, position);
+                    position++;
+                }
+            }
             bindingPositionsPerComponent.add(positionInTuple);
             Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
             List<Atomic[]> bindings=new ArrayList<Atomic[]>();

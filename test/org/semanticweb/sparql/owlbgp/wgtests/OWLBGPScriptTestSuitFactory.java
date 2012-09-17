@@ -8,6 +8,7 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.sparql.core.DataFormat;
+import com.hp.hpl.jena.sparql.junit.OWLBGPQueryTest;
 import com.hp.hpl.jena.sparql.junit.QueryTestException;
 import com.hp.hpl.jena.sparql.junit.ScriptTestSuiteFactory;
 import com.hp.hpl.jena.sparql.junit.TestItem;
@@ -33,25 +34,27 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
             System.out.println("Null action: "+entry);
             return null;
         } 
-        // Defaults
-        Syntax querySyntax=TestQueryUtils.getQuerySyntax(manifest);
-        if (querySyntax!=null && !querySyntax.equals(Syntax.syntaxARQ) && !querySyntax.equals(Syntax.syntaxSPARQL_10) && !querySyntax.equals(Syntax.syntaxSPARQL_11))
-            throw new QueryTestException("Unknown syntax: "+querySyntax);
-        // May be null
-        Resource defaultTestType=TestUtils.getResource(manifest,TestManifestX.defaultTestType);
-        // test name,test type,action -> query specific query[+data],results
-        Resource testType=defaultTestType;
-        if (entry.hasProperty(RDF.type))
-            testType=entry.getProperty(RDF.type).getResource();
-        TestItem item=null;
-        if (testType==null || (!testType.equals(TestManifestUpdate_11.UpdateEvaluationTest) && !testType.equals(TestManifest_11.UpdateEvaluationTest))) 
-            item=TestItem.create(entry,defaultTestType,querySyntax,DataFormat.langXML);
-        if (testType!=null && (testType.equals(TestManifest.QueryEvaluationTest) || testType.equals(TestManifestX.TestQuery))) {
-            Property entRegime=new PropertyImpl(SD, "entailmentRegime");
-            Resource owlds=new ResourceImpl(ENT, "OWL-Direct");
-            if (action.hasProperty(entRegime) && TestUtils.getResource(action, entRegime).equals(owlds))
-                return new OWLBGPQueryTest(testName,results,fileManager,item);
-        }
+//        if (testName.startsWith("paper-sparqldl-Q2")) {
+            // Defaults
+            Syntax querySyntax=TestQueryUtils.getQuerySyntax(manifest);
+            if (querySyntax!=null && !querySyntax.equals(Syntax.syntaxARQ) && !querySyntax.equals(Syntax.syntaxSPARQL_10) && !querySyntax.equals(Syntax.syntaxSPARQL_11))
+                throw new QueryTestException("Unknown syntax: "+querySyntax);
+            // May be null
+            Resource defaultTestType=TestUtils.getResource(manifest,TestManifestX.defaultTestType);
+            // test name,test type,action -> query specific query[+data],results
+            Resource testType=defaultTestType;
+            if (entry.hasProperty(RDF.type))
+                testType=entry.getProperty(RDF.type).getResource();
+            TestItem item=null;
+            if (testType==null || (!testType.equals(TestManifestUpdate_11.UpdateEvaluationTest) && !testType.equals(TestManifest_11.UpdateEvaluationTest))) 
+                item=TestItem.create(entry,defaultTestType,querySyntax,DataFormat.langXML);
+            if (testType!=null && (testType.equals(TestManifest.QueryEvaluationTest) || testType.equals(TestManifestX.TestQuery))) {
+                Property entRegime=new PropertyImpl(SD, "entailmentRegime");
+                Resource owlds=new ResourceImpl(ENT, "OWL-Direct");
+                if (action.hasProperty(entRegime) && TestUtils.getResource(action, entRegime).equals(owlds))
+                    return new OWLBGPQueryTest(testName,results,fileManager,item);
+            }
+//        }
         return null;
     }
 

@@ -166,7 +166,7 @@ public class TestParser extends TestCase {
             + "_:class owl:allValuesFrom _:dr . "+LB
             + "_:dr rdf:type rdfs:Datatype . "+LB
             + "_:dr owl:intersectionOf ( xsd:int xsd:decimal <http://www.w3.org/2001/XMLSchema#byte>) . "
-            + "<http://example.org/myOnt/dp> a owl:DataProperty . "
+            + "<http://example.org/myOnt/dp> a owl:DatatypeProperty . "
             + "<http://example.org/myOnt/class> a owl:Class . ";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         parser.parse();
@@ -191,7 +191,7 @@ public class TestParser extends TestCase {
             + "_:class owl:allValuesFrom _:dr . "+LB
             + "_:dr rdf:type rdfs:Datatype . "+LB
             + "_:dr owl:intersectionOf ( ?dtint xsd:decimal ?dtbyte) . "
-            + "?dp a owl:DataProperty . "
+            + "?dp a owl:DatatypeProperty . "
             + "?class rdf:type owl:Class . "
             + "?dtint a rdfs:Datatype . "
             + "?dtbyte a rdfs:Datatype . ";

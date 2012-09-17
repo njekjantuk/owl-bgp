@@ -104,7 +104,7 @@ public class TestClassExpressionParsing extends AbstractTest {
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:maxQualifiedCardinality \"3\"^^xsd:nonNegativeInteger ."
             + "_:x owl:onDataRange xsd:integer ."
-            + "<http://example.org/r> a owl:DataProperty .";
+            + "<http://example.org/r> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -121,7 +121,7 @@ public class TestClassExpressionParsing extends AbstractTest {
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:minQualifiedCardinality \"3\"^^xsd:nonNegativeInteger ."
             + "_:x owl:onDataRange xsd:integer ."
-            + "<http://example.org/r> a owl:DataProperty .";
+            + "<http://example.org/r> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -137,7 +137,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:qualifiedCardinality \"3\"^^xsd:nonNegativeInteger ."
-            + "<http://example.org/r> a owl:DataProperty ."
+            + "<http://example.org/r> a owl:DatatypeProperty ."
             + "_:x owl:onDataRange _:dr ."
             + "_:dr rdf:type rdfs:Datatype ."
             + "_:dr owl:unionOf (xsd:int xsd:byte) .";
@@ -231,7 +231,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:maxCardinality \"3\"^^xsd:nonNegativeInteger ."
-            + "<http://example.org/r> a owl:DataProperty .";
+            + "<http://example.org/r> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -247,7 +247,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:minCardinality \"3\"^^xsd:nonNegativeInteger ."
-            + "<http://example.org/r> a owl:DataProperty .";
+            + "<http://example.org/r> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -263,7 +263,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/r> ."
             + "_:x owl:cardinality \"3\"^^xsd:nonNegativeInteger ."
-            + "<http://example.org/r> a owl:DataProperty .";
+            + "<http://example.org/r> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();
@@ -343,7 +343,7 @@ public class TestClassExpressionParsing extends AbstractTest {
         String s="_:x rdf:type owl:Restriction ."
             + "_:x owl:onProperty <http://example.org/dp> ."
             + "_:x owl:hasValue \"abc\"^^xsd:string ."
-            + "<http://example.org/dp> a owl:DataProperty .";
+            + "<http://example.org/dp> a owl:DatatypeProperty .";
         OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
         TripleConsumer consumer=parser.handler;
         parser.parse();

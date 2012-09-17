@@ -33,8 +33,8 @@ import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.Identifier;
 import org.semanticweb.sparql.owlbgp.model.InterningManager;
-import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.Variable.VarType;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
@@ -116,7 +116,7 @@ public class Declaration extends AbstractAxiom {
         } else if (m_declaredObject instanceof ObjectProperty || m_declaredObject instanceof ObjectPropertyVariable) {
             object=Vocabulary.OWL_OBJECT_PROPERTY;
         } else if (m_declaredObject instanceof DataProperty || m_declaredObject instanceof DataPropertyVariable) {
-            object=Vocabulary.OWL_DATA_PROPERTY;
+            object=Vocabulary.OWL_DATATYPE_PROPERTY;
         } else if (m_declaredObject instanceof NamedIndividual || m_declaredObject instanceof IndividualVariable) {
             object=Vocabulary.OWL_NAMED_INDIVIDUAL;
         } else if (m_declaredObject instanceof Datatype || m_declaredObject instanceof DatatypeVariable) {

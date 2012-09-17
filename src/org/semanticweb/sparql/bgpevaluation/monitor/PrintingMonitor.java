@@ -38,8 +38,9 @@ public class PrintingMonitor extends TimingMonitor {
         super.bgpEvaluationFinished(resultSize);
         m_out.println("BGP Evalation finished in: "+getLastBGPEvaluationTime()+" ms with "+resultSize+" results. ");
     }
-    public void bgpParsingFinished() {
-        super.bgpParsingFinished();
+    public void bgpParsingFinished(String parsedAxioms) {
+        super.bgpParsingFinished(parsedAxioms);
+        m_out.println("Parsed BGP: "+parsedAxioms);
         m_out.println("BGP parsing finished in: "+getLastBGPParsingTime()+" ms. ");
     }
     public void connectedComponentsComputationFinished(int numComponents) {
