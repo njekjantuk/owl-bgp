@@ -178,13 +178,25 @@ public class ToOWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> 
         return m_dataFactory.getOWLObjectHasValue((OWLObjectPropertyExpression)objectHasValue.getObjectPropertyExpression().accept(this),(OWLNamedIndividual)objectHasValue.getIndividual().accept(this));
     }
     public OWLObject visit(ObjectMinCardinality objectMinCardinality) {
-        return m_dataFactory.getOWLObjectMinCardinality(objectMinCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMinCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectMinCardinality.getClassExpression().accept(this));
+        ClassExpression ce=objectMinCardinality.getClassExpression();
+        if (ce!=null)
+            return m_dataFactory.getOWLObjectMinCardinality(objectMinCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMinCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectMinCardinality.getClassExpression().accept(this));
+        else 
+            return m_dataFactory.getOWLObjectMinCardinality(objectMinCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMinCardinality.getObjectPropertyExpression().accept(this));
     }
     public OWLObject visit(ObjectExactCardinality objectExactCardinality) {
-        return m_dataFactory.getOWLObjectExactCardinality(objectExactCardinality.getCardinality(),(OWLObjectPropertyExpression)objectExactCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectExactCardinality.getClassExpression().accept(this));
+        ClassExpression ce=objectExactCardinality.getClassExpression();
+        if (ce!=null)
+            return m_dataFactory.getOWLObjectExactCardinality(objectExactCardinality.getCardinality(),(OWLObjectPropertyExpression)objectExactCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectExactCardinality.getClassExpression().accept(this));
+        else
+            return m_dataFactory.getOWLObjectExactCardinality(objectExactCardinality.getCardinality(),(OWLObjectPropertyExpression)objectExactCardinality.getObjectPropertyExpression().accept(this));
     }
     public OWLObject visit(ObjectMaxCardinality objectMaxCardinality) {
-        return m_dataFactory.getOWLObjectMaxCardinality(objectMaxCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMaxCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectMaxCardinality.getClassExpression().accept(this));
+        ClassExpression ce=objectMaxCardinality.getClassExpression();
+        if (ce!=null)
+            return m_dataFactory.getOWLObjectMaxCardinality(objectMaxCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMaxCardinality.getObjectPropertyExpression().accept(this),(OWLClassExpression)objectMaxCardinality.getClassExpression().accept(this));
+        else 
+            return m_dataFactory.getOWLObjectMaxCardinality(objectMaxCardinality.getCardinality(),(OWLObjectPropertyExpression)objectMaxCardinality.getObjectPropertyExpression().accept(this));
     }
     public OWLObject visit(ObjectHasSelf objectHasSelf) {
         return m_dataFactory.getOWLObjectHasSelf((OWLObjectPropertyExpression)objectHasSelf.getObjectPropertyExpression().accept(this));
@@ -205,13 +217,25 @@ public class ToOWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> 
         return m_dataFactory.getOWLDataHasValue((OWLDataPropertyExpression)dataHasValue.getDataPropertyExpression().accept(this),(OWLLiteral)dataHasValue.getLiteral().accept(this));
     }
     public OWLObject visit(DataMinCardinality dataMinCardinality) {
-        return m_dataFactory.getOWLDataMinCardinality(dataMinCardinality.getCardinality(),(OWLDataPropertyExpression)dataMinCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataMinCardinality.getDataRange().accept(this));
+        DataRange dr=dataMinCardinality.getDataRange();
+        if (dr!=null)
+            return m_dataFactory.getOWLDataMinCardinality(dataMinCardinality.getCardinality(),(OWLDataPropertyExpression)dataMinCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataMinCardinality.getDataRange().accept(this));
+        else
+            return m_dataFactory.getOWLDataMinCardinality(dataMinCardinality.getCardinality(),(OWLDataPropertyExpression)dataMinCardinality.getDataPropertyExpression().accept(this));
     }
     public OWLObject visit(DataExactCardinality dataExactCardinality) {
-        return m_dataFactory.getOWLDataMaxCardinality(dataExactCardinality.getCardinality(),(OWLDataPropertyExpression)dataExactCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataExactCardinality.getDataRange().accept(this));
+        DataRange dr=dataExactCardinality.getDataRange();
+        if (dr!=null)
+            return m_dataFactory.getOWLDataMaxCardinality(dataExactCardinality.getCardinality(),(OWLDataPropertyExpression)dataExactCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataExactCardinality.getDataRange().accept(this));
+        else
+            return m_dataFactory.getOWLDataMaxCardinality(dataExactCardinality.getCardinality(),(OWLDataPropertyExpression)dataExactCardinality.getDataPropertyExpression().accept(this));
     }
     public OWLObject visit(DataMaxCardinality dataMaxCardinality) {
-        return m_dataFactory.getOWLDataMaxCardinality(dataMaxCardinality.getCardinality(),(OWLDataPropertyExpression)dataMaxCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataMaxCardinality.getDataRange().accept(this));
+        DataRange dr=dataMaxCardinality.getDataRange();
+        if (dr!=null)
+            return m_dataFactory.getOWLDataMaxCardinality(dataMaxCardinality.getCardinality(),(OWLDataPropertyExpression)dataMaxCardinality.getDataPropertyExpression().accept(this),(OWLDataRange)dataMaxCardinality.getDataRange().accept(this));
+        else
+            return m_dataFactory.getOWLDataMaxCardinality(dataMaxCardinality.getCardinality(),(OWLDataPropertyExpression)dataMaxCardinality.getDataPropertyExpression().accept(this));
     }
     public OWLObject visit(ObjectProperty objectProperty) {
         return m_dataFactory.getOWLObjectProperty((IRI)objectProperty.getIRI().accept(this));

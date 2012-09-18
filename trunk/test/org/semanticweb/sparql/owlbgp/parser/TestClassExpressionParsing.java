@@ -52,6 +52,18 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 public class TestClassExpressionParsing extends AbstractTest {
     public static final String LB = System.getProperty("line.separator") ;
     
+    public void testClassAssertion() throws Exception {
+        String s="<http://example.org/hasChild> rdf:type owl:ObjectProperty . "+LB+
+                "?parent rdf:type [ "+LB+
+                " rdf:type owl:Restriction ; "+LB+
+                " owl:onProperty  <http://example.org/hasChild> ; "+LB+
+                " owl:minCardinality \"1\"^^xsd:nonNegativeInteger ] ";
+        OWLBGPParser parser=new OWLBGPParser(new StringReader(s));
+        TripleConsumer consumer=parser.handler;
+        parser.parse();
+        assertNoTriplesLeft(consumer);
+    }
+    
     public void testOWL1Classes() throws Exception {
         String s="_:v rdf:type owl:Class . "
             + "_:v owl:unionOf _:u1 . "

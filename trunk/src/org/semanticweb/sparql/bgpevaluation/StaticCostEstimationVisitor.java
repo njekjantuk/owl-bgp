@@ -41,6 +41,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssert
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyDomain;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ReflexiveObjectProperty;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SameIndividual;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubClassOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SymmetricObjectProperty;
@@ -55,6 +56,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
+import org.semanticweb.sparql.owlbgp.model.axioms.SameIndividual;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
@@ -234,9 +236,14 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
 //    public double[] visit(QO_HasKey queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_SameIndividual queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_SameIndividual queryObject, Set<Variable> boundVar) {
+        SameIndividual axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        int multiplier=1;        
+        for (@SuppressWarnings("unused") Variable var : vars)
+            multiplier*=m_indCount;
+        return new double[] { multiplier*COST_ENTAILMENT, multiplier };
+    }
 //    public double[] visit(QO_DifferentIndividuals queryObject) {
 //        return new double[] { 0, 0 };
 //    }

@@ -30,11 +30,11 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
     
     @Override
     public Test makeTest(Resource manifest,Resource entry,String testName,Resource action,Resource result) {
-        if (action==null) {
-            System.out.println("Null action: "+entry);
-            return null;
-        } 
-//        if (testName.startsWith("sparqldl-12")) {
+//        if (testName.startsWith("sparqldl-10")) {
+            if (action==null) {
+                System.out.println("Null action: "+entry);
+                return null;
+            } 
             // Defaults
             Syntax querySyntax=TestQueryUtils.getQuerySyntax(manifest);
             if (querySyntax!=null && !querySyntax.equals(Syntax.syntaxARQ) && !querySyntax.equals(Syntax.syntaxSPARQL_10) && !querySyntax.equals(Syntax.syntaxSPARQL_11))
