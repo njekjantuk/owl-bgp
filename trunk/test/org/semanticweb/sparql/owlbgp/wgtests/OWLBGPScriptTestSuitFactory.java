@@ -49,10 +49,25 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
             if (testType==null || (!testType.equals(TestManifestUpdate_11.UpdateEvaluationTest) && !testType.equals(TestManifest_11.UpdateEvaluationTest))) 
                 item=TestItem.create(entry,defaultTestType,querySyntax,DataFormat.langXML);
             if (testType!=null && (testType.equals(TestManifest.QueryEvaluationTest) || testType.equals(TestManifestX.TestQuery))) {
-                Property entRegime=new PropertyImpl(SD, "entailmentRegime");
+                Property sd_entailmentRegime=new PropertyImpl(SD, "entailmentRegime");
                 Resource owlds=new ResourceImpl(ENT, "OWL-Direct");
-                if (action.hasProperty(entRegime) && TestUtils.getResource(action, entRegime).equals(owlds))
-                    return new OWLBGPQueryTest(testName,results,fileManager,item);
+                boolean isRelevantTest=false;
+                if (action.hasProperty(sd_entailmentRegime)) {
+                    Resource regime=TestUtils.getResource(action, sd_entailmentRegime);
+                    if (regime.isResource() && regime.equals(owlds)) {
+                        isRelevantTest=true;
+                    } else if (regime.isAnon() && regime.getProperty(RDF.first)!=null) {
+                        Resource listItem=regime;
+                        while (!listItem.equals(RDF.nil)&&!isRelevantTest) {
+                            regime=listItem.getProperty(RDF.first).getResource();
+                            if (regime.isResource() && regime.equals(owlds))
+                                isRelevantTest=true;
+                            listItem=listItem.getProperty(RDF.rest).getResource();
+                        }
+                    }
+                    if (isRelevantTest)
+                        return new OWLBGPQueryTest(testName,results,fileManager,item);
+                }
             }
 //        }
         return null;
