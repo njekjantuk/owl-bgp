@@ -163,7 +163,16 @@ public class OWLReasonerStageGenerator implements StageGenerator {
                 //TODO: check how we get the bnodes (without also taking the auxiliary ones)
             }
             return "?"+name;
-        } else
+        } else if (node.isLiteral()) {
+                String datatypeURI=node.getLiteralDatatypeURI();
+                String language=node.getLiteralLanguage();
+                String lexicalForm=node.getLiteralLexicalForm();
+                if (datatypeURI!=null&&datatypeURI!=""&&(language==null||language=="")) 
+                    return "\""+lexicalForm+"\"^^<"+datatypeURI+">";
+                else 
+                    return node.toString();
+            
+        } else 
             return node.toString();
     }
 }

@@ -54,7 +54,7 @@ public interface StaticQueryObjectVisitorEx<O> {
 //    
 //    O visit(QO_HasKey axiom, Set<Variable> bound);
 //    
-//    O visit(QO_SameIndividual axiom, Set<Variable> bound);
+    O visit(QO_SameIndividual axiom, Set<Variable> bound);
 //    O visit(QO_DifferentIndividuals axiom, Set<Variable> bound);
     O visit(QO_ClassAssertion axiom, Set<Variable> bound);
     O visit(QO_ObjectPropertyAssertion axiom, Set<Variable> bound);

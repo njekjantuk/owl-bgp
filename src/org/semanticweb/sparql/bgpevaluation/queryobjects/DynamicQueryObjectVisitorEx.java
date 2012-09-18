@@ -47,7 +47,7 @@ public interface DynamicQueryObjectVisitorEx<O> {
 //    
 //    O visit(QO_HasKey axiom);
 //    
-//    O visit(QO_SameIndividual axiom);
+    O visit(QO_SameIndividual axiom);
 //    O visit(QO_DifferentIndividuals axiom);
 
     O visit(QO_ClassAssertion axiom);

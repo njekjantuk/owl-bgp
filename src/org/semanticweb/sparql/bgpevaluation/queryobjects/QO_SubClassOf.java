@@ -50,25 +50,44 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             SubClassOf axiom=(SubClassOf)m_axiomTemplate.getBoundVersion(bindingMap);
             ClassExpression subClass=axiom.getSubClassExpression();
             ClassExpression superClass=axiom.getSuperClassExpression();
-            if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())) {
-            	if (subClass.isVariable() && superClass.isVariable()) {
-            		int[] positions=new int[2];
-                    positions[0]=bindingPositions.get(subClass);
-                    positions[1]=bindingPositions.get(superClass);
-                    return computeAllSubClassOfRelations(currentBinding,positions);
-                } else if (subClass.isVariable() && !superClass.isVariable()) {
-                    int position=bindingPositions.get(subClass);
-                    return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-                } else if (!subClass.isVariable() && superClass.isVariable()) {
-                    int position=bindingPositions.get(superClass);
-                    return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-                } else if (!subClass.isVariable() && !superClass.isVariable()) {
-                    return checkSubsumption(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter));
-                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here");
-            } 
-            else {
+            if (subClass.isVariable() && superClass.isVariable()) {
+                int[] positions=new int[2];
+                positions[0]=bindingPositions.get(subClass);
+                positions[1]=bindingPositions.get(superClass);
+                return computeAllSubClassOfRelations(currentBinding,positions);
+            } else if (subClass.isVariable() && !superClass.isVariable() && superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+                int position=bindingPositions.get(subClass);
+                return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+            } else if (superClass.isVariable() && !subClass.isVariable() && subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+                int position=bindingPositions.get(superClass);
+                return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+            } else if (subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty() && superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty())
+                return checkSubsumption(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter));
+            else 
                 return complex(currentBinding,axiom,bindingPositions);
-            }
+            
+            //@Ilianna: The code below gives incorrect results and is inefficient, e.g., owl:Nothing is missing from the subclasses of a complex class 
+            // and finding the subclasses of a complex class does not require an iteration over all classes, as long as the superclass does not contain an 
+            // unbound variable, the reasoner can directly compute the subclasses   
+//            if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())) {
+//            	if (subClass.isVariable() && superClass.isVariable()) {
+//            		int[] positions=new int[2];
+//                    positions[0]=bindingPositions.get(subClass);
+//                    positions[1]=bindingPositions.get(superClass);
+//                    return computeAllSubClassOfRelations(currentBinding,positions);
+//                } else if (subClass.isVariable() && !superClass.isVariable()) {
+//                    int position=bindingPositions.get(subClass);
+//                    return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+//                } else if (!subClass.isVariable() && superClass.isVariable()) {
+//                    int position=bindingPositions.get(superClass);
+//                    return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
+//                } else if (!subClass.isVariable() && !superClass.isVariable()) {
+//                    return checkSubsumption(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter));
+//                } else throw new RuntimeException("There is no other case so it shouldn't have arrived here");
+//            } 
+//            else {
+//                return complex(currentBinding,axiom,bindingPositions);
+//            }
         } catch (IllegalArgumentException e) {
             // current binding is incompatible will not add new bindings in newBindings
             return new ArrayList<Atomic[]>();

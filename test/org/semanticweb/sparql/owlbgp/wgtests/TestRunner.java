@@ -35,8 +35,10 @@ public class TestRunner extends qtest {
     }
     
     public static void main (String... argv) {
+        //ARQ.hideNonDistiguishedVariables
         StageGenerator orig=(StageGenerator)ARQ.getContext().get(ARQ.stageGenerator);
         StageGenerator hermiTStageGenerator=new OWLReasonerStageGenerator(orig, new MonitorAdapter());
+//        StageGenerator hermiTStageGenerator=new OWLReasonerStageGenerator(orig, new PrintingMonitor());
         StageBuilder.setGenerator(ARQ.getContext(), hermiTStageGenerator);
         ARQ.getContext().set(ARQ.optimization, false);
         ARQ.init();

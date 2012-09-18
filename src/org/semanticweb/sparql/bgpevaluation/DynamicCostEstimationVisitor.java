@@ -49,6 +49,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyAssert
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyDomain;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ReflexiveObjectProperty;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SameIndividual;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubClassOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SymmetricObjectProperty;
@@ -66,6 +67,7 @@ import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertio
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.SameIndividual;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassExpression;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
@@ -348,9 +350,22 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
 //    public double[] visit(QO_HasKey queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_SameIndividual queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_SameIndividual queryObject) {
+        double[] estimate=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return estimate; // no answers, no tests
+        SameIndividual axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        int multiplier=1;
+        for (Variable var : vars) {
+            int varPos=m_bindingPositions.get(var);
+            if (m_candidateBindings.get(0)[varPos]==null) //unbound
+                multiplier*=m_indCount;
+            else // bound
+                multiplier*=m_candidateBindings.size();
+        }
+        return new double[] { multiplier*COST_ENTAILMENT, multiplier };
+    }
 //    public double[] visit(QO_DifferentIndividuals queryObject) {
 //        return new double[] { 0, 0 };
 //    }
