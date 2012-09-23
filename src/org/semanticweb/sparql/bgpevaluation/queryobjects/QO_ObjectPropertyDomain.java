@@ -60,14 +60,14 @@ public class QO_ObjectPropertyDomain extends AbstractQueryObject<ObjectPropertyD
             	int position=bindingPositions.get(ce);
                 return computeDomains(currentBinding, ope, position);
             } 
-            else if (!ce.isVariable() && !ope.isVariable()) {//ObjectPropertyRange(R C)
+            else if (!ce.isVariable() && !ope.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//ObjectPropertyRange(R C)
                 return checkDomain(currentBinding, (OWLObjectPropertyExpression)ope.asOWLAPIObject(m_dataFactory), (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory));
             }
-            else if (!ce.isVariable() && ope.isVariable()) {//ObjectPropertyRange(?p C)
+            else if (!ce.isVariable() && ope.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//ObjectPropertyRange(?p C)
             	int position=bindingPositions.get(ope);
             	return computePropertiesForDomains(currentBinding, (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory), position);
             } 
-            else if (ce.isVariable() && ope.isVariable()){//ObjectPropertyRange(?p ?x)
+            else if (ce.isVariable() && ope.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()){//ObjectPropertyRange(?p ?x)
             	int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ce);
                 positions[1]=bindingPositions.get(ope);

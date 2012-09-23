@@ -39,6 +39,9 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyDomain;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyRange;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DifferentIndividuals;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DisjointClasses;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_EquivalentClasses;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
@@ -62,6 +65,9 @@ import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyDomain;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyRange;
+import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
+import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
+import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.ObjectPropertyAssertion;
@@ -176,12 +182,59 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
         }
         else return complex(unbound, m_candidateBindings);
     }
-//    public double[] visit(QO_EquivalentClasses queryObject) {
-//        return new double[] { 0, 0 };
-//    }
-//    public double[] visit(QO_DisjointClasses queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_EquivalentClasses queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+            Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+                existingBindings.put(var,binding);
+        }
+        EquivalentClasses instantiated=(EquivalentClasses)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        Set<ClassExpression> equivClasses=instantiated.getClassExpressions();
+        Iterator<ClassExpression> classIt=equivClasses.iterator();
+        int flag=0;
+        while (classIt.hasNext()) {
+        	ClassExpression clsi=classIt.next();
+        	if (!(clsi instanceof Atomic) && !clsi.isVariable()) {
+        		flag=1;
+        		break;
+        	}
+        }
+        int results=1;
+        if (flag==0){
+        	for (int i=0;i<unbound.size();i++)
+        		results*=m_classCount;	
+            return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
+        }
+        else return complex(unbound, m_candidateBindings);
+    }
+    public double[] visit(QO_DisjointClasses queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+            Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+                existingBindings.put(var,binding);
+        }
+        DisjointClasses instantiated=(DisjointClasses)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        //Set<ClassExpression> equivClasses=instantiated.getClassExpressions();
+        return complex(unbound, m_candidateBindings);
+    }
 //    public double[] visit(QO_DisjointUnion queryObject) {
 //        return new double[] { 0, 0 };
 //    }
@@ -366,9 +419,22 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
         }
         return new double[] { multiplier*COST_ENTAILMENT, multiplier };
     }
-//    public double[] visit(QO_DifferentIndividuals queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_DifferentIndividuals queryObject) {
+    	double[] estimate=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return estimate; // no answers, no tests
+        DifferentIndividuals axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        int multiplier=1;
+        for (Variable var : vars) {
+            int varPos=m_bindingPositions.get(var);
+            if (m_candidateBindings.get(0)[varPos]==null) //unbound
+                multiplier*=m_indCount;
+            else // bound
+                multiplier*=m_candidateBindings.size();
+        }
+        return new double[] { multiplier*COST_ENTAILMENT, multiplier };
+    }
     public double[] visit(QO_ClassAssertion queryObject) {
         double[] estimate=new double[2];
         if (m_candidateBindings.isEmpty())
