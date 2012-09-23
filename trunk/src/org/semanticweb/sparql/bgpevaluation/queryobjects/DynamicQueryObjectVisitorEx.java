@@ -20,8 +20,8 @@ package  org.semanticweb.sparql.bgpevaluation.queryobjects;
 
 public interface DynamicQueryObjectVisitorEx<O> {  
     O visit(QO_SubClassOf axiom);
-//    O visit(QO_EquivalentClasses axiom);
-//    O visit(QO_DisjointClasses axiom);
+    O visit(QO_EquivalentClasses axiom);
+    O visit(QO_DisjointClasses axiom);
 
     O visit(QO_SubObjectPropertyOf axiom);
 //    O visit(QO_EquivalentObjectProperties axiom);
@@ -48,7 +48,7 @@ public interface DynamicQueryObjectVisitorEx<O> {
 //    O visit(QO_HasKey axiom);
 //    
     O visit(QO_SameIndividual axiom);
-//    O visit(QO_DifferentIndividuals axiom);
+    O visit(QO_DifferentIndividuals axiom);
 
     O visit(QO_ClassAssertion axiom);
     O visit(QO_ObjectPropertyAssertion axiom);

@@ -50,23 +50,9 @@ public class QO_DataPropertyRange extends AbstractQueryObject<DataPropertyRange>
             //System.out.println(instantiated);
     		DataRange dr=instantiated.getRange();
     		DataProperty dpe=(DataProperty)instantiated.getDataPropertyExpression();
-            /*if ((dr.isVariable()) && !dpe.isVariable()) {//DataPropertyDomain(R ?x)
-            	int position=bindingPositions.get(dr);
-                return computeRanges(currentBinding, dpe.asOWLAPIObject(m_dataFactory), position);
-            }*/ 
             if (!dr.isVariable() && !dpe.isVariable()) {//DataPropertyRange(R C)
                 return checkRange(currentBinding, (OWLDataProperty)dpe.asOWLAPIObject(m_dataFactory), (OWLDataRange)dr.asOWLAPIObject(m_dataFactory));
             }
-            /*else if (!dr.isVariable() && dpe.isVariable()) {//DataPropertyRange(?p C)
-            	int position=bindingPositions.get(dpe);
-            	return computePropertiesForRanges(currentBinding, (OWLDataRange)dr.asOWLAPIObject(m_dataFactory), position);
-            } 
-            else if (dr.isVariable() && dpe.isVariable()){//DataPropertyRange(?p ?x)
-            	int[] positions=new int[2];
-                positions[0]=bindingPositions.get(dr);
-                positions[1]=bindingPositions.get(dpe);
-                return computeAllPropertiesAndRanges(currentBinding,positions);
-            }*/
             else {
                 return complex(currentBinding,instantiated,bindingPositions);
             }

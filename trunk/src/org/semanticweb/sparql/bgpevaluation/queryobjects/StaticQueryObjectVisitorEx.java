@@ -26,8 +26,8 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public interface StaticQueryObjectVisitorEx<O> {  
     O visit(QO_SubClassOf axiom, Set<Variable> bound);
-//    O visit(QO_EquivalentClasses axiom, Set<Variable> bound);
-//    O visit(QO_DisjointClasses axiom, Set<Variable> bound);
+    O visit(QO_EquivalentClasses axiom, Set<Variable> bound);
+    O visit(QO_DisjointClasses axiom, Set<Variable> bound);
 
     O visit(QO_SubObjectPropertyOf axiom, Set<Variable> bound);
 //    O visit(QO_EquivalentObjectProperties axiom, Set<Variable> bound);
@@ -55,7 +55,7 @@ public interface StaticQueryObjectVisitorEx<O> {
 //    O visit(QO_HasKey axiom, Set<Variable> bound);
 //    
     O visit(QO_SameIndividual axiom, Set<Variable> bound);
-//    O visit(QO_DifferentIndividuals axiom, Set<Variable> bound);
+    O visit(QO_DifferentIndividuals axiom, Set<Variable> bound);
     O visit(QO_ClassAssertion axiom, Set<Variable> bound);
     O visit(QO_ObjectPropertyAssertion axiom, Set<Variable> bound);
     O visit(QO_NegativeObjectPropertyAssertion axiom, Set<Variable> bound); 

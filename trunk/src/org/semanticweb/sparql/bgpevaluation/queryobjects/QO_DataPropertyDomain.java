@@ -56,14 +56,14 @@ public class QO_DataPropertyDomain extends AbstractQueryObject<DataPropertyDomai
             	int position=bindingPositions.get(ce);
                 return computeDomains(currentBinding, (OWLDataProperty)dpe.asOWLAPIObject(m_dataFactory), position);
             } 
-            else if (!ce.isVariable() && !dpe.isVariable()) {//DataPropertyRange(R C)
+            else if (!ce.isVariable() && !dpe.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//DataPropertyDomain(R C)
                 return checkDomain(currentBinding, (OWLDataProperty)dpe.asOWLAPIObject(m_dataFactory), (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory));
             }
-            else if (!ce.isVariable() && dpe.isVariable()) {//DataPropertyRange(?p C)
+            else if (!ce.isVariable() && dpe.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//DataPropertyDomain(?p C)
             	int position=bindingPositions.get(dpe);
             	return computePropertiesForDomains(currentBinding, (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory), position);
             } 
-            else if (ce.isVariable() && dpe.isVariable()){//DataPropertyRange(?p ?x)
+            else if (ce.isVariable() && dpe.isVariable()){//DataPropertyDomain(?p ?x)
             	int[] positions=new int[2];
                 positions[0]=bindingPositions.get(ce);
                 positions[1]=bindingPositions.get(dpe);
@@ -80,14 +80,14 @@ public class QO_DataPropertyDomain extends AbstractQueryObject<DataPropertyDomai
 		
 	}
     protected List<Atomic[]> checkDomain(Atomic[] currentBinding, OWLDataProperty dp, OWLClassExpression ce) {
-    	 // ObjectPropertyRange(:op :C)       
+    	 // ObjectPropertyDomain(:op :C)       
 		 List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
 	     if (m_reasoner.isEntailed(m_dataFactory.getOWLDataPropertyDomainAxiom(dp, ce)))
 	    	 newBindings.add(currentBinding);
 	     return newBindings;
     }
 	protected List<Atomic[]> computeDomains(Atomic[] currentBinding, OWLDataProperty dp, int bindingPosition) {
-        // DataPropertyRange(R :a)
+        // DataPropertyDomain(R :a)
 		Atomic[] binding;
 		List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Set<OWLClass> domains=m_reasoner.getDataPropertyDomains(dp, false).getFlattened();      	
@@ -99,7 +99,7 @@ public class QO_DataPropertyDomain extends AbstractQueryObject<DataPropertyDomai
         return newBindings;
     }
     protected List<Atomic[]> computePropertiesForDomains(Atomic[] currentBinding, OWLClassExpression classExpression, int bindingPosition) {
-        // DataPropertyRange(?p C)
+        // DataPropertyDomain(?p C)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         Set<OWLDataProperty> properties=m_reasoner.getRootOntology().getDataPropertiesInSignature(true);
@@ -114,7 +114,7 @@ public class QO_DataPropertyDomain extends AbstractQueryObject<DataPropertyDomai
         return newBindings;
     }
     protected List<Atomic[]> computeAllPropertiesAndDomains(Atomic[] currentBinding, int[] bindingPositions) {
-        // DataPropertyRange(?p ?x)
+        // DataPropertyDomain(?p ?x)
         Atomic[] binding;
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         for (OWLDataProperty op : m_reasoner.getRootOntology().getDataPropertiesInSignature(true)) {

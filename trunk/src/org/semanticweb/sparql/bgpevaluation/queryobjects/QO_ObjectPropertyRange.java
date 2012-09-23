@@ -58,12 +58,12 @@ public class QO_ObjectPropertyRange extends AbstractQueryObject<ObjectPropertyRa
     		ObjectPropertyExpression ope=instantiated.getObjectPropertyExpression();
             if ((ce.isVariable()) && !ope.isVariable()) {//ObjectPropertyRange(R ?x)
             	int position=bindingPositions.get(ce);
-                return computeRanges(currentBinding, ope, position);
-            } 
-            else if (!ce.isVariable() && !ope.isVariable()) {//ObjectPropertyRange(R C)
-                return checkRange(currentBinding, (OWLObjectPropertyExpression)ope.asOWLAPIObject(m_dataFactory), (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory));
+            	return computeRanges(currentBinding, ope, position);
+            }        	
+            else if (!ce.isVariable() && !ope.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//ObjectPropertyRange(R C)
+                	return checkRange(currentBinding, (OWLObjectPropertyExpression)ope.asOWLAPIObject(m_dataFactory), (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory));
             }
-            else if (!ce.isVariable() && ope.isVariable()) {//ObjectPropertyRange(?p C)
+            else if (!ce.isVariable() && ope.isVariable() && ce.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {//ObjectPropertyRange(?p C)
             	int position=bindingPositions.get(ope);
             	return computePropertiesForRanges(currentBinding, (OWLClassExpression)ce.asOWLAPIObject(m_dataFactory), position);
             } 
