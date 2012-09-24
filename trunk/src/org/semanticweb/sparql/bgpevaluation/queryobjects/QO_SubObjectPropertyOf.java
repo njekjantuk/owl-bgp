@@ -32,14 +32,13 @@ import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
-import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubObjectPropertyOf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 
-public class QO_SubObjectPropertyOf extends AbstractQueryObject<SubClassOf> {
+public class QO_SubObjectPropertyOf extends AbstractQueryObject<SubObjectPropertyOf> {
 
-	public QO_SubObjectPropertyOf(SubClassOf axiomTemplate, OWLOntologyGraph graph) {
+	public QO_SubObjectPropertyOf(SubObjectPropertyOf axiomTemplate, OWLOntologyGraph graph) {
         super(axiomTemplate, graph);
     }
 	

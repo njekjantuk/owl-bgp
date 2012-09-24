@@ -32,9 +32,15 @@ import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_AsymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ClassAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyAssertion;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyDomain;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DataPropertyRange;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DifferentIndividuals;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_DisjointClasses;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_EquivalentClasses;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseObjectProperties;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_IrreflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeObjectPropertyAssertion;
@@ -44,6 +50,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ObjectPropertyRange;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_ReflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SameIndividual;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubClassOf;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SubObjectPropertyOf;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_SymmetricObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_TransitiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
@@ -236,15 +243,15 @@ public class RewriterAndSplitter implements AxiomVisitor {
         axiom.getClassExpressions().toArray(classes);
         for (int i=0;i<classes.length;i++) 
             for (int j=i+1;j<classes.length;j++)
-                m_bgpAxioms.add(EquivalentClasses.create(classes[i], classes[j]));
+                m_rewritten.add(new QO_EquivalentClasses(EquivalentClasses.create(classes[i], classes[j]), m_graph));
     }
     public void visit(DisjointClasses axiom) {
         ClassExpression[] classes=new ClassExpression[axiom.getClassExpressions().size()];
         axiom.getClassExpressions().toArray(classes);
         for (int i=0;i<classes.length;i++)
             for (int j=i+1;j<classes.length;j++)
-                ;//m_rewritten.add(DisjointClasses.create(classes[i], classes[j]));
-        throw new UnsupportedOperationException("Disjoint classes axioms are not yet supported in the query pattern. ");
+                m_rewritten.add(new QO_DisjointClasses(DisjointClasses.create(classes[i], classes[j]), m_graph));
+        //throw new UnsupportedOperationException("Disjoint classes axioms are not yet supported in the query pattern. ");
     }
     public void visit(DisjointUnion axiom) {
         ClassExpression c=(ClassExpression)axiom.getClazz();
@@ -262,15 +269,15 @@ public class RewriterAndSplitter implements AxiomVisitor {
         throw new UnsupportedOperationException("Disjoint union axioms are not yet supported in the query pattern. ");
     }
     public void visit(SubObjectPropertyOf axiom) {
-        //m_rewritten.add(axiom);
-        throw new UnsupportedOperationException("Sub-object property axioms are not yet supported in the query pattern. ");
+        m_rewritten.add(new QO_SubObjectPropertyOf(axiom, m_graph));
+        //throw new UnsupportedOperationException("Sub-object property axioms are not yet supported in the query pattern. ");
     }
     public void visit(EquivalentObjectProperties axiom) {
         ObjectPropertyExpression[] opes=new ObjectPropertyExpression[axiom.getObjectPropertyExpressions().size()];
         axiom.getObjectPropertyExpressions().toArray(opes);
         for (int i=0;i<opes.length;i++)
             for (int j=i+1;j<opes.length;j++)
-                ;//m_rewritten.add(EquivalentObjectProperties.create(opes[i], opes[j]));
+                ;//m_rewritten.add(new EquivalentObjectProperties(EquivalentObjectProperties.create(opes[i], opes[j]), m_graph));
         throw new UnsupportedOperationException("Equivalent object property axioms are not yet supported in the query pattern. ");
     }
     public void visit(DisjointObjectProperties axiom) {
@@ -278,7 +285,7 @@ public class RewriterAndSplitter implements AxiomVisitor {
         axiom.getObjectPropertyExpressions().toArray(opes);
         for (int i=0;i<opes.length;i++)
             for (int j=i+1;j<opes.length;j++)
-                ;//m_rewritten.add(DisjointObjectProperties.create(opes[i], opes[j]));
+                ;//m_rewritten.add(new DisjointObjectProperties(DisjointObjectProperties.create(opes[i], opes[j]), m_graph));
         throw new UnsupportedOperationException("Disjoint object property axioms are not yet supported in the query pattern. ");
     }
     public void visit(InverseObjectProperties axiom) {
@@ -286,8 +293,8 @@ public class RewriterAndSplitter implements AxiomVisitor {
         axiom.getObjectPropertyExpressions().toArray(opes);
         for (int i=0;i<opes.length;i++)
             for (int j=i+1;j<opes.length;j++)
-                ;//m_rewritten.add(InverseObjectProperties.create(opes[i], opes[j]));
-        throw new UnsupportedOperationException("Inverse object property axioms are not yet supported in the query pattern. ");
+                m_rewritten.add(new QO_InverseObjectProperties (InverseObjectProperties.create(opes[i], opes[j]), m_graph));
+        //throw new UnsupportedOperationException("Inverse object property axioms are not yet supported in the query pattern. ");
     }
     public void visit(ObjectPropertyDomain axiom) {
         m_rewritten.add(new QO_ObjectPropertyDomain(axiom, m_graph));
@@ -337,12 +344,12 @@ public class RewriterAndSplitter implements AxiomVisitor {
         throw new UnsupportedOperationException("Disjoint data property axioms are not yet supported in the query pattern. ");
     }
     public void visit(DataPropertyDomain axiom) {
-        ;//m_rewritten.add(axiom);
-        throw new UnsupportedOperationException("Data property domain axioms are not yet supported in the query pattern. ");
+        m_rewritten.add(new QO_DataPropertyDomain(axiom, m_graph));
+        //throw new UnsupportedOperationException("Data property domain axioms are not yet supported in the query pattern. ");
     }
     public void visit(DataPropertyRange axiom) {
-        ;//m_rewritten.add(axiom);
-        throw new UnsupportedOperationException("Data property range axioms are not yet supported in the query pattern. ");
+        m_rewritten.add(new QO_DataPropertyRange(axiom, m_graph));
+        //throw new UnsupportedOperationException("Data property range axioms are not yet supported in the query pattern. ");
     }
     public void visit(FunctionalDataProperty axiom) {
         m_rewritten.add(new QO_FunctionalDataProperty(axiom, m_graph));
@@ -368,8 +375,8 @@ public class RewriterAndSplitter implements AxiomVisitor {
         axiom.getIndividuals().toArray(inds);
         for (int i=0;i<inds.length;i++)
             for (int j=i+1;j<inds.length;j++)
-                ;//m_rewritten.add(DifferentIndividuals.create(inds[i], inds[j]));
-        throw new UnsupportedOperationException("Different individual axioms are not yet supported in the query pattern. ");
+              m_rewritten.add(new QO_DifferentIndividuals(DifferentIndividuals.create(inds[i], inds[j]), m_graph));
+        //throw new UnsupportedOperationException("Different individual axioms are not yet supported in the query pattern. ");
     }
     public void visit(ClassAssertion axiom) {
         ClassExpression ce = axiom.getClassExpression();

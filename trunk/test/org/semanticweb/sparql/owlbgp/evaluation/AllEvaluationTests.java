@@ -29,6 +29,7 @@ public class AllEvaluationTests extends TestCase {
         // $JUnit-BEGIN$
         suite.addTestSuite(TestPizzaQueries.class);
         suite.addTestSuite(TestSeveralComponents.class);
+        //suite.addTestSuite(QueryTests.class);
         // $JUnit-END$
         return suite;
     }

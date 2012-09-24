@@ -32,7 +32,7 @@ public interface StaticQueryObjectVisitorEx<O> {
     O visit(QO_SubObjectPropertyOf axiom, Set<Variable> bound);
 //    O visit(QO_EquivalentObjectProperties axiom, Set<Variable> bound);
 //    O visit(QO_DisjointObjectProperties axiom, Set<Variable> bound);
-//    O visit(QO_InverseObjectProperties axiom, Set<Variable> bound);
+    O visit(QO_InverseObjectProperties axiom, Set<Variable> bound);
     O visit(QO_ObjectPropertyDomain axiom, Set<Variable> bound);
     O visit(QO_ObjectPropertyRange axiom, Set<Variable> bound);
     O visit(QO_FunctionalObjectProperty axiom, Set<Variable> bound);
