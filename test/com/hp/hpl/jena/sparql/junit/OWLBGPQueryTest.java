@@ -49,11 +49,6 @@ public class OWLBGPQueryTest extends QueryTest {
             if (dataset==null && !doesQueryHaveDataset(query)) 
                 fail("No dataset for query") ;
             QueryExecution qe=QueryExecutionFactory.create(query, dataset);
-//            if ( dataset == null )
-//                qe = QueryExecutionFactory.create(query, queryFileManager) ;
-//            else
-//                qe = QueryExecutionFactory.create(query, dataset) ;
-            
             try {
                 if (query.isSelectType())
                     super.runTestSelect(query, qe);
@@ -109,5 +104,8 @@ public class OWLBGPQueryTest extends QueryTest {
     }
     protected boolean doesQueryHaveDataset(Query query) {
         return query.hasDatasetDescription() ;
+    }
+    public TestItem getTestItem() {
+        return testItem;
     }
 }

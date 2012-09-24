@@ -37,6 +37,7 @@ import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;
 import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
+import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
 import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
 import com.hp.hpl.jena.sparql.engine.iterator.QueryIter1;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
@@ -116,7 +117,15 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
                     Var var=Var.alloc(variable.getVariable());
                     Atomic[] result=resultsPerComponent.get(i).get(m_currentBindingIndexes[i]);
                     Node node=createNode(result[positionInTuple.get(variable)]);
-                    bindingMap.add(var,node);
+                    if (bindingMap.contains(var)) {
+                        System.err.println("*************************** binding contains var "+var+"already");
+                        BindingHashMap bhm=(BindingHashMap)bindingMap;
+                        Binding parent=bhm.getParent();
+                        if (parent!=null && parent.contains(var)) {
+                            System.err.println("*************************** parent contains var "+var+"already");
+                        }
+                    } else
+                        bindingMap.add(var,node);
                 }
             }
             currentRow++;
