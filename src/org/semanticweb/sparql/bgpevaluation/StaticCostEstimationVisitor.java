@@ -38,6 +38,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_EquivalentClasses;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseObjectProperties;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_IrreflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeObjectPropertyAssertion;
@@ -58,7 +59,6 @@ import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.axioms.ClassAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.DifferentIndividuals;
-import org.semanticweb.sparql.owlbgp.model.axioms.DisjointClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.EquivalentClasses;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.owlbgp.model.axioms.NegativeObjectPropertyAssertion;
@@ -123,6 +123,7 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         ClassExpression subClass=template.getSubClassExpression();
         ClassExpression superClass=template.getSuperClassExpression();
         int results=1;
+        
         if ((subClass instanceof Atomic || subClass.isVariable()) && (superClass instanceof Atomic || superClass.isVariable())){
         	for (int i=0;i<unbound.size();i++)
         		results*=m_classCount;	
@@ -134,10 +135,23 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
     	EquivalentClasses template=(EquivalentClasses)queryObject.getAxiomTemplate();
         Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
         Set<Variable> unbound=vars;
-        unbound.removeAll(boundVar);
+        unbound.removeAll(boundVar); 
         Set<ClassExpression> equivClasses=template.getClassExpressions();
+        int exprSize=equivClasses.size();
         Iterator<ClassExpression> classIt=equivClasses.iterator();
-        int flag=0;
+        ClassExpression cls1=classIt.next();
+        ClassExpression cls2;
+        if (exprSize==1)
+            cls2=cls1;
+        else
+        	cls2=classIt.next();
+        int results=1;
+        if ((cls1 instanceof Atomic || cls1.isVariable()) && (cls2 instanceof Atomic || cls2.isVariable())){
+        	for (int i=0;i<unbound.size();i++)
+        		results*=m_classCount;	
+            return new double[] { results*COST_LOOKUP, results };
+        }
+        /*int flag=0;
         while (classIt.hasNext()) {
         	ClassExpression clsi=classIt.next();
         	if (!(clsi instanceof Atomic) && !clsi.isVariable()) {
@@ -150,7 +164,7 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         	for (int i=0;i<unbound.size();i++)
         		results*=m_classCount;	
             return new double[] { results*COST_LOOKUP, results };
-        }
+        }*/
         else return complex(unbound);
     }
     public double[] visit(QO_DisjointClasses queryObject, Set<Variable> boundVar) {
@@ -179,9 +193,16 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
 //    public double[] visit(QO_DisjodointObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_InverseObjectProperties queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_InverseObjectProperties queryObject, Set<Variable> boundVar) {
+    	Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=template.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        int results=1;
+        for (int i=0;i<unbound.size();i++)
+            results*=m_opCount;
+        return new double[] { results*COST_LOOKUP, results };
+    }
     public double[] visit(QO_ObjectPropertyDomain queryObject, Set<Variable> boundVar) {
     	Axiom template=queryObject.getAxiomTemplate(); 
     	Set<Variable> vars=template.getVariablesInSignature();

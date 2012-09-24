@@ -26,7 +26,7 @@ public interface DynamicQueryObjectVisitorEx<O> {
     O visit(QO_SubObjectPropertyOf axiom);
 //    O visit(QO_EquivalentObjectProperties axiom);
 //    O visit(QO_DisjointObjectProperties axiom);
-//    O visit(QO_InverseObjectProperties axiom);
+    O visit(QO_InverseObjectProperties axiom);
     O visit(QO_ObjectPropertyDomain axiom);
     O visit(QO_ObjectPropertyRange axiom);
     O visit(QO_FunctionalObjectProperty axiom);

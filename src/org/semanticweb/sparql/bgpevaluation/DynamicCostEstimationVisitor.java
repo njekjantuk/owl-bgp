@@ -45,6 +45,7 @@ import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_EquivalentClasses;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalDataProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_FunctionalObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseFunctionalObjectProperty;
+import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_InverseObjectProperties;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_IrreflexiveObjectProperty;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeDataPropertyAssertion;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QO_NegativeObjectPropertyAssertion;
@@ -198,21 +199,20 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
         }
         EquivalentClasses instantiated=(EquivalentClasses)template.getBoundVersion(existingBindings);
         Set<Variable> unbound=instantiated.getVariablesInSignature();
-        Set<ClassExpression> equivClasses=instantiated.getClassExpressions();
+        Set<ClassExpression> equivClasses=instantiated.getClassExpressions();      
+        int exprSize=equivClasses.size();
         Iterator<ClassExpression> classIt=equivClasses.iterator();
-        int flag=0;
-        while (classIt.hasNext()) {
-        	ClassExpression clsi=classIt.next();
-        	if (!(clsi instanceof Atomic) && !clsi.isVariable()) {
-        		flag=1;
-        		break;
-        	}
-        }
+        ClassExpression cls1=classIt.next();
+        ClassExpression cls2;
+        if (exprSize==1)
+            cls2=cls1;
+        else
+        	cls2=classIt.next();
         int results=1;
-        if (flag==0){
+        if ((cls1 instanceof Atomic || cls1.isVariable()) && (cls2 instanceof Atomic || cls2.isVariable())){
         	for (int i=0;i<unbound.size();i++)
         		results*=m_classCount;	
-            return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
+        return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
         }
         else return complex(unbound, m_candidateBindings);
     }
@@ -265,9 +265,27 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
 //    public double[] visit(QO_DisjodointObjectProperties queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-//    public double[] visit(QO_InverseObjectProperties queryObject) {
-//        return new double[] { 0, 0 };
-//    }
+    public double[] visit(QO_InverseObjectProperties queryObject) {
+    	double[] result=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return result; // no answers, no tests
+        // check just one binding
+        Atomic[] testBinding=m_candidateBindings.get(0);
+        Axiom template=queryObject.getAxiomTemplate();
+        Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        for (Variable var : vars) {
+            Atomic binding=testBinding[m_bindingPositions.get(var)];
+            if (binding!=null)
+                existingBindings.put(var,binding);
+        }
+        Axiom instantiated=(Axiom)template.getBoundVersion(existingBindings);
+        Set<Variable> unbound=instantiated.getVariablesInSignature();
+        int results=1;
+        for (int i=0;i<unbound.size();i++)
+            results*=m_opCount;
+        return new double[] { m_candidateBindings.size()*results*COST_LOOKUP, m_candidateBindings.size()*results };
+    }
     public double[] visit(QO_ObjectPropertyDomain queryObject) {
     	double[] result=new double[2];
         if (m_candidateBindings.isEmpty())

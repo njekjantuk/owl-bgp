@@ -199,7 +199,7 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 			if (!bound.contains(opVar) && !bound.contains(ind1)) {//?z(?x b)
 					double[] costMatrix= {0.0,0.0};
 					for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-						int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory));
+						int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
 						 costMatrix[0]+=estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
 			             costMatrix[1]+=estimate[0]+POSSIBLE_INSTANCE_SUCCESS*estimate[1];
 					}	

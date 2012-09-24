@@ -145,6 +145,29 @@ public class QueryTests extends AbstractQueryTest {
         assertTrue(noResults==3);
     }
     
+    public void testDisjointClassesQuery() throws Exception {
+        loadDataSetWithAxioms(getAxioms());
+        String s= "PREFIX  ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?c WHERE {"+LB
+                + "?c owl:disjointWith ex:Conference." +LB
+                + "}";
+        
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            //System.out.println(result.next());
+            noResults++;
+        }
+        
+        assertTrue(noResults==2);
+    }
+    
     public void testOPSuccessors() throws Exception {
         loadDataSetWithAxioms(getAxioms());
         
