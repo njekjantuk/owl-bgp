@@ -99,7 +99,7 @@ public class OWLOntologyDataSet implements Dataset, DatasetGraph {
         OWLOntology ontology=manager.createOntology(IRI.create(DEFAULT_IRI_PREFIX+ontologyCounter+"/"));
         for (String uri : graphURIs) {
             OWLOntology o=manager.loadOntology(IRI.create(uri));
-            manager.addAxioms(ontology, o.getLogicalAxioms());
+            manager.addAxioms(ontology, o.getAxioms());
             manager.removeOntology(o);
         }
         defaultGraph=new OWLOntologyGraph(ontology);

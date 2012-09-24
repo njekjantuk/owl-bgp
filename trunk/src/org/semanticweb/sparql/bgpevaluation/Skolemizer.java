@@ -130,6 +130,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
  * This class implements the structural transformation from our new tableau paper. This transformation departs in the following way from the paper: it keeps the concepts of the form \exists R.{ a_1, ..., a_n }, \forall R.{ a_1, ..., a_n }, and \forall R.\neg { a } intact. These concepts are then clausified in a more efficient way.
  */
 public class Skolemizer {
+    public static final String ANONYMOUS_INDIVIDUAL_SKOLEM_PREFIX="http://ananymous.org/";
     protected final SkolemizationVisitor m_skolemizationVisitor;
     protected final Set<String> m_skolems=new HashSet<String>();
     protected final Set<Literal> m_literals=new HashSet<Literal>();
@@ -204,6 +205,9 @@ public class Skolemizer {
                 else 
                     newAxioms.add(axiom);
         try {
+            Set<OWLAxiom> nonLogicalAxioms=ontology.getAxioms();
+            nonLogicalAxioms.removeAll(ontology.getLogicalAxioms());
+            newAxioms.addAll(nonLogicalAxioms);
             return OWLManager.createOWLOntologyManager().createOntology(newAxioms);
         } catch (OWLOntologyCreationException e) {
             throw new RuntimeException("Error: Could not create the Skolemized ontology. ");
@@ -551,7 +555,8 @@ public class Skolemizer {
         }
         public OWLIndividual visit(OWLAnonymousIndividual individual) {
             m_modified=true;
-            OWLNamedIndividual skolem=m_factory.getOWLNamedIndividual(IRI.create(individual.toStringID()));
+            String newIRI=ANONYMOUS_INDIVIDUAL_SKOLEM_PREFIX+individual.toStringID().substring(2);
+            OWLNamedIndividual skolem=m_factory.getOWLNamedIndividual(IRI.create(newIRI));
             m_skolems.add(individual.toStringID());
             return skolem;
         }
