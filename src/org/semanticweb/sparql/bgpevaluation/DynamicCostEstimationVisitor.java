@@ -421,7 +421,7 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
 //    public double[] visit(QO_HasKey queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-    public double[] visit(QO_SameIndividual queryObject) {
+    /*public double[] visit(QO_SameIndividual queryObject) {
         double[] estimate=new double[2];
         if (m_candidateBindings.isEmpty())
             return estimate; // no answers, no tests
@@ -436,6 +436,43 @@ public class DynamicCostEstimationVisitor implements DynamicQueryObjectVisitorEx
                 multiplier*=m_candidateBindings.size();
         }
         return new double[] { multiplier*COST_ENTAILMENT, multiplier };
+    }*/
+    
+    public double[] visit(QO_SameIndividual queryObject) {
+        double[] estimate=new double[2];
+        if (m_candidateBindings.isEmpty())
+            return estimate; // no answers, no tests
+        SameIndividual axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        Map<Variable,Atomic> existingBindings=new HashMap<Variable,Atomic>();
+        Set<Variable> unbound=new HashSet<Variable>();
+        
+        for (Atomic[] testBinding : m_candidateBindings) {
+        	existingBindings.clear();
+            for (Variable var : vars) {
+            	Atomic binding=testBinding[m_bindingPositions.get(var)];
+                if (binding!=null)
+                	existingBindings.put(var,binding);
+            }
+            SameIndividual instantiated=(SameIndividual)axiomTemplate.getBoundVersion(existingBindings);
+            unbound.addAll(vars);
+            unbound.removeAll(existingBindings.keySet()); 
+            Iterator<Individual> it=instantiated.getIndividuals().iterator();
+            Individual ind1=it.next();
+            Individual ind2=it.next();
+            double[] currentEstimate=getSameIndividualCost(ind1, ind2, unbound);
+            estimate[0]+=currentEstimate[0];
+            estimate[1]+=currentEstimate[1]; 
+        }           
+        return estimate;
+    }
+    protected double[] getSameIndividualCost(Individual ind1, Individual ind2, Set<Variable> unbound) {
+        if (unbound.size()==0) //SameIndividual(:a :b)
+            return new double[] { COST_ENTAILMENT, 1 };
+        else if (unbound.size()==1) // SameIndividual(:a ?x) or SameIndividual(?x :b)
+            return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
+        else //SameIndividual(?x ?y) 
+            return new double[] { m_indCount * m_indCount * COST_ENTAILMENT, m_indCount * m_indCount };
     }
     public double[] visit(QO_DifferentIndividuals queryObject) {
     	double[] estimate=new double[2];

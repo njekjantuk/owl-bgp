@@ -97,7 +97,43 @@ public class InstanceStatistics {
         m_reasoner.classifyObjectProperties();
         return m_instanceManager.m_currentRoleHierarchy.getDepth();
     }
+ 
+    // *************************************    
+    // methods for class statistics
+    // *************************************
     
+/*    public int[] getNumberOfSubClasses(OWLClass owlClass) {
+        m_reasoner.classifyClasses();
+        AtomicConcept concept=H(owlClass);
+        return getNumberOfSubClasses(concept);
+    }
+    protected int[] getNumberOfSubClasses(AtomicConcept concept) {
+        int[] result=new int[2];
+        HierarchyNode<AtomicConcept> node=m_instanceManager.m_currentConceptHierarchy.getNodeForElement(concept);
+        if (node==null)
+            return result; // unknown concept
+        AtomicConcept representative=node.getRepresentative();
+        if (representative.equals(m_bottomConcept))
+            return result;
+        if (representative.equals(m_topConcept)) {
+            result[0]=m_instanceManager
+            return result;
+        }
+        m_instanceManager
+        return getNumberOfConceptInstances(node,result);
+    }
+    protected int[] getNumberOfSubClasses(HierarchyNode<AtomicConcept> node,int[] result) {
+        AtomicConceptElement representativeElement=m_instanceManager.m_conceptToElement.get(node.getRepresentative());
+        if (representativeElement!=null) {
+            result[0]+=representativeElement.getKnownInstances().size();
+            result[1]+=representativeElement.getPossibleInstances().size();
+        }
+        for (HierarchyNode<AtomicConcept> child : node.getChildNodes())
+            if (child!=m_instanceManager.m_currentConceptHierarchy.m_bottomNode)
+                getNumberOfConceptInstances(child,result);
+        return result;
+    }
+*/    
     // *************************************    
     // methods for class instance statistics
     // *************************************
@@ -599,6 +635,24 @@ public class InstanceStatistics {
                     result[1]+=possiblySameAs.size();
         }
         return result;
+    }
+    public boolean[] isKnownOrPossibleSameIndividual(OWLIndividual individual1, OWLIndividual individual2) {
+    	Individual ind1=H(individual1);
+        Individual ind2=H(individual2);
+        return isKnownOrPossibleSameIndividual(ind1, ind2);
+    }
+    protected boolean[] isKnownOrPossibleSameIndividual(Individual individual1, Individual individual2) {
+    	Set<Individual> equivalenceClass=m_instanceManager.m_individualToEquivalenceClass.get(individual1);
+        if (equivalenceClass!=null && equivalenceClass.contains(individual2)) 
+        	return new boolean[] { true, false };
+        Set<Set<Individual>> possiblySameEquivalenceClasses=m_instanceManager.m_individualToPossibleEquivalenceClass.get(equivalenceClass);	
+        if (possiblySameEquivalenceClasses!=null){
+            for (Set<Individual> possiblySameAs : possiblySameEquivalenceClasses){
+                if (possiblySameAs.contains(individual2))
+                	return new boolean[] { false, true };
+            }
+        }
+        return new boolean[] { false, false };
     }
     
     // ****************************************    

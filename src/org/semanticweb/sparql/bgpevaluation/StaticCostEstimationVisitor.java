@@ -131,6 +131,46 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         }
         else return complex(unbound);
     }
+    
+/*    public double[] visit(QO_SubClassOf queryObject, Set<Variable> boundVar) {
+        double[] estimate=new double[2];
+        SubClassOf axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        ClassExpression subexpression= axiomTemplate.getSubClassExpression();
+        ClassExpression superexpression= axiomTemplate.getSuperClassExpression();
+        if (((subexpression instanceof Atomic || subexpression.isVariable())) && (superexpression instanceof Atomic || superexpression.isVariable())){
+        	double[] currentEstimate=getSubClassOfCost(subexpression, superexpression, boundVar);
+            estimate[0]+=currentEstimate[0];
+            estimate[1]+=currentEstimate[1];
+            return estimate;
+        }
+        else return complex(unbound);
+    }
+    protected double[] getSubClassOfCost(ClassExpression subce, ClassExpression superce, Set<Variable> boundVar) {
+    	if (subce.isVariable() && !boundVar.contains(subce)){ 
+    		if (superce.isVariable() && !boundVar.contains(superce)) //SubClassOf(?x ?y)
+    			return new double[] { m_classCount * m_classCount * COST_LOOKUP, m_classCount * m_classCount};
+    		else if (superce.isVariable() && boundVar.contains(superce)) //SubClass(?x :C) <- SubClassOf(?x ?y)
+    			return new double[] { m_classCount * COST_LOOKUP, m_classCount};
+    		else //SubClassOf(?x :C) 
+    			return new double[] { m_classCount * COST_LOOKUP, m_classCount};
+    	}	
+    	else if (subce.isVariable() && boundVar.contains(subce) ) {
+    		if (superce.isVariable() && !boundVar.contains(superce)) //SubClassOf(:C ?y) <- SubClassOf(?x ?y)
+    			return new double[] { m_classCount * COST_LOOKUP, m_classCount};
+    		else //SubClass(:C :D) <- SubClassOf(?x ?y)
+    			return new double[] { COST_LOOKUP, 1};
+    	}
+    	else { 
+    		if (superce.isVariable() && !boundVar.contains(superce)) //SubClassOf(:C ?y) 
+    			return new double[] { m_classCount * COST_LOOKUP, m_classCount };    		
+		    else //SubClassOf(:C :D) <- subClassOf(:C ?y) or SubClassOf(:C :D)
+		    	return new double[] { COST_LOOKUP, 1};
+		}
+    }
+*/    
     public double[] visit(QO_EquivalentClasses queryObject, Set<Variable> boundVar) {
     	EquivalentClasses template=(EquivalentClasses)queryObject.getAxiomTemplate();
         Set<Variable> vars=queryObject.getAxiomTemplate().getVariablesInSignature();
@@ -288,13 +328,52 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
 //    public double[] visit(QO_HasKey queryObject) {
 //        return new double[] { 0, 0 };
 //    }
-    public double[] visit(QO_SameIndividual queryObject, Set<Variable> boundVar) {
+    /*public double[] visit(QO_SameIndividual queryObject, Set<Variable> boundVar) {
         SameIndividual axiomTemplate=queryObject.getAxiomTemplate();
         Set<Variable> vars=axiomTemplate.getVariablesInSignature();
         int multiplier=1;        
         for (@SuppressWarnings("unused") Variable var : vars)
             multiplier*=m_indCount;
         return new double[] { multiplier*COST_ENTAILMENT, multiplier };
+    }*/
+    public double[] visit(QO_SameIndividual queryObject, Set<Variable> boundVar) {
+        double[] estimate=new double[2];
+        SameIndividual axiomTemplate=queryObject.getAxiomTemplate();
+        Set<Variable> vars=axiomTemplate.getVariablesInSignature();
+        Set<Variable> unbound=vars;
+        unbound.removeAll(boundVar);
+        Iterator<Individual> it=axiomTemplate.getIndividuals().iterator();
+        Individual ind1=it.next();
+        Individual ind2=it.next();
+        double[] currentEstimate=getSameIndividualCost(ind1, ind2, boundVar);
+        estimate[0]+=currentEstimate[0];
+        estimate[1]+=currentEstimate[1];
+        return estimate;
+    }
+    protected double[] getSameIndividualCost(Individual ind1, Individual ind2, Set<Variable> boundVar) {
+    	if (ind1.isVariable() && ind2.isVariable()) {
+    		if (!boundVar.contains(ind1) && !boundVar.contains(ind2)) { //SameIndividual(?x ?y)
+    			return new double[] { m_indCount * m_indCount * COST_ENTAILMENT, m_indCount *m_indCount };
+    		}
+    		else if ((boundVar.contains(ind1) && !boundVar.contains(ind2)) || (!boundVar.contains(ind1) && boundVar.contains(ind2)))//SameIndividual(?x :a) or SameIndividual(:a ?x)
+    			return new double[] { m_indCount * COST_ENTAILMENT, m_indCount};
+    		else //SameIndividual(?a :b)
+    			return new double[] { COST_ENTAILMENT, 1};
+    	}	
+    	else if (!ind1.isVariable() && ind2.isVariable()) {
+	    	if (!boundVar.contains(ind2)) //SameIndividual(:a ?x)
+	    		return new double[] {m_indCount * COST_ENTAILMENT, m_indCount};
+	    	else //SameIndividual(:a :b) 
+	    		return new double[] {COST_ENTAILMENT, 1};
+	    }
+    	else if (ind1.isVariable() && !ind2.isVariable()) {
+	    	if (!boundVar.contains(ind1)) //SameIndividual(?x :a)
+	    		return new double[] {m_indCount * COST_ENTAILMENT, m_indCount};
+	    	else //SameIndividual(:a :b) 
+	    		return new double[] {COST_ENTAILMENT, 1};
+	    }
+    	else //SameIndividual(:a :b)
+    		return new double[] {COST_ENTAILMENT, 1};
     }
     public double[] visit(QO_DifferentIndividuals queryObject, Set<Variable> boundVar) {
     	DifferentIndividuals axiomTemplate=queryObject.getAxiomTemplate();

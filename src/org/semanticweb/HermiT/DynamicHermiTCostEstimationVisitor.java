@@ -23,6 +23,7 @@ import org.semanticweb.HermiT.hierarchy.InstanceStatistics;
 import org.semanticweb.HermiT.hierarchy.InstanceStatistics.RoleInstanceStatistics;
 import org.semanticweb.HermiT.model.DLClause;
 import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLNamedIndividual;
 import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
@@ -156,4 +157,33 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
             return costMatrix;
         }
     }
+    
+    protected double[] getSameIndividualCost(Individual ind1, Individual ind2, Set<Variable> unbound) {
+        double cost=0;
+    	if (unbound.size()==0){ //SameIndividual(:a :b)
+        	boolean[] result=m_instanceStatistics.isKnownOrPossibleSameIndividual((OWLIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLIndividual)ind2.asOWLAPIObject(m_dataFactory)); 
+            if (result[0])
+            	return new double[] { cost+COST_LOOKUP, 1 };
+            else if (result[1])
+            	return new double[] { cost+((double)0.5*COST_ENTAILMENT*m_instanceStatistics.getClassHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
+            else return new double[] { cost+COST_LOOKUP, 0};   
+        }
+        else if (unbound.size()==1 && ind1 instanceof Variable){ //SameIndividual(?x :b)
+        	int[] estimate=m_instanceStatistics.getNumberOfSameIndividuals((OWLIndividual)ind2.asOWLAPIObject(m_dataFactory));
+	        return new double[] { cost+estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1])};
+        }
+	    else if (unbound.size()==1 && ind2 instanceof Variable){//SameIndividual(:a ?x) 
+	    	int[] estimate=m_instanceStatistics.getNumberOfSameIndividuals((OWLIndividual)ind1.asOWLAPIObject(m_dataFactory));
+		    return new double[] { cost+estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1])};
+	    }	
+        else{ //SameIndividual(?x ?y) 
+        	double[] costMatrix={0.0,0.0};
+		    for (Individual ind : m_graph.getIndividualsInSignature()){ 
+		    	int[] estimate=m_instanceStatistics.getNumberOfSameIndividuals((OWLIndividual)ind.asOWLAPIObject(m_dataFactory));
+		        costMatrix[0]+=estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth();
+                costMatrix[1]+=estimate[0]+POSSIBLE_INSTANCE_SUCCESS*estimate[1];
+            }
+		    return costMatrix; 
+        }
+    }    
 }
