@@ -62,7 +62,7 @@ public class TestRunner extends qtest {
     
     // include only tests that have a name starting with one of the given string
     // leave empty for all tests
-    public static final String[] includeOnlyTests=new String[] { "bind03" };
+    public static final String[] includeOnlyTests=new String[] {  }; //"bind03"
     // generates just the entailment tests with OWL Direct Semantics
     public static final String[] includeOnlySemantics=new String[] { OWLDIRECT_NS };
     

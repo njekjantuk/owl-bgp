@@ -27,7 +27,7 @@ public class AlgebraTranslation {
 	public static final String LB = System.getProperty("line.separator") ; 
 
 	public static void main(String[] args) throws Exception {
-	    String sparqlQueryString[]=new String[7];
+	    String sparqlQueryString[]=new String[9];
 	    sparqlQueryString[0]="PREFIX ex: <http://example.org/test#> "+LB
 	       +"SELECT ?book WHERE "+LB
 	       + "{ { { ?book ex:price ?price . FILTER (?price < 15) } OPTIONAL { ?book ex:title ?title . } } "+LB
@@ -76,7 +76,19 @@ public class AlgebraTranslation {
            + "    { ?book ex:author ex:Shakespeare . } UNION "+LB
            + "    { ?book ex:author ex:Marlowe . } "+LB
            + " } ";
-	    
+        sparqlQueryString[7]="PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
+                +"SELECT ?s ?p ?o ?z WHERE "+LB
+                + " {  ?s ?p ?o . "+LB
+                + "    ?p a owl:DatatypeProperty . "+LB
+                + "    { BIND(?o+1 AS ?z) } UNION "+LB
+                + "    { BIND(?o+2 AS ?z) } "+LB
+                + " } ";
+        sparqlQueryString[8]="PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
+                +"SELECT * WHERE "+LB
+                + " {  ?s ?p ?o . "+LB
+                + "    BIND(?o+10 AS ?z) "+LB
+                + " } ";
+        
 	    for (String queryString : sparqlQueryString) {
     	    // Parse
             Query query=QueryFactory.create(queryString);

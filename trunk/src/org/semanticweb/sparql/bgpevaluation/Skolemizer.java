@@ -205,9 +205,6 @@ public class Skolemizer {
                 else 
                     newAxioms.add(axiom);
         try {
-            Set<OWLAxiom> nonLogicalAxioms=ontology.getAxioms();
-            nonLogicalAxioms.removeAll(ontology.getLogicalAxioms());
-            newAxioms.addAll(nonLogicalAxioms);
             return OWLManager.createOWLOntologyManager().createOntology(newAxioms);
         } catch (OWLOntologyCreationException e) {
             throw new RuntimeException("Error: Could not create the Skolemized ontology. ");
@@ -555,8 +552,10 @@ public class Skolemizer {
         }
         public OWLIndividual visit(OWLAnonymousIndividual individual) {
             m_modified=true;
-            String newIRI=ANONYMOUS_INDIVIDUAL_SKOLEM_PREFIX+individual.toStringID().substring(2);
-            OWLNamedIndividual skolem=m_factory.getOWLNamedIndividual(IRI.create(newIRI));
+//            String newIRI=ANONYMOUS_INDIVIDUAL_SKOLEM_PREFIX+individual.toStringID().substring(2);
+//            OWLNamedIndividual skolem=m_factory.getOWLNamedIndividual(IRI.create(newIRI));
+            //TODO: check
+            OWLNamedIndividual skolem=m_factory.getOWLNamedIndividual(IRI.create(individual.toStringID()));
             m_skolems.add(individual.toStringID());
             return skolem;
         }
