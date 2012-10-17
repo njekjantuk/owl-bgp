@@ -11,137 +11,7 @@
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#lang> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#plainLit> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind08> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q4> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent9> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-10> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent4> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-08> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#owlds01> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent6> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-05> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-03> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-07> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -151,57 +21,27 @@
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind07> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent9> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-11> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent6> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple4> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind05> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind03> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -211,11 +51,31 @@
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple2> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind02> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-13> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple3> .
 
 _:b1
       rdf:type      foaf:Person ;
@@ -226,17 +86,7 @@ _:b1
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind01> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -246,142 +96,7 @@ _:b1
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple1> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple7> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent10> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q3> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-01> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-09> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent7> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent8> .
-
-<http://code.google.com/p/owl-bgp/>
-      rdf:type      earl:Software ;
-      rdf:type      doap:Project ;
-      dc:creator    _:b1 ;
-      dc:title      "SPARQLing HermiT" ;
-      dct:hasVersion  "0.0" ;
-      doap:homepage  "http://code.google.com/p/owl-bgp/" ;
-      doap:maintainer  _:b1 ;
-      doap:name     "SPARQLing HermiT" ;
-      doap:release  [ rdf:type      doap:Version ;
-                      doap:created  "2012-09-18+02:00"^^xsd:date ;
-                      doap:name     "SPARQLing HermiT"
-                    ] ;
-      foaf:homepage  <http://code.google.com/p/owl-bgp/> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent5> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q5> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-02> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple5> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -391,7 +106,27 @@ _:b1
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-03> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind08> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -401,77 +136,82 @@ _:b1
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-12> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q4> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind06> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#owlds01> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple3> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-10> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-04> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent10> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
-                    ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind04> .
-
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
       earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple8> .
 
-[]    rdf:type      earl:Assertion ;
-      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
-      earl:mode     earl:automatic ;
-      earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
-                      earl:outcome  earl:pass
+<http://code.google.com/p/owl-bgp/>
+      rdf:type      earl:Software ;
+      rdf:type      doap:Project ;
+      dc:creator    _:b1 ;
+      dc:title      "SPARQLing HermiT" ;
+      dct:hasVersion  "0.1" ;
+      doap:homepage  "http://code.google.com/p/owl-bgp/" ;
+      doap:maintainer  _:b1 ;
+      doap:name     "SPARQLing HermiT" ;
+      doap:release  [ rdf:type      doap:Version ;
+                      doap:created  "2012-10-17+02:00"^^xsd:date ;
+                      doap:name     "SPARQLing HermiT"
                     ] ;
-      earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#owlds02> .
+      foaf:homepage  <http://code.google.com/p/owl-bgp/> .
 
 []    rdf:type      earl:Assertion ;
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind01> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
@@ -481,8 +221,278 @@ _:b1
       earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
       earl:mode     earl:automatic ;
       earl:result   [ rdf:type      earl:TestResult ;
-                      dc:date       "2012-09-18+02:00"^^xsd:date ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
                       earl:outcome  earl:pass
                     ] ;
       earl:subject  <http://code.google.com/p/owl-bgp/> ;
-      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind02> .
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind05> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q3> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-01> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-09> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent5> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-02> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple1> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#owlds02> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-11> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent8> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-05> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#lang> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple4> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind06> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-08> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind03> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#plainLit> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple7> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent4> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple2> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind04> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-12> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#parent7> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#simple5> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-04> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#bind07> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#sparqldl-07> .
+
+[]    rdf:type      earl:Assertion ;
+      earl:assertedBy  <http://code.google.com/p/owl-bgp/> ;
+      earl:mode     earl:automatic ;
+      earl:result   [ rdf:type      earl:TestResult ;
+                      dc:date       "2012-10-17+02:00"^^xsd:date ;
+                      earl:outcome  earl:pass
+                    ] ;
+      earl:subject  <http://code.google.com/p/owl-bgp/> ;
+      earl:test     <http://www.w3.org/2009/sparql/docs/tests/data-sparql11/entailment/manifest#paper-sparqldl-Q5> .

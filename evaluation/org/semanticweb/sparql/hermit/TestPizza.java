@@ -16,7 +16,7 @@
    along with OWL-BGP. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package  org.semanticweb.sparql.hermit;
+package org.semanticweb.sparql.hermit;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.reasoner.InferenceType;

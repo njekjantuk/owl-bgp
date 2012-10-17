@@ -87,11 +87,13 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
         return currentRow<numRows;
     }
     protected Binding moveToNextBinding() {
+        boolean isNew=true;
         if (hasNextBinding()) {
             BindingMap bindingMap=null;
-            if (input!=null && input.hasNext())
+            if (input!=null && input.hasNext()) {
                 bindingMap=BindingFactory.create(input.next());
-            else 
+                isNew=false;
+            } else 
                 bindingMap=BindingFactory.create();
             boolean flip=false;
             for (int index=resultsPerComponent.size()-1;index>=0;index--) {
@@ -113,12 +115,12 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
             }
             for (int i=0;i<resultsPerComponent.size();i++) {
                 Map<Variable,Integer> positionInTuple=bindingPositionsPerComponent.get(i);
+                Atomic[] result=resultsPerComponent.get(i).get(m_currentBindingIndexes[i]);
                 for (Variable variable : positionInTuple.keySet()) {
                     Var var=Var.alloc(variable.getVariable());
-                    Atomic[] result=resultsPerComponent.get(i).get(m_currentBindingIndexes[i]);
                     Node node=createNode(result[positionInTuple.get(variable)]);
                     if (bindingMap.contains(var)) {
-                        System.err.println("*************************** binding contains var "+var+"already");
+                        System.err.println("*************************** binding contains var "+var+"already (is newly created binding? "+isNew+")");
                         BindingHashMap bhm=(BindingHashMap)bindingMap;
                         Binding parent=bhm.getParent();
                         if (parent!=null && parent.contains(var)) {
@@ -161,7 +163,7 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
             String iri=atomic.toString(Prefixes.NO_PREFIXES);
             iri=iri.substring(1, iri.length()-1);
             if (atomic instanceof NamedIndividual && m_skolemConstants.contains(iri)) {
-                String label=iri.substring(15);
+                String label=iri.substring("_:genid-nodeid-".length());
                 AnonId id=AnonId.create(label);
                 Node node=Node.createAnon(id);
                 return node;
