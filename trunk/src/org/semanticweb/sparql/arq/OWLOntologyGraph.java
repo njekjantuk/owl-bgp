@@ -85,17 +85,32 @@ public class OWLOntologyGraph implements Graph {
 		m_literals=skolemizer.getLiterals();
 		m_classes=new HashSet<Clazz>();
         for (OWLClass cls : skolomized.getClassesInSignature(true))
-            m_classes.add(Clazz.create(cls.toString()));
+            if (cls.isOWLThing())
+                m_classes.add(Clazz.THING);
+            else if (cls.isOWLNothing())
+                m_classes.add(Clazz.NOTHING);
+            else 
+                m_classes.add(Clazz.create(cls.toString()));
         m_datatypes=new HashSet<Datatype>();
         for (OWLDatatype dt : skolomized.getDatatypesInSignature(true))
             if (!dt.isBuiltIn()) 
                 m_datatypes.add(Datatype.create(dt.toString()));
         m_objectProperties=new HashSet<ObjectProperty>();
         for (OWLObjectProperty op : skolomized.getObjectPropertiesInSignature(true))
-            m_objectProperties.add(ObjectProperty.create(op.toString()));
+            if (op.isOWLTopObjectProperty())
+                m_objectProperties.add(ObjectProperty.TOP_OBJECT_PROPERTY);
+            else if (op.isOWLBottomObjectProperty())
+                m_objectProperties.add(ObjectProperty.BOTTOM_OBJECT_PROPERTY);
+            else
+                m_objectProperties.add(ObjectProperty.create(op.toString()));
         m_dataProperties=new HashSet<DataProperty>();
         for (OWLDataProperty dp : skolomized.getDataPropertiesInSignature(true))
-            m_dataProperties.add(DataProperty.create(dp.toString()));
+            if (dp.isOWLTopDataProperty())
+                m_dataProperties.add(DataProperty.TOP_DATA_PROPERTY);
+            else if (dp.isOWLBottomDataProperty())
+                m_dataProperties.add(DataProperty.BOTTOM_DATA_PROPERTY);
+            else
+                m_dataProperties.add(DataProperty.create(dp.toString()));
         m_annotationProperties=new HashSet<AnnotationProperty>();
         for (OWLAnnotationProperty ap : skolomized.getAnnotationPropertiesInSignature())
             m_annotationProperties.add(AnnotationProperty.create(ap.toString()));
