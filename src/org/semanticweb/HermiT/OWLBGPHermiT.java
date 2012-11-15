@@ -48,6 +48,8 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     public OWLBGPHermiT(OWLOntology rootOntology) {
         super(rootOntology);
         m_instanceStatistics=createInstanceStatistics();
+        m_instanceStatistics.getObjectPropertyHierarchyDepth();
+        m_instanceStatistics.getClassHierarchyDepth();
         //m_instanceStatistics=null;
     }
 
@@ -63,6 +65,8 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
         super(configuration,rootOntology);
         m_instanceStatistics=createInstanceStatistics();  
         //m_instanceStatistics=null;
+        m_instanceStatistics.getObjectPropertyHierarchyDepth();
+        m_instanceStatistics.getClassHierarchyDepth();
     }
 
     /**
@@ -78,6 +82,8 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     public OWLBGPHermiT(Configuration configuration,OWLOntology rootOntology,Collection<DescriptionGraph> descriptionGraphs) {
     	super(configuration, rootOntology, descriptionGraphs);
     	m_instanceStatistics=getInstanceStatistics();
+    	m_instanceStatistics.getObjectPropertyHierarchyDepth();
+    	m_instanceStatistics.getClassHierarchyDepth();
     }
 
     public InstanceStatistics getInstanceStatistics() {

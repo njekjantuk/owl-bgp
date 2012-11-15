@@ -79,6 +79,9 @@ public class TestUOBM {
 	    System.out.println("QEx");
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:Person. " +LB
+	    + "  ?x uob:isHeadOf ?y. " +LB
+	    + "  ?y rdf:type uob:Department." +LB
+	    + "  ?x rdf:type uob:PeopleWithManyHobbies." +LB
 	    + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);

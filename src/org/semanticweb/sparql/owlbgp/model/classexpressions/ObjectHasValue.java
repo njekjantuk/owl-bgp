@@ -26,6 +26,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.AbstractExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.ClassExpressionVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
@@ -121,6 +122,9 @@ public class ObjectHasValue extends AbstractExtendedOWLObject implements ClassEx
         return visitor.visit(this);
     }
     public void accept(ExtendedOWLObjectVisitor visitor) {
+        visitor.visit(this);
+    }
+    public void accept(ClassExpressionVisitor visitor) {
         visitor.visit(this);
     }
     protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {

@@ -39,6 +39,7 @@ public class DynamicEvaluator extends QueryEvaluator {
                 cheapest=connectedComponent.iterator().next();
             else 
                 cheapest=DynamicQueryReordering.getCheapest(m_costEstimator, connectedComponent, boundVar, m_monitor);
+            System.out.println(cheapest);
             m_monitor.costEvaluationFinished(cheapest);
             connectedComponent.remove(cheapest);   
             Axiom ax=cheapest.getAxiomTemplate();

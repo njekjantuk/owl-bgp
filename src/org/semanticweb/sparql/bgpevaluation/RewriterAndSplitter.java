@@ -147,6 +147,7 @@ public class RewriterAndSplitter implements AxiomVisitor {
                         if (componentVars.contains(var))
                             key=i;
                 }
+                //else key=1;
             }
             if (key<0) {
                 // new component
@@ -201,7 +202,10 @@ public class RewriterAndSplitter implements AxiomVisitor {
     public void visit(Declaration axiom) {
     }
     public void visit(SubClassOf axiom) {
-        ClassExpression sub=axiom.getSubClassExpression();
+    	//ClassExpression sub=axiom.getSubClassExpression();
+        //ClassExpression sup=axiom.getSuperClassExpression();
+    	//m_rewritten.add(new QO_SubClassOf(SubClassOf.create(sub, sup), m_graph));
+    	ClassExpression sub=axiom.getSubClassExpression();
         ClassExpression sup=axiom.getSuperClassExpression();
         Set<ClassExpression> subs;
         Set<ClassExpression> sups;
@@ -224,7 +228,7 @@ public class RewriterAndSplitter implements AxiomVisitor {
                         m_bgpAxioms.add(DataPropertyRange.create(all.getDataPropertyExpression(), all.getDataRange()));
                     }
                 } else if (sub_i instanceof ObjectSomeValuesFrom) {
-                    ObjectSomeValuesFrom some=(ObjectSomeValuesFrom)sup_j;
+                    ObjectSomeValuesFrom some=(ObjectSomeValuesFrom)sub_i;
                     if (some.getClassExpression().equals(Clazz.THING))
                         m_bgpAxioms.add(ObjectPropertyDomain.create(some.getObjectPropertyExpression(), sup_j));
                     else

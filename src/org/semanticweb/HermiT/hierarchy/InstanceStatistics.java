@@ -17,6 +17,9 @@
 */
 package org.semanticweb.HermiT.hierarchy;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -91,10 +94,59 @@ public class InstanceStatistics {
     
     public int getClassHierarchyDepth() {
         m_reasoner.classifyClasses();
+        FileWriter fstream=null;
+        try {
+            fstream = new FileWriter("outputConcept.txt");
+        } catch (IOException e) {
+            System.err.println("Error: Cannot create file output.txt");
+            e.printStackTrace();
+        }
+        BufferedWriter out = new BufferedWriter(fstream);
+        for (HierarchyNode<AtomicConcept> conceptNode : m_instanceManager.m_currentConceptHierarchy.getAllNodes()) {
+        	int n=conceptNode.getParentNodes().size();
+            try {
+    			out.newLine();
+    			out.write(conceptNode.toString() + " : " +n);
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        }
+        try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return m_instanceManager.m_currentConceptHierarchy.getDepth();
     }
     public int getObjectPropertyHierarchyDepth() {
         m_reasoner.classifyObjectProperties();
+        FileWriter fstream=null;
+        try {
+            fstream = new FileWriter("outputRole.txt");
+        } catch (IOException e) {
+            System.err.println("Error: Cannot create file output.txt");
+            e.printStackTrace();
+        }
+        BufferedWriter out = new BufferedWriter(fstream);
+        for (HierarchyNode<RoleElement> roleNode : m_instanceManager.m_currentRoleHierarchy.getAllNodes()) {
+        	int n=roleNode.getParentNodes().size();
+            try {
+    			out.newLine();
+    			out.write(roleNode.toString() + " : " +n);
+    		} catch (IOException e) {
+    			// TODO Auto-generated catch block
+    			e.printStackTrace();
+    		}
+        	//System.out.println(roleNode.toString() + " : " +n);
+        }
+        try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return m_instanceManager.m_currentRoleHierarchy.getDepth();
     }
  
