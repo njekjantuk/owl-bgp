@@ -41,7 +41,7 @@ public class PlanChecker extends QueryEvaluator {
         int permNum=0;
         try {
             while (generator.hasMore()) {//new permutation of query atoms
-                bindings.clear();
+            	bindings.clear();
                 bindings.add(initialBinding);
                 List<QueryObject<? extends Axiom>> atomList=generator.nextPermutationAsList();
                 Set<Variable> boundVar= new HashSet<Variable>();
@@ -62,11 +62,14 @@ public class PlanChecker extends QueryEvaluator {
                 }   
                 if (valid) {
                     permNum++;
+                    System.out.println("permNumber:  "+permNum);
                     long t=System.currentTimeMillis();
                     out.write("Ordering:  ");
+                    System.out.println("Ordering:  ");
                     for (QueryObject<? extends Axiom> cheapest : atomList) {
                         out.newLine();
                         out.write(cheapest.getAxiomTemplate().toString()+" ");
+                    	System.out.println(cheapest.getAxiomTemplate().toString()+" ");
                         if (!bindings.isEmpty())
                             bindings=cheapest.computeBindings(bindings, positionInTuple);
                     }
@@ -77,19 +80,26 @@ public class PlanChecker extends QueryEvaluator {
                     }
                     out.newLine();
                     out.write("RunningTime: " + y +" ms.");
+                    out.newLine();
+                    out.newLine();
+                    System.out.println("RunningTime: " + y +" ms.");
                 }
              }
              out.newLine();
              out.write("The cheapestOrdering is: ");
+             System.out.println("The cheapestOrdering is: ");
              for (QueryObject<? extends Axiom> cheapest:cheapestOrder) {
                 out.write(cheapest.getAxiomTemplate().toString()+" ");
                 out.newLine();
+            	System.out.println(cheapest.getAxiomTemplate().toString()+" ");
              }
              out.write("with running time "+minTime+" ms."); 
              out.newLine();
              out.newLine();
+             System.out.println("with running time "+minTime+" ms.");
              out.write("The number of valid orderings is " + permNum+" .");
              out.close();
+             System.out.println("The number of valid orderings is " + permNum+" .");
         } catch (IOException e) {
             System.err.println("Error: Cannot write to file output.txt");
             e.printStackTrace();

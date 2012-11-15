@@ -99,7 +99,7 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
             else if (result[1])
                 return new double[] { cost+((double)0.5*COST_ENTAILMENT*m_instanceStatistics.getObjectPropertyHierarchyDepth()), 1*POSSIBLE_INSTANCE_SUCCESS };
             else return new double[] {cost+COST_LOOKUP, 0 }; 
-        } else if (unbound.size()==1 && opVar!=null) {// ?x(:a :b) 
+        } else if (unbound.size()==1 && unbound.contains(opVar)) {// ?y(:a :b) 
         	double[] costMatrix={0.0,0.0};
         	for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
         		boolean[] result=m_instanceStatistics.hasSuccessor((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
@@ -117,7 +117,7 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
                 }
         	}
             return costMatrix;
-        } else if (unbound.size()==1 && opVar==null) {// op(:a ?x) or op(?x :a)
+        } else if (unbound.size()==1 && !unbound.contains(opVar)) {// op(:a ?x) or op(?x :a)
         	int[] estimate;
             if (ind2 instanceof Variable)
             	estimate=m_instanceStatistics.getNumberOfSuccessors((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind1.asOWLAPIObject(m_dataFactory));
@@ -125,7 +125,7 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
                 estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
                 //double[] estimate=m_instanceStatistics.getAverageNumberOfSuccessors(AtomicRole.create(op.getIRIString()));
             return new double[] { cost + estimate[0]*COST_LOOKUP+(estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth()), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) }; 
-        } else if (unbound.size()==2 && opVar!=null) {// ?x(:a ?y) or ?x(?y :a)
+        } else if (unbound.size()==2 && unbound.contains(opVar)) {// ?x(:a ?y) or ?x(?y :a)
         	int[] estimate;
         	double[] costMatrix={0.0,0.0};
             for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
@@ -140,7 +140,7 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
             }
             return costMatrix;
             
-        } else if (unbound.size()==2 && opVar==null) {// op(?x ?y)
+        } else if (unbound.size()==2 && !unbound.contains(opVar)) {// op(?x ?y)
         	RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
                 //int[] estimate=m_instanceStatistics.getNumberOfPropertyInstances((OWLObjectProperty)op.asOWLAPIObject(m_dataFactory));
 //                System.out.println("known "+ op.toString()+ " instances: " +estimate[0]+"  possible: "+estimate[1]);

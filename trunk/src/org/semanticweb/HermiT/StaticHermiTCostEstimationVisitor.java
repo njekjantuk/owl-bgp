@@ -131,7 +131,7 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	    else if (ce instanceof Variable && bound.contains(ce)) {
 	    	if (indVar==null) {//C(a)<-?x(a)
 	    		 int[] estimate=m_instanceStatistics.getNumberOfTypes((OWLNamedIndividual)ind.asOWLAPIObject(m_dataFactory));
-	             return new double[] { cost + estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), estimate[0]+(POSSIBLE_INSTANCE_SUCCESS*estimate[1]) };
+	             return new double[] { cost + (estimate[0]/(double)(m_classCount))*COST_LOOKUP+(estimate[1]/(double)(m_classCount))*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), (estimate[0]/(double)(m_classCount))+(POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)(m_classCount))) };
 	    	}	
 	    	else if (bound.contains(indVar)) {//C(a)<-?x(?y)
 	    		double[] costMatrix={0.0,0.0};

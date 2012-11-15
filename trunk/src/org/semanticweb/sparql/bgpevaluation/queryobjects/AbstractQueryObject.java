@@ -25,7 +25,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
@@ -34,11 +36,13 @@ import org.semanticweb.sparql.owlbgp.model.ToOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
 import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
 import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
 import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public abstract class AbstractQueryObject<T extends Axiom> implements QueryObject<T> {
@@ -60,6 +64,9 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
     public T getAxiomTemplate() {
         return m_axiomTemplate;
     }
+    public boolean isComplex() {
+    	return false;
+    }
     public List<Atomic[]> computeBindings(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions) {
         // if no solutions are computed yet, candidate bindings should have one all null array as an entry 
         // if candidateBindings is empty, there are no solutions already due to other constraints
@@ -69,8 +76,48 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         for (int i=0;i<candidateBindings.size();i++)
             newBindings.addAll(addBindings(candidateBindings.get(i), bindingPositions));
-        return newBindings;
+        return newBindings;  
     }
+    
+    /*public List<Atomic[]> computeBindings(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions) {
+        // if no solutions are computed yet, candidate bindings should have one all null array as an entry 
+        // if candidateBindings is empty, there are no solutions already due to other constraints
+        if (candidateBindings.size()==0)
+            return candidateBindings;
+        
+        List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
+        for (int i=0;i<candidateBindings.size();i++)
+            newBindings.addAll(addBindings(candidateBindings.get(i), bindingPositions));
+        
+        boolean[] matrix_flag=new boolean[newBindings.size()];
+        for (int d=0;d<newBindings.size();d++) 
+        	matrix_flag[d]=true;
+        List<Atomic[]> entailedBindings=new ArrayList<Atomic[]>();;
+        //entailedBindings.addAll(results);
+        for (int i=0;i<newBindings.size();i++) { 
+        	for (int r=i+1;r<newBindings.size();r++) {
+        		if (matrix_flag[r]==true) { 
+        		    if (isTheSameAssignment(newBindings.get(r),newBindings.get(i), bindingPositions)) {
+                        matrix_flag[r]=false;
+                    }
+                } 
+            }    
+        }    
+        for (int i=0;i<newBindings.size();i++) {
+    	    if (matrix_flag[i]==true)
+    		    entailedBindings.add(newBindings.get(i));
+        }
+        return entailedBindings;  
+    }*/
+    
+    protected boolean isTheSameAssignment(Atomic[] binding1, Atomic[] binding2, Map<Variable,Integer> bindingPositions) {
+        for (Variable var:bindingPositions.keySet()) {
+          if (binding1[bindingPositions.get(var)]!=binding2[bindingPositions.get(var)]) 
+           return false;
+        }
+        return true;
+    }
+    
     protected abstract List<Atomic[]> addBindings(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions);
 
     protected List<Atomic[]> complex(Atomic[] currentBinding, Axiom axiom, Map<Variable,Integer> bindingPositions) {
@@ -79,12 +126,24 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         List<Variable> vars=new ArrayList<Variable>(axiom.getVariablesInSignature());
         Map<Variable,Set<? extends Atomic>> varToBindingSets=new HashMap<Variable, Set<? extends Atomic>>();
         for (Variable var : vars) {
-            if (var instanceof ClassVariable)
-                varToBindingSets.put(var, m_graph.getClassesInSignature());
+            if (var instanceof ClassVariable) {
+                Set<Clazz> classSet=m_graph.getClassesInSignature();
+                if (!classSet.contains(Clazz.THING))
+                    classSet.add(Clazz.THING);
+                if (!classSet.contains(Clazz.NOTHING))
+                    classSet.add(Clazz.NOTHING);
+            	varToBindingSets.put(var, classSet);
+            }    
             else if (var instanceof DatatypeVariable)
                 varToBindingSets.put(var, m_graph.getDatatypesInSignature());
-            else if (var instanceof ObjectPropertyVariable)
-                varToBindingSets.put(var, m_graph.getObjectPropertiesInSignature());
+            else if (var instanceof ObjectPropertyVariable) {
+            	Set<ObjectProperty> propertySet=m_graph.getObjectPropertiesInSignature();
+            	if (!propertySet.contains(ObjectProperty.TOP_OBJECT_PROPERTY))
+            	    propertySet.add(ObjectProperty.TOP_OBJECT_PROPERTY);
+            	if (!propertySet.contains(ObjectProperty.BOTTOM_OBJECT_PROPERTY))
+            	    propertySet.add(ObjectProperty.BOTTOM_OBJECT_PROPERTY);
+            	varToBindingSets.put(var, propertySet);
+            }    
             else if (var instanceof DataPropertyVariable)
                 varToBindingSets.put(var, m_graph.getDataPropertiesInSignature());
             else if (var instanceof AnnotationPropertyVariable)
@@ -97,7 +156,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
                 throw new IllegalArgumentException("Error: The class assertion axiom template "+axiom+" contains untyped variables. ");
         }
         for (Map<Variable,? extends Atomic> bindings : new BindingIterator(varToBindingSets)) {
-            if (m_reasoner.isEntailed((OWLAxiom)axiom.getBoundVersion(bindings, m_dataFactory))) {
+        	if (m_reasoner.isEntailed((OWLAxiom)axiom.getBoundVersion(bindings, m_dataFactory))) {
                 result=currentBinding.clone();
                 for (Variable var : bindings.keySet())
                     result[bindingPositions.get(var)]=bindings.get(var);

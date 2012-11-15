@@ -18,6 +18,9 @@
 
 package  org.semanticweb.sparql;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -31,6 +34,7 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
+import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.sparql.ARQConstants;
@@ -72,11 +76,35 @@ public class OWLReasonerSPARQLEngine {
         QueryExecution engine=QueryExecutionFactory.create(query,dataSet);
         long t=System.currentTimeMillis();
         ResultSet results=engine.execSelect();
-        //while (results.hasNext()) {
-        //	QuerySolution rb=results.nextSolution();
-		//	System.out.println(rb);
-        //  results.next();
-        //}
+        //int resultsSize=0;
+        FileWriter fstream=null;
+        try {
+            fstream = new FileWriter("outputAnswers.txt");
+        } catch (IOException e) {
+            System.err.println("Error: Cannot create file output.txt");
+            e.printStackTrace();
+        }
+        BufferedWriter out = new BufferedWriter(fstream);
+        while (results.hasNext()) {
+        	QuerySolution rb=results.nextSolution();
+			//System.out.println(rb);
+			try {
+				out.newLine();
+				out.write(rb.toString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//resultsSize++;
+          //results.next();
+        }
+        try {
+			out.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        //System.out.println("The result size is "+resultsSize);
         long evalTime=System.currentTimeMillis()-t;
         ARQ.getContext().put(BGP_EXEC_TIME, evalTime);
         return results;

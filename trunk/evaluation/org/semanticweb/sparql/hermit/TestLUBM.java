@@ -117,7 +117,7 @@ public class TestLUBM {
 	    + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
-	    System.out.println("Query: "+(System.currentTimeMillis()-t));
+	    //System.out.println("Query: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    sparqlEngine.execQuery(query,dataset);
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -134,7 +134,7 @@ public class TestLUBM {
 	        + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
-	    System.out.println("Query: "+(System.currentTimeMillis()-t));
+	    //System.out.println("Query: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    sparqlEngine.execQuery(query,dataset);
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -146,12 +146,12 @@ public class TestLUBM {
         + "  ?x rdf:type ub:GraduateStudent. " +LB
         + "  ?x ub:takesCourse <http://www.Department0.University0.edu/GraduateCourse0>. " +LB
         + " } "+LB;
-        long t=System.currentTimeMillis();
+       //long t=System.currentTimeMillis();
        Query query=QueryFactory.create(queryString);
-       System.out.println("Query: "+(System.currentTimeMillis()-t));
-       t=System.currentTimeMillis();
+       //System.out.println("Query: "+(System.currentTimeMillis()-t));
+       //t=System.currentTimeMillis();
        sparqlEngine.execQuery(query,dataset);
-       System.out.println("Result: "+(System.currentTimeMillis()-t));
+       //System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
 	public static void getLUBMQ2(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q2");
@@ -163,12 +163,12 @@ public class TestLUBM {
             + "  ?z ub:subOrganizationOf ?y. " +LB
             + "  ?x ub:undergraduateDegreeFrom ?y." +LB
             + "} "+LB;
-	    long t=System.currentTimeMillis();
+	    //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
 	}
 	public static void getLUBMQ3(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q3");
@@ -176,12 +176,12 @@ public class TestLUBM {
             + "  ?x rdf:type ub:Publication. " +LB
             + "  ?x ub:publicationAuthor <http://www.Department0.University0.edu/AssistantProfessor0>. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ4(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q4");
@@ -192,12 +192,12 @@ public class TestLUBM {
             + "?x ub:emailAddress ?y2. " +LB
             + "?x ub:telephone ?y3. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ5(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q5");
@@ -205,24 +205,24 @@ public class TestLUBM {
             + "?x rdf:type ub:Person. " +LB         
             + "?x ub:memberOf <http://www.Department0.University0.edu>. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ6(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q6");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:Student. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 	public static void getLUBMQ7(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q7");
@@ -232,12 +232,12 @@ public class TestLUBM {
             +"  <http://www.Department0.University0.edu/AssociateProfessor0> ub:teacherOf ?y. " +LB
             +"  ?x ub:takesCourse ?y." +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ8(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q8");
@@ -248,12 +248,12 @@ public class TestLUBM {
             +"  ?y ub:subOrganizationOf <http://www.University0.edu>."
             +"  ?x ub:emailAddress ?z." +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ9(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q9");
@@ -265,12 +265,12 @@ public class TestLUBM {
             +"  ?y ub:teacherOf ?z. " +LB
             +"  ?x ub:takesCourse ?z. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ10(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q10");
@@ -278,13 +278,12 @@ public class TestLUBM {
             + "  ?x rdf:type ub:Student. " +LB
             + "  ?x ub:takesCourse <http://www.Department0.University0.edu/GraduateCourse0>"
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-    
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ11(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q11");
@@ -292,12 +291,12 @@ public class TestLUBM {
             + "  ?x rdf:type ub:ResearchGroup. " +LB   
             + "  ?x ub:subOrganizationOf <http://www.University0.edu>." +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ12(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q12");
@@ -307,12 +306,12 @@ public class TestLUBM {
             + "  ?x ub:worksFor ?y. "+LB
             + "  ?y ub:subOrganizationOf <http://www.University0.edu>." +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ13(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q13");
@@ -320,143 +319,23 @@ public class TestLUBM {
             + "  ?x rdf:type ub:Person. " +LB
             + "  <http://www.University0.edu> ub:hasAlumnus ?x." +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
     public static void getLUBMQ14(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
         System.out.println("Q14");
         String queryString=getLUBMPrefix()
             + "  ?x rdf:type ub:UndergraduateStudent. " +LB
             + "} "+LB;
-        long t=System.currentTimeMillis();
+        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        System.out.println("Query: "+(System.currentTimeMillis()-t));
-        t=System.currentTimeMillis();
+        //System.out.println("Query: "+(System.currentTimeMillis()-t));
+        //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
-        System.out.println("Result: "+(System.currentTimeMillis()-t));
+        //System.out.println("Result: "+(System.currentTimeMillis()-t));
     }
 }
-//OWLOntology: 13654
-//Class classification: 6201
-//Realisation: 42420
-//Q1
-//Query: 243, 253
-//Cost estimation time: 0, computation time: 30, results size: 4
-//Result: 311, 278
-//Q2
-//Query: 3, 3
-//Cost estimation time: 0, computation time: 32, results size: 0
-//Result: 278, 125
-//Q3
-//Query: 11, 2
-//Cost estimation time: 0, computation time: 6, results size: 6
-//Result: 29, 12
-//Q4
-//Query: 4, 2
-//Cost estimation time: 0, computation time: 4, results size: 34
-//Result: 33, 86
-
-//Q5
-//Query: 3, 1
-//Cost estimation time: 0, computation time: 259, results size: 719
-//Result: 318, 46
-//Q6
-//Query: 4, 2
-//Cost estimation time: 0, computation time: 228, results size: 7790
-//Result: 243, 117
-//Q7
-//Query: 727, 2
-//Cost estimation time: 0, computation time: 40, results size: 67
-//Result: 1414, 38
-//Q8
-//Query: 1, 1
-//Cost estimation time: 0, computation time: 408, results size: 7790
-//Result: 497, 853
-//Q9
-//Query: 3, 1
-//Cost estimation time: 0, computation time: 7164, results size: 208
-//Result: 235818, 221652
-//Q10
-//Query: 2, 1
-//Cost estimation time: 0, computation time: 4, results size: 4
-//Result: 12, 12
-//Q11
-//Query: 1, 2
-//Cost estimation time: 0, computation time: 4, results size: 224
-//Result: 11, 11
-//Q12
-//Query: 2, 1
-//Cost estimation time: 0, computation time: 306, results size: 15
-//Result: 2866, 8
-//Q13
-//Query: 3, 2
-//Cost estimation time: 0, computation time: 0, results size: 1
-//Result: 14, 5
-//Q14
-//Query: 2, 0
-//Cost estimation time: 0, computation time: 133, results size: 5916
-//Result: 149, 53
-
-//OWLOntology: 9248
-//Class classification: 3822
-//Realisation: 26900
-//Q1
-//Query: 316
-//Cost estimation time: 26, computation time: 58, results size: 4
-//Result: 430
-//Q2
-//Query: 39
-//Cost estimation time: 238, computation time: 20, results size: 0
-//Result: 345
-//Q3
-//Query: 3
-//Cost estimation time: 2, computation time: 4, results size: 6
-//Result: 17
-//Q4
-//Query: 2
-//Cost estimation time: 24, computation time: 51, results size: 34
-//Result: 94
-//Q5
-//Query: 1
-//Cost estimation time: 13, computation time: 29, results size: 719
-//Result: 48
-//Q6
-//Query: 1
-//Cost estimation time: 0, computation time: 105, results size: 7790
-//Result: 110
-//Q7
-//Query: 1
-//Cost estimation time: 13, computation time: 17, results size: 67
-//Result: 37
-//Q8
-//Query: 2
-//Cost estimation time: 184, computation time: 664, results size: 7790
-//Result: 855
-//Q9
-//Query: 2
-//Cost estimation time: 221190, computation time: 6631, results size: 208
-//Result: 227827
-//Q10
-//Query: 1
-//Cost estimation time: 3, computation time: 4, results size: 4
-//Result: 14
-//Q11
-//Query: 1
-//Cost estimation time: 0, computation time: 5, results size: 224
-//Result: 27
-//Q12
-//Query: 1
-//Cost estimation time: 2496, computation time: 166, results size: 15
-//Result: 2669
-//Q13
-//Query: 1
-//Cost estimation time: 1, computation time: 0, results size: 1
-//Result: 7
-//Q14
-//Query: 1
-//Cost estimation time: 1, computation time: 37, results size: 5916
-//Result: 43

@@ -84,13 +84,9 @@ public class OWLOntologyGraph implements Graph {
 		m_skolemConstants=skolemizer.getSkolems();
 		m_literals=skolemizer.getLiterals();
 		m_classes=new HashSet<Clazz>();
-        for (OWLClass cls : skolomized.getClassesInSignature(true))
-            if (cls.isOWLThing())
-                m_classes.add(Clazz.THING);
-            else if (cls.isOWLNothing())
-                m_classes.add(Clazz.NOTHING);
-            else 
+        for (OWLClass cls : skolomized.getClassesInSignature(true)) {
                 m_classes.add(Clazz.create(cls.toString()));
+        }
         m_datatypes=new HashSet<Datatype>();
         for (OWLDatatype dt : skolomized.getDatatypesInSignature(true))
             if (!dt.isBuiltIn()) 

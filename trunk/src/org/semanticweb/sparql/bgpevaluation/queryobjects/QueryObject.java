@@ -27,6 +27,7 @@ import org.semanticweb.sparql.owlbgp.model.Variable;
 
 public interface QueryObject<T> {
     public T getAxiomTemplate();
+    public boolean isComplex();
 	public List<Atomic[]> computeBindings(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions);
 	<O> O accept(DynamicQueryObjectVisitorEx<O> visitor);
 	<O> O accept(StaticQueryObjectVisitorEx<O> visitor, Set<Variable> bound);
