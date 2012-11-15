@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,17 +33,35 @@ import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
+import org.semanticweb.sparql.owlbgp.model.Prefixes;
+import org.semanticweb.sparql.owlbgp.model.UntypedVariable;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.Axiom;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.ClassVariable;
+import org.semanticweb.sparql.owlbgp.model.classexpressions.Clazz;
+import org.semanticweb.sparql.owlbgp.model.dataranges.Datatype;
+import org.semanticweb.sparql.owlbgp.model.dataranges.DatatypeVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.AnonymousIndividual;
 import org.semanticweb.sparql.owlbgp.model.individuals.IndividualVariable;
+import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
+import org.semanticweb.sparql.owlbgp.model.literals.LiteralVariable;
+import org.semanticweb.sparql.owlbgp.model.literals.TypedLiteral;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.AnnotationPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.DataProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 import org.semanticweb.sparql.owlbgp.parser.OWLBGPParser;
 
 import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
+import com.hp.hpl.jena.sparql.core.Var;
 import com.hp.hpl.jena.sparql.engine.ExecutionContext;
 import com.hp.hpl.jena.sparql.engine.QueryIterator;
+import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.main.StageGenerator;
 
 public class OWLReasonerStageGenerator implements StageGenerator {
@@ -127,9 +146,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             }
 
             bindingPositionsPerComponent.add(positionInTuple);
-            Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
-            List<Atomic[]> bindings=new ArrayList<Atomic[]>();
-            bindings.add(initialBinding);
+            List<Atomic[]> bindings=initiliseBindings(input, positionInTuple, connectedComponent);
             bindings=evaluator.execute(connectedComponent, positionInTuple, bindings);
             bindingsPerComponent.add(bindings);
             if (resultSize==null)
@@ -140,7 +157,55 @@ public class OWLReasonerStageGenerator implements StageGenerator {
         m_monitor.bgpEvaluationFinished(resultSize);
         return new OWLBGPQueryIterator(pattern,input,execCxt,bindingsPerComponent,bindingPositionsPerComponent,bnodes);
     }
-    private String arqPatternToBGP(BasicPattern pattern) {
+    protected List<Atomic[]> initiliseBindings(QueryIterator input, Map<Variable,Integer> positionInTuple, List<QueryObject<? extends Axiom>> connectedComponent) {
+        List<Atomic[]> bindings=new ArrayList<Atomic[]>();
+        while (input.hasNext()) {
+            Atomic[] initialBinding=new Atomic[positionInTuple.keySet().size()];
+            Binding binding=input.nextBinding();
+            Var jenaVar;
+            for (Iterator<Var> bindingsIterator=binding.vars(); bindingsIterator.hasNext(); ) {
+                jenaVar=bindingsIterator.next();
+                for (QueryObject<? extends Axiom> ax : connectedComponent) {
+                    for (Variable var : ax.getAxiomTemplate().getVariablesInSignature()) {
+                        if (var.toString().equals(jenaVar.toString())) {
+                            Atomic existingBinding=null;
+                            String existingBindingString=binding.get(jenaVar).toString();
+                            if (var instanceof ClassVariable)
+                                existingBinding=Clazz.create(existingBindingString);
+                            else if (var instanceof DatatypeVariable)
+                                existingBinding=Datatype.create(existingBindingString);
+                            else if (var instanceof ObjectPropertyVariable)
+                                existingBinding=ObjectProperty.create(existingBindingString);
+                            else if (var instanceof DataPropertyVariable)
+                                existingBinding=DataProperty.create(existingBindingString);
+                            else if (var instanceof IndividualVariable)
+                                if (binding.get(jenaVar).isURI())
+                                    existingBinding=NamedIndividual.create(existingBindingString);
+                                else
+                                    existingBinding=AnonymousIndividual.create(binding.get(jenaVar).getBlankNodeLabel());
+                            else if (var instanceof LiteralVariable) {
+                                String datatypeURI=binding.get(jenaVar).getLiteralDatatypeURI();
+                                if (datatypeURI==null)
+                                    datatypeURI=Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral";
+                                String langTag=binding.get(jenaVar).getLiteralLanguage();
+                                String lexical=binding.get(jenaVar).getLiteralLexicalForm();
+                                existingBinding=TypedLiteral.create(lexical, langTag, Datatype.create(datatypeURI));
+                            } else if (var instanceof AnnotationPropertyVariable)
+                                existingBinding=AnnotationProperty.create(existingBindingString);
+                            else
+                                existingBinding=UntypedVariable.create(existingBindingString);
+                            initialBinding[positionInTuple.get(var)]=existingBinding;
+                        }
+                    }
+                }
+            }
+            bindings.add(initialBinding);
+        }
+        if (bindings.isEmpty())
+            bindings.add(new Atomic[positionInTuple.keySet().size()]);
+        return bindings;
+    }
+    protected String arqPatternToBGP(BasicPattern pattern) {
         StringBuffer buffer=new StringBuffer();
         for (Triple triple : pattern) {
             buffer.append(printNode(triple.getSubject()));

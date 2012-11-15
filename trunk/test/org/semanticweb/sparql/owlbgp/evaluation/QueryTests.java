@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 
 import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
-import org.semanticweb.sparql.bgpevaluation.monitor.PrintingMonitor;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryFactory;
@@ -68,6 +67,188 @@ public class QueryTests extends AbstractQueryTest {
                 "DisjointClasses( :Conference :Workshop )";
         return axioms;
     }
+    
+    public void testMinus() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :bob ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(Class( :Person ))"+LB+
+                "Declaration(ObjectProperty( :knows ))"+LB+
+                "ClassAssertion( :Person :alice )"+LB+
+                "ObjectPropertyAssertion( :knows :alice  :tom )"+LB+ 
+                "ClassAssertion( :Person :bob )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?person WHERE {"+LB
+                + "  ?person rdf:type :Person . "+LB
+                + "  MINUS { ?person :knows :tom } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==1);
+    } 
+    public void testMinusLiterals() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :bob ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(DataProperty( :name ))"+LB+
+                "Declaration(DataProperty( :nick ))"+LB+
+                "DataPropertyAssertion( :name :tom \"Tom\" )"+LB+
+                "DataPropertyAssertion( :name :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :nick :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :name :bob \"Bob\" )"+LB+ 
+                "DataPropertyAssertion( :nick :bob \"Bobby\" )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?name WHERE {"+LB
+                + "  ?person :name ?name . "+LB
+                + "  MINUS { ?person :nick ?name } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    } 
+    public void testMinusBlanks() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(DataProperty( :name ))"+LB+
+                "Declaration(DataProperty( :nick ))"+LB+
+                "DataPropertyAssertion( :name :tom \"Tom\" )"+LB+
+                "DataPropertyAssertion( :name :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :nick :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :name _:bob \"Bob\" )"+LB+ 
+                "DataPropertyAssertion( :nick _:bob \"Bobby\" )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?name WHERE {"+LB
+                + "  ?person :name ?name . "+LB
+                + "  MINUS { ?person :nick ?name } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    } 
+    
+    public void testNotExists() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :bob ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(Class( :Person ))"+LB+
+                "Declaration(ObjectProperty( :knows ))"+LB+
+                "ClassAssertion( :Person :alice )"+LB+
+                "ObjectPropertyAssertion( :knows :alice  :tom )"+LB+ 
+                "ClassAssertion( :Person :bob )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?person WHERE {"+LB
+                + "  ?person rdf:type :Person . "+LB
+                + "  FILTER NOT EXISTS { ?person :knows :tom } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==1);
+    } 
+    public void testNotExistsLiterals() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :bob ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(DataProperty( :name ))"+LB+
+                "Declaration(DataProperty( :nick ))"+LB+
+                "DataPropertyAssertion( :name :tom \"Tom\" )"+LB+
+                "DataPropertyAssertion( :name :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :nick :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :name :bob \"Bob\" )"+LB+ 
+                "DataPropertyAssertion( :nick :bob \"Bobby\" )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?name WHERE {"+LB
+                + "  ?person :name ?name . "+LB
+                + "  FILTER NOT EXISTS { ?person :nick ?name } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    } 
+    public void testNotExistsBlanks() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :tom ))"+LB+
+                "Declaration(DataProperty( :name ))"+LB+
+                "Declaration(DataProperty( :nick ))"+LB+
+                "DataPropertyAssertion( :name :tom \"Tom\" )"+LB+
+                "DataPropertyAssertion( :name :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :nick :alice  \"Alice\" )"+LB+
+                "DataPropertyAssertion( :name _:bob \"Bob\" )"+LB+ 
+                "DataPropertyAssertion( :nick _:bob \"Bobby\" )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?name WHERE {"+LB
+                + "  ?person :name ?name . "+LB
+                + "  FILTER NOT EXISTS { ?person :nick ?name } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    } 
             
     public void testOPParsing() throws Exception {
         loadDataSetWithAxioms(getAxioms());
@@ -87,7 +268,7 @@ public class QueryTests extends AbstractQueryTest {
                 + "   ] "+LB
                 + "}";
         
-        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new PrintingMonitor());
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
         int noResults=0;
