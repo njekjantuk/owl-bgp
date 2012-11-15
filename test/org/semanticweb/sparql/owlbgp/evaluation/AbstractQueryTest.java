@@ -63,6 +63,7 @@ public class AbstractQueryTest extends AbstractTest {
         buffer.append("Prefix(owl:=<http://www.w3.org/2002/07/owl#>)"+LB);
         buffer.append("Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)"+LB);
         buffer.append("Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)"+LB);
+        buffer.append("Prefix(foaf:=<http://xmlns.com/foaf/0.1/>)"+LB);
         buffer.append("Ontology("+ONTOLOGY_IRI+LB);
         buffer.append(axioms+LB);
         buffer.append(")");

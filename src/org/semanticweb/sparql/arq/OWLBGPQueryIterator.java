@@ -162,7 +162,7 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
             // we could do something with the Skolem constants here
             String iri=atomic.toString(Prefixes.NO_PREFIXES);
             iri=iri.substring(1, iri.length()-1);
-            if (atomic instanceof NamedIndividual && m_skolemConstants.contains(iri)) {
+            if (atomic instanceof NamedIndividual && m_skolemConstants.contains(iri) && iri.startsWith("_:genid-nodeid-")) {
                 String label=iri.substring("_:genid-nodeid-".length());
                 AnonId id=AnonId.create(label);
                 Node node=Node.createAnon(id);
