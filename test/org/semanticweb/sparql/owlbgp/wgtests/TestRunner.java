@@ -59,6 +59,15 @@ public class TestRunner extends qtest {
     public static final String D_NS=ENT+"D";
     public static final String RDF_NS=ENT+"RDF";
     public static final String RDFS_NS=ENT+"RDFS";
+    public static final String[] semantics=new String[] { RDF_NS, RDFS_NS, D_NS, OWLRDFBASED_NS, OWLDIRECT_NS };
+    
+    public static final String PROF="http://www.w3.org/ns/owl-profile/";
+    public static final String EL=PROF+"EL";
+    public static final String QL=PROF+"QL";
+    public static final String RL=PROF+"RL";
+    public static final String DL=PROF+"DL";
+    public static final String FULL=PROF+"Full";
+    public static final String[] profiles=new String[] { EL, QL, RL, DL, FULL };
     
     // include only tests that have a name starting with one of the given string
     // leave empty for all tests
