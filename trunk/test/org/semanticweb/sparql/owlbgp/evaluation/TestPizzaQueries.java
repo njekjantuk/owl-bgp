@@ -94,6 +94,15 @@ public class TestPizzaQueries extends TestCase {
                 + "?o rdf:type owl:Class . "+LB
                 + "?x rdfs:subClassOf [rdf:type owl:Restriction; owl:onProperty :hasTopping; owl:someValuesFrom ?o]"+LB
                 + "}";
+        
+        //+ "SELECT ?x ?o WHERE {"+LB
+        //+ "?o rdf:type owl:Class . "+LB
+        //+ "pizza:Pizza rdfs:subClassOf  _:o. " +LB
+	    //   + "_:o rdf:type owl:Restriction. " +LB
+	    //   + "_:o owl:onProperty ?x. "+LB
+	    //   + "_:o owl:someValuesFrom ?o. " +LB
+        //+ " ?x rdf:type owl:ObjectProperty." +LB
+        //+ "}";
         OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
         ResultSet result=sparqlEngine.execQuery(query,dataset);
@@ -109,6 +118,7 @@ public class TestPizzaQueries extends TestCase {
         int noResults=0;
         while (result.hasNext()) {
             QuerySolution solution=result.next();
+            System.out.println(solution);
             noResults++;
             subClass=factory.getOWLClass(IRI.create(solution.get("?x").asResource().getURI()));
             qualification=factory.getOWLClass(IRI.create(solution.get("?o").asResource().getURI()));
@@ -116,6 +126,30 @@ public class TestPizzaQueries extends TestCase {
             subClassOf=factory.getOWLSubClassOfAxiom(subClass, superClass);
             assertTrue(hermit.isEntailed(subClassOf));
         }
-        assertTrue(noResults==532);
+        //System.out.println("The results are "+noResults);
+        assertTrue(noResults==503);
+        /*OWLDataFactory factory=manager.getOWLDataFactory();
+        OWLClass subClass;
+        OWLClass qualificationClass;
+        OWLObjectProperty qualificationProperty;
+        OWLClassExpression superClass;
+        OWLSubClassOfAxiom subClassOf;
+        subClass=factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/pizza/pizza.owl#Pizza"));
+        int noResults=0;
+        while (result.hasNext()) {
+            QuerySolution solution=result.next();
+            //System.out.println(solution);
+            noResults++;
+            qualificationClass=factory.getOWLClass(IRI.create(solution.get("?o").asResource().getURI()));
+            qualificationProperty=factory.getOWLObjectProperty(IRI.create(solution.get("?x").asResource().getURI()));
+            superClass=factory.getOWLObjectSomeValuesFrom(qualificationProperty, qualificationClass);
+            subClassOf=factory.getOWLSubClassOfAxiom(subClass, superClass);
+            assertTrue(hermit.isEntailed(subClassOf));
+        }
+        System.out.println("The results are "+noResults);
+        assertTrue(noResults==8);
+
+        //assertTrue(noResults==532);*/
+
     }
 }
