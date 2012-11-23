@@ -89,47 +89,6 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
                 boolean isRelevantTest=false;
                 if (action.hasProperty(sd_entailmentRegime)) {
                     Resource regime=TestUtils.getResource(action, sd_entailmentRegime);
-//                    System.out.print(entry.toString().substring(entry.toString().lastIndexOf("#"))+"\t");
-//                    Set<String> testRegimes=new HashSet<String>();
-//                    if (regime.isResource() && !regime.isAnon()) {
-//                        testRegimes.add(regime.toString());
-//                    } else if (regime.isAnon() && regime.getProperty(RDF.first)!=null) {
-//                        Resource listItem=regime;
-//                        while (!listItem.equals(RDF.nil)) {
-//                            regime=listItem.getProperty(RDF.first).getResource();
-//                            testRegimes.add(regime.toString());
-//                            listItem=listItem.getProperty(RDF.rest).getResource();
-//                        }
-//                    }
-//                    for (String semantic : TestRunner.semantics) {
-//                        if (testRegimes.contains(semantic))
-//                            System.out.print("x\t");
-//                        else 
-//                            System.out.print("\t");
-//                    }
-//                }   
-//                Property sd_entailmentProfile=new PropertyImpl(SD, "EntailmentProfile");
-//                if (action.hasProperty(sd_entailmentProfile)) {
-//                    Resource profile=TestUtils.getResource(action, sd_entailmentProfile);
-//                    Set<String> testProfiles=new HashSet<String>();
-//                    if (profile.isResource() && !profile.isAnon()) {
-//                        testProfiles.add(profile.toString());
-//                    } else if (profile.isAnon() && profile.getProperty(RDF.first)!=null) {
-//                        Resource listItem=profile;
-//                        while (!listItem.equals(RDF.nil)) {
-//                            profile=listItem.getProperty(RDF.first).getResource();
-//                            testProfiles.add(profile.toString());
-//                            listItem=listItem.getProperty(RDF.rest).getResource();
-//                        }
-//                    }
-//                    for (String prof : TestRunner.profiles) {
-//                        if (testProfiles.contains(prof))
-//                            System.out.print("x\t");
-//                        else 
-//                            System.out.print("\t");
-//                    }
-//                }
-
                     if (regime.isResource() && !regime.isAnon() && allowedRegimes.contains(regime.toString())) {
                         isRelevantTest=true;
                     } else if (regime.isAnon() && regime.getProperty(RDF.first)!=null) {
@@ -146,7 +105,6 @@ public class OWLBGPScriptTestSuitFactory extends ScriptTestSuiteFactory {
                 }
             }
         }
-//        System.out.println();
         return null;
     }
 
