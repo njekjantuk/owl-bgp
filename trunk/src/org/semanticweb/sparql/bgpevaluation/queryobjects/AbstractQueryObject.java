@@ -25,9 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
-import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
-import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
@@ -71,14 +69,12 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         // if no solutions are computed yet, candidate bindings should have one all null array as an entry 
         // if candidateBindings is empty, there are no solutions already due to other constraints
         if (candidateBindings.size()==0)
-            return candidateBindings;
-        
+            return candidateBindings;        
         List<Atomic[]> newBindings=new ArrayList<Atomic[]>();
         for (int i=0;i<candidateBindings.size();i++)
             newBindings.addAll(addBindings(candidateBindings.get(i), bindingPositions));
         return newBindings;  
-    }
-    
+    }  
     /*public List<Atomic[]> computeBindings(List<Atomic[]> candidateBindings, Map<Variable,Integer> bindingPositions) {
         // if no solutions are computed yet, candidate bindings should have one all null array as an entry 
         // if candidateBindings is empty, there are no solutions already due to other constraints
@@ -108,16 +104,14 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
     		    entailedBindings.add(newBindings.get(i));
         }
         return entailedBindings;  
-    }*/
-    
+    }*/    
     protected boolean isTheSameAssignment(Atomic[] binding1, Atomic[] binding2, Map<Variable,Integer> bindingPositions) {
         for (Variable var:bindingPositions.keySet()) {
           if (binding1[bindingPositions.get(var)]!=binding2[bindingPositions.get(var)]) 
            return false;
         }
         return true;
-    }
-    
+    }    
     protected abstract List<Atomic[]> addBindings(Atomic[] currentBinding, Map<Variable,Integer> bindingPositions);
 
     protected List<Atomic[]> complex(Atomic[] currentBinding, Axiom axiom, Map<Variable,Integer> bindingPositions) {

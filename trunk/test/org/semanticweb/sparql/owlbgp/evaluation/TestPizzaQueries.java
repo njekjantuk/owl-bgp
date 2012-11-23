@@ -63,15 +63,16 @@ public class TestPizzaQueries extends TestCase {
     
     @Override
     protected void setUp() throws Exception {
-        org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/pizza.owl").toURI());
-        queriedOntology=manager.loadOntologyFromOntologyDocument(physicalIRI);
+        //org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/pizza.owl").toURI());
+    	org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/Galen.owl").toURI());
+    	queriedOntology=manager.loadOntologyFromOntologyDocument(physicalIRI);
         dataset=new OWLOntologyDataSet(queriedOntology, new HashMap<String, OWLOntology>());
         OWLOntologyGraph graph=dataset.getDefaultGraph();
         graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY);
     }
 
     public void testPizzaBNode() throws Exception {
-        String s="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
+    	String s="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
                 + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
                 + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
                 + "PREFIX pizza: <http://www.co-ode.org/ontologies/pizza/pizza.owl#>" +LB

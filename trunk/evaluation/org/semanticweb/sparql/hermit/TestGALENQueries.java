@@ -24,21 +24,16 @@ public class TestGALENQueries {
 	    System.out.println("OWLOntology loaded in: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
 	    t=System.currentTimeMillis();	    
-//	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
 	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
 	    System.out.println("Precomputation lasted: "+(System.currentTimeMillis()-t));
 	    t=System.currentTimeMillis();
 	    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
 
-	    t=System.currentTimeMillis();   
-	    
 	    getComplexQ1(sparqlEngine, dataset);
         getComplexQ2(sparqlEngine, dataset);
         getComplexQ3(sparqlEngine, dataset);
         getComplexQ4(sparqlEngine, dataset);
         getComplexQ5(sparqlEngine, dataset);
-        
-        System.out.println("The execution of the 5 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getGALENDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -64,9 +59,7 @@ public class TestGALENQueries {
     	   + "_:o owl:onProperty g:HasCausalLinkTo. "+LB
     	   + "_:o owl:someValuesFrom ?x." +LB
         + " } "+LB;
-       //long t=System.currentTimeMillis();
        Query query=QueryFactory.create(queryString);
-       //System.out.println(": "+(System.currentTimeMillis()-t));
        //t=System.currentTimeMillis();
        sparqlEngine.execQuery(query,dataset);
        //System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -80,9 +73,7 @@ public class TestGALENQueries {
 	       + "_:o owl:someValuesFrom ?x. " +LB
 	       + " ?y rdf:type owl:ObjectProperty." +LB
             + "} "+LB;
-	    //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        //System.out.println("Query: "+(System.currentTimeMillis()-t));
         //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
         //System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -102,22 +93,7 @@ public class TestGALENQueries {
             + "      ) "+LB
             + "] ."+LB
             + "} "+LB;
-	        /* String queryString=getLUBMPrefix()
-	        +"owl:Nothing rdfs:subClassOf ["+LB
-	        + "   a owl:Class ; "+LB
-	        + "      owl:intersectionOf ("+LB
-	        + "         g:Infection "+LB
-	        + "         ["+LB
-	        + "            a owl:Restriction ;"+LB
-	        + "            owl:onProperty g:hasCausalAgent ; "+LB 
-	        + "            owl:someValuesFrom owl:Nothing "+LB
-	        + "         ]"+LB
-	        + "      ) "+LB
-	        + "] ."+LB
-	        + "} "+LB;*/
-        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        //System.out.println("Query: "+(System.currentTimeMillis()-t));
         //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
         //System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -168,9 +144,7 @@ public class TestGALENQueries {
             //+"?y rdfs:subClassOf g:Shape. "+LB
             + "?z rdf:type owl:ObjectProperty." +LB
             + "} "+LB;
-        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        //System.out.println("Query: "+(System.currentTimeMillis()-t));
         //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
         //System.out.println("Result: "+(System.currentTimeMillis()-t));
@@ -196,9 +170,7 @@ public class TestGALENQueries {
             +"?w rdfs:subClassOf g:AbstractStatus. "+LB
             +"?y rdfs:subPropertyOf g:StatusAttribute."+LB
             + "} "+LB;
-        //long t=System.currentTimeMillis();
         Query query=QueryFactory.create(queryString);
-        //System.out.println("Query: "+(System.currentTimeMillis()-t));
         //t=System.currentTimeMillis();
         sparqlEngine.execQuery(query,dataset);
         //System.out.println("Result: "+(System.currentTimeMillis()-t));

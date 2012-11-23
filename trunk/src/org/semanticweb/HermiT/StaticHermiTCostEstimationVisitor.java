@@ -49,14 +49,12 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	    	m_hermit=(OWLBGPHermiT)m_reasoner;
 	        m_instanceStatistics=m_hermit.getInstanceStatistics();
 	        double numDisjunctions=0;
-	        
 	        for (DLClause clause : m_hermit.getDLOntology().getDLClauses()){
-                
-	        	//System.out.println(clause);
+                //System.out.println(clause);
 	        	if (clause.getHeadLength()>1) 
 	        		numDisjunctions+=clause.getHeadLength();	
 	        }
-	            m_numDisjunctions=numDisjunctions;
+	        m_numDisjunctions=numDisjunctions;
 	    } else 
 	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
 	    COST_ENTAILMENT=(double)EntailmentLookUpCostEstimation.entailmentCost;
@@ -217,28 +215,28 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 			    //return new double[] {cost+m_opCount*m_indCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_opCount*m_indCount};	
 			}
 			else if (!bound.contains(opVar) && bound.contains(ind1) && !bound.contains(ind2)) {//?z(a ?y)<-?z(?x ?y) 
-					double[] costMatrix={0.0,0.0};
-					for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-						RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory));
-					    if (roleStatistics.getNumberOfDistinctKnownPredecessors()!=0 && roleStatistics.getNumberOfDistinctPossiblePredecessors()!=0) {
-					    	costMatrix[0]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())*COST_LOOKUP+ (roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors())*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-					        costMatrix[1]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())+POSSIBLE_INSTANCE_SUCCESS*(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors());   
-					    }
-					    else if (roleStatistics.getNumberOfDistinctPossiblePredecessors()!=0){
-					    	costMatrix[0]+=(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors())*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-					    	costMatrix[1]+=POSSIBLE_INSTANCE_SUCCESS*(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors());
-				        } 
-					    else if (roleStatistics.getNumberOfDistinctKnownPredecessors()!=0) {
-					    	costMatrix[0]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())*COST_LOOKUP; 
-					    	costMatrix[1]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors());
-					    }
-					    else {
-		                	costMatrix[0]=0.0;
-		                	costMatrix[1]=0.0;
-		                }
-				    }
-					return costMatrix;
-				 //return new double[] {cost+m_opCount*m_indCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_opCount*m_indCount};	
+				double[] costMatrix={0.0,0.0};
+				for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+					RoleInstanceStatistics roleStatistics=m_instanceStatistics.getRoleInstanceStatistics((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory));
+					if (roleStatistics.getNumberOfDistinctKnownPredecessors()!=0 && roleStatistics.getNumberOfDistinctPossiblePredecessors()!=0) {
+					    costMatrix[0]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())*COST_LOOKUP+ (roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors())*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+					    costMatrix[1]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())+POSSIBLE_INSTANCE_SUCCESS*(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors());   
+					}
+					else if (roleStatistics.getNumberOfDistinctPossiblePredecessors()!=0){
+					    costMatrix[0]+=(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors())*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+					    costMatrix[1]+=POSSIBLE_INSTANCE_SUCCESS*(roleStatistics.getNumberOfPossibleInstances()/roleStatistics.getNumberOfDistinctPossiblePredecessors());
+				    } 
+					else if (roleStatistics.getNumberOfDistinctKnownPredecessors()!=0) {
+					    costMatrix[0]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors())*COST_LOOKUP; 
+					    costMatrix[1]+=(roleStatistics.getNumberOfKnownInstances()/roleStatistics.getNumberOfDistinctKnownPredecessors());
+					}
+					else {
+		                costMatrix[0]=0.0;
+		                costMatrix[1]=0.0;
+		            }
+				}
+				return costMatrix;
+				//return new double[] {cost+m_opCount*m_indCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_opCount*m_indCount};	
 			}	
 			else if (bound.contains(opVar) && !bound.contains(ind1) && !bound.contains(ind2)) {//R(?x,?y)<-?z(?x ?y)
 				double[] costMatrix={0.0,0.0};
@@ -331,45 +329,45 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
         }
 		else if (opVar!=null && ind1 instanceof Variable) {
 			if (!bound.contains(opVar) && !bound.contains(ind1)) {//?z(?x b)
-					double[] costMatrix= {0.0,0.0};
-					for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-						int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
-						 costMatrix[0]+=estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-			             costMatrix[1]+=estimate[0]+POSSIBLE_INSTANCE_SUCCESS*estimate[1];
-					}	
-	                return costMatrix;
-			}
-			else if (bound.contains(opVar) && !bound.contains(ind1)) {//R(?x b)<-?z(?x b)
-				//return new double[] {cost+m_indCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_indCount};	
 				double[] costMatrix= {0.0,0.0};
 				for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
 					int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
-					 costMatrix[0]+=(estimate[0]/(double)m_opCount)*COST_LOOKUP+(estimate[1]/(double)m_opCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-		             costMatrix[1]+=(estimate[0]/(double)m_opCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_opCount);
-				}
+					costMatrix[0]+=estimate[0]*COST_LOOKUP+estimate[1]*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+			        costMatrix[1]+=estimate[0]+POSSIBLE_INSTANCE_SUCCESS*estimate[1];
+		        }	
+	            return costMatrix;
+		    }
+		    else if (bound.contains(opVar) && !bound.contains(ind1)) {//R(?x b)<-?z(?x b)
+			    //return new double[] {cost+m_indCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_indCount};	
+			    double[] costMatrix= {0.0,0.0};
+			    for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+				    int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
+			        costMatrix[0]+=(estimate[0]/(double)m_opCount)*COST_LOOKUP+(estimate[1]/(double)m_opCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+		            costMatrix[1]+=(estimate[0]/(double)m_opCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_opCount);
+			    }
+		        return costMatrix;
+		    }
+		    else if (!bound.contains(opVar) && bound.contains(ind1)) {//?z(a b)<-?z(?y b))
+			    //return new double[] {cost+m_opCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_opCount};
+			    double[] costMatrix= {0.0,0.0};
+			    for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+				    int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
+			        costMatrix[0]+=(estimate[0]/(double)m_indCount)*COST_LOOKUP+(estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+		            costMatrix[1]+=(estimate[0]/(double)m_indCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_indCount);
+			    }
 			    return costMatrix;
-			}
-			else if (!bound.contains(opVar) && bound.contains(ind1)) {//?z(a b)<-?z(?y b))
-				//return new double[] {cost+m_opCount*COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), m_opCount};
-				double[] costMatrix= {0.0,0.0};
-				for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-					int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
-					 costMatrix[0]+=(estimate[0]/(double)m_indCount)*COST_LOOKUP+(estimate[1]/(double)m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-		             costMatrix[1]+=(estimate[0]/(double)m_indCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_indCount);
-				}
+		    }
+		    else {//R(a b)<-?z(?y b) 
+			    //return new double[] {cost+COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), 1};
+			    double[] costMatrix= {0.0,0.0};
+			    for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
+				    int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
+			        costMatrix[0]+=(estimate[0]/(double)m_opCount*m_indCount)*COST_LOOKUP+(estimate[1]/(double)m_opCount*m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
+		            costMatrix[1]+=(estimate[0]/(double)m_opCount*m_indCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_opCount*m_indCount);
+			    }
 			    return costMatrix;
-			}
-			else {//R(a b)<-?z(?y b) 
-				//return new double[] {cost+COST_ENTAILMENT*0.5*m_instanceStatistics.getClassHierarchyDepth(), 1};
-				double[] costMatrix= {0.0,0.0};
-				for (ObjectProperty prop : m_graph.getObjectPropertiesInSignature()) {
-					int[] estimate=m_instanceStatistics.getNumberOfPredecessors((OWLObjectProperty)prop.asOWLAPIObject(m_dataFactory), (OWLNamedIndividual)ind2.asOWLAPIObject(m_dataFactory));
-					 costMatrix[0]+=(estimate[0]/(double)m_opCount*m_indCount)*COST_LOOKUP+(estimate[1]/(double)m_opCount*m_indCount)*COST_ENTAILMENT*0.5*m_instanceStatistics.getObjectPropertyHierarchyDepth();
-		             costMatrix[1]+=(estimate[0]/(double)m_opCount*m_indCount)+POSSIBLE_INSTANCE_SUCCESS*(estimate[1]/(double)m_opCount*m_indCount);
-				}
-			    return costMatrix;
-			}
-		}
+	        }
+	    }
 		else if (opVar!=null && ind2 instanceof Variable) {
 			if (!bound.contains(opVar) && !bound.contains(ind2)) {//?z(a ?y)
 				double[] costMatrix= {0.0,0.0};

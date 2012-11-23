@@ -472,7 +472,7 @@ public class ToOWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> 
         for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions()) {
             pes.add((OWLDataPropertyExpression)dpe.accept(this));
         }
-        return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.getClassExpression().accept(this),pes,getAnnotations(axiom));
+        return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.getClassExpression().accept(this),(Set<? extends OWLPropertyExpression<?, ?>>) pes,getAnnotations(axiom));
     }
     
     public OWLObject visit(SameIndividual axiom) {
