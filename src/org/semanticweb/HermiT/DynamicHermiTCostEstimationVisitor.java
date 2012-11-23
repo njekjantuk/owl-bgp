@@ -156,8 +156,7 @@ public class DynamicHermiTCostEstimationVisitor extends DynamicCostEstimationVis
             }
             return costMatrix;
         }
-    }
-    
+    }    
     protected double[] getSameIndividualCost(Individual ind1, Individual ind2, Set<Variable> unbound) {
         double cost=0;
     	if (unbound.size()==0){ //SameIndividual(:a :b)

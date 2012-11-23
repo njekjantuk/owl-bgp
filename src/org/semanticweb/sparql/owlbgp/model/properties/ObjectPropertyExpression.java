@@ -19,10 +19,9 @@
 
 package  org.semanticweb.sparql.owlbgp.model.properties;
 
-import org.semanticweb.sparql.owlbgp.model.ClassExpressionVisitor;
-
+import org.semanticweb.sparql.owlbgp.model.ClassAndPropertyExpressionVisitorEx;
 
 public interface ObjectPropertyExpression extends PropertyExpression {
     public ObjectPropertyExpression getNormalized();
-    public void accept(ClassExpressionVisitor visitor);
+    public <O> O accept(ClassAndPropertyExpressionVisitorEx<O> visitor);
 }

@@ -24,7 +24,8 @@ import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
-import org.semanticweb.sparql.owlbgp.model.ClassExpressionVisitor;
+import org.semanticweb.sparql.owlbgp.model.ClassAndPropertyExpressionVisitor;
+import org.semanticweb.sparql.owlbgp.model.ClassAndPropertyExpressionVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObject;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitor;
 import org.semanticweb.sparql.owlbgp.model.ExtendedOWLObjectVisitorEx;
@@ -62,8 +63,11 @@ public class ClassVariable extends Variable implements ClassExpression {
     public void accept(ExtendedOWLObjectVisitor visitor) {
         visitor.visit(this);
     }
-    public void accept(ClassExpressionVisitor visitor) {
+    public void accept(ClassAndPropertyExpressionVisitor visitor) {
         visitor.visit(this);
+    }
+    public <O> O accept(ClassAndPropertyExpressionVisitorEx<O> visitor) {
+        return visitor.visit(this);
     }
     @Override
     protected OWLObject convertToOWLAPIObject(ToOWLAPIConverter converter) {

@@ -34,7 +34,7 @@ import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
-import org.semanticweb.sparql.owlbgp.model.ClassExpressionVisitor;
+import org.semanticweb.sparql.owlbgp.model.ClassAndPropertyExpressionVisitorEx;
 import org.semanticweb.sparql.owlbgp.model.FromOWLAPIConverter;
 import org.semanticweb.sparql.owlbgp.model.Variable;
 import org.semanticweb.sparql.owlbgp.model.axioms.SubClassOf;
@@ -55,8 +55,6 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
-
-	//private Object rb;
 
 	public QO_SubClassOf(SubClassOf axiomTemplate, OWLOntologyGraph graph) {
         super(axiomTemplate, graph);
@@ -84,10 +82,10 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                 positions[0]=bindingPositions.get(subClass);
                 positions[1]=bindingPositions.get(superClass);
                 return computeAllSubClassOfRelations(currentBinding,positions);
-            } else if (subClass.isVariable() && !superClass.isVariable() && superClass instanceof Clazz/*superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()*/) {
+            } else if (subClass.isVariable() && !superClass.isVariable() && /*superClass instanceof Clazz*/superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
                 int position=bindingPositions.get(subClass);
                 return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (superClass.isVariable() && !subClass.isVariable() && subClass instanceof Clazz/*subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()*/) {
+            } else if (superClass.isVariable() && !subClass.isVariable() && /*subClass instanceof Clazz*/subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
                 int position=bindingPositions.get(superClass);
                 return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
             } else if (subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty() && superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty())
@@ -174,8 +172,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
     }
     
     protected List<Atomic[]> complex(Atomic[] currentBinding, SubClassOf axiom, Map<Variable,Integer> bindingPositions) {
-    	
-    	ClassExpression subClass=axiom.getSubClassExpression();
+       	ClassExpression subClass=axiom.getSubClassExpression();
     	ClassExpression superClass=axiom.getSuperClassExpression();
     	Set<Variable> subClassVars=subClass.getVariablesInSignature();
     	List<Atomic[]> results=new ArrayList<Atomic[]>();
@@ -188,18 +185,16 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             Atomic[] clonedBinding;
             for (Atomic[] binding:newBindingsOut) {
             	if (var instanceof ClassVariable) {
-            	    boolean polarity;
+            	    Integer polarity;
             		if (subClassVars.contains(var)){
             			NegativePolarityClassVisitor clsVisitor=new NegativePolarityClassVisitor(var);
-            		    subClass.accept(clsVisitor);
-            		    polarity=clsVisitor.getVarPolarity();
+            		    polarity=subClass.accept(clsVisitor);
             		}    
             		else {
                 	    PositivePolarityClassVisitor clsVisitor=new PositivePolarityClassVisitor(var);
-                	    superClass.accept(clsVisitor);
-                		polarity=clsVisitor.getVarPolarity();    
+                	    polarity=superClass.accept(clsVisitor);    
             		}    
-            		if (polarity==Boolean.TRUE){
+            		if (polarity==1){
             		    //OWLClass top = m_reasoner.getTopClassNode().getRepresentativeElement();
             		    //Set<OWLClass> classSet = m_reasoner.getSubClasses(top, true).getFlattened();
                         //Iterator<OWLClass> itr = classSet.iterator();
@@ -214,7 +209,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                         clonedBinding[bindingPositions.get(var)]=Clazz.create(top.toString());                       
                         testedBindings.add(clonedBinding);
             		}
-            		else {
+            		else if (polarity==2){
             		    //OWLClass bottom = m_reasoner.getBottomClassNode().getRepresentativeElement();
             		    //Set<OWLClass> classSet = m_reasoner.getSuperClasses(bottom, true).getFlattened();
                         //Iterator<OWLClass> itr = classSet.iterator(); 
@@ -230,19 +225,16 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             		}
             	}
             	else if (var instanceof ObjectPropertyVariable) {
-            		boolean polarity;
+            		Integer polarity;
             		if (subClassVars.contains(var)){
-            			NegativePolarityPropertyVisitor clsVisitor=new NegativePolarityPropertyVisitor(var);
-            		    subClass.accept(clsVisitor);
-            		    polarity=clsVisitor.getVarPolarity();
+            			NegativePolarityPropertyVisitor propVisitor=new NegativePolarityPropertyVisitor(var);
+            		    polarity=subClass.accept(propVisitor);
             		}    
             		else {
-                	    PositivePolarityPropertyVisitor clsVisitor=new PositivePolarityPropertyVisitor(var);
-                	    superClass.accept(clsVisitor);
-                		polarity=clsVisitor.getVarPolarity();    
-            		}
-            		
-            		if (polarity==Boolean.TRUE){
+                	    PositivePolarityPropertyVisitor propVisitor=new PositivePolarityPropertyVisitor(var);
+                	    polarity=superClass.accept(propVisitor);    
+            		}            		
+            		if (polarity==1){
             		    //OWLObjectPropertyExpression top = m_reasoner.getTopObjectPropertyNode().getRepresentativeElement();
             		    //Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSubObjectProperties(top, true).getFlattened();
             		    //for (OWLObjectPropertyExpression propexpr:propertySet) {
@@ -256,7 +248,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                         clonedBinding[bindingPositions.get(var)]=ObjectProperty.TOP_OBJECT_PROPERTY;
                         testedBindings.add(clonedBinding);
                     }
-            		else {
+            		else if (polarity==2){
             		    //OWLObjectPropertyExpression bottom = m_reasoner.getBottomObjectPropertyNode().getRepresentativeElement();
             		    //Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSuperObjectProperties(bottom, true).getFlattened();
                         //for (OWLObjectPropertyExpression propexpr:propertySet) {
@@ -321,15 +313,6 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         Atomic[] clonedBinding;
     	List<Atomic[]> returnBindings=new ArrayList<Atomic[]>();
     	//int entNo=0;
-    	///FileWriter fstream=null;
-        //try {
-        //    fstream = new FileWriter("output.txt");
-        //} catch (IOException e) {
-        //    System.err.println("Error: Cannot create file output.txt");
-        //    e.printStackTrace();
-        //}
-        //BufferedWriter out = new BufferedWriter(fstream);
-    	
     	List<Atomic[]> notEntailedList=new ArrayList<Atomic[]>();
         while (!bindingList.isEmpty()) {
     		Atomic[] currentBinding=bindingList.remove(0);
@@ -340,44 +323,32 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
     		List<Variable> vars=new ArrayList<Variable>(axiom.getVariablesInSignature());
             ClassExpression subClass=axiom.getSubClassExpression();
             ClassExpression superClass=axiom.getSuperClassExpression();
-    		//try {
-			//	out.newLine();
-			//	out.write(axiom.getBoundVersion(bindingMap, m_dataFactory).toString());
-			//} catch (IOException e) {
-			//	// TODO Auto-generated catch block
-			//	e.printStackTrace();
-			//}
-    		//System.out.println(axiom.getBoundVersion(bindingMap, m_dataFactory).toString());
-    		//if (!results.contains(currentBinding)){
-            if (!isInNotEntailedList(currentBinding, notEntailedList, bindingPositions, vars, axiom) && !isInList(currentBinding, results, bindingPositions, vars)) {
-    		//	entNo++;
-    	    if (m_reasoner.isEntailed((OWLAxiom) axiom.getBoundVersion(bindingMap, m_dataFactory))) {
-    			results.add(currentBinding);
-    	    	List<Atomic[]> testedBindings=new ArrayList<Atomic[]>();
-    	    	Atomic[] binding=currentBinding;
-    	    	for (Variable var : vars) {
-    	    		testedBindings=new ArrayList<Atomic[]>();
+            if (!isInNotEntailedList(currentBinding, notEntailedList, bindingPositions, vars/*, axiom*/) && !isInList(currentBinding, results, bindingPositions, vars)) {
+    		    //	entNo++;
+    	        if (m_reasoner.isEntailed((OWLAxiom) axiom.getBoundVersion(bindingMap, m_dataFactory))) {
+    			    results.add(currentBinding);
+    	    	    List<Atomic[]> testedBindings=new ArrayList<Atomic[]>();
+    	    	    Atomic[] binding=currentBinding;
+    	    	    for (Variable var : vars) {
+    	    		    testedBindings=new ArrayList<Atomic[]>();
     	    			if (var instanceof ClassVariable) {
     	    				OWLClass equivClass=(OWLClass)bindingMap.get(var).asOWLAPIObject(m_toOWLAPIConverter);
-                			for (OWLClass cls:m_reasoner.getEquivalentClasses(equivClass).getEntities()){
+                		   	for (OWLClass cls:m_reasoner.getEquivalentClasses(equivClass).getEntities()){
                 				clonedBinding=binding.clone();
                                 clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(cls);
                                 if (!isInList(clonedBinding, results, bindingPositions, vars))
                                     results.add(clonedBinding);
                 			}	
-    	    				boolean polarity;
+    	    				Integer polarity;
                 			if (subClass.getVariablesInSignature().contains(var)){
-                    			NegativePolarityPropertyVisitor clsVisitor=new NegativePolarityPropertyVisitor(var);
-                    		    subClass.accept(clsVisitor);
-                    		    polarity=clsVisitor.getVarPolarity();
+                    			NegativePolarityClassVisitor clsVisitor=new NegativePolarityClassVisitor(var);
+                    		    polarity=subClass.accept(clsVisitor);
                     		}    
                     		else {
                         	    PositivePolarityClassVisitor clsVisitor=new PositivePolarityClassVisitor(var);
-                        	    superClass.accept(clsVisitor);
-                        		polarity=clsVisitor.getVarPolarity();    
+                        	    polarity=superClass.accept(clsVisitor);  
                     		}    
-                			
-                            if (polarity==Boolean.TRUE){
+                            if (polarity==1){
             		            OWLClass currentClass = (OWLClass)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLClass> classSet = m_reasoner.getSubClasses(currentClass, true).getFlattened();
                                 Iterator<OWLClass> itr = classSet.iterator();
@@ -388,7 +359,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                                     testedBindings.add(clonedBinding);
                                 } 
             		        }
-            		        else {
+            		        else if (polarity==2){
             		            OWLClass currentClass = (OWLClass)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory);
             		            Set<OWLClass> classSet = m_reasoner.getSuperClasses(currentClass, true).getFlattened();
                                 Iterator<OWLClass> itr = classSet.iterator(); 
@@ -410,38 +381,27 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                                         results.add(clonedBinding);
                 				}
                 			}	
-    	    				boolean polarity;
+    	    				Integer polarity;
                 			if (subClass.getVariablesInSignature().contains(var)){
-                    			NegativePolarityPropertyVisitor clsVisitor=new NegativePolarityPropertyVisitor(var);
-                    		    subClass.accept(clsVisitor);
-                    		    polarity=clsVisitor.getVarPolarity();
+                    			NegativePolarityPropertyVisitor propVisitor=new NegativePolarityPropertyVisitor(var);
+                    		    polarity=subClass.accept(propVisitor);
                     		}    
                     		else {
-                        	    PositivePolarityPropertyVisitor clsVisitor=new PositivePolarityPropertyVisitor(var);
-                        	    superClass.accept(clsVisitor);
-                        		polarity=clsVisitor.getVarPolarity();    
+                        	    PositivePolarityPropertyVisitor propVisitor=new PositivePolarityPropertyVisitor(var);
+                        	    polarity=superClass.accept(propVisitor);
                     		}    
-                			
-                            if (polarity==Boolean.TRUE){
+                            if (polarity==1){
             		            OWLObjectProperty currentProperty = (OWLObjectProperty)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSubObjectProperties(currentProperty, true).getFlattened();
-                                
             		            for (OWLObjectPropertyExpression propexpr:propertySet) {
                                     if (propexpr instanceof OWLObjectProperty) {
                                      	clonedBinding=binding.clone();
                                         clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
                                         testedBindings.add(clonedBinding);  
                                     } 
-                                    //else {
-                                    //	OWLObjectInverseOf invProperty=(OWLObjectInverseOf)propexpr;
-                                    //	OWLObjectProperty prop=invProperty.getNamedProperty();
-                                    //	clonedBinding=binding.clone();
-                                    //  clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert(prop);
-                                    //  testedBindings.add(clonedBinding);
-                                    //}
                                 }    
             		        }
-            		        else {
+            		        else if (polarity==2){
             		        	OWLObjectProperty currentProperty = (OWLObjectProperty)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSuperObjectProperties(currentProperty, true).getFlattened();
                                 for (OWLObjectPropertyExpression propexpr:propertySet) {
@@ -450,34 +410,22 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                                         clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
                                         testedBindings.add(clonedBinding);    
                                     }
-                                    //else {
-                                    //	OWLObjectInverseOf invProperty=(OWLObjectInverseOf)propexpr;
-                                    //	OWLObjectProperty prop=invProperty.getNamedProperty();
-                                    //	clonedBinding=binding.clone();
-                                   //   clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert(prop);
-                                   //   testedBindings.add(clonedBinding);
-                                    //}
                                 }  
                             }
     	    			}
-    		       returnBindings.addAll(testedBindings);   
+    		            returnBindings.addAll(testedBindings);   
+    	            }        
+    	            testedBindings=new ArrayList<Atomic[]>();    	        
+    	            bindingList.addAll(returnBindings);
+               }               	
+    	       else {
+    	  	       notEntailedList.add(currentBinding);
     	       }
-    	       testedBindings=new ArrayList<Atomic[]>();    	        
-    	       bindingList.addAll(returnBindings);
-           }           	
-    	   else {
-    	  	   notEntailedList.add(currentBinding);
-    	   }}
+           }   
        }
-        //try {
-		//	out.close();
-		//} catch (IOException e) {
-		//	// TODO Auto-generated catch block
-		//	e.printStackTrace();
-		//}
        //System.out.println("EntailmentChecksNo=  "+entNo);
        return results; 
-    } 
+    }
     
     public boolean isInList(Atomic[] binding, List<Atomic[]> list, Map<Variable,Integer> bindingPositions, List<Variable> vars) {
        	for (int i=0; i<list.size(); i++) {
@@ -488,7 +436,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
     	return false;
     }
     
-    public boolean isInNotEntailedList(Atomic[] binding, List<Atomic[]> list, Map<Variable,Integer> bindingPositions, List<Variable> vars, SubClassOf axiom) {
+    public boolean isInNotEntailedList(Atomic[] binding, List<Atomic[]> list, Map<Variable,Integer> bindingPositions, List<Variable> vars/*, SubClassOf axiom*/) {
        	for (int i=0; i<list.size(); i++) {
     		Atomic[] bind=list.get(i);
     		if (isTheSameAssignment(bind, binding, bindingPositions))
@@ -596,379 +544,597 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
 	    return visitor.visit(this, bound); 
 	}
 	
-	protected class PositivePolarityClassVisitor implements ClassExpressionVisitor {
+	//polarities: notDefined=0; positive=1; negative=2, both=3
+	protected class PositivePolarityClassVisitor implements ClassAndPropertyExpressionVisitorEx<Integer> {
 
 		protected Variable var;
-		protected boolean varPolarity;
 		
 		public PositivePolarityClassVisitor(Variable queryVar) {
 			var=queryVar;
 		}
-		public Boolean getVarPolarity() {
-			return varPolarity;
-		}
-		
-		public void visit(ClassVariable object) {
+		public Integer visit(ClassVariable object) {
 			if (var.getVariable().equals(object.getVariable()))
-					varPolarity=Boolean.TRUE;
+					return 1;
+			else return 0;
 		}		
-		public void visit(Clazz object) {
-			
+		public Integer visit(Clazz object) {
+			return 0;
         }
-        public void visit(ObjectIntersectionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectIntersectionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            }
+            if (pos!=0 && neg!=0)
+            	return 3; 
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectUnionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectUnionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            	else ;
+            }
+            if (pos!=0 && neg!=0) {
+            	return 3; 
+            }
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectComplementOf object) {
+        public Integer visit(ObjectComplementOf object) {
         	ClassExpression expr=object.getComplementedClassExpression();
             NegativePolarityClassVisitor npv=new NegativePolarityClassVisitor(var);
-        	expr.accept(npv);
+        	return expr.accept(npv);
         }
-        public void visit(ObjectOneOf object) {
-            
+        public Integer visit(ObjectOneOf object) {
+            return 0;
         }
-        public void visit(ObjectSomeValuesFrom object) {
-        	object.getClassExpression().accept(this);
+        public Integer visit(ObjectSomeValuesFrom object) {
+        	return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectAllValuesFrom object) {
-        	object.getClassExpression().accept(this);
+        public Integer visit(ObjectAllValuesFrom object) {
+        	return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectHasValue object) {
-            
+        public Integer visit(ObjectHasValue object) {
+            return 0;
         }
-        public void visit(ObjectHasSelf object) {
-            
+        public Integer visit(ObjectHasSelf object) {
+            return 0;
         }
-        public void visit(ObjectMinCardinality object) {
-            object.getClassExpression().accept(this);
+        public Integer visit(ObjectMinCardinality object) {
+            return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectMaxCardinality object) {
+        public Integer visit(ObjectMaxCardinality object) {
         	ClassExpression expr=object.getClassExpression();
         	NegativePolarityClassVisitor npv=new NegativePolarityClassVisitor(var);
-         	expr.accept(npv);
+         	return expr.accept(npv);
         }
-        public void visit(ObjectExactCardinality object) {
-        	ClassExpression expr=object.getClassExpression();
-        	NegativePolarityClassVisitor npv=new NegativePolarityClassVisitor(var);
-         	expr.accept(npv);
+        public Integer visit(ObjectExactCardinality object) {
+        	ClassExpression clsexpr=object.getClassExpression();
+        	if (clsexpr.getVariablesInSignature().contains(var.getVariable()))
+        		return 3;
+        	else return 0;
         }
-        public void visit(DataSomeValuesFrom desc) {
-            
+        public Integer visit(DataSomeValuesFrom desc) {
+            return 0;    
         }
-        public void visit(DataAllValuesFrom desc) {
-           
+        public Integer visit(DataAllValuesFrom desc) {
+           return 0;
         }
-        public void visit(DataHasValue desc) {
-            
+        public Integer visit(DataHasValue desc) {
+            return 0;
         }
-        public void visit(DataMinCardinality desc) {
-            
+        public Integer visit(DataMinCardinality desc) {
+            return 0;
         }
-        public void visit(DataMaxCardinality desc) {
-            
+        public Integer visit(DataMaxCardinality desc) {
+            return 0;
         }
-        public void visit(DataExactCardinality desc) {
-            
+        public Integer visit(DataExactCardinality desc) {
+            return 0;
         }
-		public void visit(ObjectProperty objectProperty) {
-	
+		public Integer visit(ObjectProperty objectProperty) {
+	        return 0;
 		}
-		public void visit(ObjectInverseOf objectproperty) {
-			
+		public Integer visit(ObjectInverseOf objectproperty) {
+			return 0;
 		}
-		public void visit(ObjectPropertyChain objectProperty) {
-			
+		public Integer visit(ObjectPropertyChain objectProperty) {
+			return 0;
 		}
-		public void visit(ObjectPropertyVariable objectPropertyVariable) {
-		
+		public Integer visit(ObjectPropertyVariable objectPropertyVariable) {
+		    return 0;
 		}
     }
 	
-	protected class NegativePolarityClassVisitor implements ClassExpressionVisitor {
+	protected class NegativePolarityClassVisitor implements ClassAndPropertyExpressionVisitorEx<Integer> {
 		protected Variable var;
-		protected boolean varPolarity;
 		
 		public NegativePolarityClassVisitor(Variable queryVar) {
 			var=queryVar;
 		}
-		public Boolean getVarPolarity() {
-			return varPolarity;
-		}
-		
-		public void visit(ClassVariable object) {
+		public Integer visit(ClassVariable object) {
 			if (var.getVariable().equals(object.getVariable()))
-					varPolarity=Boolean.FALSE;
+					return 2;
+			else return 0;
 		}		
-		public void visit(Clazz object) {
-			
+		public Integer visit(Clazz object) {
+			return 0;
         }
-        public void visit(ObjectIntersectionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectIntersectionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            }
+            if (pos!=0 && neg!=0) 
+            	return 3; 
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectUnionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectUnionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            	else ;
+            }
+            if (pos!=0 && neg!=0) {
+            	return 3; 
+            }
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectComplementOf object) {
+        public Integer visit(ObjectComplementOf object) {
         	ClassExpression expr=object.getComplementedClassExpression();
             PositivePolarityClassVisitor npv=new PositivePolarityClassVisitor(var);
-        	expr.accept(npv);
+        	return expr.accept(npv);
         }
-        public void visit(ObjectOneOf object) {
-            
+        public Integer visit(ObjectOneOf object) {
+            return 0;
         }
-        public void visit(ObjectSomeValuesFrom object) {
-        	object.getClassExpression().accept(this);
+        public Integer visit(ObjectSomeValuesFrom object) {
+        	return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectAllValuesFrom object) {
-        	object.getClassExpression().accept(this);
+        public Integer visit(ObjectAllValuesFrom object) {
+        	return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectHasValue object) {
-            
+        public Integer visit(ObjectHasValue object) {
+            return 0;
         }
-        public void visit(ObjectHasSelf object) {
-            
+        public Integer visit(ObjectHasSelf object) {
+            return 0;
         }
-        public void visit(ObjectMinCardinality object) {
-            object.getClassExpression().accept(this);
+        public Integer visit(ObjectMinCardinality object) {
+            return object.getClassExpression().accept(this);
         }
-        public void visit(ObjectMaxCardinality object) {
+        public Integer visit(ObjectMaxCardinality object) {
         	ClassExpression expr=object.getClassExpression();
         	PositivePolarityClassVisitor npv=new PositivePolarityClassVisitor(var);
-         	expr.accept(npv);
+         	return expr.accept(npv);
         }
-        public void visit(ObjectExactCardinality object) {
-        	ClassExpression expr=object.getClassExpression();
-        	PositivePolarityClassVisitor npv=new PositivePolarityClassVisitor(var);
-         	expr.accept(npv);
+        public Integer visit(ObjectExactCardinality object) {
+        	ClassExpression clsexpr=object.getClassExpression();
+        	if (clsexpr.getVariablesInSignature().contains(var.getVariable()))
+        		return 3;
+        	else return 0;
         }
-        public void visit(DataSomeValuesFrom desc) {
-            
+        public Integer visit(DataSomeValuesFrom desc) {
+            return 0;
         }
-        public void visit(DataAllValuesFrom desc) {
-           
+        public Integer visit(DataAllValuesFrom desc) {
+           return 0;
         }
-        public void visit(DataHasValue desc) {
-            
+        public Integer visit(DataHasValue desc) {
+            return 0;
         }
-        public void visit(DataMinCardinality desc) {
-            
+        public Integer visit(DataMinCardinality desc) {
+            return 0;
         }
-        public void visit(DataMaxCardinality desc) {
-            
+        public Integer visit(DataMaxCardinality desc) {
+            return 0;
         }
-        public void visit(DataExactCardinality desc) {
-            
+        public Integer visit(DataExactCardinality desc) {
+            return 0;
         }
-		public void visit(ObjectProperty objectProperty) {
-			
+		public Integer visit(ObjectProperty objectProperty) {
+			return 0;
 		}
-		public void visit(ObjectInverseOf objectproperty) {
-			
+		public Integer visit(ObjectInverseOf objectproperty) {
+			return 0;
 		}
-		public void visit(ObjectPropertyChain objectProperty) {
-	
+		public Integer visit(ObjectPropertyChain objectProperty) {
+	        return 0;    
 		}
-		public void visit(ObjectPropertyVariable objectPropertyVariable) {
-			
+		public Integer visit(ObjectPropertyVariable objectPropertyVariable) {
+			return 0;
 		}
 	}
 	
-	protected class PositivePolarityPropertyVisitor implements ClassExpressionVisitor {
+	protected class PositivePolarityPropertyVisitor implements ClassAndPropertyExpressionVisitorEx<Integer> {
 
 		protected Variable var;
-		protected boolean varPolarity;
 		
 		public PositivePolarityPropertyVisitor(Variable queryVar) {
 			var=queryVar;
 		}
-		public Boolean getVarPolarity() {
-			return varPolarity;
-		}
-		public void visit(ObjectProperty object) {
-			
+		public Integer visit(ObjectProperty object) {
+			return 0;
 		} 
-        public void visit(ObjectInverseOf object) {
-			object.getInvertedObjectProperty().accept(this);
+        public Integer visit(ObjectInverseOf object) {
+			return object.getInvertedObjectProperty().accept(this);
 		}
-        public void visit(ObjectPropertyChain object) {
-        	
+        public Integer visit(ObjectPropertyChain object) {
+        	return 0;
 		}
-		public void visit(ObjectPropertyVariable object) {
+		public Integer visit(ObjectPropertyVariable object) {
 			if (var.getVariable().equals(object.getVariable()))
-				varPolarity=Boolean.TRUE;
+				return 1;
+			else return 0;
 		}
-		public void visit(ClassVariable object) {
-			
+		public Integer visit(ClassVariable object) {
+			return 0;
 		}		
-		public void visit(Clazz object) {
-			
+		public Integer visit(Clazz object) {
+		    return 0;	
         }
-        public void visit(ObjectIntersectionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectIntersectionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            	else ;
+            }
+            if (pos!=0 && neg!=0) 
+            	return 3; 
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectUnionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectUnionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            	else ;
+            }
+            if (pos!=0 && neg!=0) 
+            	return 3;  
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectComplementOf object) {
+        public Integer visit(ObjectComplementOf object) {
         	ClassExpression expr=object.getComplementedClassExpression();
             NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
-        	expr.accept(npv);
+        	return expr.accept(npv);
         }
-        public void visit(ObjectOneOf object) {
-            
+        public Integer visit(ObjectOneOf object) {
+            return 0;
         }
-        public void visit(ObjectSomeValuesFrom object) {
-        	object.getClassExpression().accept(this);
-        	object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectSomeValuesFrom object) {
+        	int polcl=object.getClassExpression().accept(this);
+        	int polprop=object.getObjectPropertyExpression().accept(this);
+        	if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;		
         }
-        public void visit(ObjectAllValuesFrom object) {
-        	object.getClassExpression().accept(this);
+        public Integer visit(ObjectAllValuesFrom object) {
+        	int polcl=object.getClassExpression().accept(this);
         	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
-        	object.getObjectPropertyExpression().accept(npv1);
+        	int polprop=object.getObjectPropertyExpression().accept(npv1);
+        	if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;
         }
-        public void visit(ObjectHasValue object) {
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectHasValue object) {
+            return 0;
         }
-        public void visit(ObjectHasSelf object) {
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectHasSelf object) {
+            return 0;
         }
-        public void visit(ObjectMinCardinality object) {
-            object.getClassExpression().accept(this);
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectMinCardinality object) {
+            int polcl=object.getClassExpression().accept(this);
+            int polprop=object.getObjectPropertyExpression().accept(this);
+            if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;
         }
-        public void visit(ObjectMaxCardinality object) {
+        public Integer visit(ObjectMaxCardinality object) {
         	NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
-            object.getClassExpression().accept(npv);
+            int polcl=object.getClassExpression().accept(npv);
         	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
-         	object.getObjectPropertyExpression().accept(npv1);
+         	int polprop=object.getObjectPropertyExpression().accept(npv1);
+         	if (polprop==2 && (polcl==0 || polcl==2))
+        	   	return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 2;
+        	else if (polprop==0 && polcl==2)
+        		return 1;
+        	else return 0;
         }
-        public void visit(ObjectExactCardinality object) {
-        	NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
-            object.getClassExpression().accept(npv);
-        	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
-         	object.getObjectPropertyExpression().accept(npv1);
+        public Integer visit(ObjectExactCardinality object) {
+         	if (object.getClassExpression().getVariablesInSignature().contains(var.getVariable()) || object.getObjectPropertyExpression().getVariablesInSignature().contains(var.getVariable()))
+        		return 3;
+        	else return 0;
         }
-        public void visit(DataSomeValuesFrom desc) {
-            
+        public Integer visit(DataSomeValuesFrom desc) {
+            return 0;
         }
-        public void visit(DataAllValuesFrom desc) {
-           
+        public Integer visit(DataAllValuesFrom desc) {
+           return 0;
         }
-        public void visit(DataHasValue desc) {
-            
+        public Integer visit(DataHasValue desc) {
+            return 0;
         }
-        public void visit(DataMinCardinality desc) {
-            
+        public Integer visit(DataMinCardinality desc) {
+            return 0;
         }
-        public void visit(DataMaxCardinality desc) {
-            
+        public Integer visit(DataMaxCardinality desc) {
+            return 0;
         }
-        public void visit(DataExactCardinality desc) {
-            
+        public Integer visit(DataExactCardinality desc) {
+            return 0;
         }
     }
 	
-	protected class NegativePolarityPropertyVisitor implements ClassExpressionVisitor {
+	protected class NegativePolarityPropertyVisitor implements ClassAndPropertyExpressionVisitorEx<Integer> {
 		protected Variable var;
-		protected boolean varPolarity;
 		
 		public NegativePolarityPropertyVisitor(Variable queryVar) {
 			var=queryVar;
 		}
-		public Boolean getVarPolarity() {
-			return varPolarity;
-		}
-		public void visit(ObjectProperty object) {
-			
+		public Integer visit(ObjectProperty object) {
+			return 0;
 		} 
-        public void visit(ObjectInverseOf object) {
-			object.getInvertedObjectProperty().accept(this);
+        public Integer visit(ObjectInverseOf object) {
+			return object.getInvertedObjectProperty().accept(this);
 		}
-        public void visit(ObjectPropertyChain object) {
-        	
+        public Integer visit(ObjectPropertyChain object) {
+        	return 0;
 		}
-		public void visit(ObjectPropertyVariable object) {
+		public Integer visit(ObjectPropertyVariable object) {
 			if (var.getVariable().equals(object.getVariable()))
-				varPolarity=Boolean.FALSE;
+				return 2;
+			else return 0;
 		}
-		public void visit(ClassVariable object) {
-			
+		public Integer visit(ClassVariable object) {
+			return 0;
 		}		
-		public void visit(Clazz object) {
-			
+		public Integer visit(Clazz object) {
+			return 0;
         }
-        public void visit(ObjectIntersectionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectIntersectionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            }
+            if (pos!=0 && neg!=0) 
+            	return 3; 
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectUnionOf object) {
-            for (ClassExpression desc : object.getClassExpressions())
-                desc.accept(this);
+        public Integer visit(ObjectUnionOf object) {
+        	int i=0;
+        	int clsexprsize=object.getClassExpressions().size();
+            int polarity[]=new int[clsexprsize];
+            for (ClassExpression desc : object.getClassExpressions()) {
+                polarity[i]=desc.accept(this);
+                i++;
+            }
+            int pos=0, neg=0;
+            for (int k=0;k<clsexprsize;k++) {
+            	if (polarity[k]==1)
+            	    pos++;
+            	else if (polarity[k]==2)
+            	    neg++;
+            	else ;
+            }
+            if (pos!=0 && neg!=0) 
+            	return 3; 
+            else if (pos!=0)
+            	return 1;
+            else if (neg!=0)
+            	return 2;
+            else return 0;
         }
-        public void visit(ObjectComplementOf object) {
+        public Integer visit(ObjectComplementOf object) {
         	ClassExpression expr=object.getComplementedClassExpression();
             PositivePolarityPropertyVisitor npv=new PositivePolarityPropertyVisitor(var);
-        	expr.accept(npv);
+        	return expr.accept(npv);
         }
-        public void visit(ObjectOneOf object) {
-            
+        public Integer visit(ObjectOneOf object) {
+            return 0;
         }
-        public void visit(ObjectSomeValuesFrom object) {
-        	object.getClassExpression().accept(this);
-        	object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectSomeValuesFrom object) {
+        	int polcl=object.getClassExpression().accept(this);
+        	int polprop=object.getObjectPropertyExpression().accept(this);
+        	if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;		
         }
-        public void visit(ObjectAllValuesFrom object) {
-        	object.getClassExpression().accept(this);
-        	PositivePolarityPropertyVisitor npv1=new PositivePolarityPropertyVisitor(var);
-        	object.getObjectPropertyExpression().accept(npv1);
+        public Integer visit(ObjectAllValuesFrom object) {
+        	int polcl=object.getClassExpression().accept(this);
+        	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
+        	int polprop=object.getObjectPropertyExpression().accept(npv1);
+        	if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;
         }
-        public void visit(ObjectHasValue object) {
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectHasValue object) {
+            return 0;
         }
-        public void visit(ObjectHasSelf object) {
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectHasSelf object) {
+            return 0;
         }
-        public void visit(ObjectMinCardinality object) {
-            object.getClassExpression().accept(this);
-            object.getObjectPropertyExpression().accept(this);
+        public Integer visit(ObjectMinCardinality object) {
+            int polcl=object.getClassExpression().accept(this);
+            int polprop=object.getObjectPropertyExpression().accept(this);
+            if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else return 0;
         }
-        public void visit(ObjectMaxCardinality object) {
-        	PositivePolarityPropertyVisitor npv=new PositivePolarityPropertyVisitor(var);
-            object.getClassExpression().accept(npv);
-        	PositivePolarityPropertyVisitor npv1=new PositivePolarityPropertyVisitor(var);
-         	object.getObjectPropertyExpression().accept(npv1);
+        public Integer visit(ObjectMaxCardinality object) {
+        	NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
+            int polcl=object.getClassExpression().accept(npv);
+        	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
+         	int polprop=object.getObjectPropertyExpression().accept(npv1);
+         	if (polprop==2 && (polcl==0 || polcl==2))
+        	   	return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==0 && polcl==1)
+        		return 2;
+        	else if (polprop==0 && polcl==2)
+        		return 1;
+        	else return 0;
         }
-        public void visit(ObjectExactCardinality object) {
-        	PositivePolarityPropertyVisitor npv=new PositivePolarityPropertyVisitor(var);
-            object.getClassExpression().accept(npv);
-        	PositivePolarityPropertyVisitor npv1=new PositivePolarityPropertyVisitor(var);
-         	object.getObjectPropertyExpression().accept(npv1);
+        public Integer visit(ObjectExactCardinality object) {
+        	if (object.getClassExpression().getVariablesInSignature().contains(var.getVariable()) || object.getObjectPropertyExpression().getVariablesInSignature().contains(var.getVariable()))
+        		return 3;
+        	else return 0;
         }
-        public void visit(DataSomeValuesFrom desc) {
-            
+        public Integer visit(DataSomeValuesFrom desc) {
+            return 0;
         }
-        public void visit(DataAllValuesFrom desc) {
-           
+        public Integer visit(DataAllValuesFrom desc) {
+           return 0;
         }
-        public void visit(DataHasValue desc) {
-            
+        public Integer visit(DataHasValue desc) {
+            return 0;
         }
-        public void visit(DataMinCardinality desc) {
-            
+        public Integer visit(DataMinCardinality desc) {
+            return 0;
         }
-        public void visit(DataMaxCardinality desc) {
-            
+        public Integer visit(DataMaxCardinality desc) {
+            return 0;
         }
-        public void visit(DataExactCardinality desc) {
-            
+        public Integer visit(DataExactCardinality desc) {
+            return 0;
         }
 	}
 	

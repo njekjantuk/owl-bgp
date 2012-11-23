@@ -24,30 +24,30 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
-public interface ClassExpressionVisitor {
+public interface ClassAndPropertyExpressionVisitorEx<O> {
 
-	void visit(Clazz clazz);
-    void visit(ClassVariable classVariable);
-    void visit(ObjectProperty objectProperty);
-    void visit(ObjectInverseOf objectproperty);
-    void visit(ObjectPropertyChain objectProperty);
-    void visit(ObjectPropertyVariable objectPropertyVariable);
-    void visit(ObjectIntersectionOf objectIntersectionOf);
-    void visit(ObjectUnionOf objectUnionOf);
-    void visit(ObjectComplementOf objectComplementOf);
-    void visit(ObjectSomeValuesFrom objectSomeValuesFrom);
-    void visit(ObjectAllValuesFrom objectAllValuesFrom);
-    void visit(ObjectHasValue objectHasValue);
-    void visit(ObjectMinCardinality objectMinCardinality);
-    void visit(ObjectExactCardinality objectExactCardinality);
-    void visit(ObjectMaxCardinality objectMaxCardinality);
-    void visit(ObjectHasSelf objectHasSelf);
-    void visit(ObjectOneOf objectOneOf);
-    void visit(DataSomeValuesFrom dataSomeValuesFrom);
-    void visit(DataAllValuesFrom dataAllValuesFrom);
-    void visit(DataHasValue dataHasValue);
-    void visit(DataMinCardinality dataMinCardinality );
-    void visit(DataExactCardinality dataExactCardinality);
-    void visit(DataMaxCardinality dataMaxCardinality);
+	O visit(Clazz clazz);
+    O visit(ClassVariable classVariable);
+    O visit(ObjectProperty objectProperty);
+    O visit(ObjectInverseOf objectproperty);
+    O visit(ObjectPropertyChain objectProperty);
+    O visit(ObjectPropertyVariable objectPropertyVariable);
+    O visit(ObjectIntersectionOf objectIntersectionOf);
+    O visit(ObjectUnionOf objectUnionOf);
+    O visit(ObjectComplementOf objectComplementOf);
+    O visit(ObjectSomeValuesFrom objectSomeValuesFrom);
+    O visit(ObjectAllValuesFrom objectAllValuesFrom);
+    O visit(ObjectHasValue objectHasValue);
+    O visit(ObjectMinCardinality objectMinCardinality);
+    O visit(ObjectExactCardinality objectExactCardinality);
+    O visit(ObjectMaxCardinality objectMaxCardinality);
+    O visit(ObjectHasSelf objectHasSelf);
+    O visit(ObjectOneOf objectOneOf);
+    O visit(DataSomeValuesFrom dataSomeValuesFrom);
+    O visit(DataAllValuesFrom dataAllValuesFrom);
+    O visit(DataHasValue dataHasValue);
+    O visit(DataMinCardinality dataMinCardinality );
+    O visit(DataExactCardinality dataExactCardinality);
+    O visit(DataMaxCardinality dataMaxCardinality);
     
 }
