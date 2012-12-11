@@ -63,8 +63,7 @@ public class TestPizzaQueries extends TestCase {
     
     @Override
     protected void setUp() throws Exception {
-        //org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/pizza.owl").toURI());
-    	org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/Galen.owl").toURI());
+        org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/pizza.owl").toURI());
     	queriedOntology=manager.loadOntologyFromOntologyDocument(physicalIRI);
         dataset=new OWLOntologyDataSet(queriedOntology, new HashMap<String, OWLOntology>());
         OWLOntologyGraph graph=dataset.getDefaultGraph();

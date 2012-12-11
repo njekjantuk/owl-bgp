@@ -82,10 +82,10 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                 positions[0]=bindingPositions.get(subClass);
                 positions[1]=bindingPositions.get(superClass);
                 return computeAllSubClassOfRelations(currentBinding,positions);
-            } else if (subClass.isVariable() && !superClass.isVariable() && /*superClass instanceof Clazz*/superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+            } else if (subClass.isVariable() && /*!superClass.isVariable() && superClass instanceof Clazz*/superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
                 int position=bindingPositions.get(subClass);
                 return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (superClass.isVariable() && !subClass.isVariable() && /*subClass instanceof Clazz*/subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+            } else if (superClass.isVariable() && !subClass.isVariable() && /*subClass instanceof Clazz*/ subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
                 int position=bindingPositions.get(superClass);
                 return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
             } else if (subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty() && superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty())

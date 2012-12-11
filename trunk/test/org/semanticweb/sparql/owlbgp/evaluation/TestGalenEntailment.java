@@ -44,7 +44,7 @@ public static final String LB = System.getProperty("line.separator") ;
 	
         Configuration c=new Configuration();
         c.ignoreUnsupportedDatatypes=true;
-        OWLReasoner hermit=new OWLBGPHermiT(c, dataset.getDefaultGraph().getOntology());
+        OWLReasoner hermit=new OWLBGPHermiT(c, queriedOntology);
         OWLDataFactory factory=manager.getOWLDataFactory();
         OWLClass subClass1;
         OWLClass qualificationClass1;
@@ -63,18 +63,18 @@ public static final String LB = System.getProperty("line.separator") ;
         qualificationProperty1=factory.getOWLObjectProperty(IRI.create("http://www.w3.org/2002/07/owl#topObjectProperty"));
         superClass1=factory.getOWLObjectSomeValuesFrom(qualificationProperty1, qualificationClass1);
         subClassOf1=factory.getOWLSubClassOfAxiom(subClass1, superClass1);
-        if (hermit.isEntailed(subClassOf1))
-            System.out.println("SubClassAxiom 1 is entailed!");
-        //assertTrue(hermit.isEntailed(subClassOf1));
+        //if (hermit.isEntailed(subClassOf1))
+        //    System.out.println("SubClassAxiom 1 is entailed!");
+        assertTrue(hermit.isEntailed(subClassOf1));
         
         subClass2=factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/galen#Infection"));
         qualificationClass2=factory.getOWLClass(IRI.create("http://www.co-ode.org/ontologies/galen#DomainCategory"));
         qualificationProperty2=factory.getOWLObjectProperty(IRI.create("http://www.co-ode.org/ontologies/galen#Attribute"));
         superClass2=factory.getOWLObjectSomeValuesFrom(qualificationProperty2, qualificationClass2);
         subClassOf2=factory.getOWLSubClassOfAxiom(subClass2, superClass2);
-        if (hermit.isEntailed(subClassOf2))
-            System.out.println("SubClassAxiom 2 is entailed!");
-        //assertTrue(hermit.isEntailed(subClassOf2));
+        //if (hermit.isEntailed(subClassOf2))
+        //    System.out.println("SubClassAxiom 2 is entailed!");
+        assertTrue(hermit.isEntailed(subClassOf2));
 
 	}
 }

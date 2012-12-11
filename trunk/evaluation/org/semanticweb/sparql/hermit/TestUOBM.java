@@ -34,31 +34,32 @@ public class TestUOBM {
 	    //getUOBMQ1(sparqlEngine, dataset);
 	      //getUOBMQ01(sparqlEngine, dataset);
           //getUOBMQ02(sparqlEngine, dataset);
-	    //getUOBMQ1(sparqlEngine, dataset);
-	      //getUOBMQ2(sparqlEngine, dataset);
-          //getUOBMQ3(sparqlEngine, dataset);
-       //getUOBMQ4(sparqlEngine, dataset);
-          /*getUOBMQ5(sparqlEngine, dataset);
-          getUOBMQ6(sparqlEngine, dataset);
-          getUOBMQ7(sparqlEngine, dataset);
-          getUOBMQ8(sparqlEngine, dataset);*/
-      //getUOBMQ9(sparqlEngine, dataset);
-//          getUOBMQ10(sparqlEngine, dataset);
-      //getUOBMQ11(sparqlEngine, dataset);
-      //getUOBMQ12(sparqlEngine, dataset);
-//          getUOBMQ13(sparqlEngine, dataset);        
-      //getUOBMQ14(sparqlEngine, dataset);
-//        getUOBMQ15(sparqlEngine, dataset);
+	    getUOBMQ1(sparqlEngine, dataset);
+	    getUOBMQ2(sparqlEngine, dataset);
+        getUOBMQ3(sparqlEngine, dataset);
+        getUOBMQ4(sparqlEngine, dataset);
+        getUOBMQ5(sparqlEngine, dataset);
+        getUOBMQ6(sparqlEngine, dataset);
+        getUOBMQ7(sparqlEngine, dataset);
+        getUOBMQ8(sparqlEngine, dataset);
+        getUOBMQ9(sparqlEngine, dataset);
+        getUOBMQ10(sparqlEngine, dataset);
+        getUOBMQ11(sparqlEngine, dataset);
+        getUOBMQ12(sparqlEngine, dataset);
+        getUOBMQ13(sparqlEngine, dataset);        
+        getUOBMQ14(sparqlEngine, dataset);
+        getUOBMQ15(sparqlEngine, dataset);
 	}
 	public static OWLOntologyDataSet getUOBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
 	    OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/univ-bench-dl.owl"));
-	    OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0"+".owl"));
+	    //OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0"+".owl"));
+	    OWLOntology tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/univ0.owl"));
 	    manager.addAxioms(ont, tmp.getAxioms());
-	    for (int i=0;i<3;i++) {
+	    /*for (int i=0;i<3;i++) {
 	    	tmp=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBM_owl-dl/1-ub-dl-univ0-dept"+i+".owl"));
             manager.addAxioms(ont, tmp.getAxioms());
-	    }
+	    }*/
 	    //OWLOntology ont=manager.loadOntologyFromOntologyDocument(new File("evaluation/ontologies2/UOBMw3Dep.owl"));
         return new OWLOntologyDataSet(ont, null);
     }
@@ -79,9 +80,9 @@ public class TestUOBM {
 	    System.out.println("QEx");
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:Person. " +LB
-	    + "  ?x uob:isHeadOf ?y. " +LB
-	    + "  ?y rdf:type uob:Department." +LB
-	    + "  ?x rdf:type uob:PeopleWithManyHobbies." +LB
+	    + "  ?x uob:teachingAssistantOf ?y. " +LB
+	    + "  ?y rdf:type uob:Course." +LB
+	    //+ "  ?x rdf:type uob:PeopleWithManyHobbies." +LB
 	    + " } "+LB;
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
