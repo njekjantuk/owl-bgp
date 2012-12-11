@@ -68,6 +68,54 @@ public class QueryTests extends AbstractQueryTest {
         return axioms;
     }
     
+    protected String getAxiomsPunning() {
+        String axioms="Declaration( Class( :Pneumonia ) )"+
+                "Declaration( Class( :Flu ) )"+
+                "Declaration( Class( :Book ) )"+
+                "Declaration( ObjectProperty( :isAbout ) )"+LB+
+                "Declaration( ObjectProperty( :has ) )"+LB+
+                "Declaration( DataProperty( :prevalence ) )"+LB+
+                "Declaration( NamedIndividual( :John ) )"+LB+
+                "Declaration( NamedIndividual( :Anite ) )"+LB+
+                "Declaration( NamedIndividual( :George ) )"+LB+
+                "Declaration( NamedIndividual( :Pneumonia ) )"+LB+
+                "Declaration( NamedIndividual( :Flu ) )"+LB+
+                "Declaration( NamedIndividual( :Arthritis ) )"+LB+
+                "Declaration( NamedIndividual( :BookAboutPneumonia ) )"+LB+
+                "ClassAssertion( ObjectSomeValuesFrom( :has :Pneumonia ) :John )"+LB+
+                "ClassAssertion( ObjectSomeValuesFrom( :has :Flu ) :George )"+LB+
+                "ObjectPropertyAssertion( :isAbout :BookAboutPneumonia :Pneumonia )"+LB+
+                "ClassAssertion( :Book :BookAboutPneumonia )"+LB+
+                "DataPropertyAssertion( :prevalence :Pneumonia \"0.0001\"^^xsd:decimal )"+LB+
+                "DataPropertyAssertion( :prevalence :Arthritis \"0.0005\"^^xsd:decimal )"+LB+
+                "DataPropertyAssertion( :prevalence :Flu \"0.000001\"^^xsd:decimal )";
+        return axioms;
+    }
+    
+    public void testPunning() throws Exception {
+        loadDataSetWithAxioms(getAxiomsPunning());
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :     <http://example.org/>" +LB
+                + "PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?pun ?prev WHERE {"+LB
+                + "  ?pun :prevalence ?prev . "+LB
+                + "  FILTER (?prev >= 0.0001) "+LB
+                + "  ?pun rdf:type owl:Class . "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    } 
+    
     public void testMinus() throws Exception {
         String axioms="Declaration(NamedIndividual( :alice ))"+LB+
                 "Declaration(NamedIndividual( :bob ))"+LB+

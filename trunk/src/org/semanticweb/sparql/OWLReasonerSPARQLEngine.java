@@ -18,9 +18,6 @@
 
 package  org.semanticweb.sparql;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
@@ -34,7 +31,6 @@ import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
-import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.Syntax;
 import com.hp.hpl.jena.sparql.ARQConstants;
@@ -77,6 +73,10 @@ public class OWLReasonerSPARQLEngine {
         long t=System.currentTimeMillis();
         ResultSet results=engine.execSelect();
         //int resultsSize=0;
+        /*
+         * OK, I COMMENTED OUT THIS BIT OF CODE BECAUSE IT MEANS THAT NO QUERY ANSWERS ARE EVER 
+         * DELIVERED. THE RESULTS ITERATOR IS CLOSED, DONE, FINISHED!!!
+     * FINDING THIS **BUG** PLUS THE Sytem.out.... TOOK ME ABOUT AN HOUR THAT I COULD HAVE USED MUCH BETTER!
         FileWriter fstream=null;
         try {
             fstream = new FileWriter("outputAnswers.txt");
@@ -105,6 +105,7 @@ public class OWLReasonerSPARQLEngine {
 			e.printStackTrace();
 		}
         //System.out.println("The result size is "+resultsSize);
+        */
         long evalTime=System.currentTimeMillis()-t;
         ARQ.getContext().put(BGP_EXEC_TIME, evalTime);
         return results;

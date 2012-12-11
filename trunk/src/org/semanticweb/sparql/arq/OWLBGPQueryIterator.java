@@ -39,12 +39,12 @@ import com.hp.hpl.jena.sparql.engine.binding.Binding;
 import com.hp.hpl.jena.sparql.engine.binding.BindingFactory;
 import com.hp.hpl.jena.sparql.engine.binding.BindingHashMap;
 import com.hp.hpl.jena.sparql.engine.binding.BindingMap;
-import com.hp.hpl.jena.sparql.engine.iterator.QueryIter1;
+import com.hp.hpl.jena.sparql.engine.iterator.QueryIter;
 import com.hp.hpl.jena.sparql.serializer.SerializationContext;
 import com.hp.hpl.jena.sparql.util.FmtUtils;
 import com.hp.hpl.jena.sparql.util.Utils;
 
-public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
+public class OWLBGPQueryIterator extends QueryIter {//QueryIter1, QueryIteratorBase
     protected final BasicPattern pattern;
     protected final List<Map<Variable,Integer>> bindingPositionsPerComponent;
     protected final Set<String> m_skolemConstants;
@@ -56,7 +56,7 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
     protected final int numRows;
     
     public OWLBGPQueryIterator(BasicPattern pattern, QueryIterator input, ExecutionContext execCxt, List<List<Atomic[]>> results, List<Map<Variable,Integer>> bindingPositionsPerComponent, Set<IndividualVariable> bnodes) {
-        super(input, execCxt) ;
+        super(execCxt);
         this.pattern=pattern;
         m_skolemConstants=((OWLOntologyGraph)execCxt.getActiveGraph()).getSkolemConstants();
         this.bindingPositionsPerComponent=bindingPositionsPerComponent;
@@ -172,7 +172,12 @@ public class OWLBGPQueryIterator extends QueryIter1 {//QueryIteratorBase {
         } 
     }
     @Override
-    protected void requestSubCancel() {
+    protected void closeIterator() {
+        // TODO Auto-generated method stub
+        
+    }
+    @Override
+    protected void requestCancel() {
         // TODO Auto-generated method stub
         
     }
