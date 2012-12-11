@@ -17,9 +17,9 @@
 */
 package org.semanticweb.HermiT.hierarchy;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
+//import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -94,7 +94,7 @@ public class InstanceStatistics {
     
     public int getClassHierarchyDepth() {
         m_reasoner.classifyClasses();
-        FileWriter fstream=null;
+        /*FileWriter fstream=null;
         try {
             fstream = new FileWriter("outputConcept.txt");
         } catch (IOException e) {
@@ -117,12 +117,12 @@ public class InstanceStatistics {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         return m_instanceManager.m_currentConceptHierarchy.getDepth();
     }
     public int getObjectPropertyHierarchyDepth() {
         m_reasoner.classifyObjectProperties();
-        FileWriter fstream=null;
+        /*FileWriter fstream=null;
         try {
             fstream = new FileWriter("outputRole.txt");
         } catch (IOException e) {
@@ -146,7 +146,7 @@ public class InstanceStatistics {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         return m_instanceManager.m_currentRoleHierarchy.getDepth();
     }
  
