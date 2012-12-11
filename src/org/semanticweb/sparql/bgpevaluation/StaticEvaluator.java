@@ -1,13 +1,10 @@
 package org.semanticweb.sparql.bgpevaluation;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.semanticweb.HermiT.OWLBGPHermiT;
 import org.semanticweb.HermiT.StaticHermiTCostEstimationVisitor;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.sparql.arq.OWLOntologyGraph;
 import org.semanticweb.sparql.bgpevaluation.monitor.Monitor;
 import org.semanticweb.sparql.bgpevaluation.queryobjects.QueryObject;
@@ -48,7 +45,8 @@ public class StaticEvaluator extends QueryEvaluator {
     	//staticAxiomOrder.addAll(connectedComponent);
     	List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(m_costEstimator, connectedComponent, m_monitor);
         for (QueryObject<? extends Axiom> cheapest : staticAxiomOrder){
-        	System.out.println(cheapest);
+            // PLEASE DON'T LEAVE System.out.... IN COMMITED CODE. IT'S TIME CONSUMING AND A NUISANCE TO FIND OUT WHERE THE OUITPUT IS COMMING FROM!
+        	//System.out.println(cheapest);
             if (!bindings.isEmpty()){
                 bindings=cheapest.computeBindings(bindings, positionInTuple);
                 //System.out.println("The result size is: "+bindings.size());

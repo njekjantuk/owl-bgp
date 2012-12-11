@@ -117,6 +117,6 @@ public class TestPizzaQueries extends TestCase {
             subClassOf=factory.getOWLSubClassOfAxiom(subClass, superClass);
             assertTrue(hermit.isEntailed(subClassOf));
         }
-        assertTrue(noResults==532);
+        assertTrue(noResults==627);
     }
 }
