@@ -28,8 +28,11 @@ public class AllEvaluationTests extends TestCase {
         TestSuite suite = new TestSuite("Unit tests for the query evaluation.");
         // $JUnit-BEGIN$
         suite.addTestSuite(TestPizzaQueries.class);
-        suite.addTestSuite(TestSeveralComponents.class);
+        suite.addTestSuite(OntologyTests.class);
         suite.addTestSuite(QueryTests.class);
+        suite.addTestSuite(TestGalenEntailment.class);
+        suite.addTestSuite(TestPizzaQueries.class);
+        suite.addTestSuite(TestSeveralComponents.class);
         // $JUnit-END$
         return suite;
     }

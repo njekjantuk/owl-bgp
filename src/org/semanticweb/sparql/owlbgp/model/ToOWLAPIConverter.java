@@ -464,15 +464,14 @@ public class ToOWLAPIConverter implements ExtendedOWLObjectVisitorEx<OWLObject> 
         return m_dataFactory.getOWLDatatypeDefinitionAxiom((OWLDatatype)axiom.getDatatype().accept(this),(OWLDataRange)axiom.getDataRange().accept(this),getAnnotations(axiom));
     }
     public OWLObject visit(HasKey axiom) {
-        @SuppressWarnings("rawtypes")
-        Set<OWLPropertyExpression> pes=new HashSet<OWLPropertyExpression>();
+        Set<OWLPropertyExpression<?, ?>> pes=new HashSet<OWLPropertyExpression<?, ?>>();
         for (ObjectPropertyExpression ope : axiom.getObjectPropertyExpressions()) {
             pes.add((OWLObjectPropertyExpression)ope.accept(this));
         }
         for (DataPropertyExpression dpe : axiom.getDataPropertyExpressions()) {
             pes.add((OWLDataPropertyExpression)dpe.accept(this));
-        }
-        return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.getClassExpression().accept(this),(Set<? extends OWLPropertyExpression<?, ?>>) pes,getAnnotations(axiom));
+        } 
+        return m_dataFactory.getOWLHasKeyAxiom((OWLClassExpression)axiom.getClassExpression().accept(this),pes,getAnnotations(axiom));
     }
     
     public OWLObject visit(SameIndividual axiom) {
