@@ -18,11 +18,6 @@
 
 package  org.semanticweb.sparql.owlbgp.evaluation;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-
-import org.coode.owlapi.turtle.TurtleOntologyFormat;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 
 import com.hp.hpl.jena.query.Query;
@@ -399,14 +394,6 @@ public class QueryTests extends AbstractQueryTest {
     
     public void testOPSuccessors() throws Exception {
         loadDataSetWithAxioms(getAxioms());
-        
-        File newOntologyFile=new File("/Users/bglimm/Documents/paper-sparqldl-data.ttl");
-        newOntologyFile=newOntologyFile.getAbsoluteFile();
-        // Now we create a buffered stream since the ontology manager can then write to that stream. 
-        BufferedOutputStream outputStream=new BufferedOutputStream(new FileOutputStream(newOntologyFile));
-        // We use the same format as for the input ontology.
-        m_ontologyManager.saveOntology(m_ontology, new TurtleOntologyFormat(), outputStream);
-        
         String s= "PREFIX ex:   <http://example.org/> "+LB
                 + "PREFIX :     <http://example.org/>" +LB
                 + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
