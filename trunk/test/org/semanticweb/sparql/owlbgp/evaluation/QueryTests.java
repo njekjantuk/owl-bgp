@@ -18,6 +18,7 @@
 
 package  org.semanticweb.sparql.owlbgp.evaluation;
 
+import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.sparql.OWLReasonerSPARQLEngine;
 
 import com.hp.hpl.jena.query.Query;
@@ -171,6 +172,7 @@ public class QueryTests extends AbstractQueryTest {
         }
         assertTrue(noResults==2);
     } 
+    
     public void testMinusBlanks() throws Exception {
         String axioms="Declaration(NamedIndividual( :alice ))"+LB+
                 "Declaration(NamedIndividual( :tom ))"+LB+
@@ -231,6 +233,7 @@ public class QueryTests extends AbstractQueryTest {
         }
         assertTrue(noResults==1);
     } 
+    
     public void testNotExistsLiterals() throws Exception {
         String axioms="Declaration(NamedIndividual( :alice ))"+LB+
                 "Declaration(NamedIndividual( :bob ))"+LB+
@@ -262,6 +265,33 @@ public class QueryTests extends AbstractQueryTest {
         }
         assertTrue(noResults==2);
     } 
+    
+    public void testAddToCarDriver() throws Exception {
+        org.semanticweb.owlapi.model.IRI physicalIRI=org.semanticweb.owlapi.model.IRI.create(getClass().getResource("ontologies/CarDriverTest.owl").toURI());
+        OWLOntology o=m_ontologyManager.loadOntologyFromOntologyDocument(physicalIRI);
+        loadDataSetFromOntology(o);
+        String s= "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
+                + "PREFIX test: <http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#>" +LB
+                + "SELECT ?indi ?role ?filler "+LB
+                + "WHERE {"+LB
+                + "  ?role rdf:type owl:ObjectProperty . " + LB
+                + "  [owl:onProperty ?role; rdf:type owl:Restriction; owl:someValuesFrom ?filler ] rdfs:subClassOf ?class . "+LB
+                + "  ?indi ?role ?obj . "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+//        ResultSetFormatter.out(System.out, result, query);
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==24);
+    }
+    
     public void testNotExistsBlanks() throws Exception {
         String axioms="Declaration(NamedIndividual( :alice ))"+LB+
                 "Declaration(NamedIndividual( :tom ))"+LB+
@@ -292,6 +322,41 @@ public class QueryTests extends AbstractQueryTest {
         }
         assertTrue(noResults==2);
     } 
+    
+//    public void testParsingFromJeff() throws Exception {
+//        loadDataSetWithAxioms(getAxioms());
+//        String s= "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> "+LB
+//                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+//                + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
+//                + "PREFIX test: <http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#> "+LB
+//                + "SELECT ?obj ?filler "+LB
+//                + "WHERE { "+LB
+//                //+ "    ?indi rdf:type owl:NamedIndividual . "+LB
+//                //+ "    ?class rdf:type owl:Class . "+LB
+//                + "    ?role rdf:type owl:ObjectProperty . "+LB
+//                //+ "    ?filler rdf:type owl:Class . "+LB
+//                //+ "    ?obj rdf:type owl:NamedIndividual . "+LB
+//                + "    test:r rdf:type owl:ObjectProperty . "+LB
+//                + "    ?indi rdf:type ["+LB
+//                + "        owl:onProperty test:r;"+LB
+//                + "        rdf:type owl:Restriction;"+LB
+//                + "        owl:someValuesFrom ?class ] . "+LB
+//                + "    [ owl:onProperty ?role;"+LB
+//                + "      rdf:type owl:Restriction;"+LB
+//                + "      owl:someValuesFrom ?filler ]"+LB
+//                + "    rdfs:subClassOf ?class . "+LB
+//                + "    ?indi ?role ?obj . "+LB
+//                + "}";
+//        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+//        Query query=QueryFactory.create(s);
+//        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+//        int noResults=0;
+//        while (result.hasNext()) {
+//            result.next();
+//            noResults++;
+//        }
+//        assertTrue(noResults==2);
+//    }
             
     public void testOPParsing() throws Exception {
         loadDataSetWithAxioms(getAxioms());

@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+
+
+<!DOCTYPE rdf:RDF [
+    <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
+    <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
+    <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
+    <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
+    <!ENTITY CarDriverTest "http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#" >
+]>
+
+
+<rdf:RDF xmlns="http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#"
+     xml:base="http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:CarDriverTest="http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#">
+    <owl:Ontology rdf:about="http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#drive -->
+
+    <owl:ObjectProperty rdf:about="&CarDriverTest;drive">
+        <rdfs:domain rdf:resource="&CarDriverTest;People"/>
+        <rdfs:range rdf:resource="&CarDriverTest;Vehicle"/>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#r -->
+
+    <owl:ObjectProperty rdf:about="&CarDriverTest;r"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#Car -->
+
+    <owl:Class rdf:about="&CarDriverTest;Car">
+        <rdfs:subClassOf rdf:resource="&CarDriverTest;Vehicle"/>
+        <owl:disjointWith rdf:resource="&CarDriverTest;Van"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#CarDriver -->
+
+    <owl:Class rdf:about="&CarDriverTest;CarDriver">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&CarDriverTest;People"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&CarDriverTest;drive"/>
+                        <owl:someValuesFrom rdf:resource="&CarDriverTest;Car"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#People -->
+
+    <owl:Class rdf:about="&CarDriverTest;People"/>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#Van -->
+
+    <owl:Class rdf:about="&CarDriverTest;Van">
+        <rdfs:subClassOf rdf:resource="&CarDriverTest;Vehicle"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#VanDriver -->
+
+    <owl:Class rdf:about="&CarDriverTest;VanDriver">
+        <owl:equivalentClass>
+            <owl:Class>
+                <owl:intersectionOf rdf:parseType="Collection">
+                    <rdf:Description rdf:about="&CarDriverTest;People"/>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="&CarDriverTest;drive"/>
+                        <owl:someValuesFrom rdf:resource="&CarDriverTest;Van"/>
+                    </owl:Restriction>
+                </owl:intersectionOf>
+            </owl:Class>
+        </owl:equivalentClass>
+    </owl:Class>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#Vehicle -->
+
+    <owl:Class rdf:about="&CarDriverTest;Vehicle">
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#Micky -->
+
+    <owl:NamedIndividual rdf:about="&CarDriverTest;Micky">
+        <rdf:type rdf:resource="&CarDriverTest;People"/>
+        <rdf:type>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="&CarDriverTest;r"/>
+                <owl:someValuesFrom rdf:resource="&CarDriverTest;CarDriver"/>
+            </owl:Restriction>
+        </rdf:type>
+        <drive rdf:resource="&CarDriverTest;v1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#v1 -->
+
+    <owl:NamedIndividual rdf:about="&CarDriverTest;v1">
+        <rdf:type rdf:resource="&CarDriverTest;Van"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 3.4.2) http://owlapi.sourceforge.net -->
+
