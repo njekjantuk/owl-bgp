@@ -46,15 +46,24 @@ public class StaticEvaluator extends QueryEvaluator {
     	List<QueryObject<? extends Axiom>> staticAxiomOrder=StaticQueryReordering.getCheapestOrdering(m_costEstimator, connectedComponent, m_monitor);
         for (QueryObject<? extends Axiom> cheapest : staticAxiomOrder){
             // PLEASE DON'T LEAVE System.out.... IN COMMITED CODE. IT'S TIME CONSUMING AND A NUISANCE TO FIND OUT WHERE THE OUITPUT IS COMMING FROM!
-        	//System.out.println(cheapest);
+//        	System.out.println(cheapest);
             if (!bindings.isEmpty()){
+//                for (Variable v : positionInTuple.keySet()) {
+//                    System.out.println(v + " " + positionInTuple.get(v));
+//                }
                 bindings=cheapest.computeBindings(bindings, positionInTuple);
-                //System.out.println("The result size is: "+bindings.size());
-                /*for (Atomic[] bind:bindings) {
-                	for (int p=0; p<bind.length; p++)
-                		System.out.print(bind[p]+"  ");
-                	System.out.println();
-                }*/
+//                System.out.println("The result size is: "+bindings.size());
+//                Prefixes pre=new Prefixes();
+//                pre.addPrefixes(Prefixes.STANDARD_PREFIXES);
+//                pre.declarePrefix("test", "http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#");
+//                for (Atomic[] bind:bindings) {
+//                	for (int p=0; p<bind.length; p++)
+////                	    if (bind[p] != null)
+////                		    System.out.print(bind[p].toString(pre)+"  ");
+////                	    else 
+//                	        System.out.print(bind[p]+"  ");
+//                	System.out.println();
+//                }
             }
         }
         return bindings;
