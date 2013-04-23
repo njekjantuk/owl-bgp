@@ -67,7 +67,7 @@ public class TestLUBM {
         getLUBMQ12(sparqlEngine, dataset);
         getLUBMQ13(sparqlEngine, dataset);
         getLUBMQ14(sparqlEngine, dataset);
-        System.out.println("The execution of the 14 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
+        //System.out.println("The execution of the 14 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}
 	public static OWLOntologyDataSet getLUBMDataSet() throws OWLOntologyCreationException {
 	    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();
@@ -118,9 +118,9 @@ public class TestLUBM {
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
 	    //System.out.println("Query: "+(System.currentTimeMillis()-t));
-	    t=System.currentTimeMillis();
+	    //t=System.currentTimeMillis();
 	    sparqlEngine.execQuery(query,dataset);
-	    System.out.println("Result: "+(System.currentTimeMillis()-t));
+	    //System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
 	}
 	public static void getLUBMQ0(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
@@ -135,9 +135,9 @@ public class TestLUBM {
 	    long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
 	    //System.out.println("Query: "+(System.currentTimeMillis()-t));
-	    t=System.currentTimeMillis();
+	    //t=System.currentTimeMillis();
 	    sparqlEngine.execQuery(query,dataset);
-	    System.out.println("Result: "+(System.currentTimeMillis()-t));
+	    //System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
 	}
 	public static void getLUBMQ1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
