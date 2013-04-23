@@ -61,6 +61,8 @@ import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
 import com.hp.hpl.jena.util.iterator.ExtendedIterator;
 
+
+
 public class OWLOntologyGraph implements Graph {
 	
     protected final ToOWLAPIConverter m_toOWLAPIConverter;

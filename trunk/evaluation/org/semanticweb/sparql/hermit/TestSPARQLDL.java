@@ -54,7 +54,7 @@ public class TestSPARQLDL {
 	    
 	    
 	    getLUBMQ1(sparqlEngine, dataset);
-        getLUBMQ2(sparqlEngine, dataset);
+        /*getLUBMQ2(sparqlEngine, dataset);
         getLUBMQ3(sparqlEngine, dataset);
         getLUBMQ4(sparqlEngine, dataset);
         getLUBMQ5(sparqlEngine, dataset);
@@ -62,7 +62,7 @@ public class TestSPARQLDL {
         getLUBMQ7(sparqlEngine, dataset);
         getLUBMQ8(sparqlEngine, dataset);
         getLUBMQ9(sparqlEngine, dataset);
-        getLUBMQ10(sparqlEngine, dataset);
+        getLUBMQ10(sparqlEngine, dataset);*/
         
         System.out.println("The execution of the 10 queries finished in "+(System.currentTimeMillis()-t) +"  msec");
 	}

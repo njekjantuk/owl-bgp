@@ -65,8 +65,8 @@ public class InstanceStatistics {
         m_bottomConcept=AtomicConcept.NOTHING;
         m_topRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.TOP_OBJECT_ROLE);
         m_bottomRoleElement=instanceManger.m_roleElementManager.getRoleElement(AtomicRole.BOTTOM_OBJECT_ROLE);
-        /*Set<OWLClass> atomicConcepts=reasoner.getRootOntology().getClassesInSignature();
-	    for (OWLClass con:atomicConcepts) {
+        //Set<OWLClass> atomicConcepts=reasoner.getRootOntology().getClassesInSignature();
+	    /*for (OWLClass con:atomicConcepts) {
 	    	int[] estimate=getNumberOfInstances(con);
 	    	System.out.println(con.toString()+" known instances= "+estimate[0] +" possible instances= "+estimate[1]);
 	    }

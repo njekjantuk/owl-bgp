@@ -104,7 +104,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
     		    entailedBindings.add(newBindings.get(i));
         }
         return entailedBindings;  
-    }*/    
+    }*/   
     protected boolean isTheSameAssignment(Atomic[] binding1, Atomic[] binding2, Map<Variable,Integer> bindingPositions) {
         for (Variable var:bindingPositions.keySet()) {
           if (binding1[bindingPositions.get(var)]!=binding2[bindingPositions.get(var)]) 
@@ -126,6 +126,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
                     classSet.add(Clazz.THING);
                 if (!classSet.contains(Clazz.NOTHING))
                     classSet.add(Clazz.NOTHING);
+                //System.out.println("class size= "+classSet.size());
             	varToBindingSets.put(var, classSet);
             }    
             else if (var instanceof DatatypeVariable)
@@ -137,6 +138,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
             	if (!propertySet.contains(ObjectProperty.BOTTOM_OBJECT_PROPERTY))
             	    propertySet.add(ObjectProperty.BOTTOM_OBJECT_PROPERTY);
             	varToBindingSets.put(var, propertySet);
+            	//System.out.println("property size= "+propertySet.size());
             }    
             else if (var instanceof DataPropertyVariable)
                 varToBindingSets.put(var, m_graph.getDataPropertiesInSignature());
@@ -151,7 +153,7 @@ public abstract class AbstractQueryObject<T extends Axiom> implements QueryObjec
         }
         for (Map<Variable,? extends Atomic> bindings : new BindingIterator(varToBindingSets)) {
         	if (m_reasoner.isEntailed((OWLAxiom)axiom.getBoundVersion(bindings, m_dataFactory))) {
-                result=currentBinding.clone();
+        		result=currentBinding.clone();
                 for (Variable var : bindings.keySet())
                     result[bindingPositions.get(var)]=bindings.get(var);
                 results.add(result);

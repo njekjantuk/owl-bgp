@@ -31,11 +31,11 @@ import com.hp.hpl.jena.query.QueryFactory;
 		    OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine(new MinimalPrintingMonitor());
 		   
 		    //getQ1(sparqlEngine, dataset);
-	        getQ2(sparqlEngine, dataset);
+	        //getQ2(sparqlEngine, dataset);
 	        //getQ3(sparqlEngine, dataset);
-	        //getQ4(sparqlEngine, dataset);
+	        getQ4(sparqlEngine, dataset);
 		    //getQ5(sparqlEngine, dataset);
-	        getQ6(sparqlEngine, dataset);
+	        //getQ6(sparqlEngine, dataset);
 		}
 		public static OWLOntologyDataSet getFBbt_XPDataSet() throws OWLOntologyCreationException {
 		    OWLOntologyManager manager=OWLManager.createOWLOntologyManager();

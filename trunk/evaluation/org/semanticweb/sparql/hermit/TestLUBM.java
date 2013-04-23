@@ -41,7 +41,7 @@ public class TestLUBM {
 	    OWLOntologyDataSet dataset=getLUBMDataSet();
 	    System.out.println("OWLOntology loaded in: "+(System.currentTimeMillis()-t));
 	    OWLOntologyGraph graph=dataset.getDefaultGraph();
-	    t=System.currentTimeMillis();	    
+	    t=System.currentTimeMillis();
 //	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY);
 	    graph.getReasoner().precomputeInferences(InferenceType.CLASS_HIERARCHY, InferenceType.OBJECT_PROPERTY_HIERARCHY, InferenceType.DATA_PROPERTY_HIERARCHY/*, InferenceType.CLASS_ASSERTIONS, InferenceType.OBJECT_PROPERTY_ASSERTIONS*/);
 	    System.out.println("Precomputation lasted: "+(System.currentTimeMillis()-t));

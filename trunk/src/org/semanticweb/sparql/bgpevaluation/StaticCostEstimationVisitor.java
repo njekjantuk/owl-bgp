@@ -80,8 +80,11 @@ import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<double[]> {
+    //protected double COST_CONCEPT_ENTAILMENT=100;
+    //protected double COST_ROLE_ENTAILMENT=120;
     protected double COST_ENTAILMENT=100;
     protected double COST_LOOKUP=1;
+    //protected double COST_CLASS_HIERARCHY_INSERTION=10*COST_CONCEPT_ENTAILMENT;
     protected double COST_CLASS_HIERARCHY_INSERTION=10*COST_ENTAILMENT;
     
     protected final OWLReasoner m_reasoner;
@@ -265,8 +268,10 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         Set<Variable> unbound=opeVar;
         unbound.removeAll(opeVar);
         if (unbound.isEmpty()) 
+            //return new double[] { COST_ROLE_ENTAILMENT, 1 };
             return new double[] { COST_ENTAILMENT, 1 };
         else
+            //return new double[] { m_opCount*COST_ROLE_ENTAILMENT, m_opCount }; // better return told numbers
             return new double[] { m_opCount*COST_ENTAILMENT, m_opCount }; // better return told numbers
     }
     protected double[] getDataPropertyAxiomCost(QueryObject<? extends Axiom> queryObject, Set<Variable> boundVar) {
@@ -274,8 +279,10 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         Set<Variable> unbound=dpeVar;
         unbound.removeAll(dpeVar);
         if (unbound.isEmpty())
+            //return new double[] { COST_ROLE_ENTAILMENT, 1 };
             return new double[] { COST_ENTAILMENT, 1 };
         else
+            //return new double[] { m_dpCount*COST_ROLE_ENTAILMENT, m_dpCount }; // better return told numbers
             return new double[] { m_dpCount*COST_ENTAILMENT, m_dpCount }; // better return told numbers
     }
     public double[] visit(QO_InverseFunctionalObjectProperty queryObject, Set<Variable> boundVar) {
@@ -403,19 +410,24 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
     protected double[] getClassAssertionCost(ClassExpression ce, Individual ind, Set<Variable> boundVar, Variable indVar) {
     	if (indVar!=null && !boundVar.contains(indVar)){
     		if (ce instanceof Atomic) { //C(?x)
-    			return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
+    			//return new double[] { m_indCount * COST_CONCEPT_ENTAILMENT, m_indCount };
+    		    return new double[] { m_indCount * COST_ENTAILMENT, m_indCount };
     		}
     		else //?x(?y)
-    			return new double[] { m_indCount * m_classCount * COST_ENTAILMENT, m_indCount * m_classCount};
+    			//return new double[] { m_indCount * m_classCount * COST_CONCEPT_ENTAILMENT, m_indCount * m_classCount};
+    	        return new double[] { m_indCount * m_classCount * COST_ENTAILMENT, m_indCount * m_classCount};
     	}	
     	else if (indVar!=null && boundVar.contains(indVar)) {//C(a)<-C(x)
 	    	if (ce instanceof Atomic) {
-	    		return new double[] {COST_ENTAILMENT, 1};
+	    		//return new double[] {COST_CONCEPT_ENTAILMENT, 1};
+	    	    return new double[] {COST_ENTAILMENT, 1};
 	    	}
 	    	else //?x(a)<-?x(?y)
-	    		return new double[] { m_classCount * COST_ENTAILMENT, m_classCount};
+	    		//return new double[] { m_classCount * COST_CONCEPT_ENTAILMENT, m_classCount};
+	            return new double[] { m_classCount * COST_ENTAILMENT, m_classCount};
 	    }
     	else //C(a)
+    		//return new double[] {COST_CONCEPT_ENTAILMENT, 1};
     		return new double[] {COST_ENTAILMENT, 1};
     }
     public double[] visit(QO_ObjectPropertyAssertion queryObject, Set<Variable> boundVar) {
@@ -443,8 +455,7 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
     		unbound.add((Variable) ind1);
     	if (ind2 instanceof Variable && !boundVar.contains(ind2))	
     		unbound.add((Variable) ind2);
-    	
-        if (unbound.size()==0) //r(a,b)
+    	if (unbound.size()==0) //r(a,b)
             return new double[] { COST_ENTAILMENT, 1 };
         else if (unbound.size()==1 && opVar!=null) // ?x(a, b)
             return new double[] { m_opCount * COST_ENTAILMENT, m_opCount };
@@ -455,6 +466,18 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
         else if (unbound.size()==2 && opVar==null) // op(?x ?y)
             return new double[] { m_indCount * m_indCount * COST_ENTAILMENT, m_indCount * m_indCount };
         else return new double[] { m_indCount * m_indCount * m_opCount * COST_ENTAILMENT, m_indCount * m_indCount * m_opCount};
+        /*if (unbound.size()==0) //r(a,b)
+            return new double[] { COST_ROLE_ENTAILMENT, 1 };
+        else if (unbound.size()==1 && opVar!=null) // ?x(a, b)
+            return new double[] { m_opCount * COST_ROLE_ENTAILMENT, m_opCount };
+        else if (unbound.size()==1 && opVar==null) // op(:a ?x) or op(?x :a)  
+            return new double[] { m_indCount * COST_ROLE_ENTAILMENT, m_indCount };
+        else if (unbound.size()==2 && opVar!=null) // ?x(:a ?y) or ?x(?y :a)  
+            return new double[] { m_opCount * m_indCount * COST_ROLE_ENTAILMENT, m_indCount * m_opCount };
+        else if (unbound.size()==2 && opVar==null) // op(?x ?y)
+            return new double[] { m_indCount * m_indCount * COST_ROLE_ENTAILMENT, m_indCount * m_indCount };
+        else return new double[] { m_indCount * m_indCount * m_opCount * COST_ROLE_ENTAILMENT, m_indCount * m_indCount * m_opCount};
+     */
     }
     public double[] visit(QO_NegativeObjectPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
@@ -520,6 +543,23 @@ public class StaticCostEstimationVisitor implements StaticQueryObjectVisitorEx<d
             return new double[] { m_indCount * m_litCount * COST_ENTAILMENT, m_indCount * m_litCount };
         else  //?x(?y ?z)
         	return new double[] { m_indCount * m_litCount * m_opCount * COST_ENTAILMENT, m_indCount * m_litCount * m_opCount};    
+    	/*if (unbound.size()==0)
+            return new double[] { COST_ROLE_ENTAILMENT, 1 };
+        else if (unbound.size()==1 && dpVar!=null) // ?x(i, lit)
+            return new double[] { m_dpCount * COST_ROLE_ENTAILMENT, m_dpCount };
+        else if (unbound.size()==1 && indVar!=null) // dp(?x :a)  
+            return new double[] { m_indCount * COST_ROLE_ENTAILMENT, m_indCount };
+        else if (unbound.size()==1 && litVar!=null) // dp(:a ?x)  
+            return new double[] { m_litCount * COST_ROLE_ENTAILMENT, m_litCount };
+        else if (unbound.size()==2 && litVar==null) // ?x(?y :a)  
+            return new double[] { m_dpCount * m_indCount * COST_ROLE_ENTAILMENT, m_indCount * m_dpCount };
+        else if (unbound.size()==2 && indVar==null) // ?x(:a ?y)  
+            return new double[] { m_dpCount * m_litCount * COST_ROLE_ENTAILMENT, m_litCount * m_dpCount };
+        else if (unbound.size()==2 && dpVar==null) // dp(?x ?y)
+            return new double[] { m_indCount * m_litCount * COST_ROLE_ENTAILMENT, m_indCount * m_litCount };
+        else  //?x(?y ?z)
+        	return new double[] { m_indCount * m_litCount * m_opCount * COST_ROLE_ENTAILMENT, m_indCount * m_litCount * m_opCount};    
+    */
     }
     public double[] visit(QO_NegativeDataPropertyAssertion queryObject, Set<Variable> boundVar) {
         double[] estimate=new double[2];
