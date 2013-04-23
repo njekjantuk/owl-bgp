@@ -73,10 +73,10 @@ public class OWLReasonerSPARQLEngine {
         long t=System.currentTimeMillis();
         ResultSet results=engine.execSelect();
         //int resultsSize=0;
-        /*
-         * OK, I COMMENTED OUT THIS BIT OF CODE BECAUSE IT MEANS THAT NO QUERY ANSWERS ARE EVER 
-         * DELIVERED. THE RESULTS ITERATOR IS CLOSED, DONE, FINISHED!!!
-     * FINDING THIS **BUG** PLUS THE Sytem.out.... TOOK ME ABOUT AN HOUR THAT I COULD HAVE USED MUCH BETTER!
+
+        /*FileWriter fstream=null;
+
+        
         FileWriter fstream=null;
         try {
             fstream = new FileWriter("outputAnswers.txt");
@@ -84,8 +84,8 @@ public class OWLReasonerSPARQLEngine {
             System.err.println("Error: Cannot create file output.txt");
             e.printStackTrace();
         }
-        BufferedWriter out = new BufferedWriter(fstream);
-        while (results.hasNext()) {
+        BufferedWriter out = new BufferedWriter(fstream);*/
+        /*while (results.hasNext()) {
         	QuerySolution rb=results.nextSolution();
 			//System.out.println(rb);
 			try {
@@ -103,9 +103,9 @@ public class OWLReasonerSPARQLEngine {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
         //System.out.println("The result size is "+resultsSize);
-        */
+        
         long evalTime=System.currentTimeMillis()-t;
         ARQ.getContext().put(BGP_EXEC_TIME, evalTime);
         return results;

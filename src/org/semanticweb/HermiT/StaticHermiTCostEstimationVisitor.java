@@ -59,6 +59,9 @@ public class StaticHermiTCostEstimationVisitor extends StaticCostEstimationVisit
 	    	throw new IllegalArgumentException("Error: The HermiT cost estimator can only be instantiated with a graph that has a (HermiT) Reasoner instance attached to it.");
 	    COST_ENTAILMENT=(double)EntailmentLookUpCostEstimation.entailmentCost;
         COST_LOOKUP=(double)EntailmentLookUpCostEstimation.lookUpCost;
+	    //COST_ENTAILMENT=100;
+        //COST_LOOKUP=1;
+	    
 	}
 	
 /*	protected double[] getSubClassOfCost(ClassExpression subce, ClassExpression superce, Set<Variable> boundVar) {

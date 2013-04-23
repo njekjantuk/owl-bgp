@@ -96,8 +96,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
         boolean result=super.hasType(namedIndividual, type, direct);
         int currentCost=(int)(System.currentTimeMillis()-t);
         if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCostTotal=EntailmentLookUpCostEstimation.entailmentConceptCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentConceptTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCost=(int)(EntailmentLookUpCostEstimation.entailmentConceptCostTotal/EntailmentLookUpCostEstimation.entailmentConceptTestsno);
+            EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
         }
@@ -116,8 +119,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     	NodeSet<OWLNamedIndividual> indSet=super.getInstances(classExpression, direct);
     	int currentCost=(int)(System.currentTimeMillis()-t);
     	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCostTotal=EntailmentLookUpCostEstimation.entailmentConceptCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentConceptTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCost=(int)(EntailmentLookUpCostEstimation.entailmentConceptCostTotal/EntailmentLookUpCostEstimation.entailmentConceptTestsno);
+    	    EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	}
@@ -135,8 +141,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     	NodeSet<OWLClass> clSet=super.getTypes(namedIndividual, direct);
     	int currentCost=(int)(System.currentTimeMillis()-t);
     	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCostTotal=EntailmentLookUpCostEstimation.entailmentConceptCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentConceptTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentConceptCost=(int)(EntailmentLookUpCostEstimation.entailmentConceptCostTotal/EntailmentLookUpCostEstimation.entailmentConceptTestsno);
+    	    EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	}
@@ -154,8 +163,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     	Map<OWLNamedIndividual, Set<OWLNamedIndividual>> indSet=super.getObjectPropertyInstances(property);
     	int currentCost=(int)(System.currentTimeMillis()-t);
     	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-    		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+    		//EntailmentLookUpCostEstimation.entailmentRoleCostTotal=EntailmentLookUpCostEstimation.entailmentRoleCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentRoleTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCost=(int)(EntailmentLookUpCostEstimation.entailmentRoleCostTotal/EntailmentLookUpCostEstimation.entailmentRoleTestsno);
+    	    EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	}
@@ -176,8 +188,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     	long currentCost1=l-t;
         int currentCost=(int)currentCost1;
     	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-    		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+    		//EntailmentLookUpCostEstimation.entailmentRoleCostTotal=EntailmentLookUpCostEstimation.entailmentRoleCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentRoleTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCost=(int)(EntailmentLookUpCostEstimation.entailmentRoleCostTotal/EntailmentLookUpCostEstimation.entailmentRoleTestsno);
+    	    EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	}
@@ -195,8 +210,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
         boolean result=super.hasObjectPropertyRelationship(subject, propertyExpression, object);
         int currentCost=(int)(System.currentTimeMillis()-t);
         if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCostTotal=EntailmentLookUpCostEstimation.entailmentRoleCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentRoleTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCost=(int)(EntailmentLookUpCostEstimation.entailmentRoleCostTotal/EntailmentLookUpCostEstimation.entailmentRoleTestsno);
+            EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
         }
@@ -214,8 +232,11 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     	Set<OWLLiteral> litSet=super.getDataPropertyValues(namedIndividual, property);
     	int currentCost=(int)(System.currentTimeMillis()-t);
     	if (((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests()!=testsno) {
-        	//EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
-        	EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
+        	////EntailmentLookUpCostEstimation.entailmentCost=(int)((CountingMonitor)m_configuration.monitor).getAverageTime();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCostTotal=EntailmentLookUpCostEstimation.entailmentRoleCostTotal+currentCost;
+        	//EntailmentLookUpCostEstimation.entailmentRoleTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	//EntailmentLookUpCostEstimation.entailmentRoleCost=(int)(EntailmentLookUpCostEstimation.entailmentRoleCostTotal/EntailmentLookUpCostEstimation.entailmentRoleTestsno);
+    	    EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
         	EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
         	EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     	}
@@ -235,15 +256,32 @@ import org.semanticweb.owlapi.reasoner.NodeSet;
     		initialiseClassInstanceManager(); 
     		initialisePropertiesInstanceManager();
     		int currentCost=(int)(System.currentTimeMillis()-t);
+    		//EntailmentLookUpCostEstimation.entailmentConceptCostTotal=EntailmentLookUpCostEstimation.entailmentConceptCostTotal+currentCost;
     		EntailmentLookUpCostEstimation.entailmentCostTotal=EntailmentLookUpCostEstimation.entailmentCostTotal+currentCost;
     		TableauMonitor monitor=m_configuration.monitor;
     		if (monitor != null && monitor instanceof CountingMonitor) {
-        	   EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+        	   //EntailmentLookUpCostEstimation.entailmentConceptTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    		   EntailmentLookUpCostEstimation.entailmentTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
     		}
+    		//if (EntailmentLookUpCostEstimation.entailmentConceptTestsno > 0)
+        	//   EntailmentLookUpCostEstimation.entailmentConceptCost=(int)(EntailmentLookUpCostEstimation.entailmentConceptCostTotal/EntailmentLookUpCostEstimation.entailmentConceptTestsno);
     		if (EntailmentLookUpCostEstimation.entailmentTestsno > 0)
         	   EntailmentLookUpCostEstimation.entailmentCost=(int)(EntailmentLookUpCostEstimation.entailmentCostTotal/EntailmentLookUpCostEstimation.entailmentTestsno);
     		else 
+    		   //EntailmentLookUpCostEstimation.entailmentConceptCost=1; // random value, but better then division by zero error
     		   EntailmentLookUpCostEstimation.entailmentCost=1; // random value, but better then division by zero error
+    		/*t=System.currentTimeMillis();
+    		initialisePropertiesInstanceManager();
+    		currentCost=(int)(System.currentTimeMillis()-t);
+    		EntailmentLookUpCostEstimation.entailmentRoleCostTotal=EntailmentLookUpCostEstimation.entailmentRoleCostTotal+currentCost;
+    		if (monitor != null && monitor instanceof CountingMonitor) {
+        	   EntailmentLookUpCostEstimation.entailmentRoleTestsno=((CountingMonitor)m_configuration.monitor).getOverallNumberOfTests();
+    		}
+    		if (EntailmentLookUpCostEstimation.entailmentRoleTestsno > 0)
+        	   EntailmentLookUpCostEstimation.entailmentRoleCost=(int)(EntailmentLookUpCostEstimation.entailmentRoleCostTotal/EntailmentLookUpCostEstimation.entailmentRoleTestsno);
+    		else 
+    		   EntailmentLookUpCostEstimation.entailmentRoleCost=1; // random value, but better then division by zero error
+            */
     	} else {
     		
     	}

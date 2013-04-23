@@ -274,11 +274,11 @@ public class QueryTests extends AbstractQueryTest {
                 + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
                 + "PREFIX owl: <http://www.w3.org/2002/07/owl#> "+LB
                 + "PREFIX test: <http://www.whatif-project.org/ontology/authoringOntology/CarDriverTest.owl#>" +LB
-                + "SELECT ?indi ?role ?filler "+LB
+                + "SELECT ?indi ?role ?filler ?class"+LB
                 + "WHERE {"+LB
                 + "  ?role rdf:type owl:ObjectProperty . " + LB
                 + "  [owl:onProperty ?role; rdf:type owl:Restriction; owl:someValuesFrom ?filler ] rdfs:subClassOf ?class . "+LB
-                + "  ?indi ?role ?obj . "+LB
+                //+ "  ?indi ?role ?obj . "+LB
                 + "}";
         OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
         Query query=QueryFactory.create(s);
@@ -289,7 +289,7 @@ public class QueryTests extends AbstractQueryTest {
             result.next();
             noResults++;
         }
-        assertTrue(noResults==24);
+        assertTrue(noResults==118);
     }
     
     public void testNotExistsBlanks() throws Exception {

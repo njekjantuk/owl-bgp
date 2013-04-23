@@ -52,6 +52,7 @@ import org.semanticweb.sparql.owlbgp.model.properties.DataPropertyVariable;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectInverseOf;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectProperty;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyChain;
+import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyExpression;
 import org.semanticweb.sparql.owlbgp.model.properties.ObjectPropertyVariable;
 
 public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
@@ -82,10 +83,10 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                 positions[0]=bindingPositions.get(subClass);
                 positions[1]=bindingPositions.get(superClass);
                 return computeAllSubClassOfRelations(currentBinding,positions);
-            } else if (subClass.isVariable() && /*!superClass.isVariable() && superClass instanceof Clazz*/superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+            } else if (subClass.isVariable() && !superClass.isVariable() && superClass instanceof Clazz /*superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()*/) {
                 int position=bindingPositions.get(subClass);
                 return computeSubClasses(currentBinding,(OWLClassExpression)superClass.asOWLAPIObject(m_toOWLAPIConverter),position);
-            } else if (superClass.isVariable() && !subClass.isVariable() && /*subClass instanceof Clazz*/ subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()) {
+            } else if (superClass.isVariable() && !subClass.isVariable() && subClass instanceof Clazz/*subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty()*/) {
                 int position=bindingPositions.get(superClass);
                 return computeSuperClasses(currentBinding,(OWLClassExpression)subClass.asOWLAPIObject(m_toOWLAPIConverter),position);
             } else if (subClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty() && superClass.getBoundVersion(bindingMap).getVariablesInSignature().isEmpty())
@@ -185,7 +186,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             Atomic[] clonedBinding;
             for (Atomic[] binding:newBindingsOut) {
             	if (var instanceof ClassVariable) {
-            	    Integer polarity;
+            		Integer polarity;
             		if (subClassVars.contains(var)){
             			NegativePolarityClassVisitor clsVisitor=new NegativePolarityClassVisitor(var);
             		    polarity=subClass.accept(clsVisitor);
@@ -324,7 +325,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             ClassExpression subClass=axiom.getSubClassExpression();
             ClassExpression superClass=axiom.getSuperClassExpression();
             if (!isInNotEntailedList(currentBinding, notEntailedList, bindingPositions, vars/*, axiom*/) && !isInList(currentBinding, results, bindingPositions, vars)) {
-    		    //	entNo++;
+    		    	//entNo++;
     	        if (m_reasoner.isEntailed((OWLAxiom) axiom.getBoundVersion(bindingMap, m_dataFactory))) {
     			    results.add(currentBinding);
     	    	    List<Atomic[]> testedBindings=new ArrayList<Atomic[]>();
@@ -599,9 +600,8 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
             	    neg++;
             	else ;
             }
-            if (pos!=0 && neg!=0) {
+            if (pos!=0 && neg!=0) 
             	return 3; 
-            }
             else if (pos!=0)
             	return 1;
             else if (neg!=0)
@@ -892,10 +892,20 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         		return 1;
         	else if (polprop==1 && polcl==2)
         		return 3;
+        	else if (polprop==1 && polcl==3)
+        	    return 3;
         	else if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	else if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==2 && polcl==3)
+        	    return 3;
         	else return 0;		
         }
         public Integer visit(ObjectAllValuesFrom object) {
@@ -906,10 +916,20 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         		return 2;
         	else if (polprop==2 && polcl==1)
         		return 3;
+        	else if (polprop==2 && polcl==3)
+        		return 3;
         	else if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==1 && polcl==3)
+        		return 3;
         	else return 0;
         }
         public Integer visit(ObjectHasValue object) {
@@ -921,15 +941,25 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         public Integer visit(ObjectMinCardinality object) {
             int polcl=object.getClassExpression().accept(this);
             int polprop=object.getObjectPropertyExpression().accept(this);
-            if (polprop==1 && (polcl==0 || polcl==1))
+        	if (polprop==1 && (polcl==0 || polcl==1))
         		return 1;
         	else if (polprop==1 && polcl==2)
         		return 3;
+        	else if (polprop==1 && polcl==3)
+        	    return 3;
         	else if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
-        	else return 0;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	else if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==2 && polcl==3)
+        	    return 3;
+        	else return 0;	
         }
         public Integer visit(ObjectMaxCardinality object) {
         	NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
@@ -940,10 +970,20 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         	   	return 2;
         	else if (polprop==2 && polcl==1)
         		return 3;
+        	else if (polprop==2 && polcl==3)
+        		return 3;
         	else if (polprop==0 && polcl==1)
-        		return 2;
-        	else if (polprop==0 && polcl==2)
         		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	else if (polprop==1 && (polcl==0 || polcl==1))
+        	   	return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==1 && polcl==3)
+        		return 3;
         	else return 0;
         }
         public Integer visit(ObjectExactCardinality object) {
@@ -1059,24 +1099,44 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         		return 1;
         	else if (polprop==1 && polcl==2)
         		return 3;
+        	else if (polprop==1 && polcl==3)
+        	    return 3;
         	else if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	else if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==2 && polcl==3)
+        	    return 3;
         	else return 0;		
         }
         public Integer visit(ObjectAllValuesFrom object) {
         	int polcl=object.getClassExpression().accept(this);
-        	NegativePolarityPropertyVisitor npv1=new NegativePolarityPropertyVisitor(var);
-        	int polprop=object.getObjectPropertyExpression().accept(npv1);
-        	if (polprop==2 && (polcl==0 || polcl==2))
-        		return 2;
-        	else if (polprop==2 && polcl==1)
+        	PositivePolarityPropertyVisitor npv1=new PositivePolarityPropertyVisitor(var);
+        	int polprop=object.getObjectPropertyExpression().accept(npv1);   	
+        	if (polprop==1 && (polcl==0 || polcl==1))
+        		return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==1 && polcl==3)
         		return 3;
         	else if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==2 && polcl==3)
+        		return 3;
         	else return 0;
         }
         public Integer visit(ObjectHasValue object) {
@@ -1092,11 +1152,22 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         		return 1;
         	else if (polprop==1 && polcl==2)
         		return 3;
-        	else if (polprop==0 && polcl==1)
+        	else if (polprop==1 && polcl==3)
+        	    return 3;
+        	else
+            if (polprop==0 && polcl==1)
         		return 1;
         	else if (polprop==0 && polcl==2)
         		return 2;
-        	else return 0;
+        	else if (polprop==0 && polcl==3)
+        		return 3;
+        	else if (polprop==2 && (polcl==0 || polcl==2))
+        		return 2;
+        	else if (polprop==2 && polcl==1)
+        		return 3;
+        	else if (polprop==2 && polcl==3)
+        	    return 3;
+        	else return 0;		
         }
         public Integer visit(ObjectMaxCardinality object) {
         	NegativePolarityPropertyVisitor npv=new NegativePolarityPropertyVisitor(var);
@@ -1107,10 +1178,20 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
         	   	return 2;
         	else if (polprop==2 && polcl==1)
         		return 3;
+        	else if (polprop==2 && polcl==3)
+        		return 3;
         	else if (polprop==0 && polcl==1)
-        		return 2;
-        	else if (polprop==0 && polcl==2)
         		return 1;
+        	else if (polprop==0 && polcl==2)
+        		return 2;
+        	else if (polprop==0 && polcl==1)
+        		return 3;
+         	if (polprop==1 && (polcl==0 || polcl==1))
+        	   	return 1;
+        	else if (polprop==1 && polcl==2)
+        		return 3;
+        	else if (polprop==1 && polcl==3)
+        		return 3;
         	else return 0;
         }
         public Integer visit(ObjectExactCardinality object) {
