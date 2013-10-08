@@ -128,7 +128,7 @@ public class TestPizzaQueries extends TestCase {
                 }
             }
         }
-//        System.out.println(expectedResults);
+        //System.out.println(expectedResults);
         // We get 635 expected results
         int noResults=0;
         while (result.hasNext()) {
@@ -144,14 +144,15 @@ public class TestPizzaQueries extends TestCase {
             Set<OWLClass> values=expectedSolutions.get(subClass);
             assertTrue(values!=null);
             boolean isRemoved=values.remove(qualification);
-//            assertTrue(isRemoved); // FAILS
+            assertTrue(isRemoved); 
             if (values.isEmpty())
                 expectedSolutions.remove(subClass);
         }
-        System.out.println("----missed-----");
+        /*System.out.println("----missed-----");
         for (OWLClass missedSubClass : expectedSolutions.keySet())
             for (OWLClass missedQualification : expectedSolutions.get(missedSubClass))
                 System.out.println(missedSubClass+" -> "+missedQualification);
-//        assertTrue(noResults==noExpectedResults); // FAILS
+        System.out.println("NoResults: "+noResults);*/
+        assertTrue(noResults==noExpectedResults); 
     }
 }
