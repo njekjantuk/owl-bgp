@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLClass;
@@ -195,34 +196,34 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                 	    PositivePolarityClassVisitor clsVisitor=new PositivePolarityClassVisitor(var);
                 	    polarity=superClass.accept(clsVisitor);    
             		}    
-            		if (polarity==1){
-            		    //OWLClass top = m_reasoner.getTopClassNode().getRepresentativeElement();
-            		    //Set<OWLClass> classSet = m_reasoner.getSubClasses(top, true).getFlattened();
-                        //Iterator<OWLClass> itr = classSet.iterator();
-                        //while(itr.hasNext()) {
-                        //    OWLClass element = itr.next();
-                        //    clonedBinding=binding.clone();
-                        //    clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(element);
-                        //    testedBindings.add(clonedBinding);
-                        //} 
+            		if (polarity==1){ 
                         clonedBinding=binding.clone();
                         IRI top=m_reasoner.getTopClassNode().getRepresentativeElement().getIRI();
                         clonedBinding[bindingPositions.get(var)]=Clazz.create(top.toString());                       
                         testedBindings.add(clonedBinding);
+                        
+                        OWLClass equivClass=OWLManager.getOWLDataFactory().getOWLThing();
+                        for (OWLClass cls:m_reasoner.getEquivalentClasses(equivClass).getEntities()){
+                        	if (!cls.equals(equivClass)) {
+            				    clonedBinding=binding.clone();
+                                clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(cls);
+                                testedBindings.add(clonedBinding);
+            			    }
+                        }	
             		}
             		else if (polarity==2){
-            		    //OWLClass bottom = m_reasoner.getBottomClassNode().getRepresentativeElement();
-            		    //Set<OWLClass> classSet = m_reasoner.getSuperClasses(bottom, true).getFlattened();
-                        //Iterator<OWLClass> itr = classSet.iterator(); 
-                        //while(itr.hasNext()) {
-                        //     OWLClass element = itr.next(); 
-                        //    clonedBinding=binding.clone();
-                        //    clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(element);
-                        //    testedBindings.add(clonedBinding);  
-                        //}
                         clonedBinding=binding.clone();
                         clonedBinding[bindingPositions.get(var)]=Clazz.NOTHING;
                         testedBindings.add(clonedBinding);
+                        
+                        OWLClass equivClass=OWLManager.getOWLDataFactory().getOWLNothing();
+                        for (OWLClass cls:m_reasoner.getEquivalentClasses(equivClass).getEntities()){
+                        	if (!cls.equals(equivClass)) {
+                        	    clonedBinding=binding.clone();
+                                clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(cls);
+                                testedBindings.add(clonedBinding);
+                        	}
+            			}
             		}
             	}
             	else if (var instanceof ObjectPropertyVariable) {
@@ -235,33 +236,33 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                 	    PositivePolarityPropertyVisitor propVisitor=new PositivePolarityPropertyVisitor(var);
                 	    polarity=superClass.accept(propVisitor);    
             		}            		
-            		if (polarity==1){
-            		    //OWLObjectPropertyExpression top = m_reasoner.getTopObjectPropertyNode().getRepresentativeElement();
-            		    //Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSubObjectProperties(top, true).getFlattened();
-            		    //for (OWLObjectPropertyExpression propexpr:propertySet) {
-                        //    if (propexpr instanceof OWLObjectProperty) {
-                        //        clonedBinding=binding.clone();
-                        //        clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
-                        //        testedBindings.add(clonedBinding);
-                        //    }
-            		    //}   
+            		if (polarity==1){   
                         clonedBinding=binding.clone();
                         clonedBinding[bindingPositions.get(var)]=ObjectProperty.TOP_OBJECT_PROPERTY;
                         testedBindings.add(clonedBinding);
+                        
+                        OWLObjectProperty equivProp=OWLManager.getOWLDataFactory().getOWLTopObjectProperty();
+                        for (OWLObjectPropertyExpression prop:m_reasoner.getEquivalentObjectProperties(equivProp).getEntities()){
+                            if (prop instanceof OWLObjectProperty && !prop.equals(equivProp)) {
+                        	    clonedBinding=binding.clone();
+                                clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert(prop);
+                                testedBindings.add(clonedBinding);
+                            } 
+            			}
                     }
             		else if (polarity==2){
-            		    //OWLObjectPropertyExpression bottom = m_reasoner.getBottomObjectPropertyNode().getRepresentativeElement();
-            		    //Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSuperObjectProperties(bottom, true).getFlattened();
-                        //for (OWLObjectPropertyExpression propexpr:propertySet) {
-                        //    if (propexpr instanceof OWLObjectProperty) {
-                        //        clonedBinding=binding.clone();
-                        //        clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
-                        //        testedBindings.add(clonedBinding);
-                        //    }
-                        //}
                         clonedBinding=binding.clone();
                         clonedBinding[bindingPositions.get(var)]=ObjectProperty.BOTTOM_OBJECT_PROPERTY;
                         testedBindings.add(clonedBinding);
+                        
+                        OWLObjectProperty equivProp=OWLManager.getOWLDataFactory().getOWLBottomObjectProperty();
+                        for (OWLObjectPropertyExpression prop:m_reasoner.getEquivalentObjectProperties(equivProp).getEntities()){
+                            if (prop instanceof OWLObjectProperty && !prop.equals(equivProp)) {
+                        	    clonedBinding=binding.clone();
+                                clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert(prop);
+                                testedBindings.add(clonedBinding);
+                            } 
+            			}
             		}
                 }
                 else if (var instanceof DatatypeVariable) {
@@ -333,13 +334,16 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
     	    	    for (Variable var : vars) {
     	    		    testedBindings=new ArrayList<Atomic[]>();
     	    			if (var instanceof ClassVariable) {
-    	    				OWLClass equivClass=(OWLClass)bindingMap.get(var).asOWLAPIObject(m_toOWLAPIConverter);
+    	    				/*OWLClass equivClass=(OWLClass)bindingMap.get(var).asOWLAPIObject(m_toOWLAPIConverter);
                 		   	for (OWLClass cls:m_reasoner.getEquivalentClasses(equivClass).getEntities()){
                 				clonedBinding=binding.clone();
                                 clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(cls);
-                                if (!isInList(clonedBinding, results, bindingPositions, vars))
-                                    results.add(clonedBinding);
-                			}	
+                                if (!cls.equals(equivClass)){
+                                	if (!isInList(clonedBinding, results, bindingPositions, vars))
+                                		results.add(clonedBinding);
+                                	loopEquivBindings.add(clonedBinding);	
+                                }	
+                			}*/	
     	    				Integer polarity;
                 			if (subClass.getVariablesInSignature().contains(var)){
                     			NegativePolarityClassVisitor clsVisitor=new NegativePolarityClassVisitor(var);
@@ -352,18 +356,28 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                             if (polarity==1){
             		            OWLClass currentClass = (OWLClass)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLClass> classSet = m_reasoner.getSubClasses(currentClass, true).getFlattened();
-                                Iterator<OWLClass> itr = classSet.iterator();
+            		            Set<OWLClass> equivClasses=m_reasoner.getEquivalentClasses(currentClass).getEntities();
+            		            for (OWLClass cls:equivClasses) {
+            		            	if (!cls.equals(currentClass)) 
+            		            		classSet.add(cls);
+            		            }	
+            		            Iterator<OWLClass> itr = classSet.iterator();
                                 while(itr.hasNext()) {
                                     OWLClass element = itr.next();
                                     clonedBinding=binding.clone();
                                     clonedBinding[bindingPositions.get(var)]=(Clazz)FromOWLAPIConverter.convert(element);
                                     testedBindings.add(clonedBinding);
-                                } 
+                                }
             		        }
             		        else if (polarity==2){
             		            OWLClass currentClass = (OWLClass)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory);
             		            Set<OWLClass> classSet = m_reasoner.getSuperClasses(currentClass, true).getFlattened();
-                                Iterator<OWLClass> itr = classSet.iterator(); 
+            		            Set<OWLClass> equivClasses=m_reasoner.getEquivalentClasses(currentClass).getEntities();
+            		            for (OWLClass cls:equivClasses) {
+            		            	if (!cls.equals(currentClass)) 
+            		            		classSet.add(cls);
+            		            }	
+            		            Iterator<OWLClass> itr = classSet.iterator(); 
                                 while(itr.hasNext()) {
                                     OWLClass element = itr.next(); 
                                     clonedBinding=binding.clone();
@@ -372,16 +386,7 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                                 } 
                             }
             	        }
-    	    			else if (var instanceof ObjectPropertyVariable) {
-    	    				OWLObjectProperty equivProp=(OWLObjectProperty)bindingMap.get(var).asOWLAPIObject(m_toOWLAPIConverter);
-                			for (OWLObjectPropertyExpression prop:m_reasoner.getEquivalentObjectProperties(equivProp).getEntities()){
-                				if (prop instanceof OWLObjectProperty){
-                				    clonedBinding=binding.clone();
-                                    clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert(prop);
-                                    if (!isInList(clonedBinding, results, bindingPositions, vars))
-                                        results.add(clonedBinding);
-                				}
-                			}	
+    	    			else if (var instanceof ObjectPropertyVariable) {	
     	    				Integer polarity;
                 			if (subClass.getVariablesInSignature().contains(var)){
                     			NegativePolarityPropertyVisitor propVisitor=new NegativePolarityPropertyVisitor(var);
@@ -394,24 +399,34 @@ public class QO_SubClassOf extends AbstractQueryObject<SubClassOf> {
                             if (polarity==1){
             		            OWLObjectProperty currentProperty = (OWLObjectProperty)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSubObjectProperties(currentProperty, true).getFlattened();
+            		            Set<OWLObjectPropertyExpression> equivProperties=m_reasoner.getEquivalentObjectProperties(currentProperty).getEntities();
+            		            for (OWLObjectPropertyExpression prop:equivProperties) {
+            		            	if (!prop.equals(currentProperty)) 
+            		            		propertySet.add(prop);
+            		            }	
             		            for (OWLObjectPropertyExpression propexpr:propertySet) {
                                     if (propexpr instanceof OWLObjectProperty) {
                                      	clonedBinding=binding.clone();
                                         clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
                                         testedBindings.add(clonedBinding);  
                                     } 
-                                }    
+                                }
             		        }
             		        else if (polarity==2){
             		        	OWLObjectProperty currentProperty = (OWLObjectProperty)binding[bindingPositions.get(var)].asOWLAPIObject(m_dataFactory); 
             		            Set<OWLObjectPropertyExpression> propertySet = m_reasoner.getSuperObjectProperties(currentProperty, true).getFlattened();
-                                for (OWLObjectPropertyExpression propexpr:propertySet) {
+            		            Set<OWLObjectPropertyExpression> equivProperties=m_reasoner.getEquivalentObjectProperties(currentProperty).getEntities();
+            		            for (OWLObjectPropertyExpression prop:equivProperties) {
+            		            	if (!prop.equals(currentProperty)) 
+            		            		propertySet.add(prop);
+            		            }
+            		            for (OWLObjectPropertyExpression propexpr:propertySet) {
                                     if (propexpr instanceof OWLObjectProperty) {
                                     	clonedBinding=binding.clone();
                                         clonedBinding[bindingPositions.get(var)]=(ObjectProperty)FromOWLAPIConverter.convert((OWLObjectProperty)propexpr);
                                         testedBindings.add(clonedBinding);    
                                     }
-                                }  
+                                }
                             }
     	    			}
     		            returnBindings.addAll(testedBindings);   
