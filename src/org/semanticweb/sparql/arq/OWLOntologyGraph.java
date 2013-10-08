@@ -51,11 +51,9 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.graph.GraphEventManager;
 import com.hp.hpl.jena.graph.GraphStatisticsHandler;
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Reifier;
 import com.hp.hpl.jena.graph.TransactionHandler;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.graph.TripleMatch;
-import com.hp.hpl.jena.graph.query.QueryHandler;
 import com.hp.hpl.jena.shared.AddDeniedException;
 import com.hp.hpl.jena.shared.DeleteDeniedException;
 import com.hp.hpl.jena.shared.PrefixMapping;
@@ -227,10 +225,6 @@ public class OWLOntologyGraph implements Graph {
 		return null;
 	}
 	@Override
-	public Reifier getReifier() {
-		return null;
-	}
-	@Override
 	public GraphStatisticsHandler getStatisticsHandler() {
 		return null;
 	}
@@ -251,10 +245,6 @@ public class OWLOntologyGraph implements Graph {
 		return false;
 	}
 	@Override
-	public QueryHandler queryHandler() {
-		return null;
-	}
-	@Override
 	public int size() {
 		return m_reasoner.getRootOntology().getAxiomCount();
 	}
@@ -262,4 +252,12 @@ public class OWLOntologyGraph implements Graph {
 	public void add(Triple t) throws AddDeniedException {
 	    throw new AddDeniedException("HermiT does not accept additions to graphs.");
 	}
+    @Override
+    public void clear() {
+        throw new UnsupportedOperationException("Clearing graphs is not yet supported.");
+    }
+    @Override
+    public void remove(Node s, Node p, Node o) {
+        throw new UnsupportedOperationException("Removing triples from OWLONtologyGraph instances is not supported. ");
+    }
 }

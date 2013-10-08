@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.jena.atlas.io.IndentedWriter;
 import org.semanticweb.sparql.owlbgp.model.Atomic;
 import org.semanticweb.sparql.owlbgp.model.Prefixes;
 import org.semanticweb.sparql.owlbgp.model.Variable;
@@ -30,6 +31,7 @@ import org.semanticweb.sparql.owlbgp.model.individuals.NamedIndividual;
 import org.semanticweb.sparql.owlbgp.model.literals.Literal;
 
 import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.rdf.model.AnonId;
 import com.hp.hpl.jena.sparql.core.BasicPattern;
 import com.hp.hpl.jena.sparql.core.Var;
@@ -143,7 +145,7 @@ public class OWLBGPQueryIterator extends QueryIter {//QueryIter1, QueryIteratorB
 //        input=null;
 //        resultsPerComponent=null;
 //    }
-    public void output(org.openjena.atlas.io.IndentedWriter out, SerializationContext sCxt) {
+    public void output(IndentedWriter out, SerializationContext sCxt) {
         out.print(Utils.className(this)) ;
         out.println() ;
         out.incIndent() ;
@@ -155,9 +157,9 @@ public class OWLBGPQueryIterator extends QueryIter {//QueryIter1, QueryIteratorB
             Literal lit=(Literal)atomic;
             String iri=lit.getDatatype().getIRI().toString(Prefixes.NO_PREFIXES);
             if (iri.equals("<http://www.w3.org/1999/02/22-rdf-syntax-ns#PlainLiteral>"))
-                return Node.createLiteral(lit.getLexicalForm(), lit.getLangTag(), null);
+                return NodeFactory.createLiteral(lit.getLexicalForm(), lit.getLangTag(), null); 
             else 
-                return Node.createLiteral(lit.getLexicalForm(), lit.getLangTag(), Node.getType(iri.substring(1, iri.length()-1)));
+                return NodeFactory.createLiteral(lit.getLexicalForm(), lit.getLangTag(), NodeFactory.getType(iri.substring(1, iri.length()-1)));
         } else {
             // we could do something with the Skolem constants here
             String iri=atomic.toString(Prefixes.NO_PREFIXES);
@@ -165,10 +167,10 @@ public class OWLBGPQueryIterator extends QueryIter {//QueryIter1, QueryIteratorB
             if (atomic instanceof NamedIndividual && m_skolemConstants.contains(iri) && iri.startsWith("_:genid-nodeid-")) {
                 String label=iri.substring("_:genid-nodeid-".length());
                 AnonId id=AnonId.create(label);
-                Node node=Node.createAnon(id);
+                Node node=NodeFactory.createAnon(id);
                 return node;
             } else 
-                return Node.createURI(iri);
+                return NodeFactory.createURI(iri);
         } 
     }
     @Override
