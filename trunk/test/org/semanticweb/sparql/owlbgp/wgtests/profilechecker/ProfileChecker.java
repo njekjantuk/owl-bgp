@@ -52,7 +52,7 @@ public class ProfileChecker extends TestRunner {
     protected void exec() {
         NodeValue.VerboseWarnings=false;
         E_Function.WarnOnUnknownFunction=false;
-        TestSuite suite=new ProfileCheckerScriptTestSuitFactory().process(testfileAbs);
+        TestSuite suite=new ProfileCheckerScriptTestSuitFactory().process(testfile);
         junit.textui.TestRunner.run(suite) ;
     }
 

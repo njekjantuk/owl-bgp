@@ -3,7 +3,7 @@ package com.hp.hpl.jena.sparql.junit;
 import java.io.IOException;
 import java.util.List;
 
-import org.openjena.atlas.logging.Log;
+import org.apache.jena.atlas.logging.Log;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.sparql.arq.OWLOntologyDataSet;
 

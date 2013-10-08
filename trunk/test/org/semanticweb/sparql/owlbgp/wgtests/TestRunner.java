@@ -44,7 +44,7 @@ import com.hp.hpl.jena.sparql.expr.NodeValue;
 import com.hp.hpl.jena.sparql.junit.EarlReport;
 import com.hp.hpl.jena.sparql.junit.ScriptTestSuiteFactory;
 import com.hp.hpl.jena.sparql.junit.SimpleTestRunner;
-import com.hp.hpl.jena.sparql.util.NodeFactory;
+import com.hp.hpl.jena.sparql.util.NodeFactoryExtra;
 import com.hp.hpl.jena.sparql.vocabulary.DOAP;
 import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 import com.hp.hpl.jena.sparql.vocabulary.TestManifest;
@@ -100,9 +100,9 @@ public class TestRunner extends qtest {
         NodeValue.VerboseWarnings=false;
         E_Function.WarnOnUnknownFunction=false;
         if (createEarlReport)
-            oneManifestEarl(testfileAbs) ;
+            oneManifestEarl(testfile) ;
         else
-            oneManifest(testfileAbs) ;
+            oneManifest(testfile) ;
     }
     static void oneManifest(String testManifest) {
         TestSuite suite=new OWLBGPScriptTestSuitFactory().process(testManifest);// generates just the entailment tests with OWL Direct Semantics
@@ -137,7 +137,7 @@ public class TestRunner extends qtest {
         Resource release=model.createResource(DOAP.Version) ;
         system.addProperty(DOAP.release, release) ;
         
-        Node today_node=NodeFactory.todayAsDate() ;
+        Node today_node=NodeFactoryExtra.todayAsDate() ;
         Literal today=model.createTypedLiteral(today_node.getLiteralLexicalForm(), today_node.getLiteralDatatype()) ;
         release.addProperty(DOAP.created, today) ;
         release.addProperty(DOAP.name, releaseName) ;      // Again
