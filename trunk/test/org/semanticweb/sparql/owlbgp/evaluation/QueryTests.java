@@ -112,6 +112,49 @@ public class QueryTests extends AbstractQueryTest {
         assertTrue(noResults==2);
     } 
     
+    public void testSubquery() throws Exception {
+        String axioms="Declaration(NamedIndividual( :alice ))"+LB+
+                "Declaration(NamedIndividual( :bob ))"+LB+
+                "Declaration(NamedIndividual( :carol ))"+LB+
+                "Declaration(ObjectProperty( :knows ))"+LB+
+                "Declaration(DataProperty( :name ))"+LB+
+                "ObjectPropertyAssertion( :knows :alice :bob )"+LB+
+                "ObjectPropertyAssertion( :knows :alice :carol )"+LB+
+                "DataPropertyAssertion( :name :alice \"Alice\" )"+LB+
+                "DataPropertyAssertion( :name :alice \"Alice Foo\" )"+LB+
+                "DataPropertyAssertion( :name :alice \"A. Foo\" )"+LB+
+                "DataPropertyAssertion( :name :bob \"Bob\" )"+LB+
+                "DataPropertyAssertion( :name :bob \"Bob Bar\" )"+LB+
+                "DataPropertyAssertion( :name :bob \"B. Bar\" )"+LB+
+                "DataPropertyAssertion( :name :carol \"Carol\" )"+LB+
+                "DataPropertyAssertion( :name :carol \"Carol Baz\" )"+LB+
+                "DataPropertyAssertion( :name :carol \"C. Baz\" )";
+        loadDataSetWithAxioms(axioms);
+        String s= "PREFIX ex:   <http://example.org/> "+LB
+                + "PREFIX :      <http://example.org/>" +LB
+                + "PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +LB
+                + "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> "+LB
+                + "PREFIX owl:  <http://www.w3.org/2002/07/owl#> "+LB
+                + "SELECT ?y ?minName WHERE {"+LB
+                + "  :alice :knows ?y . "+LB
+                + "  { "+LB
+                + "    SELECT ?y (MIN(?name) AS ?minName)"+LB
+                + "    WHERE { "+LB
+                + "    ?y :name ?name . "+LB
+                + "    } GROUP BY ?y "+LB
+                + "  } "+LB
+                + "}";
+        OWLReasonerSPARQLEngine sparqlEngine=new OWLReasonerSPARQLEngine();
+        Query query=QueryFactory.create(s);
+        ResultSet result=sparqlEngine.execQuery(query,m_dataSet);
+//        System.out.println(ResultSetFormatter.asText(result));
+        int noResults=0;
+        while (result.hasNext()) {
+            result.next();
+            noResults++;
+        }
+        assertTrue(noResults==2);
+    }         
     public void testMinus() throws Exception {
         String axioms="Declaration(NamedIndividual( :alice ))"+LB+
                 "Declaration(NamedIndividual( :bob ))"+LB+
