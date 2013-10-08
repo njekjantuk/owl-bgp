@@ -15,18 +15,19 @@
     
     <!-- libraries -->
     <property name="libdir" value="${projectroot}/lib"/>
-    <property name="owlapi" value="${libdir}/owlapi-3.2.1.jar"/>
-    <property name="hermit" value="${libdir}/HermiT-1.3.3.jar"/>
-    <property name="arq" value="${libdir}/arq-2.8.7.jar"/>
-    <property name="arq-test" value="${libdir}/arq-2.8.7-test.jar"/>
-    <property name="jena" value="${libdir}/jena-2.6.4.jar"/>
-    <property name="jena-test" value="${libdir}/jena-2.6.4-test.jar"/>
-    <property name="icu4j" value="${libdir}/icu4j-3.4.4.jar"/>
-    <property name="iri" value="${libdir}/iri-0.8.jar"/>
+	<property name="icu4j" value="${libdir}/icu4j-3.4.4.jar"/>
 	<property name="log4j" value="${libdir}/log4j-1.2.14.jar"/>
-	<property name="slf4j-api" value="${libdir}/slf4j-api-1.5.8.jar"/>
 	<property name="slf4j-log4j" value="${libdir}/slf4j-log4j12-1.5.8.jar"/>
-	<property name="xerces" value="${libdir}/xercesImpl-2.7.1.jar"/>
+	<property name="slf4j-api" value="${libdir}/slf4j-api-1.5.8.jar"/>
+	<property name="uncommons-maths" value="${libdir}/uncommons-maths-1.2.2.jar"/>
+	<property name="arq" value="${libdir}/jena-arq-2.11.0.jar"/>
+	<property name="jena" value="${libdir}/jena-core-2.11.0.jar"/>
+	<property name="iri" value="${libdir}/jena-iri-1.0.0.jar"/>
+	<property name="owlapi" value="${libdir}/owlapi-3.4.5.jar"/>
+	<property name="hermit" value="${libdir}/HermiT-1.3.8.jar"/>
+    <property name="arq-test" value="${libdir}/jena-arq-2.11.0-test.jar"/>
+    <property name="jena-test" value="${libdir}/jena-core-2.11.0-test.jar"/>
+    <property name="xerces" value="${libdir}/xercesImpl-2.7.1.jar"/>
 	
     <!-- to generate a debug version, use -Ddebug=on argument when running ant -->
     <property name="debug" value="off"/>
@@ -38,17 +39,18 @@
 
     <!-- CLASS PATHS -->
     <path id="classpath">
-        <pathelement location="${owlapi}"/>
-        <pathelement location="${hermit}"/>
-        <pathelement location="${arq}"/>
-        <pathelement location="${arq-test}"/>
-        <pathelement location="${jena}"/>
-    	<pathelement location="${jena-test}"/>
     	<pathelement location="${icu4j}"/>
-    	<pathelement location="${iri}"/>
     	<pathelement location="${log4j}"/>
-    	<pathelement location="${slf4j-api}"/>
     	<pathelement location="${slf4j-log4j}"/>
+    	<pathelement location="${slf4j-api}"/>
+    	<pathelement location="${uncommons-maths}"/>
+    	<pathelement location="${arq}"/>
+        <pathelement location="${jena}"/>
+    	<pathelement location="${iri}"/>
+    	<pathelement location="${owlapi}"/>
+        <pathelement location="${hermit}"/>
+    	<pathelement location="${arq-test}"/>
+    	<pathelement location="${jena-test}"/>
     	<pathelement location="${xerces}"/>
     </path>
 
@@ -74,18 +76,19 @@
 	
 	<target name="unpack-libraries">
 	    <mkdir dir="${classdir}"/>
-	    <unjar src="${owlapi}" dest="${classdir}"/>
+		<unjar src="${icu4j}" dest="${classdir}"/>
+		<unjar src="${log4j}" dest="${classdir}"/>
+		<unjar src="${slf4j-log4j}" dest="${classdir}"/>
+		<unjar src="${slf4j-api}" dest="${classdir}"/>
+        <unjar src="${uncommons-maths}" dest="${classdir}"/>
+		<unjar src="${arq}" dest="${classdir}"/>
+		<unjar src="${jena}" dest="${classdir}"/>
+    	<unjar src="${iri}" dest="${classdir}"/>
+		<unjar src="${owlapi}" dest="${classdir}"/>
         <unjar src="${hermit}" dest="${classdir}"/>
-        <unjar src="${arq}" dest="${classdir}"/>
-        <unjar src="${arq-test}" dest="${classdir}"/>
-        <unjar src="${jena}" dest="${classdir}"/>
-        <unjar src="${jena-test}" dest="${classdir}"/>
-        <unjar src="${icu4j}" dest="${classdir}"/>
-        <unjar src="${iri}" dest="${classdir}"/>
-        <unjar src="${log4j}" dest="${classdir}"/>
-        <unjar src="${slf4j-api}" dest="${classdir}"/>
-        <unjar src="${slf4j-log4j}" dest="${classdir}"/>
-        <unjar src="${xerces}" dest="${classdir}"/>
+		<unjar src="${arq-test}" dest="${classdir}"/>
+		<unjar src="${jena-test}" dest="${classdir}"/>
+		<unjar src="${xerces}" dest="${classdir}"/>
     </target>
     
     <target name="licenses">
@@ -102,7 +105,7 @@
     	<jar jarfile="${builddir}/${ant.project.name}-${version}.jar">
             <manifest>
                 <attribute name="Implementation-Title" value="OWL-BGP"/>
-                <attribute name="Implementation-Vendor" value="Oxford University Computing Laboratory"/>
+                <attribute name="Implementation-Vendor" value="University of Ulm"/>
                 <attribute name="Implementation-Version" value="${version}.${revision.number}"/>
                 <attribute name="Built-By" value="${user.name}"/>
                 <attribute name="Main-Class" value="org.semanticweb.sparql.GUI_Demo"/>
