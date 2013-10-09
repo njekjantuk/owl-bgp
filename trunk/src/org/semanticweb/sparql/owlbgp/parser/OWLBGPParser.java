@@ -424,6 +424,11 @@ public class OWLBGPParser implements OWLBGPParserConstants {
       } else {
         ;
       }
+      if (datatypeIdentifier==IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral")) {
+          int atLocation=lexicalForm.lastIndexOf("@");
+          lang=lexicalForm.substring(atLocation+1);
+          lexicalForm=lexicalForm.substring(0, atLocation);
+      }
       if (datatypeIdentifier==null)
           datatypeIdentifier=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
       dt=Datatype.create((IRI)datatypeIdentifier);

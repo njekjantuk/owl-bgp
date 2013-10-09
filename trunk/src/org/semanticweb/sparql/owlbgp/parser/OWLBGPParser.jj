@@ -420,6 +420,11 @@ void parseLiteral(Identifier subject, Identifier predicate) :
 {
     (lexicalForm=parseQuotedString() ((<DOUBLE_CARET> datatypeIdentifier=parseResource()) | (("@" (t=<PN_LOCAL>)){lang=t.image;}) | <AT>)?
         {
+      if (datatypeIdentifier==IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral")) {
+          int atLocation=lexicalForm.lastIndexOf("@");
+          lang=lexicalForm.substring(atLocation+1);
+          lexicalForm=lexicalForm.substring(0, atLocation);
+      }
       if (datatypeIdentifier==null)
           datatypeIdentifier=IRI.create(Prefixes.s_semanticWebPrefixes.get("rdf")+"PlainLiteral");
       dt=Datatype.create((IRI)datatypeIdentifier);
