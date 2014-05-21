@@ -92,7 +92,7 @@ public class TestUOBM {
 //	    ResultSetFormatter.asText(result);
 	}*/
 	
-	public static void getUOBMQExample(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	/*public static void getUOBMQExample(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("QEx");
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:Person. " +LB
@@ -106,7 +106,7 @@ public class TestUOBM {
 	    sparqlEngine.execQuery(query,dataset);
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
-	}
+	}*/
 	
 	/*public static void getUOBMQExample(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("QEx");
@@ -125,7 +125,7 @@ public class TestUOBM {
 //	    ResultSetFormatter.asText(result);
 	}*/
 	
-	public static void getUOBMQExample1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
+	/*public static void getUOBMQExample1(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("QEx");
 	    String queryString=getUOBMPrefix()
 	    + "  ?x rdf:type uob:Woman. " +LB
@@ -140,7 +140,7 @@ public class TestUOBM {
 	    sparqlEngine.execQuery(query,dataset);
 	    System.out.println("Result: "+(System.currentTimeMillis()-t));
 //	    ResultSetFormatter.asText(result);
-	}
+	}*/
 	
 	/*public static void getUOBMQ01(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q01");
@@ -166,14 +166,9 @@ public class TestUOBM {
 	public static void getUOBMQ01(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q01");
 	    String queryString=getUOBMPrefix()
-	    + "  ?x rdf:type uob:Person. " +LB
-	    + "  ?y rdf:type uob:GraduateCourse. " +LB
-	    //+ "  ?y rdf:type uob:Faculty. " +LB
-	    //+ "  ?y rdf:type uob:Employee. " +LB
-	    //+ "  ?y rdf:type uob:Professor. " +LB
-	   // + "  ?x rdf:type uob:SportsFan. " +LB
-	    + "  ?x uob:takesCourse ?y. " +LB
-//	    + "  ?x rdf:type uob:PeopleWithManyHobbies. " +LB
+	    + "  ?y rdf:type uob:Woman. " +LB
+	    + "  ?x rdf:type uob:GraduateStudent. " +LB
+	    + "  ?x uob:isAdvisedBy ?y. " +LB
 	    + " } "+LB;
 	    //long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
@@ -186,14 +181,10 @@ public class TestUOBM {
 	
 	public static void getUOBMQ02(OWLReasonerSPARQLEngine sparqlEngine, OWLOntologyDataSet dataset) {
 	    System.out.println("Q02");
-	    String queryString=getUOBMPrefix()
-	    //+ "  ?x rdf:type uob:Man. " +LB
+	    String queryString=getUOBMPrefix()	    
 	    + "  ?x rdf:type uob:Woman. " +LB
 	    + "  ?x rdf:type uob:GraduateStudent. " +LB
 	    + "  ?x rdf:type uob:SportsFan. " +LB
-	    + "  ?x rdf:type uob:PeopleWithHobby. " +LB
-	    + "  ?x rdf:type uob:SportsLover. " +LB
-	    //+ "  ?x uob:isAdvisedBy ?y. " +LB
         + " } "+LB;
 	    //long t=System.currentTimeMillis();
 	    Query query=QueryFactory.create(queryString);
