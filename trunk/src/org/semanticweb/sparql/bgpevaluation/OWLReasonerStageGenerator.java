@@ -128,7 +128,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
         if (evaluator==null)
             evaluator=new StaticEvaluator(ontologyGraph, m_monitor);
         
-        Integer resultSize=null;
+        int resultSize=0;
         List<List<Atomic[]>> bindingsPerComponent=new ArrayList<List<Atomic[]>>();
         List<Map<Variable,Integer>> bindingPositionsPerComponent=new ArrayList<Map<Variable,Integer>>();
         for (List<QueryObject<? extends Axiom>> connectedComponent : connectedComponents) {          	
@@ -149,7 +149,7 @@ public class OWLReasonerStageGenerator implements StageGenerator {
             List<Atomic[]> bindings=initiliseBindings(input, positionInTuple, connectedComponent);
             bindings=evaluator.execute(connectedComponent, positionInTuple, bindings);
             bindingsPerComponent.add(bindings);
-            if (resultSize==null)
+            if (resultSize==0)
                 resultSize=bindings.size();
             else resultSize*=bindings.size();
             m_monitor.componentsEvaluationFinished(bindings.size());

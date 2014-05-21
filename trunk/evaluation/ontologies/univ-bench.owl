@@ -75,7 +75,6 @@
 <owl:Class rdf:ID="Dean">
   <rdfs:label>dean</rdfs:label>
   <owl:intersectionOf rdf:parseType="Collection">
-  <owl:Class rdf:about="#Person" /> 
   <owl:Restriction>
   <owl:onProperty rdf:resource="#headOf" /> 
   <owl:someValuesFrom>
@@ -199,7 +198,7 @@
 
 <owl:Class rdf:ID="ResearchAssistant">
   <rdfs:label>university research assistant</rdfs:label>
-  <rdfs:subClassOf rdf:resource="#Student" /> 
+  <rdfs:subClassOf rdf:resource="#Person" /> 
   <rdfs:subClassOf>
   <owl:Restriction>
   <owl:onProperty rdf:resource="#worksFor" /> 
